@@ -24,8 +24,13 @@ import {
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
+import { GoogleOAuthProvider, GoogleLogin, googleLogout } from '@react-oauth/google';
+import {jwtDecode} from 'jwt-decode';
+const clientId = "251792493601-lkt15jmuh1jfr1cvgd0a45uamdqusosg.apps.googleusercontent.com";
 
 export default function LoginForm() {
+  const [user, setUser] = useState(null);
+
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -207,14 +212,49 @@ export default function LoginForm() {
 
           <Divider sx={{ my: 1 }}>Or sign in with</Divider>
 
-          <Button
-            variant="outlined"
-            fullWidth
-            size="large"
-            startIcon={<Google />}
-          >
-            Continue with Google
-          </Button>
+          <GoogleOAuthProvider clientId={clientId}>
+            <div style={{ padding: "2rem" }}>
+              {!user ? (
+                <>
+                  
+                  <GoogleLogin
+                    onSuccess={(credentialResponse) => {
+                      const decoded = jwtDecode(credentialResponse.credential);
+                      setUser(decoded);
+                      navigate("/home");
+
+                    }}
+                    onError={() => {
+                      console.log("Login Failed");
+                    }}
+                  />
+                </>
+              ) : (
+                <>
+                  <h2>Thông tin người dùng</h2>
+                  <img
+                    src={user.picture}
+                    alt="avatar"
+                    style={{ borderRadius: "50%" }}
+                  />
+                  <p>
+                    <strong>Họ tên:</strong> {user.name}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {user.email}
+                  </p>
+                  <button
+                    onClick={() => {
+                      googleLogout();
+                      setUser(null);
+                    }}
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
+            </div>
+          </GoogleOAuthProvider>
 
           <Box
             sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 1 }}
