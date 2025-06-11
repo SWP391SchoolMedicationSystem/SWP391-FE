@@ -8,7 +8,7 @@ const GoogleLogin = ({
 }) => {
   const googleButtonRef = useRef(null);
   const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
-  const [debugInfo, setDebugInfo] = useState("");
+  const [debugInfo , setDebugInfo] = useState("");
   useEffect(() => {
     // Load Google Identity Services script
     const loadGoogleScript = () => {
@@ -84,7 +84,10 @@ const GoogleLogin = ({
           console.log("Processed user object:", user);
           onSuccess(user);
         } catch (error) {
-          onError("Failed to process Google login response");
+          console.error("Google login processing failed:", error);
+          if (onError) {
+            onError("Failed to process Google login response");
+          }
         }
       };
 

@@ -26,7 +26,7 @@ export default function Header() {
           <Box component="nav" sx={{ display: { xs: "none", md: "flex" }, gap: 3 }}>
             <Link
               component={RouterLink}
-              to="#"
+              to="/Home"
               color="text.secondary"
               sx={{ textDecoration: "none", "&:hover": { color: "info.main" } }}
             >

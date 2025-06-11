@@ -141,7 +141,7 @@ export default function LoginForm() {
                   htmlFor="password-field"
                   sx={{ fontWeight: 500 }}
                 >
-                  Password
+                  
                 </Typography>
                 <Link
                   component={RouterLink}
