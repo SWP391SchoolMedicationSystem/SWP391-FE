@@ -8,7 +8,7 @@ const GoogleLogin = ({
 }) => {
   const googleButtonRef = useRef(null);
   const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
-  const [debugInfo , setDebugInfo] = useState("");
+  const [ , setDebugInfo] = useState("");
   useEffect(() => {
     // Load Google Identity Services script
     const loadGoogleScript = () => {

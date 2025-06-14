@@ -6,8 +6,8 @@ import MedlearnLoginPage from "./pages/Login"; // Đảm bảo đúng đường 
 import AdminLayout from "./components/layout/AdminLayout";
 import Dashboard from "./pages/Admin/Dashboard";
 import AccountManagement from "./pages/Admin/AccountManagement";
-import PermissionsAndRoles from "./pages/Admin/PermissionsAndRoles";
-import Appointments from "./pages/Admin/Appointments";
+import BlogManagement from "./pages/Admin/BlogManagement";
+import VaccinationList from "./pages/Admin/VaccinationList";
 import MonitoringReporting from "./pages/Admin/MonitoringReporting";
 import Notifications from "./pages/Admin/Notifications";
 import CategoryForms from "./pages/Admin/CategoryForms";
@@ -26,8 +26,8 @@ function App() {
         <Route path="/admin" element={<AdminLayout />}>
     <Route index element={<Dashboard />} />
     <Route path="accounts" element={<AccountManagement />} />
-    <Route path="roles" element={<PermissionsAndRoles />} />
-    <Route path="appointments" element={<Appointments />} />
+    <Route path="blogs" element={<BlogManagement />} />
+    <Route path="vaccinations" element={<VaccinationList />} />
     <Route path="reports" element={<MonitoringReporting />} />
     <Route path="notifications" element={<Notifications />} />
     <Route path="forms" element={<CategoryForms />} />

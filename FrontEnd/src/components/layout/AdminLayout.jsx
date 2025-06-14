@@ -27,6 +27,8 @@ import {
   Menu,
   Logout,
   ChatBubbleOutline,
+  Article,
+  FormatListBulleted,
 } from "@mui/icons-material";
 
 const drawerWidth = 240;
@@ -34,10 +36,18 @@ const drawerWidth = 240;
 const navItems = [
   { to: "/admin", label: "Dashboard", icon: <Dashboard /> },
   { to: "/admin/accounts", label: "Account Management", icon: <People /> },
-  { to: "/admin/roles", label: "Permissions and Roles", icon: <Security /> },
-  { to: "/admin/appointments", label: "Appointments", icon: <Event /> },
+  { to: "/admin/blogs", label: "Blog Management", icon: <Article /> },
+  {
+    to: "/admin/vaccinations",
+    label: "Vaccination List",
+    icon: <FormatListBulleted />,
+  },
   { to: "/admin/reports", label: "Monitoring & Reporting", icon: <BarChart /> },
-  { to: "/admin/notifications", label: "Notifications", icon: <Notifications /> },
+  {
+    to: "/admin/notifications",
+    label: "Notifications",
+    icon: <Notifications />,
+  },
   { to: "/admin/forms", label: "Category Forms", icon: <Description /> },
   { to: "/admin/info", label: "View Information", icon: <Info /> },
   { to: "/admin/settings", label: "Settings", icon: <Settings /> },
@@ -66,36 +76,37 @@ export default function AdminLayout() {
         <List>
           {navItems.map(({ to, label, icon }) => (
             <NavLink
-            to={to}
-            key={to}
-            end={to === "/admin"} // chỉ dùng end cho dashboard
-            style={{ textDecoration: "none" }}
-          >
-            {({ isActive }) => (
-              <ListItem disablePadding>
-                <ListItemButton
-                  sx={{
-                    borderRadius: 1,
-                    mx: 1,
-                    my: 0.5,
-                    color: isActive ? "white" : "#333",
-                    background: isActive
-                      ? "linear-gradient(to right, #56D0DB, #2D77C1)"
-                      : "transparent",
-                    "&:hover": {
+              to={to}
+              key={to}
+              end={to === "/admin"} // chỉ dùng end cho dashboard
+              style={{ textDecoration: "none" }}
+            >
+              {({ isActive }) => (
+                <ListItem disablePadding>
+                  <ListItemButton
+                    sx={{
+                      borderRadius: 1,
+                      mx: 1,
+                      my: 0.5,
+                      color: isActive ? "white" : "#333",
                       background: isActive
                         ? "linear-gradient(to right, #56D0DB, #2D77C1)"
-                        : "#f0f0f0",
-                    },
-                  }}
-                >
-                  <ListItemIcon sx={{ color: "inherit" }}>{icon}</ListItemIcon>
-                  <ListItemText primary={label} />
-                </ListItemButton>
-              </ListItem>
-            )}
-          </NavLink>
-          
+                        : "transparent",
+                      "&:hover": {
+                        background: isActive
+                          ? "linear-gradient(to right, #56D0DB, #2D77C1)"
+                          : "#f0f0f0",
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: "inherit" }}>
+                      {icon}
+                    </ListItemIcon>
+                    <ListItemText primary={label} />
+                  </ListItemButton>
+                </ListItem>
+              )}
+            </NavLink>
           ))}
         </List>
 
@@ -148,19 +159,9 @@ export default function AdminLayout() {
                   borderRadius: 1,
                 }}
               >
-                <Search
-                  sx={{
-                    position: "absolute",
-                    left: 8,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: "#888",
-                    fontSize: 20,
-                  }}
-                />
                 <InputBase
                   placeholder="Search for data, users, etc."
-                  sx={{ pl: 4, pr: 2, py: 0.5, width: "100%" }}
+                  sx={{ pl: 2, pr: 2, py: 0.5, width: "100%" }}
                 />
               </Box>
             </Box>
