@@ -23,7 +23,7 @@ export default function Header() {
               <img
                 src={MedlearnLogo}
                 alt="Medlearn Logo"
-                style={{ height: 65, objectFit: "contain" }}
+                style={{ height: 90, width: 120, objectFit: "contain" }}
               />
             </Box>
           </Link>
