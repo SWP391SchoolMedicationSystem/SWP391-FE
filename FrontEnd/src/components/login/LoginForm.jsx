@@ -24,9 +24,14 @@ import {
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
-import { GoogleOAuthProvider, GoogleLogin, googleLogout } from '@react-oauth/google';
-import {jwtDecode} from 'jwt-decode';
-const clientId = "251792493601-lkt15jmuh1jfr1cvgd0a45uamdqusosg.apps.googleusercontent.com";
+import {
+  GoogleOAuthProvider,
+  GoogleLogin,
+  googleLogout,
+} from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
+const clientId =
+  "251792493601-lkt15jmuh1jfr1cvgd0a45uamdqusosg.apps.googleusercontent.com";
 
 export default function LoginForm() {
   const [user, setUser] = useState(null);
@@ -55,9 +60,9 @@ export default function LoginForm() {
 
     try {
       const response = await axios.post(
-        "https://c2c0-2405-4802-9173-48c0-5084-4fcd-28bb-eeed.ngrok-free.app/api/Login/login",
+        "https://api-schoolhealth.purintech.id.vn/api/User/Login",
         {
-          username: formData.username,
+          email: formData.email,
           password: formData.password,
         }
       );
@@ -65,16 +70,29 @@ export default function LoginForm() {
       const data = response.data;
       console.log("Login success:", data);
 
-      // Lưu token
-      localStorage.setItem("token", data.token);
+      // Lưu thông tin user và token nếu có
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
 
-      // Điều hướng đến dashboard
-      navigate("/home");
-    } catch (err) {
-      if (err.response && err.response.data?.message) {
-        setError(err.response.data.message); // Lỗi từ server
+      // Điều hướng dựa trên vai trò người dùng
+      if (data.isStaff) {
+        navigate("/manager"); // hoặc trang quản trị phù hợp
       } else {
-        setError("Đã xảy ra lỗi. Vui lòng thử lại.");
+        navigate("/home"); // trang cho phụ huynh
+      }
+    } catch (err) {
+      if (err.response) {
+        if (err.response.status === 401) {
+          setError("Email hoặc mật khẩu không đúng.");
+        } else if (err.response.data?.message) {
+          setError(err.response.data.message);
+        } else {
+          setError("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+        }
+      } else {
+        setError("Không thể kết nối đến server. Vui lòng thử lại.");
       }
     }
   };
@@ -114,11 +132,13 @@ export default function LoginForm() {
 
           <form onSubmit={handleSubmit}>
             <TextField
-              name="username"
+              name="email"
               label="Email"
+              type="email"
               fullWidth
-              value={formData.username}
+              value={formData.email}
               onChange={handleChange}
+              required
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -140,9 +160,7 @@ export default function LoginForm() {
                   variant="body2"
                   htmlFor="password-field"
                   sx={{ fontWeight: 500 }}
-                >
-                  
-                </Typography>
+                ></Typography>
                 <Link
                   component={RouterLink}
                   to="#"
@@ -160,6 +178,7 @@ export default function LoginForm() {
                 fullWidth
                 value={formData.password}
                 onChange={handleChange}
+                required
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -216,13 +235,11 @@ export default function LoginForm() {
             <div style={{ padding: "2rem" }}>
               {!user ? (
                 <>
-                  
                   <GoogleLogin
                     onSuccess={(credentialResponse) => {
                       const decoded = jwtDecode(credentialResponse.credential);
                       setUser(decoded);
                       navigate("/home");
-
                     }}
                     onError={() => {
                       console.log("Login Failed");

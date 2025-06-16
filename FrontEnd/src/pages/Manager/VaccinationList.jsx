@@ -1,19 +1,19 @@
 import React, { useState } from "react";
-import "../../css/VaccinationList.css";
+import "../../css/Manager/VaccinationList.css";
 
 function VaccinationList() {
   // Mock data for student vaccination records
   const [students, setStudents] = useState([
     {
       id: 1,
-      studentId: "HS001",
+      studentId: "MN001",
       fullName: "Nguyễn Văn An",
-      className: "10A1",
-      dateOfBirth: "2008-05-15",
+      className: "Mầm",
+      dateOfBirth: "2020-05-15",
       parentName: "Nguyễn Thị Hoa",
       parentPhone: "0912345678",
-      vaccineName: "Vaccine COVID-19",
-      vaccineType: "Pfizer",
+      vaccineName: "Vaccine Viêm gan B",
+      vaccineType: "Engerix-B",
       scheduledDate: "2024-03-20",
       actualDate: "2024-03-20",
       status: "Đã tiêm",
@@ -24,14 +24,14 @@ function VaccinationList() {
     },
     {
       id: 2,
-      studentId: "HS002",
+      studentId: "MN002",
       fullName: "Trần Thị Bình",
-      className: "10A2",
-      dateOfBirth: "2008-08-22",
+      className: "Chồi",
+      dateOfBirth: "2020-08-22",
       parentName: "Trần Văn Nam",
       parentPhone: "0923456789",
-      vaccineName: "Vaccine COVID-19",
-      vaccineType: "Pfizer",
+      vaccineName: "Vaccine DPT",
+      vaccineType: "Adacel",
       scheduledDate: "2024-03-20",
       actualDate: null,
       status: "Từ chối",
@@ -43,14 +43,14 @@ function VaccinationList() {
     },
     {
       id: 3,
-      studentId: "HS003",
+      studentId: "MN003",
       fullName: "Lê Minh Cường",
-      className: "11B1",
-      dateOfBirth: "2007-12-10",
+      className: "Lá 1",
+      dateOfBirth: "2019-12-10",
       parentName: "Lê Thị Mai",
       parentPhone: "0934567890",
-      vaccineName: "Vaccine HPV",
-      vaccineType: "Gardasil 9",
+      vaccineName: "Vaccine Cúm",
+      vaccineType: "Vaxigrip",
       scheduledDate: "2024-03-22",
       actualDate: "2024-03-22",
       status: "Đã tiêm",
@@ -61,10 +61,10 @@ function VaccinationList() {
     },
     {
       id: 4,
-      studentId: "HS004",
+      studentId: "MN004",
       fullName: "Phạm Thị Diệu",
-      className: "12A3",
-      dateOfBirth: "2006-03-08",
+      className: "Lá 2",
+      dateOfBirth: "2019-03-08",
       parentName: "Phạm Văn Hùng",
       parentPhone: "0945678901",
       vaccineName: "Vaccine Viêm gan B",
@@ -79,14 +79,14 @@ function VaccinationList() {
     },
     {
       id: 5,
-      studentId: "HS005",
+      studentId: "MN005",
       fullName: "Hoàng Văn Em",
-      className: "9A1",
-      dateOfBirth: "2009-07-30",
+      className: "Lá 3",
+      dateOfBirth: "2019-07-30",
       parentName: "Hoàng Thị Lan",
       parentPhone: "0956789012",
-      vaccineName: "Vaccine COVID-19",
-      vaccineType: "Pfizer",
+      vaccineName: "Vaccine DPT",
+      vaccineType: "Adacel",
       scheduledDate: "2024-03-20",
       actualDate: null,
       status: "Từ chối",
@@ -98,14 +98,14 @@ function VaccinationList() {
     },
     {
       id: 6,
-      studentId: "HS006",
+      studentId: "MN006",
       fullName: "Võ Thị Phượng",
-      className: "11A2",
-      dateOfBirth: "2007-11-18",
+      className: "Chồi",
+      dateOfBirth: "2020-11-18",
       parentName: "Võ Văn Giang",
       parentPhone: "0967890123",
-      vaccineName: "Vaccine HPV",
-      vaccineType: "Gardasil 9",
+      vaccineName: "Vaccine Cúm",
+      vaccineType: "Vaxigrip",
       scheduledDate: "2024-03-22",
       actualDate: "2024-03-22",
       status: "Đã tiêm",
@@ -144,24 +144,14 @@ function VaccinationList() {
 
   // Available options
   const statuses = ["Chờ tiêm", "Đã tiêm", "Từ chối", "Hoãn tiêm"];
-  const classes = [
-    "9A1",
-    "9A2",
-    "10A1",
-    "10A2",
-    "11A1",
-    "11A2",
-    "11B1",
-    "12A1",
-    "12A2",
-    "12A3",
-  ];
+  const classes = ["Mầm", "Chồi", "Lá 1", "Lá 2", "Lá 3"];
   const vaccines = [
-    "Vaccine COVID-19",
-    "Vaccine HPV",
     "Vaccine Viêm gan B",
-    "Vaccine Cúm",
     "Vaccine DPT",
+    "Vaccine Cúm",
+    "Vaccine MMR",
+    "Vaccine Varicella",
+    "Vaccine Polio",
   ];
   const healthStatuses = ["Tốt", "Bình thường", "Có dị ứng", "Cần theo dõi"];
 
