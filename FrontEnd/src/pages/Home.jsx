@@ -188,13 +188,18 @@ export default function Home() {
           </Typography>
         </Box>
 
-        <Grid container spacing={3}>
+        <Grid container spacing={8} justifyContent="center">
           {overviewStats.map((stat, index) => (
             <Grid item xs={12} sm={6} md={3} key={index}>
               <Card
                 sx={{
+                  width: "110%",
+                  height: "100%",
                   borderRadius: 2,
                   overflow: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
                   transition: "transform 0.3s ease, box-shadow 0.3s ease",
                   "&:hover": {
                     transform: "translateY(-4px)",
@@ -210,7 +215,7 @@ export default function Home() {
                     p: 2,
                     display: "flex",
                     alignItems: "center",
-                    gap: 1,
+                    gap: 10,
                   }}
                 >
                   {stat.icon}
@@ -254,10 +259,18 @@ export default function Home() {
 
       {/* Health Statistics & Recent Events */}
       <Container maxWidth="lg" sx={{ py: 6 }}>
-        <Grid container spacing={4}>
+        <Grid container spacing={4} alignItems="stretch">
           {/* Student Health Statistics */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3, borderRadius: 2, height: "100%" }}>
+            <Paper
+              sx={{
+                p: 3,
+                borderRadius: 2,
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
               <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
                 <Assessment sx={{ color: "#8B5CF6", mr: 1 }} />
                 <Typography variant="h6" sx={{ fontWeight: "bold" }}>
@@ -271,16 +284,17 @@ export default function Home() {
               {/* Placeholder for chart */}
               <Box
                 sx={{
-                  height: 200,
+                  height: 300,
+                  width: 700,
                   bgcolor: "#F0F9FF",
-                  borderRadius: 1,
+                  borderRadius: 5,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexDirection: "column",
                 }}
               >
-                <Assessment sx={{ fontSize: 48, color: "#56D0DB", mb: 1 }} />
+                <Assessment sx={{ fontSize: 60, color: "#56D0DB", mb: 2 }} />
                 <Typography variant="body2" color="text.secondary">
                   Student Health Statistics
                 </Typography>
@@ -290,9 +304,18 @@ export default function Home() {
 
           {/* Recent Health Events */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3, borderRadius: 2, height: "100%" }}>
+            <Paper
+              sx={{
+                p: 3,
+                borderRadius: 2,
+                height: "100%",
+                width: "105%",
+                overflow: "hidden",
+              }}
+            >
               <Box
                 sx={{
+                  width: "100%",
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
@@ -312,7 +335,20 @@ export default function Home() {
 
               <List sx={{ p: 0 }}>
                 {recentEvents.map((event, index) => (
-                  <ListItem key={index} sx={{ px: 0, py: 1 }}>
+                  <ListItem
+                    key={index}
+                    sx={{
+                      px: 1.5,
+                      py: 1.5,
+                      borderBottom:
+                        index !== recentEvents.length - 1
+                          ? "1px solid #ccc"
+                          : "none",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
                     <ListItemIcon sx={{ minWidth: 36 }}>
                       <FiberManualRecord
                         sx={{
@@ -347,167 +383,354 @@ export default function Home() {
 
       {/* Main Services - Fixed equal height Cards with no spacing */}
       <Container maxWidth="lg" sx={{ py: 6 }}>
-  <Box sx={{ textAlign: "center", mb: 4 }}>
-    <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-      Our <span style={{ color: "#56D0DB" }}>Main Services</span>
-    </Typography>
-    <Typography
-      variant="h6"
-      sx={{ fontWeight: "bold", color: "text.secondary" }}
-    >
-      Categories
-    </Typography>
-  </Box>
-
-  <Grid container spacing={0} alignItems="stretch">
-    {mainServices.map((service, index) => (
-      <Grid
-        item
-        xs={12}
-        sm={6}
-        md={6}
-        key={index}
-        sx={{
-          display: "flex",
-          alignItems: "stretch",
-        }}
-      >
-        <Box sx={{ width: "100%", display: "flex" }}>
-          <Card
-            sx={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              textAlign: "center",
-              background: service.bgColor,
-              borderRadius: 3,
-              flexGrow: 1,
-              cursor: "pointer",
-              border: "none",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-              transition: "transform 0.3s ease, box-shadow 0.3s ease",
-              "&:hover": {
-                transform: "translateY(-8px)",
-                boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
-              },
-              p: 4,
-            }}
+        <Box sx={{ textAlign: "center", mb: 4 }}>
+          <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
+            Our <span style={{ color: "#56D0DB" }}>Main Services</span>
+          </Typography>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: "bold", color: "text.secondary" }}
           >
-            <Box>{service.icon}</Box>
-            <Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontWeight: "bold",
-                  mt: 2,
-                  mb: 1,
-                  color: index === 1 ? "white" : "text.primary",
-                }}
-              >
-                {service.title}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  color:
-                    index === 1
-                      ? "rgba(255,255,255,0.9)"
-                      : "text.secondary",
-                }}
-              >
-                {service.description}
-              </Typography>
-            </Box>
-          </Card>
+            Categories
+          </Typography>
         </Box>
-      </Grid>
-    ))}
-  </Grid>
-</Container>
 
-{/* Service Categories Detail - Fixed height and alignment */}
-<Container maxWidth="lg" sx={{ py: 6 }}>
-  <Grid container spacing={0} alignItems="stretch">
-    {["vaccination", "healthCheckup", "medicinesSupplies"].map((key, i) => {
-      const titles = {
-        vaccination: "Vaccination Schedule",
-        healthCheckup: "Health Checkup Schedule",
-        medicinesSupplies: "Medicines & Supplies",
-      };
-      const icons = {
-        vaccination: <Vaccines sx={{ color: "#56D0DB", fontSize: 28 }} />,
-        healthCheckup: <LocalHospital sx={{ color: "#56D0DB", fontSize: 28 }} />,
-        medicinesSupplies: <MedicalServices sx={{ color: "#56D0DB", fontSize: 28 }} />,
-      };
-
-      return (
-        <Grid item xs={12} sm={4} md={4} key={i} sx={{ display: 'flex' }}>
-          <Paper
-            sx={{
-              p: 3,
-              borderRadius: 2,
-              height: "100%",
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              flexGrow: 1,
-              border: "1px solid #e0e0e0",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              {icons[key]}
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: "bold", color: "#1a237e", ml: 1 }}
-              >
-                {titles[key]}
-              </Typography>
-            </Box>
-            <Box sx={{ flexGrow: 1 }}>
-              <List sx={{ p: 0 }}>
-                {serviceCategories[key].map((item, index) => (
-                  <ListItem key={index} sx={{ px: 0, py: 1.5 }}>
-                    <ListItemIcon sx={{ minWidth: 36 }}>{icons[key]}</ListItemIcon>
-                    <ListItemText
-                      primary={item}
-                      primaryTypographyProps={{
-                        fontSize: "0.9rem",
-                        color: "text.primary",
-                      }}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            </Box>
-            <Button
-              fullWidth
-              variant="contained"
+        <Grid
+          container
+          spacing={4}
+          justifyContent="center"
+          alignItems="stretch"
+        >
+          {mainServices.map((service, index) => (
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+              key={index}
               sx={{
-                mt: 3,
-                background: "linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)",
-                color: "white",
-                py: 1.5,
-                borderRadius: 2,
-                textTransform: "none",
-                fontSize: "0.9rem",
-                fontWeight: 600,
-                "&:hover": { opacity: 0.9 },
+                display: "flex",
+                justifyContent: "center",
               }}
             >
-              {key === "vaccination"
-                ? "SEE VACCINATION SCHEDULE"
-                : key === "healthCheckup"
-                ? "SEE CHECKUP SCHEDULE"
-                : "SEE MEDICAL SUPPLIES"}
-            </Button>
-          </Paper>
+              <Box sx={{ width: "100%", display: "flex" }}>
+                <Card
+                  sx={{
+                    height: "100%",
+                    width: 200,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    textAlign: "center",
+                    background: service.bgColor,
+                    borderRadius: 3,
+                    flexGrow: 1,
+                    cursor: "pointer",
+                    border: "none",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                    "&:hover": {
+                      transform: "translateY(-8px)",
+                      boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
+                    },
+                    p: 4,
+                  }}
+                >
+                  <Box sx={{ mb: 2 }}>{service.icon}</Box>
+                  <Box>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: "bold",
+                        mt: 1,
+                        mb: 1,
+                        color: index === 1 ? "white" : "text.primary",
+                      }}
+                    >
+                      {service.title}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color:
+                          index === 1
+                            ? "rgba(255,255,255,0.9)"
+                            : "text.secondary",
+                      }}
+                    >
+                      {service.description}
+                    </Typography>
+                  </Box>
+                </Card>
+              </Box>
+            </Grid>
+          ))}
         </Grid>
-      );
-    })}
-  </Grid>
-</Container>
+      </Container>
+
+      {/* Service Categories Detail - Fixed height and alignment */}
+      <Container maxWidth="lg" sx={{ py: 6 }}>
+        <Grid container spacing={0} alignItems="stretch">
+          {["vaccination", "healthCheckup", "medicinesSupplies"].map(
+            (key, i) => {
+              const titles = {
+                vaccination: "Vaccination Schedule",
+                healthCheckup: "Health Checkup Schedule",
+                medicinesSupplies: "Medicines & Supplies",
+              };
+              const icons = {
+                vaccination: (
+                  <Vaccines sx={{ color: "#56D0DB", fontSize: 28 }} />
+                ),
+                healthCheckup: (
+                  <LocalHospital sx={{ color: "#56D0DB", fontSize: 28 }} />
+                ),
+                medicinesSupplies: (
+                  <MedicalServices sx={{ color: "#56D0DB", fontSize: 28 }} />
+                ),
+              };
+
+              return (
+                <Grid
+                  spacing={10}
+                  justifyContent="center"
+                  item
+                  xs={12}
+                  sm={4}
+                  md={4}
+                  key={i}
+                  sx={{ display: "flex" }}
+                >
+                  <Paper
+                    sx={{
+                      p: 3,
+                      borderRadius: 2,
+                      height: "100%",
+                      weight: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+
+                      overflow: "hidden",
+                      boxShadow: 3,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        px: 3,
+                        py: 2,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        borderBottom: "1px solid #e0e0e0",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        {icons[key]}
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ fontWeight: "bold", color: "#1a237e", ml: 1 }}
+                        >
+                          {titles[key]}
+                        </Typography>
+                      </Box>
+                      <Typography sx={{ fontWeight: "bold", color: "#90A4AE" }}>
+                        {">"}
+                      </Typography>
+                    </Box>
+
+                    <Box sx={{ flexGrow: 1 }}>
+                      <List sx={{ p: 0 }}>
+                        {serviceCategories[key].map((item, index) => (
+                          <ListItem
+                            key={index}
+                            sx={{
+                              px: 1,
+                              py: 1.5,
+                              display: "flex",
+                              alignItems: "center",
+                              borderBottom: "1px solid #eee",
+                            }}
+                          >
+                            <ListItemIcon sx={{ minWidth: 36 }}>
+                              {icons[key]}
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={item}
+                              primaryTypographyProps={{
+                                fontSize: "0.9rem",
+                                color: "text.primary",
+                              }}
+                            />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Box>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      sx={{
+                        mt: 3,
+                        background:
+                          "linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)",
+                        color: "white",
+                        py: 1.5,
+                        borderRadius: 2,
+                        textTransform: "none",
+                        fontSize: "0.9rem",
+                        fontWeight: 600,
+                        "&:hover": { opacity: 0.9 },
+                      }}
+                    >
+                      {key === "vaccination"
+                        ? "SEE VACCINATION SCHEDULE"
+                        : key === "healthCheckup"
+                        ? "SEE CHECKUP SCHEDULE"
+                        : "SEE MEDICAL SUPPLIES"}
+                    </Button>
+                  </Paper>
+                </Grid>
+              );
+            }
+          )}
+        </Grid>
+      </Container>
+
+      {/* Our Doctors Section */}
+      <Container maxWidth="lg" sx={{ py: 8 }}>
+        <Grid container spacing={4} alignItems="center">
+          {/* Text and Doctor Card */}
+          <Grid item xs={12} md={6}>
+            <Typography variant="overline" sx={{ color: "#555" }}>
+              Our Doctors
+            </Typography>
+            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
+              <span style={{ color: "#56D0DB" }}>Qualified</span> Doctors
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+              Handled directly by general doctors and professional and
+              experienced specialists doctors.
+            </Typography>
+
+            {/* Doctor Card */}
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                width: "100%",
+                maxWidth: 350,
+                background: "linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)",
+                color: "white",
+              }}
+            >
+              <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                Orthopedy
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: "bold", mt: 1 }}>
+                Dr. James Wellington
+              </Typography>
+              <Button
+                variant="text"
+                size="small"
+                sx={{ mt: 2, color: "white", textTransform: "none" }}
+              >
+                Read More
+              </Button>
+            </Paper>
+
+            {/* View All Doctors button */}
+            <Button
+              variant="contained"
+              sx={{
+                mt: 4,
+                background: "linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)",
+                color: "white",
+                px: 4,
+                py: 1.5,
+                borderRadius: 30,
+                textTransform: "none",
+                "&:hover": {
+                  opacity: 0.9,
+                },
+              }}
+            >
+              View All Doctors
+            </Button>
+          </Grid>
+
+          {/* Doctor Avatar Image */}
+          <Grid item xs={12} md={6}>
+            <Box
+              sx={{
+                position: "relative",
+                width: "100%",
+                maxWidth: 350,
+                mx: "auto",
+              }}
+            >
+              <Avatar
+                src="https://randomuser.me/api/portraits/women/44.jpg" // bạn có thể thay bằng hình bác sĩ thật của bạn
+                alt="Doctor"
+                sx={{
+                  width: "100%",
+                  height: "auto",
+                  borderRadius: "50%",
+                  border: "8px solid white",
+                  boxShadow: 3,
+                }}
+              />
+              {/* Navigation arrows */}
+              <IconButton
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: -20,
+                  transform: "translateY(-50%)",
+                  backgroundColor: "white",
+                  "&:hover": { backgroundColor: "#f0f0f0" },
+                }}
+              >
+                <ArrowForward
+                  sx={{ transform: "rotate(180deg)", color: "#56D0DB" }}
+                />
+              </IconButton>
+              <IconButton
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  right: -20,
+                  transform: "translateY(-50%)",
+                  backgroundColor: "white",
+                  "&:hover": { backgroundColor: "#f0f0f0" },
+                }}
+              >
+                <ArrowForward sx={{ color: "#56D0DB" }} />
+              </IconButton>
+
+              {/* Dot indicators */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  mt: 3,
+                }}
+              >
+                {[0, 1, 2, 3].map((dot, i) => (
+                  <FiberManualRecord
+                    key={i}
+                    sx={{
+                      fontSize: 10,
+                      color: i === 3 ? "#2D77C1" : "#B0BEC5",
+                      mx: 0.5,
+                    }}
+                  />
+                ))}
+              </Box>
+            </Box>
+          </Grid>
+        </Grid>
+      </Container>
 
       {/* Get Started */}
       <Container maxWidth="lg" sx={{ py: 6 }}>
