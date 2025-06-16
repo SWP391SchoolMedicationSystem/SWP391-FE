@@ -1,5 +1,5 @@
-import React from "react";
-import "../../css/Dashboard.css";
+import React, { useState, useEffect } from "react";
+import "../../css/Manager/Dashboard.css";
 
 function Dashboard() {
   // Mock data for dashboard statistics
@@ -51,9 +51,10 @@ function Dashboard() {
     <div className="dashboard-container">
       {/* Header Section */}
       <div className="dashboard-header">
-        <h1 className="dashboard-title">Admin Dashboard</h1>
+        <h1 className="dashboard-title">Bảng Điều Khiển Quản Trị</h1>
         <p className="dashboard-subtitle">
-          Manage the entire healthcare system from this central admin panel.
+          Quản lý toàn bộ hệ thống y tế từ bảng điều khiển quản trị trung tâm
+          này.
         </p>
       </div>
 
@@ -61,7 +62,7 @@ function Dashboard() {
       <div className="stats-grid">
         <div className="stat-card total-users">
           <div className="stat-header">
-            <h3>Total User</h3>
+            <h3>Tổng Người Dùng</h3>
           </div>
           <div className="stat-content">
             <div className="stat-value">
@@ -77,7 +78,7 @@ function Dashboard() {
 
         <div className="stat-card active-managers">
           <div className="stat-header">
-            <h3>Active Managers</h3>
+            <h3>Quản Lý Hoạt Động</h3>
           </div>
           <div className="stat-content">
             <div className="stat-value">
@@ -93,7 +94,7 @@ function Dashboard() {
 
         <div className="stat-card form-categories">
           <div className="stat-header">
-            <h3>Form Categories</h3>
+            <h3>Danh Mục Biểu Mẫu</h3>
           </div>
           <div className="stat-content">
             <div className="stat-value">
@@ -109,7 +110,7 @@ function Dashboard() {
 
         <div className="stat-card system-health">
           <div className="stat-header">
-            <h3>System Health</h3>
+            <h3>Tình Trạng Hệ Thống</h3>
           </div>
           <div className="stat-content">
             <div className="stat-value">
@@ -128,22 +129,22 @@ function Dashboard() {
       <div className="charts-section">
         <div className="chart-container user-growth">
           <div className="chart-header">
-            <h3>User Growth Trend</h3>
-            <p>Monthly user registration across all roles</p>
+            <h3>Xu Hướng Tăng Trưởng Người Dùng</h3>
+            <p>Đăng ký người dùng hàng tháng theo từng vai trò</p>
           </div>
           <div className="chart-placeholder">
             <div className="chart-legend">
               <div className="legend-item">
                 <span className="legend-color managers"></span>
-                <span>Managers</span>
+                <span>Quản Lý</span>
               </div>
               <div className="legend-item">
                 <span className="legend-color nurses"></span>
-                <span>Nurses</span>
+                <span>Y Tá</span>
               </div>
               <div className="legend-item">
                 <span className="legend-color parents"></span>
-                <span>Parents</span>
+                <span>Phụ Huynh</span>
               </div>
             </div>
             <div className="chart-data">
@@ -178,8 +179,8 @@ function Dashboard() {
 
         <div className="chart-container system-activity">
           <div className="chart-header">
-            <h3>System Activity Overview</h3>
-            <p>Daily system usage and activities</p>
+            <h3>Tổng Quan Hoạt Động Hệ Thống</h3>
+            <p>Sử dụng và hoạt động hệ thống hàng ngày</p>
           </div>
           <div className="chart-placeholder">
             <div className="activity-chart">

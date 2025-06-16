@@ -1,119 +1,105 @@
 import React, { useState } from "react";
-import "../../css/BlogManagement.css";
+import "../../css/Manager/BlogManagement.css";
 
 function BlogManagement() {
-  // Mock data for blog posts with approval workflow
+  // Mock data for blog posts
   const [blogPosts, setBlogPosts] = useState([
     {
       id: 1,
-      title: "Hướng dẫn sử dụng hệ thống quản lý thuốc trường học",
-      content:
-        "Bài viết hướng dẫn chi tiết cách sử dụng hệ thống quản lý thuốc trong trường học để đảm bảo an toàn cho học sinh. Hệ thống này giúp theo dõi việc sử dụng thuốc, quản lý đơn thuốc và đảm bảo an toàn cho học sinh trong môi trường trường học.",
-      author: "Nguyễn Văn An",
-      category: "Hướng dẫn",
+      title: "Hướng dẫn chăm sóc trẻ em mùa đông",
+      excerpt:
+        "Những lưu ý quan trọng khi chăm sóc sức khỏe trẻ em trong mùa đông lạnh giá...",
+      content: "Nội dung chi tiết về cách chăm sóc trẻ em mùa đông...",
+      author: "Dr. Nguyễn Văn A",
+      category: "Sức khỏe",
       status: "Published",
-      createdDate: "2024-03-10",
-      publishDate: "2024-03-12",
-      views: 156,
-      featured: true,
       approvalStatus: "Approved",
-      approvedBy: "Admin",
-      approvedDate: "2024-03-11",
+      featured: true,
+      createdDate: "2024-03-10",
+      publishedDate: "2024-03-12",
+      views: 1250,
+      approvedBy: "Manager",
+      tags: ["sức khỏe", "trẻ em", "mùa đông"],
     },
     {
       id: 2,
-      title: "Tầm quan trọng của việc quản lý sức khỏe học sinh",
-      content:
-        "Sức khỏe học sinh là yếu tố quan trọng ảnh hưởng đến việc học tập và phát triển. Bài viết này sẽ chia sẻ những kinh nghiệm và phương pháp quản lý sức khỏe học sinh hiệu quả.",
-      author: "Trần Thị Bình",
-      category: "Sức khỏe",
-      status: "Draft",
-      createdDate: "2024-03-08",
-      publishDate: null,
-      views: 0,
+      title: "Dinh dưỡng cân bằng cho trẻ mầm non",
+      excerpt:
+        "Cách xây dựng chế độ dinh dưỡng phù hợp cho trẻ em độ tuổi mầm non...",
+      content: "Nội dung chi tiết về dinh dưỡng trẻ em...",
+      author: "Y tá Trần Thị B",
+      category: "Dinh dưỡng",
+      status: "Published",
+      approvalStatus: "Approved",
       featured: false,
-      approvalStatus: "Pending",
-      approvedBy: null,
-      approvedDate: null,
+      createdDate: "2024-03-08",
+      publishedDate: "2024-03-09",
+      views: 890,
+      approvedBy: "Manager",
+      tags: ["dinh dưỡng", "trẻ em"],
     },
     {
       id: 3,
-      title: "Cập nhật tính năng mới: Theo dõi lịch uống thuốc",
-      content:
-        "Chúng tôi vừa ra mắt tính năng mới giúp phụ huynh và nhà trường có thể theo dõi lịch uống thuốc của học sinh một cách dễ dàng và chính xác.",
-      author: "Lê Văn Cường",
-      category: "Cập nhật",
-      status: "Published",
-      createdDate: "2024-03-05",
-      publishDate: "2024-03-06",
-      views: 89,
+      title: "Phòng ngừa các bệnh truyền nhiễm",
+      excerpt:
+        "Các biện pháp phòng ngừa hiệu quả để bảo vệ trẻ khỏi các bệnh truyền nhiễm...",
+      content: "Nội dung chi tiết về phòng ngừa bệnh tật...",
+      author: "Dr. Lê Văn C",
+      category: "Phòng bệnh",
+      status: "Draft",
+      approvalStatus: "Pending",
       featured: false,
-      approvalStatus: "Approved",
-      approvedBy: "Manager",
-      approvedDate: "2024-03-05",
+      createdDate: "2024-03-15",
+      publishedDate: null,
+      views: 0,
+      approvedBy: null,
+      tags: ["phòng bệnh", "truyền nhiễm"],
     },
     {
       id: 4,
-      title: "Những lưu ý khi cho trẻ uống thuốc tại trường",
-      content:
-        "Việc cho trẻ uống thuốc tại trường cần tuân thủ nhiều quy định và lưu ý quan trọng để đảm bảo an toàn cho sức khỏe của các em.",
-      author: "Phạm Thị Dung",
-      category: "An toàn",
+      title: "Tầm quan trọng của việc tiêm chủng",
+      excerpt:
+        "Lý do tại sao việc tiêm chủng đầy đủ là cần thiết cho sức khỏe trẻ em...",
+      content: "Nội dung chi tiết về tiêm chủng...",
+      author: "Y tá Phạm Thị D",
+      category: "Tiêm chủng",
       status: "Published",
-      createdDate: "2024-02-28",
-      publishDate: "2024-03-01",
-      views: 234,
-      featured: true,
       approvalStatus: "Approved",
-      approvedBy: "Admin",
-      approvedDate: "2024-02-29",
+      featured: true,
+      createdDate: "2024-03-05",
+      publishedDate: "2024-03-06",
+      views: 2100,
+      approvedBy: "Manager",
+      tags: ["tiêm chủng", "vaccine"],
     },
     {
       id: 5,
-      title: "Hệ thống báo cáo và thống kê sức khỏe học sinh",
-      content:
-        "Giới thiệu về hệ thống báo cáo và thống kê giúp nhà trường nắm bắt tình hình sức khỏe học sinh một cách toàn diện và kịp thời.",
-      author: "Hoàng Văn Em",
-      category: "Báo cáo",
-      status: "Draft",
-      createdDate: "2024-03-12",
-      publishDate: null,
-      views: 0,
+      title: "Chăm sóc răng miệng cho trẻ nhỏ",
+      excerpt:
+        "Hướng dẫn chi tiết cách chăm sóc răng miệng cho trẻ em từ sớm...",
+      content: "Nội dung chi tiết về chăm sóc răng miệng...",
+      author: "Dr. Hoàng Văn E",
+      category: "Nha khoa",
+      status: "Published",
+      approvalStatus: "Approved",
       featured: false,
-      approvalStatus: "Pending",
-      approvedBy: null,
-      approvedDate: null,
-    },
-    {
-      id: 6,
-      title: "Quy trình xử lý tình huống khẩn cấp về sức khỏe",
-      content:
-        "Hướng dẫn quy trình xử lý các tình huống khẩn cấp liên quan đến sức khỏe học sinh tại trường học.",
-      author: "Nguyễn Thị Hoa",
-      category: "An toàn",
-      status: "Draft",
-      createdDate: "2024-03-13",
-      publishDate: null,
-      views: 0,
-      featured: false,
-      approvalStatus: "Rejected",
+      createdDate: "2024-03-01",
+      publishedDate: "2024-03-02",
+      views: 750,
       approvedBy: "Manager",
-      approvedDate: "2024-03-13",
-      rejectionReason:
-        "Nội dung cần bổ sung thêm thông tin chi tiết về quy trình và trách nhiệm của từng bộ phận",
+      tags: ["nha khoa", "răng miệng"],
     },
   ]);
 
-  // Available categories, statuses, and approval statuses
+  // Available categories and statuses
   const categories = [
-    "Hướng dẫn",
-    "Sức khỏe",
-    "Cập nhật",
-    "An toàn",
-    "Báo cáo",
-    "Thông báo",
+    "Tiêm chủng",
+    "Dinh dưỡng",
+    "Phòng bệnh",
+    "Sức khỏe tổng quát",
+    "Chăm sóc trẻ em",
   ];
-  const statuses = ["Draft", "Published", "Archived"];
+  const statuses = ["Draft", "Published", "Scheduled", "Archived"];
   const approvalStatuses = ["Pending", "Approved", "Rejected"];
 
   // Modal and form states
@@ -129,16 +115,14 @@ function BlogManagement() {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
-    author: "",
-    category: "Hướng dẫn",
+    category: "Tiêm chủng",
     status: "Draft",
     featured: false,
-    publishDate: "",
   });
 
   // Approval form data
   const [approvalData, setApprovalData] = useState({
-    approvalStatus: "Pending",
+    approvalStatus: "Approved",
     rejectionReason: "",
   });
 
@@ -166,11 +150,9 @@ function BlogManagement() {
     setFormData({
       title: "",
       content: "",
-      author: "",
-      category: "Hướng dẫn",
+      category: "Tiêm chủng",
       status: "Draft",
       featured: false,
-      publishDate: "",
     });
     setCurrentPost(null);
     setShowModal(true);
@@ -182,11 +164,9 @@ function BlogManagement() {
     setFormData({
       title: post.title,
       content: post.content,
-      author: post.author,
       category: post.category,
       status: post.status,
       featured: post.featured,
-      publishDate: post.publishDate || "",
     });
     setCurrentPost(post);
     setShowModal(true);
@@ -204,8 +184,8 @@ function BlogManagement() {
     setModalMode("approve");
     setCurrentPost(post);
     setApprovalData({
-      approvalStatus: post.approvalStatus || "Pending",
-      rejectionReason: post.rejectionReason || "",
+      approvalStatus: "Approved",
+      rejectionReason: "",
     });
     setShowModal(true);
   };
@@ -218,13 +198,14 @@ function BlogManagement() {
       const newPost = {
         id: blogPosts.length + 1,
         ...formData,
+        author: "Current User",
         createdDate: new Date().toISOString().split("T")[0],
         views: 0,
         approvalStatus: "Pending",
         approvedBy: null,
         approvedDate: null,
       };
-      setBlogPosts((prev) => [newPost, ...prev]);
+      setBlogPosts((prev) => [...prev, newPost]);
     } else if (modalMode === "edit") {
       setBlogPosts((prev) =>
         prev.map((post) =>
@@ -246,7 +227,7 @@ function BlogManagement() {
           ? {
               ...post,
               approvalStatus: approvalData.approvalStatus,
-              approvedBy: "Current User", // In real app, get from auth
+              approvedBy: "Current User",
               approvedDate: new Date().toISOString().split("T")[0],
               rejectionReason:
                 approvalData.approvalStatus === "Rejected"
@@ -265,15 +246,6 @@ function BlogManagement() {
     if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
       setBlogPosts((prev) => prev.filter((post) => post.id !== postId));
     }
-  };
-
-  // Toggle featured status
-  const handleToggleFeatured = (postId) => {
-    setBlogPosts((prev) =>
-      prev.map((post) =>
-        post.id === postId ? { ...post, featured: !post.featured } : post
-      )
-    );
   };
 
   // Filter posts based on search and filters
@@ -307,7 +279,7 @@ function BlogManagement() {
     }
   };
 
-  // Get approval status badge class
+  // Get approval badge class
   const getApprovalBadgeClass = (status) => {
     switch (status) {
       case "Approved":
@@ -333,12 +305,11 @@ function BlogManagement() {
       {/* Header */}
       <div className="page-header">
         <div className="header-content">
-          <h1>Blog Management</h1>
+          <h1>Quản Lý Blog</h1>
           <p>Manage blog posts, articles, and content with approval workflow</p>
         </div>
         <button className="btn btn-primary" onClick={handleAddPost}>
-          <span>➕</span>
-          Add New Post
+          <i className="icon-plus"></i>➕ Add New Post
         </button>
       </div>
 
@@ -347,7 +318,7 @@ function BlogManagement() {
         <div className="search-box">
           <input
             type="text"
-            placeholder="Search posts by title, content, or author..."
+            placeholder="Search posts, authors, content..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -403,7 +374,7 @@ function BlogManagement() {
             key={post.id}
             className={`post-card ${post.featured ? "featured" : ""}`}
           >
-            {post.featured && <div className="featured-badge">Featured</div>}
+            {post.featured && <div className="featured-badge">⭐ Featured</div>}
 
             <div className="post-header">
               <div className="post-meta">
@@ -419,32 +390,23 @@ function BlogManagement() {
                   {post.approvalStatus}
                 </span>
               </div>
-              <div className="post-actions">
-                <button
-                  className="btn-icon"
-                  onClick={() => handleToggleFeatured(post.id)}
-                  title={
-                    post.featured ? "Remove from featured" : "Add to featured"
-                  }
-                >
-                  {post.featured ? "⭐" : "☆"}
-                </button>
-              </div>
             </div>
 
             <div className="post-content">
               <h3 className="post-title" onClick={() => handleViewPost(post)}>
                 {post.title}
               </h3>
-              <p className="post-excerpt">{truncateContent(post.content)}</p>
+              <p className="post-excerpt">
+                {truncateContent(post.content, 120)}
+              </p>
 
               <div className="post-info">
                 <div className="author-info">
-                  <span className="author">By {post.author}</span>
-                  <span className="date">{post.createdDate}</span>
+                  <span className="author">👤 {post.author}</span>
+                  <span className="date">📅 {post.createdDate}</span>
                 </div>
                 <div className="post-stats">
-                  <span className="views">👁 {post.views}</span>
+                  <span className="views">👁 {post.views} views</span>
                 </div>
               </div>
 
@@ -604,7 +566,7 @@ function BlogManagement() {
         </div>
       </div>
 
-      {/* Modal continues... */}
+      {/* Modal */}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -651,43 +613,26 @@ function BlogManagement() {
 
                 <div className="view-info">
                   <p>
-                    <strong>👤 Author:</strong> {currentPost.author}
+                    <strong>Author:</strong> {currentPost.author}
                   </p>
                   <p>
-                    <strong>📅 Created:</strong> {currentPost.createdDate}
+                    <strong>Created:</strong> {currentPost.createdDate}
                   </p>
-                  {currentPost.publishDate && (
-                    <p>
-                      <strong>🚀 Published:</strong> {currentPost.publishDate}
-                    </p>
-                  )}
                   <p>
-                    <strong>👁 Views:</strong> {currentPost.views}
+                    <strong>Views:</strong> {currentPost.views}
                   </p>
                   {currentPost.approvedBy && (
                     <p>
-                      <strong>✅ Approved by:</strong> {currentPost.approvedBy}
-                    </p>
-                  )}
-                  {currentPost.approvedDate && (
-                    <p>
-                      <strong>📆 Approved on:</strong>{" "}
+                      <strong>Approved by:</strong> {currentPost.approvedBy} on{" "}
                       {currentPost.approvedDate}
                     </p>
                   )}
                 </div>
 
                 <div className="view-content">
-                  <h4>📖 Content:</h4>
+                  <h4>Content:</h4>
                   <p>{currentPost.content}</p>
                 </div>
-
-                {currentPost.rejectionReason && (
-                  <div className="rejection-info">
-                    <h4>❌ Rejection Reason:</h4>
-                    <p>{currentPost.rejectionReason}</p>
-                  </div>
-                )}
 
                 <div className="view-actions">
                   <button
@@ -696,46 +641,36 @@ function BlogManagement() {
                   >
                     ✏️ Edit Post
                   </button>
-                  <button
-                    className="btn btn-approve"
-                    onClick={() => handleApprovePost(currentPost)}
-                  >
-                    ✅ Manage Approval
-                  </button>
                 </div>
               </div>
             ) : modalMode === "approve" ? (
-              <form onSubmit={handleApprovalSubmit} className="approval-form">
+              <form className="approval-form" onSubmit={handleApprovalSubmit}>
                 <div className="approval-info">
-                  <h4>📝 Post: {currentPost.title}</h4>
+                  <h4>Post Information</h4>
                   <p>
-                    <strong>👤 Author:</strong> {currentPost.author}
+                    <strong>Title:</strong> {currentPost.title}
                   </p>
                   <p>
-                    <strong>📂 Category:</strong> {currentPost.category}
+                    <strong>Author:</strong> {currentPost.author}
                   </p>
                   <p>
-                    <strong>🏷️ Current Status:</strong>
-                    <span
-                      className={`approval-status ${getApprovalBadgeClass(
-                        currentPost.approvalStatus
-                      )}`}
-                    >
-                      {currentPost.approvalStatus}
-                    </span>
+                    <strong>Category:</strong> {currentPost.category}
+                  </p>
+                  <p>
+                    <strong>Created:</strong> {currentPost.createdDate}
                   </p>
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="approvalStatus">✅ Approval Decision *</label>
+                  <label htmlFor="approvalStatus">Approval Decision:</label>
                   <select
                     id="approvalStatus"
                     name="approvalStatus"
                     value={approvalData.approvalStatus}
                     onChange={handleApprovalChange}
                     className="form-select"
+                    required
                   >
-                    <option value="Pending">⏳ Pending Review</option>
                     <option value="Approved">✅ Approve</option>
                     <option value="Rejected">❌ Reject</option>
                   </select>
@@ -743,17 +678,15 @@ function BlogManagement() {
 
                 {approvalData.approvalStatus === "Rejected" && (
                   <div className="form-group">
-                    <label htmlFor="rejectionReason">
-                      ❌ Rejection Reason *
-                    </label>
+                    <label htmlFor="rejectionReason">Rejection Reason:</label>
                     <textarea
                       id="rejectionReason"
                       name="rejectionReason"
                       value={approvalData.rejectionReason}
                       onChange={handleApprovalChange}
-                      rows="4"
                       className="form-textarea"
-                      placeholder="Please provide a detailed reason for rejection..."
+                      rows="4"
+                      placeholder="Please provide a reason for rejection..."
                       required
                     />
                   </div>
@@ -762,70 +695,44 @@ function BlogManagement() {
                 <div className="form-actions">
                   <button
                     type="button"
-                    onClick={() => setShowModal(false)}
                     className="btn btn-cancel"
+                    onClick={() => setShowModal(false)}
                   >
                     Cancel
                   </button>
                   <button type="submit" className="btn btn-primary">
-                    💾 Save Approval Decision
+                    {approvalData.approvalStatus === "Approved"
+                      ? "✅ Approve Post"
+                      : "❌ Reject Post"}
                   </button>
                 </div>
               </form>
             ) : (
-              <form onSubmit={handleSubmit} className="post-form">
+              <form className="post-form" onSubmit={handleSubmit}>
                 <div className="form-group">
-                  <label htmlFor="title">📝 Title *</label>
+                  <label htmlFor="title">Post Title:</label>
                   <input
                     type="text"
                     id="title"
                     name="title"
                     value={formData.title}
                     onChange={handleInputChange}
-                    required
                     className="form-input"
-                    placeholder="Enter blog post title..."
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="content">📖 Content *</label>
-                  <textarea
-                    id="content"
-                    name="content"
-                    value={formData.content}
-                    onChange={handleInputChange}
                     required
-                    rows="8"
-                    className="form-textarea"
-                    placeholder="Write your blog content here..."
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="author">👤 Author *</label>
-                  <input
-                    type="text"
-                    id="author"
-                    name="author"
-                    value={formData.author}
-                    onChange={handleInputChange}
-                    required
-                    className="form-input"
-                    placeholder="Author name..."
+                    placeholder="Enter post title..."
                   />
                 </div>
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="category">📂 Category *</label>
+                    <label htmlFor="category">Category:</label>
                     <select
                       id="category"
                       name="category"
                       value={formData.category}
                       onChange={handleInputChange}
-                      required
                       className="form-select"
+                      required
                     >
                       {categories.map((category) => (
                         <option key={category} value={category}>
@@ -836,14 +743,14 @@ function BlogManagement() {
                   </div>
 
                   <div className="form-group">
-                    <label htmlFor="status">🏷️ Status *</label>
+                    <label htmlFor="status">Status:</label>
                     <select
                       id="status"
                       name="status"
                       value={formData.status}
                       onChange={handleInputChange}
-                      required
                       className="form-select"
+                      required
                     >
                       {statuses.map((status) => (
                         <option key={status} value={status}>
@@ -854,44 +761,42 @@ function BlogManagement() {
                   </div>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="publishDate">📅 Publish Date</label>
-                    <input
-                      type="date"
-                      id="publishDate"
-                      name="publishDate"
-                      value={formData.publishDate}
-                      onChange={handleInputChange}
-                      className="form-input"
-                    />
-                  </div>
+                <div className="form-group">
+                  <label htmlFor="content">Content:</label>
+                  <textarea
+                    id="content"
+                    name="content"
+                    value={formData.content}
+                    onChange={handleInputChange}
+                    className="form-textarea"
+                    rows="8"
+                    required
+                    placeholder="Write your blog post content here..."
+                  />
+                </div>
 
-                  <div className="form-group">
-                    <div className="checkbox-group">
-                      <input
-                        type="checkbox"
-                        id="featured"
-                        name="featured"
-                        checked={formData.featured}
-                        onChange={handleInputChange}
-                        className="form-checkbox"
-                      />
-                      <label htmlFor="featured">⭐ Featured Post</label>
-                    </div>
-                  </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    id="featured"
+                    name="featured"
+                    checked={formData.featured}
+                    onChange={handleInputChange}
+                    className="form-checkbox"
+                  />
+                  <label htmlFor="featured">⭐ Mark as Featured Post</label>
                 </div>
 
                 <div className="form-actions">
                   <button
                     type="button"
-                    onClick={() => setShowModal(false)}
                     className="btn btn-cancel"
+                    onClick={() => setShowModal(false)}
                   >
                     Cancel
                   </button>
                   <button type="submit" className="btn btn-primary">
-                    {modalMode === "add" ? "➕ Create Post" : "💾 Save Changes"}
+                    {modalMode === "add" ? "➕ Create Post" : "💾 Update Post"}
                   </button>
                 </div>
               </form>

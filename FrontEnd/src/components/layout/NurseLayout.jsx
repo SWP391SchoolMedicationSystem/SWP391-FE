@@ -14,46 +14,44 @@ import {
   Avatar,
 } from "@mui/material";
 import {
-  Dashboard,
   People,
-  Security,
-  Event,
-  BarChart,
+  MedicalServices,
+  Article,
+  Chat,
   Notifications,
-  Description,
-  Info,
-  Settings,
-  Search,
   Menu,
   Logout,
   ChatBubbleOutline,
-  Article,
-  FormatListBulleted,
+  VaccinesOutlined,
+  Medication,
+  Assignment,
 } from "@mui/icons-material";
 
 const drawerWidth = 240;
 
 const navItems = [
-  { to: "/admin", label: "Dashboard", icon: <Dashboard /> },
-  { to: "/admin/accounts", label: "Account Management", icon: <People /> },
-  { to: "/admin/blogs", label: "Blog Management", icon: <Article /> },
+  { to: "/nurse", label: "Danh Sách Tiêm Chủng", icon: <VaccinesOutlined /> },
   {
-    to: "/admin/vaccinations",
-    label: "Vaccination List",
-    icon: <FormatListBulleted />,
+    to: "/nurse/medication-schedule",
+    label: "Lịch Uống Thuốc",
+    icon: <Medication />,
   },
-  { to: "/admin/reports", label: "Monitoring & Reporting", icon: <BarChart /> },
   {
-    to: "/admin/notifications",
-    label: "Notifications",
-    icon: <Notifications />,
+    to: "/nurse/handle-medicine",
+    label: "Xử Lý Thuốc",
+    icon: <MedicalServices />,
   },
-  { to: "/admin/forms", label: "Category Forms", icon: <Description /> },
-  { to: "/admin/info", label: "View Information", icon: <Info /> },
-  { to: "/admin/settings", label: "Settings", icon: <Settings /> },
+  { to: "/nurse/blog", label: "Blog", icon: <Article /> },
+  { to: "/nurse/chat", label: "Chat Phụ Huynh", icon: <Chat /> },
+  { to: "/nurse/student-list", label: "Danh Sách Học Sinh", icon: <People /> },
+  {
+    to: "/nurse/health-records",
+    label: "Hồ Sơ Sức Khỏe",
+    icon: <Assignment />,
+  },
 ];
 
-export default function AdminLayout() {
+export default function NurseLayout() {
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
       {/* Sidebar */}
@@ -71,14 +69,14 @@ export default function AdminLayout() {
         }}
       >
         <Toolbar sx={{ fontWeight: "bold", fontSize: 20, color: "#2D77C1" }}>
-          MedAdmin 🛡
+          MedNurse 👩‍⚕️
         </Toolbar>
         <List>
           {navItems.map(({ to, label, icon }) => (
             <NavLink
               to={to}
               key={to}
-              end={to === "/admin"} // chỉ dùng end cho dashboard
+              end={to === "/nurse"} // chỉ dùng end cho trang chính
               style={{ textDecoration: "none" }}
             >
               {({ isActive }) => (
@@ -121,10 +119,10 @@ export default function AdminLayout() {
             gap: 2,
           }}
         >
-          <Avatar sx={{ bgcolor: "#56D0DB" }}>A</Avatar>
+          <Avatar sx={{ bgcolor: "#56D0DB" }}>Y</Avatar>
           <Box>
-            <div style={{ fontSize: 14, fontWeight: 600 }}>Admin</div>
-            <div style={{ fontSize: 12, color: "#888" }}>admin@gmail</div>
+            <div style={{ fontSize: 14, fontWeight: 600 }}>Y Tá</div>
+            <div style={{ fontSize: 12, color: "#888" }}>nurse@gmail</div>
           </Box>
           <IconButton sx={{ marginLeft: "auto", color: "#aaa" }}>
             <Logout />
@@ -160,7 +158,7 @@ export default function AdminLayout() {
                 }}
               >
                 <InputBase
-                  placeholder="Search for data, users, etc."
+                  placeholder="Tìm kiếm thông tin, học sinh, etc."
                   sx={{ pl: 2, pr: 2, py: 0.5, width: "100%" }}
                 />
               </Box>
@@ -172,7 +170,7 @@ export default function AdminLayout() {
               <IconButton>
                 <ChatBubbleOutline />
               </IconButton>
-              <Avatar sx={{ bgcolor: "#2D77C1" }} />
+              <Avatar sx={{ bgcolor: "#2D77C1" }}>Y</Avatar>
             </Box>
           </Toolbar>
         </AppBar>
