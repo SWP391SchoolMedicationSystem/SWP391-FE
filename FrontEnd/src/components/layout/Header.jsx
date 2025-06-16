@@ -1,30 +1,60 @@
-import { Link as RouterLink } from "react-router-dom"
-import { Box, Button, Container, Link, Typography } from "@mui/material"
-import { AddCircleOutline } from "@mui/icons-material"
+import { Link as RouterLink } from "react-router-dom";
+import { Box, Button, Container, Link, Typography } from "@mui/material";
+import { AddCircleOutline } from "@mui/icons-material";
 
 export default function Header() {
   
   return (
-<Box component="header" sx={{ py: 2, fontFamily: 'Poppins, sans-serif' }}>
+    <Box component="header" sx={{ py: 2, fontFamily: "Poppins, sans-serif" }}>
       <Container maxWidth="lg">
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <Link component={RouterLink} to="#" sx={{ textDecoration: "none", color: "inherit" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Link
+            component={RouterLink}
+            to="#"
+            sx={{ textDecoration: "none", color: "inherit" }}
+          >
             <Box sx={{ position: "relative" }}>
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Typography variant="h4" component="span" sx={{ fontWeight: "bold", color: "text.primary" }}>
+                <Typography
+                  variant="h4"
+                  component="span"
+                  sx={{ fontWeight: "bold", color: "text.primary" }}
+                >
                   Medlearn
                 </Typography>
-                <AddCircleOutline sx={{ color: "info.main", fontSize: "1.2rem", ml: 0.5, mb: 2 }} />
+                <AddCircleOutline
+                  sx={{
+                    color: "info.main",
+                    fontSize: "1.2rem",
+                    ml: 0.5,
+                    mb: 2,
+                  }}
+                />
               </Box>
               <Typography
                 variant="caption"
-                sx={{ position: "absolute", top: "100%", left: 0, mt: -1.5, color: "text.secondary" }}
+                sx={{
+                  position: "absolute",
+                  top: "100%",
+                  left: 0,
+                  mt: -1.5,
+                  color: "text.secondary",
+                }}
               >
                 Medical Education
               </Typography>
             </Box>
           </Link>
-          <Box component="nav" sx={{ display: { xs: "none", md: "flex" }, gap: 3 }}>
+          <Box
+            component="nav"
+            sx={{ display: { xs: "none", md: "flex" }, gap: 3 }}
+          >
             <Link
               component={RouterLink}
               to="/Home"
@@ -75,5 +105,5 @@ export default function Header() {
         </Box>
       </Container>
     </Box>
-  )
+  );
 }

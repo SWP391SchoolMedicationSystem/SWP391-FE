@@ -22,14 +22,14 @@ import {
   Google,
 } from "@mui/icons-material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import {
   GoogleOAuthProvider,
   GoogleLogin,
   googleLogout,
 } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
+import userService from "../../services/userService";
 const clientId =
   "251792493601-lkt15jmuh1jfr1cvgd0a45uamdqusosg.apps.googleusercontent.com";
 
@@ -46,6 +46,47 @@ export default function LoginForm() {
 
   const [error, setError] = useState(null);
 
+  // Check if user is already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const userInfo = localStorage.getItem("userInfo");
+
+    if (token && userInfo) {
+      try {
+        const userData = JSON.parse(userInfo);
+        const role = userData.role;
+
+        // Redirect based on role
+        switch (role) {
+          case "Manager":
+            navigate("/manager");
+            break;
+          case "Nurse":
+            navigate("/nurse");
+            break;
+          case "Parent":
+            navigate("/parent");
+            break;
+          case "Admin":
+            navigate("/admin");
+            break;
+          default:
+            // Fallback logic
+            if (userData.isStaff) {
+              navigate("/manager");
+            } else {
+              navigate("/parent");
+            }
+            break;
+        }
+      } catch {
+        // If userInfo is corrupted, clear localStorage
+        localStorage.removeItem("token");
+        localStorage.removeItem("userInfo");
+      }
+    }
+  }, [navigate]);
+
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
     setFormData((prev) => ({
@@ -59,15 +100,7 @@ export default function LoginForm() {
     setError(null);
 
     try {
-      const response = await axios.post(
-        "https://api-schoolhealth.purintech.id.vn/api/User/Login",
-        {
-          email: formData.email,
-          password: formData.password,
-        }
-      );
-
-      const data = response.data;
+      const data = await userService.login(formData.email, formData.password);
       console.log("Login success:", data);
 
       // Lưu thông tin user và token nếu có
@@ -76,11 +109,31 @@ export default function LoginForm() {
         localStorage.setItem("token", data.token);
       }
 
-      // Điều hướng dựa trên vai trò người dùng
-      if (data.isStaff) {
-        navigate("/manager"); // hoặc trang quản trị phù hợp
-      } else {
-        navigate("/home"); // trang cho phụ huynh
+      // Điều hướng dựa trên role từ JWT token
+      const role = data.role;
+      console.log("User role:", role);
+
+      switch (role) {
+        case "Manager":
+          navigate("/manager");
+          break;
+        case "Nurse":
+          navigate("/nurse");
+          break;
+        case "Parent":
+          navigate("/parent");
+          break;
+        case "Admin":
+          navigate("/admin"); // Trang admin placeholder
+          break;
+        default:
+          // Fallback: nếu không có role hoặc role không xác định
+          if (data.isStaff) {
+            navigate("/manager"); // Backup cho staff
+          } else {
+            navigate("/parent"); // Backup cho parent
+          }
+          break;
       }
     } catch (err) {
       if (err.response) {
@@ -239,7 +292,21 @@ export default function LoginForm() {
                     onSuccess={(credentialResponse) => {
                       const decoded = jwtDecode(credentialResponse.credential);
                       setUser(decoded);
-                      navigate("/home");
+
+                      // Lưu thông tin Google user
+                      const googleUserData = {
+                        email: decoded.email,
+                        name: decoded.name,
+                        role: "Parent", // Google login mặc định là Parent
+                        isGoogleAuth: true,
+                      };
+                      localStorage.setItem(
+                        "userInfo",
+                        JSON.stringify(googleUserData)
+                      );
+
+                      // Google login luôn điều hướng đến Parent portal
+                      navigate("/parent");
                     }}
                     onError={() => {
                       console.log("Login Failed");
