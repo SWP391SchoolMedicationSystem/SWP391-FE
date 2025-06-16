@@ -1,60 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../css/Manager/AccountManagement.css";
+import userService from "../../services/userService";
 
 function AccountManagement() {
-  // Mock data for accounts
-  const [accounts] = useState([
-    {
-      id: 1,
-      fullName: "Nguyễn Văn An",
-      email: "nguyen.van.an@medmanager.com",
-      phone: "0901234567",
-      role: "Manager",
-      status: "Hoạt động",
-      createdDate: "2024-01-15",
-      lastLogin: "2024-03-15 09:30",
-    },
-    {
-      id: 2,
-      fullName: "Trần Thị Bình",
-      email: "tran.thi.binh@medmanager.com",
-      phone: "0912345678",
-      role: "Nurse",
-      status: "Hoạt động",
-      createdDate: "2024-01-20",
-      lastLogin: "2024-03-14 14:20",
-    },
-    {
-      id: 3,
-      fullName: "Lê Văn Cường",
-      email: "le.van.cuong@medmanager.com",
-      phone: "0923456789",
-      role: "Parent",
-      status: "Tạm khóa",
-      createdDate: "2024-02-01",
-      lastLogin: "2024-03-10 16:45",
-    },
-    {
-      id: 4,
-      fullName: "Phạm Thị Dung",
-      email: "pham.thi.dung@medschool.com",
-      phone: "0934567890",
-      role: "Parent",
-      status: "Hoạt động",
-      createdDate: "2024-02-10",
-      lastLogin: "2024-03-13 11:15",
-    },
-    {
-      id: 5,
-      fullName: "Hoàng Văn Em",
-      email: "hoang.van.em@medmanager.com",
-      phone: "0945678901",
-      role: "Nurse",
-      status: "Hoạt động",
-      createdDate: "2024-02-15",
-      lastLogin: "2024-03-15 08:00",
-    },
-  ]);
+  const [accounts, setAccounts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch accounts from API
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        setLoading(true);
+        const apiData = await userService.getAllUsers();
+
+        // Transform API data to match component structure
+        const transformedData = apiData.map((user) => ({
+          id: user.userId,
+          fullName:
+            user.email
+              .split("@")[0]
+              .replace(/[._]/g, " ")
+              .replace(/\b\w/g, (l) => l.toUpperCase()) || "N/A",
+          email: user.email,
+          phone: "N/A", // API doesn't provide phone
+          role: user.isStaff ? getStaffRole(user.email) : "Parent",
+          status: "Hoạt động", // API doesn't provide status, default to active
+          createdDate: "N/A", // API doesn't provide creation date
+          lastLogin: "N/A", // API doesn't provide last login
+        }));
+
+        setAccounts(transformedData);
+      } catch (err) {
+        setError(err.message);
+        console.error("Error fetching accounts:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAccounts();
+  }, []);
+
+  // Helper function to determine staff role based on email
+  const getStaffRole = (email) => {
+    if (email.includes("admin")) return "Admin";
+    if (email.includes("teacher")) return "Teacher";
+    if (email.includes("nurse")) return "Nurse";
+    if (email.includes("manager")) return "Manager";
+    return "Staff";
+  };
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("");
@@ -63,8 +58,31 @@ function AccountManagement() {
   const [currentAccount, setCurrentAccount] = useState(null);
   const [modalMode, setModalMode] = useState("view"); // 'view', 'edit', 'create'
 
-  const roles = ["Manager", "Manager", "Nurse", "Parent"];
+  const roles = ["Admin", "Manager", "Teacher", "Nurse", "Staff", "Parent"];
   const statuses = ["Hoạt động", "Tạm khóa", "Vô hiệu hóa"];
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="account-management-container">
+        <div className="loading-container">
+          <p>Đang tải dữ liệu...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="account-management-container">
+        <div className="error-container">
+          <p>Lỗi: {error}</p>
+          <button onClick={() => window.location.reload()}>Thử lại</button>
+        </div>
+      </div>
+    );
+  }
 
   // Filter accounts based on search and filters
   const filteredAccounts = accounts.filter((account) => {

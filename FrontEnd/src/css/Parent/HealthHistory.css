@@ -1,0 +1,620 @@
+.health-history-container {
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+.page-header {
+  color: white;
+  padding: 30px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.page-header h1 {
+  margin: 0 0 10px 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.page-header p {
+  margin: 0;
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+/* Stats Cards */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+  font-size: 3rem;
+  margin-right: 20px;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+}
+
+.stat-card.height .stat-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stat-card.weight .stat-icon {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.stat-card.blood-pressure .stat-icon {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.stat-card.heart-rate .stat-icon {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.stat-content h3 {
+  margin: 0 0 8px 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d77c1;
+}
+
+.stat-content p {
+  margin: 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+.stat-unit {
+  font-size: 1.2rem;
+  color: #888;
+  font-weight: 500;
+}
+
+/* Filter Section */
+.filter-section {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.filter-section h3 {
+  margin: 0 0 20px 0;
+  color: #2d77c1;
+  font-size: 1.3rem;
+}
+
+.filter-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-group label {
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.filter-group select {
+  padding: 10px 15px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: #56d0db;
+  box-shadow: 0 0 0 3px rgba(86, 208, 219, 0.1);
+}
+
+/* Health Records */
+.health-records-section {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.health-records-section h3 {
+  margin: 0 0 25px 0;
+  color: #2d77c1;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.records-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.record-item {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.record-item:hover {
+  border-color: #56d0db;
+  transform: translateY(-2px);
+}
+
+.record-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.record-info h4 {
+  margin: 0 0 5px 0;
+  color: #2d77c1;
+  font-size: 1.1rem;
+}
+
+.record-date {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.record-status {
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: white;
+}
+
+.record-status.completed {
+  background: #22c55e;
+}
+
+.record-status.scheduled {
+  background: #3b82f6;
+}
+
+.record-status.cancelled {
+  background: #ef4444;
+}
+
+.record-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #2d77c1;
+  min-width: 80px;
+}
+
+.detail-value {
+  color: #333;
+}
+
+.record-measurements {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.measurements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.measurement-item {
+  text-align: center;
+  padding: 10px;
+  background: #f1f5f9;
+  border-radius: 8px;
+}
+
+.measurement-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2d77c1;
+  margin-bottom: 5px;
+}
+
+.measurement-label {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.record-notes {
+  background: #e8f4fd;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #56d0db;
+  margin-bottom: 15px;
+}
+
+.record-notes h5 {
+  margin: 0 0 8px 0;
+  color: #2d77c1;
+  font-size: 0.9rem;
+}
+
+.record-notes p {
+  margin: 0;
+  color: #555;
+  line-height: 1.4;
+}
+
+.record-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.action-btn.view {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.action-btn.view:hover {
+  background: #1976d2;
+  color: white;
+}
+
+.action-btn.download {
+  background: #e8f5e8;
+  color: #388e3c;
+}
+
+.action-btn.download:hover {
+  background: #388e3c;
+  color: white;
+}
+
+.action-btn.share {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.action-btn.share:hover {
+  background: #f57c00;
+  color: white;
+}
+
+/* Upcoming Appointments */
+.upcoming-appointments {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.upcoming-appointments h3 {
+  margin: 0 0 25px 0;
+  color: #2d77c1;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.appointment-item {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.appointment-item:hover {
+  border-color: #56d0db;
+  transform: translateY(-2px);
+}
+
+.appointment-info {
+  flex: 1;
+}
+
+.appointment-info h4 {
+  margin: 0 0 5px 0;
+  color: #2d77c1;
+  font-size: 1.1rem;
+}
+
+.appointment-details {
+  display: flex;
+  gap: 20px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.appointment-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.appointment-btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.appointment-btn.reschedule {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.appointment-btn.reschedule:hover {
+  background: #f57c00;
+  color: white;
+}
+
+.appointment-btn.cancel {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+.appointment-btn.cancel:hover {
+  background: #d32f2f;
+  color: white;
+}
+
+/* Health Trends Chart */
+.health-trends {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.health-trends h3 {
+  margin: 0 0 25px 0;
+  color: #2d77c1;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chart-placeholder {
+  background: #f8fafc;
+  border: 2px dashed #e2e8f0;
+  border-radius: 12px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* Doctor Information */
+.doctor-info {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.doctor-info h3 {
+  margin: 0 0 20px 0;
+  color: #2d77c1;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.doctor-card {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 20px;
+  border-left: 4px solid #56d0db;
+}
+
+.doctor-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.doctor-avatar {
+  font-size: 2.5rem;
+  margin-right: 15px;
+  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.doctor-details h4 {
+  margin: 0 0 5px 0;
+  color: #2d77c1;
+  font-size: 1.1rem;
+}
+
+.doctor-details p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.doctor-contact {
+  display: flex;
+  gap: 15px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .filter-controls {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .record-details {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .measurements-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .health-history-container {
+    padding: 15px;
+  }
+
+  .page-header {
+    padding: 20px;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+  }
+
+  .stats-cards {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .filter-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .record-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .record-details {
+    grid-template-columns: 1fr;
+  }
+
+  .measurements-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .appointment-item {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+
+  .appointment-details {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .doctor-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .doctor-contact {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-content h3 {
+    font-size: 1.5rem;
+  }
+
+  .measurements-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .record-actions,
+  .appointment-actions {
+    flex-direction: column;
+  }
+
+  .chart-placeholder {
+    height: 200px;
+    font-size: 1rem;
+  }
+}

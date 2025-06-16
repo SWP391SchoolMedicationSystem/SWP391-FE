@@ -1,7 +1,6 @@
 import { Link as RouterLink } from "react-router-dom";
 import { Box, Button, Container, Link, Typography } from "@mui/material";
 import { AddCircleOutline } from "@mui/icons-material";
-import MedlearnLogo from "../../assets/images/medlearn-logo.png";
 
 export default function Header() {
   
@@ -21,11 +20,35 @@ export default function Header() {
             sx={{ textDecoration: "none", color: "inherit" }}
           >
             <Box sx={{ position: "relative" }}>
-              <img
-                src={MedlearnLogo}
-                alt="Medlearn Logo"
-                style={{ height: 90, width: 120, objectFit: "contain" }}
-              />
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Typography
+                  variant="h4"
+                  component="span"
+                  sx={{ fontWeight: "bold", color: "text.primary" }}
+                >
+                  Medlearn
+                </Typography>
+                <AddCircleOutline
+                  sx={{
+                    color: "info.main",
+                    fontSize: "1.2rem",
+                    ml: 0.5,
+                    mb: 2,
+                  }}
+                />
+              </Box>
+              <Typography
+                variant="caption"
+                sx={{
+                  position: "absolute",
+                  top: "100%",
+                  left: 0,
+                  mt: -1.5,
+                  color: "text.secondary",
+                }}
+              >
+                Medical Education
+              </Typography>
             </Box>
           </Link>
           <Box

@@ -1,4 +1,5 @@
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import {
   Box,
   Drawer,
@@ -27,6 +28,7 @@ import {
   ChatBubbleOutline,
   BarChart,
 } from "@mui/icons-material";
+import userService from "../../services/userService";
 
 const drawerWidth = 240;
 
@@ -55,6 +57,43 @@ const navItems = [
 ];
 
 export default function ManagerLayout() {
+  const navigate = useNavigate();
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    // Lấy thông tin user từ localStorage
+    const storedUserInfo = localStorage.getItem("userInfo");
+    if (storedUserInfo) {
+      try {
+        const parsedInfo = JSON.parse(storedUserInfo);
+        setUserInfo(parsedInfo);
+      } catch (error) {
+        console.error("Error parsing user info:", error);
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    userService.logout();
+    navigate("/");
+  };
+
+  // Get user display info
+  const getUserDisplayName = () => {
+    if (!userInfo) return "Manager";
+    return userInfo.userName || userInfo.email?.split("@")[0] || "Manager";
+  };
+
+  const getUserEmail = () => {
+    if (!userInfo) return "manager@example.com";
+    return userInfo.email || "manager@example.com";
+  };
+
+  const getUserAvatar = () => {
+    const displayName = getUserDisplayName();
+    return displayName.charAt(0).toUpperCase();
+  };
+
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
       {/* Sidebar */}
@@ -122,12 +161,36 @@ export default function ManagerLayout() {
             gap: 2,
           }}
         >
-          <Avatar sx={{ bgcolor: "#56D0DB" }}>M</Avatar>
-          <Box>
-            <div style={{ fontSize: 14, fontWeight: 600 }}>Manager</div>
-            <div style={{ fontSize: 12, color: "#888" }}>manager@gmail.com</div>
+          <Avatar sx={{ bgcolor: "#56D0DB" }}>{getUserAvatar()}</Avatar>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {getUserDisplayName()}
+            </div>
+            <div
+              style={{
+                fontSize: 12,
+                color: "#888",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {getUserEmail()}
+            </div>
           </Box>
-          <IconButton sx={{ marginLeft: "auto", color: "#aaa" }}>
+          <IconButton
+            sx={{ marginLeft: "auto", color: "#aaa" }}
+            onClick={handleLogout}
+            title="Đăng xuất"
+          >
             <Logout />
           </IconButton>
         </Box>
@@ -173,7 +236,7 @@ export default function ManagerLayout() {
               <IconButton>
                 <ChatBubbleOutline />
               </IconButton>
-              <Avatar sx={{ bgcolor: "#2D77C1" }}>M</Avatar>
+              <Avatar sx={{ bgcolor: "#2D77C1" }}>{getUserAvatar()}</Avatar>
             </Box>
           </Toolbar>
         </AppBar>

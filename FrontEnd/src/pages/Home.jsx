@@ -376,43 +376,36 @@ export default function Home() {
         </Grid>
       </Container>
       {/* Main Services - Fixed equal height Cards with no spacing */}
-      <Container maxWidth="lg" sx={{ py: 8 }}>
+      <Container maxWidth="lg" sx={{ py: 6 }}>
         <Box sx={{ textAlign: "center", mb: 4 }}>
           <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-            <span style={{ color: "#56D0DB" }}>Dịch Vụ Chính</span> Của Chúng
-            Tôi
+            Our <span style={{ color: "#56D0DB" }}>Main Services</span>
           </Typography>
           <Typography
-            variant="h5"
+            variant="h6"
             sx={{ fontWeight: "bold", color: "text.secondary" }}
           >
-            Danh Mục
+            Categories
           </Typography>
         </Box>
 
-        <Grid
-          container
-          spacing={10}
-          justifyContent="center"
-          alignItems="stretch"
-        >
+        <Grid container spacing={0} alignItems="stretch">
           {mainServices.map((service, index) => (
             <Grid
               item
               xs={12}
               sm={6}
-              md={4}
+              md={6}
               key={index}
               sx={{
                 display: "flex",
-                justifyContent: "center",
+                alignItems: "stretch",
               }}
             >
               <Box sx={{ width: "100%", display: "flex" }}>
                 <Card
                   sx={{
-                    height: "100%",
-                    width: 200,
+                    width: "100%",
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-between",
@@ -431,13 +424,13 @@ export default function Home() {
                     p: 4,
                   }}
                 >
-                  <Box sx={{ mb: 2 }}>{service.icon}</Box>
+                  <Box>{service.icon}</Box>
                   <Box>
                     <Typography
                       variant="h6"
                       sx={{
                         fontWeight: "bold",
-                        mt: 1,
+                        mt: 2,
                         mb: 1,
                         color: index === 1 ? "white" : "text.primary",
                       }}
@@ -462,20 +455,16 @@ export default function Home() {
           ))}
         </Grid>
       </Container>
+
       {/* Service Categories Detail - Fixed height and alignment */}
-      <Container maxWidth="lg" sx={{ py: 12 }}>
-        <Grid
-          container
-          spacing={0}
-          alignItems="stretch"
-          sx={{ flexWrap: "nowrap" }}
-        >
+      <Container maxWidth="lg" sx={{ py: 6 }}>
+        <Grid container spacing={0} alignItems="stretch">
           {["vaccination", "healthCheckup", "medicinesSupplies"].map(
             (key, i) => {
               const titles = {
-                vaccination: "Lịch Tiêm Chủng",
-                healthCheckup: "Lịch Khám Sức Khỏe",
-                medicinesSupplies: "Thuốc & Vật Tư",
+                vaccination: "Vaccination Schedule",
+                healthCheckup: "Health Checkup Schedule",
+                medicinesSupplies: "Medicines & Supplies",
               };
               const icons = {
                 vaccination: (
@@ -491,8 +480,6 @@ export default function Home() {
 
               return (
                 <Grid
-                  padding={1}
-                  justifyContent="center"
                   item
                   xs={12}
                   sm={4}
@@ -505,52 +492,27 @@ export default function Home() {
                       p: 3,
                       borderRadius: 2,
                       height: "100%",
-                      weight: "100%",
+                      width: "100%",
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "space-between",
-
-                      overflow: "hidden",
-                      boxShadow: 3,
+                      flexGrow: 1,
+                      border: "1px solid #e0e0e0",
                     }}
                   >
-                    <Box
-                      sx={{
-                        px: 3,
-                        py: 2,
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        borderBottom: "1px solid #e0e0e0",
-                      }}
-                    >
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        {icons[key]}
-                        <Typography
-                          variant="subtitle1"
-                          sx={{ fontWeight: "bold", color: "#1a237e", ml: 1 }}
-                        >
-                          {titles[key]}
-                        </Typography>
-                      </Box>
-                      <Typography sx={{ fontWeight: "bold", color: "#90A4AE" }}>
-                        {">"}
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                      {icons[key]}
+                      <Typography
+                        variant="h6"
+                        sx={{ fontWeight: "bold", color: "#1a237e", ml: 1 }}
+                      >
+                        {titles[key]}
                       </Typography>
                     </Box>
-
                     <Box sx={{ flexGrow: 1 }}>
                       <List sx={{ p: 0 }}>
                         {serviceCategories[key].map((item, index) => (
-                          <ListItem
-                            key={index}
-                            sx={{
-                              px: 1,
-                              py: 1.5,
-                              display: "flex",
-                              alignItems: "center",
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
+                          <ListItem key={index} sx={{ px: 0, py: 1.5 }}>
                             <ListItemIcon sx={{ minWidth: 36 }}>
                               {icons[key]}
                             </ListItemIcon>
@@ -594,6 +556,8 @@ export default function Home() {
           )}
         </Grid>
       </Container>
+
+            
       {/* Our Doctors Section */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Grid container spacing={4} alignItems="center">
