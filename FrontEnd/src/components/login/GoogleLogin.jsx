@@ -71,6 +71,7 @@ const GoogleLogin = ({
 
           // Add debugging to see what we receive
           console.log("Received user info from Google:", userInfo);
+          console.log("Received user token from Google:", response);
 
           const user = {
             id: userInfo.sub || "",

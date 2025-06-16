@@ -41,30 +41,30 @@ export default function Home() {
   // Mock data for statistics với colors như trong Figma
   const overviewStats = [
     {
-      title: "Total Students",
+      title: "Tổng số học sinh",
       number: "1,245",
-      note: "+15 this month",
+      note: "+15 trong tháng này",
       icon: <People sx={{ color: "white", fontSize: 24 }} />,
       noteColor: "#4CAF50",
     },
     {
-      title: "Health Events",
+      title: "Sự kiện y tế",
       number: "24",
-      note: "+2 this week",
+      note: "+2 trong tuần này",
       icon: <Info sx={{ color: "white", fontSize: 24 }} />,
       noteColor: "#FF9800",
     },
     {
-      title: "Vaccinations",
+      title: "Tiêm chủng",
       number: "85%",
-      note: "Completion rate",
+      note: "Tỷ lệ hoàn thành",
       icon: <Vaccines sx={{ color: "white", fontSize: 24 }} />,
       noteColor: "#4CAF50",
     },
     {
-      title: "Health Checkups",
+      title: "Khám sức khỏe",
       number: "12",
-      note: "Appointments today",
+      note: "Lịch hẹn hôm nay",
       icon: <Assignment sx={{ color: "white", fontSize: 24 }} />,
       noteColor: "#2196F3",
     },
@@ -73,23 +73,23 @@ export default function Home() {
   // Recent health events
   const recentEvents = [
     {
-      title: "Student with mild fever",
-      time: "Class 5A • Today",
+      title: "Học sinh bị sốt nhẹ",
+      time: "Lớp 5A • Hôm nay",
       type: "fever",
     },
     {
-      title: "Vaccine administration",
-      time: "Class 3B • 2 days ago",
+      title: "Tiêm vắc xin",
+      time: "Lớp 3B • 2 ngày trước",
       type: "vaccine",
     },
     {
-      title: "Regular health checkup",
-      time: "Class 7C • 3 days ago",
+      title: "Khám sức khỏe định kỳ",
+      time: "Lớp 7C • 3 ngày trước",
       type: "checkup",
     },
     {
-      title: "Student with stomach pain",
-      time: "Class 4A • 5 days ago",
+      title: "Học sinh đau bụng",
+      time: "Lớp 4A • 5 ngày trước",
       type: "pain",
     },
   ];
@@ -97,22 +97,20 @@ export default function Home() {
   // Main services
   const mainServices = [
     {
-      title: "Chat with doctor",
-      description:
-        "Connect with our medical professionals for consultations and health advice",
+      title: "Tư vấn với bác sĩ",
+      description: "Kết nối với đội ngũ y tế để được tư vấn và hỗ trợ sức khỏe",
       icon: <MedicalServices sx={{ fontSize: 48, color: "#1976D2" }} />,
       bgColor: "#E3F2FD",
     },
     {
-      title: "Vaccination",
-      description: "Manage and track vaccination schedules for all students",
+      title: "Tiêm chủng",
+      description: "Quản lý và theo dõi lịch tiêm chủng cho tất cả học sinh",
       icon: <Vaccines sx={{ fontSize: 48, color: "white" }} />,
       bgColor: "linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)",
     },
     {
-      title: "Healthcare",
-      description:
-        "Comprehensive healthcare monitoring and medical records management",
+      title: "Chăm sóc sức khỏe",
+      description: "Giám sát sức khỏe toàn diện và quản lý hồ sơ y tế",
       icon: <HealthAndSafety sx={{ fontSize: 48, color: "#2E7D32" }} />,
       bgColor: "#E8F5E8",
     },
@@ -121,37 +119,36 @@ export default function Home() {
   // Service categories
   const serviceCategories = {
     vaccination: [
-      "Seasonal Flu Vaccine (September 15 - October 15)",
-      "MMR Vaccine (September 20 - October 12)",
-      "Chickenpox Vaccination (September 18 - October 2)",
+      "Tiêm ngừa cúm mùa (15/9 - 15/10)",
+      "Vắc xin MMR (20/9 - 12/10)",
+      "Vắc xin thủy đậu (18/9 - 2/10)",
     ],
     healthCheckup: [
-      "Regular Health Checkup (2019/03/08 - Today)",
-      "Vision Screening (February 15 - Today)",
-      "Dental Health Checking (February 20 - Today)",
+      "Khám sức khỏe định kỳ (08/03/2019 - Hiện tại)",
+      "Kiểm tra thị lực (15/2 - Hiện tại)",
+      "Kiểm tra răng miệng (20/2 - Hiện tại)",
     ],
     medicinesSupplies: [
-      "Fever Medication (7 items)",
-      "Medical Gauze (2 items)",
-      "Antiseptic Solution (3 items)",
+      "Thuốc hạ sốt (7 mục)",
+      "Băng gạc y tế (2 mục)",
+      "Dung dịch sát khuẩn (3 mục)",
     ],
   };
 
   return (
     <div className="home-page">
       <Header />
-
       {/* Hero Section - Using CSS approach */}
       <section className="hero-section">
         <div className="hero-container">
           <div className="hero-text">
             <h1>
-              School Medical <br />
-              <span className="highlight">Management System</span>
+              Hệ thống Y tế Trường học <br />
+              <span className="highlight">Toàn diện</span>
             </h1>
             <p>
-              A comprehensive solution for managing student health,
-              vaccinations, and medical monitoring in schools
+              Giải pháp toàn diện để quản lý sức khỏe học sinh, lịch tiêm chủng
+              và theo dõi y tế tại trường học
             </p>
             <Button
               variant="contained"
@@ -165,15 +162,14 @@ export default function Home() {
                 },
               }}
             >
-              Learn More
+              Tìm hiểu thêm
             </Button>
           </div>
           <div className="hero-image">
-            <img src={DoctorHomePageImage} alt="Medical Team" />
+            <img src={DoctorHomePageImage} alt="Nhóm bác sĩ" />
           </div>
         </div>
       </section>
-
       {/* System Overview - Updated to match Figma */}
       <Container maxWidth="lg" sx={{ py: 6 }}>
         <Box sx={{ mb: 6 }}>
@@ -181,20 +177,25 @@ export default function Home() {
             variant="h4"
             sx={{ fontWeight: "bold", color: "#1a237e", mb: 1 }}
           >
-            System Overview
+            Tổng quan hệ thống
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Efficient and comprehensive student health management
+            Quản lý sức khỏe học sinh hiệu quả và toàn diện
           </Typography>
         </Box>
 
-        <Grid container spacing={3}>
+        <Grid container spacing={8} justifyContent="center">
           {overviewStats.map((stat, index) => (
             <Grid item xs={12} sm={6} md={3} key={index}>
               <Card
                 sx={{
+                  width: "110%",
+                  height: "100%",
                   borderRadius: 2,
                   overflow: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
                   transition: "transform 0.3s ease, box-shadow 0.3s ease",
                   "&:hover": {
                     transform: "translateY(-4px)",
@@ -210,7 +211,7 @@ export default function Home() {
                     p: 2,
                     display: "flex",
                     alignItems: "center",
-                    gap: 1,
+                    gap: 10,
                   }}
                 >
                   {stat.icon}
@@ -251,38 +252,46 @@ export default function Home() {
           ))}
         </Grid>
       </Container>
-
       {/* Health Statistics & Recent Events */}
       <Container maxWidth="lg" sx={{ py: 6 }}>
-        <Grid container spacing={4}>
+        <Grid container spacing={4} alignItems="stretch">
           {/* Student Health Statistics */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3, borderRadius: 2, height: "100%" }}>
+            <Paper
+              sx={{
+                p: 3,
+                borderRadius: 2,
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
               <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
                 <Assessment sx={{ color: "#8B5CF6", mr: 1 }} />
                 <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                  Student Health Statistics
+                  Thống kê Sức khỏe Học sinh
                 </Typography>
               </Box>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Monthly student health statistics trends
+                Xu hướng thống kê sức khỏe học sinh theo tháng
               </Typography>
 
               {/* Placeholder for chart */}
               <Box
                 sx={{
-                  height: 200,
+                  height: 300,
+                  width: 700,
                   bgcolor: "#F0F9FF",
-                  borderRadius: 1,
+                  borderRadius: 5,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexDirection: "column",
                 }}
               >
-                <Assessment sx={{ fontSize: 48, color: "#56D0DB", mb: 1 }} />
+                <Assessment sx={{ fontSize: 60, color: "#56D0DB", mb: 2 }} />
                 <Typography variant="body2" color="text.secondary">
-                  Student Health Statistics
+                  Thống kê Sức khỏe Học Sinh
                 </Typography>
               </Box>
             </Paper>
@@ -290,9 +299,18 @@ export default function Home() {
 
           {/* Recent Health Events */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3, borderRadius: 2, height: "100%" }}>
+            <Paper
+              sx={{
+                p: 3,
+                borderRadius: 2,
+                height: "100%",
+                width: "105%",
+                overflow: "hidden",
+              }}
+            >
               <Box
                 sx={{
+                  width: "100%",
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
@@ -300,19 +318,32 @@ export default function Home() {
                 }}
               >
                 <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                  Recent Health Events
+                  Sự kiện Sức khỏe Gần đây
                 </Typography>
                 <IconButton>
                   <ArrowForward />
                 </IconButton>
               </Box>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Recent activity occurred in the past week
+                Các hoạt động sức khỏe xảy ra trong tuần qua
               </Typography>
 
               <List sx={{ p: 0 }}>
                 {recentEvents.map((event, index) => (
-                  <ListItem key={index} sx={{ px: 0, py: 1 }}>
+                  <ListItem
+                    key={index}
+                    sx={{
+                      px: 1.5,
+                      py: 1.5,
+                      borderBottom:
+                        index !== recentEvents.length - 1
+                          ? "1px solid #ccc"
+                          : "none",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
                     <ListItemIcon sx={{ minWidth: 36 }}>
                       <FiberManualRecord
                         sx={{
@@ -344,7 +375,6 @@ export default function Home() {
           </Grid>
         </Grid>
       </Container>
-
       {/* Main Services - Fixed equal height Cards with no spacing */}
       <Container maxWidth="lg" sx={{ py: 6 }}>
         <Box sx={{ textAlign: "center", mb: 4 }}>
@@ -527,6 +557,142 @@ export default function Home() {
         </Grid>
       </Container>
 
+            
+      {/* Our Doctors Section */}
+      <Container maxWidth="lg" sx={{ py: 8 }}>
+        <Grid container spacing={4} alignItems="center">
+          {/* Text and Doctor Card */}
+          <Grid item xs={12} md={6}>
+            <Typography variant="overline" sx={{ color: "#555" }}>
+              Đội ngũ bác sĩ
+            </Typography>
+            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
+              <span style={{ color: "#56D0DB" }}>Bác sĩ</span> đủ chuyên môn
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+              Được phụ trách trực tiếp bởi bác sĩ đa khoa và các bác sĩ chuyên
+              khoa giàu kinh nghiệm.
+            </Typography>
+
+            {/* Doctor Card */}
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                width: "100%",
+                maxWidth: 350,
+                background: "linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)",
+                color: "white",
+              }}
+            >
+              <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                Chuyên khoa chỉnh hình
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: "bold", mt: 1 }}>
+                Bác sĩ James Wellington
+              </Typography>
+              <Button
+                variant="text"
+                size="small"
+                sx={{ mt: 2, color: "white", textTransform: "none" }}
+              >
+                Xem thêm
+              </Button>
+            </Paper>
+
+            {/* View All Doctors button */}
+            <Button
+              variant="contained"
+              sx={{
+                mt: 4,
+                background: "linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)",
+                color: "white",
+                px: 4,
+                py: 1.5,
+                borderRadius: 30,
+                textTransform: "none",
+                "&:hover": {
+                  opacity: 0.9,
+                },
+              }}
+            >
+            Xem tất cả bác sĩ 
+            </Button>
+          </Grid>
+
+          {/* Doctor Avatar Image */}
+          <Grid item xs={12} md={6}>
+            <Box
+              sx={{
+                position: "relative",
+                width: "100%",
+                maxWidth: 350,
+                mx: "auto",
+              }}
+            >
+              <Avatar
+                src="https://randomuser.me/api/portraits/women/44.jpg" // bạn có thể thay bằng hình bác sĩ thật của bạn
+                alt="Doctor"
+                sx={{
+                  width: "100%",
+                  height: "auto",
+                  borderRadius: "50%",
+                  border: "8px solid white",
+                  boxShadow: 3,
+                }}
+              />
+              {/* Navigation arrows */}
+              <IconButton
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: -20,
+                  transform: "translateY(-50%)",
+                  backgroundColor: "white",
+                  "&:hover": { backgroundColor: "#f0f0f0" },
+                }}
+              >
+                <ArrowForward
+                  sx={{ transform: "rotate(180deg)", color: "#56D0DB" }}
+                />
+              </IconButton>
+              <IconButton
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  right: -20,
+                  transform: "translateY(-50%)",
+                  backgroundColor: "white",
+                  "&:hover": { backgroundColor: "#f0f0f0" },
+                }}
+              >
+                <ArrowForward sx={{ color: "#56D0DB" }} />
+              </IconButton>
+
+              {/* Dot indicators */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  mt: 3,
+                }}
+              >
+                {[0, 1, 2, 3].map((dot, i) => (
+                  <FiberManualRecord
+                    key={i}
+                    sx={{
+                      fontSize: 10,
+                      color: i === 3 ? "#2D77C1" : "#B0BEC5",
+                      mx: 0.5,
+                    }}
+                  />
+                ))}
+              </Box>
+            </Box>
+          </Grid>
+        </Grid>
+      </Container>
       {/* Get Started */}
       <Container maxWidth="lg" sx={{ py: 6 }}>
         <Paper
@@ -564,7 +730,6 @@ export default function Home() {
           </Button>
         </Paper>
       </Container>
-
       <Footer />
     </div>
   );

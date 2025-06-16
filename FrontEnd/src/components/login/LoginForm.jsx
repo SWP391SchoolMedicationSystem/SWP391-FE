@@ -289,7 +289,8 @@ export default function LoginForm() {
               {!user ? (
                 <>
                   <GoogleLogin
-                    onSuccess={(credentialResponse) => {
+                    clientId={clientId}
+                    onSuccess={async (credentialResponse) => {
                       const decoded = jwtDecode(credentialResponse.credential);
                       setUser(decoded);
 
