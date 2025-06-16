@@ -236,10 +236,42 @@ export default function LoginForm() {
               {!user ? (
                 <>
                   <GoogleLogin
-                    onSuccess={(credentialResponse) => {
+                    clientId={clientId}
+                    onSuccess={async (credentialResponse) => {
                       const decoded = jwtDecode(credentialResponse.credential);
                       setUser(decoded);
-                      navigate("/home");
+                      console.log("Received user info from Google:", decoded);
+                      console.log(
+                        "Received user token from Google:",
+                        credentialResponse.credential
+                      );
+
+                      try {
+                        const response = await axios.post(
+                          "https://api-schoolhealth.purintech.id.vn/api/Staff/google",
+                          {
+                            credential: credentialResponse.credential,
+                          }
+                        );
+
+                        const data = response.data;
+                        console.log("Google login success:", data);
+
+                        // Lưu vào localStorage
+                        localStorage.setItem("userInfo", JSON.stringify(data));
+                        if (data.token) {
+                          localStorage.setItem("token", data.token);
+                        }
+
+                        // Điều hướng theo vai trò
+                        if (data.isStaff) {
+                          navigate("/manager");
+                        } else {
+                          navigate("/home");
+                        }
+                      } catch (err) {
+                        console.error("Lỗi đăng nhập Google:", err);
+                      }
                     }}
                     onError={() => {
                       console.log("Login Failed");
