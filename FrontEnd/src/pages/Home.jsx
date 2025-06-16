@@ -382,13 +382,13 @@ export default function Home() {
       </Container>
 
       {/* Main Services - Fixed equal height Cards with no spacing */}
-      <Container maxWidth="lg" sx={{ py: 6 }}>
+      <Container maxWidth="lg" sx={{ py: 8 }}>
         <Box sx={{ textAlign: "center", mb: 4 }}>
           <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
             Our <span style={{ color: "#56D0DB" }}>Main Services</span>
           </Typography>
           <Typography
-            variant="h6"
+            variant="h5"
             sx={{ fontWeight: "bold", color: "text.secondary" }}
           >
             Categories
@@ -397,7 +397,7 @@ export default function Home() {
 
         <Grid
           container
-          spacing={4}
+          spacing={10}
           justifyContent="center"
           alignItems="stretch"
         >
@@ -469,8 +469,8 @@ export default function Home() {
       </Container>
 
       {/* Service Categories Detail - Fixed height and alignment */}
-      <Container maxWidth="lg" sx={{ py: 6 }}>
-        <Grid container spacing={0} alignItems="stretch">
+      <Container maxWidth="lg" sx={{ py: 12 }}>
+        <Grid container spacing={0} alignItems="stretch"  sx={{ flexWrap: "nowrap" }} >
           {["vaccination", "healthCheckup", "medicinesSupplies"].map(
             (key, i) => {
               const titles = {
@@ -492,14 +492,15 @@ export default function Home() {
 
               return (
                 <Grid
-                  spacing={10}
+                  
+                  padding={1}
                   justifyContent="center"
                   item
                   xs={12}
                   sm={4}
                   md={4}
                   key={i}
-                  sx={{ display: "flex" }}
+                  sx={{ display: "flex"  }} 
                 >
                   <Paper
                     sx={{
