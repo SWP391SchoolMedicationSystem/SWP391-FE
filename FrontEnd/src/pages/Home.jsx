@@ -403,10 +403,10 @@ export default function Home() {
                 <Card
                   sx={{
                     width: "100%",
-                    height: "320px",
+                    height: "350px",
                     display: "flex",
                     flexDirection: "column",
-                    justifyContent: "center",
+                    justifyContent: "space-between",
                     alignItems: "center",
                     textAlign: "center",
                     background: service.bgColor,
@@ -436,51 +436,96 @@ export default function Home() {
                     p: 4,
                   }}
                 >
-                  <Box sx={{ mb: 3, zIndex: 2, position: "relative" }}>
+                  {/* Icon Section */}
+                  <Box sx={{ 
+                    zIndex: 2, 
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    pt: 2
+                  }}>
                     <Box sx={{ 
-                      p: 2, 
+                      width: 80,
+                      height: 80,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                       borderRadius: "50%", 
                       background: index === 1 ? 
-                        "rgba(255,255,255,0.2)" : 
-                        "rgba(86,208,219,0.1)",
-                      mb: 2,
-                      transition: "transform 0.3s ease",
+                        "rgba(255,255,255,0.15)" : 
+                        index === 0 ? "rgba(25,118,210,0.1)" : "rgba(46,125,50,0.1)",
+                      backdropFilter: "blur(10px)",
+                      border: index === 1 ? 
+                        "2px solid rgba(255,255,255,0.2)" : 
+                        index === 0 ? "2px solid rgba(25,118,210,0.1)" : "2px solid rgba(46,125,50,0.1)",
+                      transition: "all 0.3s ease",
                       "&:hover": {
-                        transform: "rotate(10deg) scale(1.1)"
+                        transform: "rotate(10deg) scale(1.1)",
+                        background: index === 1 ? 
+                          "rgba(255,255,255,0.25)" : 
+                          index === 0 ? "rgba(25,118,210,0.15)" : "rgba(46,125,50,0.15)",
                       }
                     }}>
-                      {service.icon}
+                      {React.cloneElement(service.icon, {
+                        sx: { 
+                          fontSize: 40, 
+                          color: index === 1 ? "white" : 
+                                 index === 0 ? "#1976D2" : "#2E7D32"
+                        }
+                      })}
                     </Box>
                   </Box>
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      fontWeight: "bold",
-                      mb: 2,
-                      color: index === 1 ? "white" : "#1a237e",
-                      zIndex: 2,
-                      position: "relative",
-                      fontSize: "1.4rem",
-                    }}
-                  >
-                    {service.title}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color:
-                        index === 1
-                          ? "rgba(255,255,255,0.9)"
-                          : "#4a5568",
-                      lineHeight: 1.6,
-                      px: 1,
-                      zIndex: 2,
-                      position: "relative",
-                      fontSize: "0.95rem",
-                    }}
-                  >
-                    {service.description}
-                  </Typography>
+
+                  {/* Content Section */}
+                  <Box sx={{ 
+                    zIndex: 2, 
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                    px: 2,
+                    pb: 2
+                  }}>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        fontWeight: "bold",
+                        mb: 2,
+                        color: index === 1 ? "white" : "#1a237e",
+                        fontSize: "1.3rem",
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {service.title}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        color: index === 1 ? "rgba(255,255,255,0.9)" : "#4a5568",
+                        lineHeight: 1.5,
+                        fontSize: "0.9rem",
+                        textAlign: "center",
+                        maxWidth: "200px",
+                      }}
+                    >
+                      {service.description}
+                    </Typography>
+                  </Box>
+
+                  {/* Decorative element */}
+                  <Box sx={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: "4px",
+                    background: index === 1 ? 
+                      "linear-gradient(90deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%)" :
+                      "linear-gradient(90deg, #56D0DB 0%, #2D77C1 100%)",
+                    zIndex: 2,
+                  }} />
                 </Card>
               </Grid>
             ))}
@@ -497,10 +542,10 @@ export default function Home() {
               <Card
                 sx={{
                   width: "100%",
-                  height: "320px",
+                  height: "350px",
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "center",
+                  justifyContent: "space-between",
                   alignItems: "center",
                   textAlign: "center",
                   background: mainServices[2].bgColor,
@@ -528,46 +573,87 @@ export default function Home() {
                   p: 4,
                 }}
               >
-                <Box sx={{ mb: 3, zIndex: 2, position: "relative" }}>
+                {/* Icon Section */}
+                <Box sx={{ 
+                  zIndex: 2, 
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  pt: 2
+                }}>
                   <Box sx={{ 
-                    p: 2, 
+                    width: 80,
+                    height: 80,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                     borderRadius: "50%", 
                     background: "rgba(46,125,50,0.1)",
-                    mb: 2,
-                    transition: "transform 0.3s ease",
+                    backdropFilter: "blur(10px)",
+                    border: "2px solid rgba(46,125,50,0.1)",
+                    transition: "all 0.3s ease",
                     "&:hover": {
-                      transform: "rotate(10deg) scale(1.1)"
+                      transform: "rotate(10deg) scale(1.1)",
+                      background: "rgba(46,125,50,0.15)",
                     }
                   }}>
-                    {mainServices[2].icon}
+                    {React.cloneElement(mainServices[2].icon, {
+                      sx: { 
+                        fontSize: 40, 
+                        color: "#2E7D32"
+                      }
+                    })}
                   </Box>
                 </Box>
-                <Typography
-                  variant="h5"
-                  sx={{
-                    fontWeight: "bold",
-                    mb: 2,
-                    color: "#1a237e",
-                    zIndex: 2,
-                    position: "relative",
-                    fontSize: "1.4rem",
-                  }}
-                >
-                  {mainServices[2].title}
-                </Typography>
-                <Typography
-                  variant="body1"
-                  sx={{
-                    color: "#4a5568",
-                    lineHeight: 1.6,
-                    px: 1,
-                    zIndex: 2,
-                    position: "relative",
-                    fontSize: "0.95rem",
-                  }}
-                >
-                  {mainServices[2].description}
-                </Typography>
+
+                {/* Content Section */}
+                <Box sx={{ 
+                  zIndex: 2, 
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  textAlign: "center",
+                  px: 2,
+                  pb: 2
+                }}>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: "bold",
+                      mb: 2,
+                      color: "#1a237e",
+                      fontSize: "1.3rem",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {mainServices[2].title}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: "#4a5568",
+                      lineHeight: 1.5,
+                      fontSize: "0.9rem",
+                      textAlign: "center",
+                      maxWidth: "200px",
+                    }}
+                  >
+                    {mainServices[2].description}
+                  </Typography>
+                </Box>
+
+                {/* Decorative element */}
+                <Box sx={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: "4px",
+                  background: "linear-gradient(90deg, #56D0DB 0%, #2D77C1 100%)",
+                  zIndex: 2,
+                }} />
               </Card>
             </Grid>
           </Grid>
