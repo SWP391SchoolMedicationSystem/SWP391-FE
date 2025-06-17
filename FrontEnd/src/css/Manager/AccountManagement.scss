@@ -1,0 +1,308 @@
+// ==========================================
+// ACCOUNT MANAGEMENT - OPTIMIZED SCSS
+// ==========================================
+
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.account-management-container {
+  padding: $spacing-xl;
+  background-color: $bg-secondary;
+  min-height: 100vh;
+  font-family: $font-family;
+}
+
+// Page header
+.page-header {
+  @include card-header;
+  margin-bottom: $spacing-3xl;
+  
+  .header-content {
+    h1 {
+      font-size: $font-size-3xl;
+      font-weight: bold;
+      color: $primary-color;
+    }
+    
+    p {
+      color: $text-secondary;
+      margin: $spacing-sm 0 0 0;
+      font-size: $font-size-lg;
+    }
+  }
+}
+
+// Statistics cards
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $spacing-xl;
+  margin-bottom: $spacing-3xl;
+}
+
+.stat-card {
+  @include card-base;
+  @include card-body;
+  @include flex-start;
+  gap: $spacing-lg;
+  
+  .stat-icon {
+    font-size: $font-size-2xl;
+    padding: $spacing-md;
+    border-radius: $radius-md;
+    background: rgba($primary-color, 0.1);
+  }
+  
+  .stat-content {
+    h3 {
+      font-size: $font-size-2xl;
+      font-weight: bold;
+      color: $text-primary;
+      margin: 0 0 $spacing-xs 0;
+    }
+    
+    p {
+      color: $text-secondary;
+      margin: 0;
+      font-size: $font-size-sm;
+    }
+  }
+  
+  &.total .stat-icon { background: rgba($primary-color, 0.1); }
+  &.active .stat-icon { background: rgba($success-color, 0.1); }
+  &.inactive .stat-icon { background: rgba($text-muted, 0.1); }
+  &.warning .stat-icon { background: rgba($warning-color, 0.1); }
+}
+
+// Filters section
+.filters-section {
+  @include flex-between;
+  @include card-base;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-xl;
+  
+  .search-box {
+    flex: 1;
+    max-width: 400px;
+  }
+  
+  .filter-group {
+    display: flex;
+    gap: $spacing-md;
+  }
+  
+  @include mobile {
+    flex-direction: column;
+    gap: $spacing-lg;
+    
+    .filter-group {
+      justify-content: stretch;
+      
+      .filter-select {
+        flex: 1;
+      }
+    }
+  }
+}
+
+.search-input {
+  @include input-base;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  
+  &::-webkit-search-decoration,
+  &::-webkit-search-cancel-button,
+  &::-webkit-search-results-button,
+  &::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+  }
+}
+
+.filter-select {
+  @include input-base;
+}
+
+// Table
+.table-container {
+  @include card-base;
+  margin-bottom: $spacing-xl;
+}
+
+.accounts-table {
+  @include table-base;
+}
+
+// Name cell with avatar
+.name-cell {
+  @include flex-start;
+  gap: $spacing-md;
+  
+  span {
+    font-weight: 500;
+    color: $text-primary;
+  }
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-full;
+  background: $primary-gradient;
+  @include flex-center;
+  color: $bg-primary;
+  font-weight: bold;
+  font-size: $font-size-lg;
+}
+
+// Role and status badges
+.role-select, .status-select {
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-xl;
+  font-size: $font-size-xs;
+  font-weight: 500;
+  display: inline-block;
+  border: 1px solid $border-light;
+  cursor: pointer;
+  transition: $transition-base;
+}
+
+.role-select {
+  &.role-manager { 
+    background: rgba($error-color, 0.1); 
+    color: $error-color; 
+  }
+  &.role-nurse { 
+    background: rgba($info-color, 0.1); 
+    color: $info-color; 
+  }
+  &.role-parent { 
+    background: rgba($success-color, 0.1); 
+    color: $success-color; 
+  }
+}
+
+.status-select {
+  &.status-active { 
+    background: rgba($success-color, 0.1); 
+    color: $success-color; 
+  }
+  &.status-inactive { 
+    background: rgba($text-muted, 0.1); 
+    color: $text-muted; 
+  }
+  &.status-suspended { 
+    background: rgba($warning-color, 0.1); 
+    color: $warning-color; 
+  }
+}
+
+// Action buttons
+.action-buttons {
+  @include flex-start;
+  gap: $spacing-sm;
+}
+
+.status-select-inline {
+  padding: $spacing-xs $spacing-sm;
+  border: 1px solid $border-medium;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  background-color: $bg-primary;
+  cursor: pointer;
+  min-width: 100px;
+  height: 32px;
+  
+  &:hover {
+    border-color: $accent-color;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: $accent-color;
+    box-shadow: 0 0 0 2px rgba($accent-color, 0.25);
+  }
+}
+
+// Modal
+.modal-overlay {
+  @include modal-overlay;
+}
+
+.modal-content {
+  @include modal-content;
+}
+
+.modal-header {
+  @include modal-header;
+}
+
+.modal-close {
+  @include modal-close;
+}
+
+// Form
+.account-form {
+  @include card-body;
+}
+
+.form-group {
+  margin-bottom: $spacing-xl;
+  
+  label {
+    display: block;
+    margin-bottom: $spacing-sm;
+    font-weight: 500;
+    color: $text-primary;
+    font-size: $font-size-sm;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-xl;
+  
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-input, .form-select {
+  @include input-base;
+}
+
+.form-actions {
+  @include flex-between;
+  gap: $spacing-md;
+  margin-top: $spacing-3xl;
+  padding-top: $spacing-xl;
+  border-top: 1px solid $border-light;
+  
+  @include mobile {
+    flex-direction: column;
+    
+    .btn {
+      width: 100%;
+    }
+  }
+}
+
+// No data state
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: $text-secondary;
+}
+
+// Loading and error states
+.loading-container, .error-container {
+  @include flex-center;
+  @include flex-column;
+  padding: 40px;
+  
+  p {
+    margin-bottom: $spacing-lg;
+    color: $text-secondary;
+  }
+} 

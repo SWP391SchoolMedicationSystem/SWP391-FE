@@ -1,190 +1,623 @@
 /* StudentHealthRecord.css */
-.health-record-container {
+.manage-health-records-container {
   padding: 20px;
-  background: linear-gradient(to right, #56d0db, #2d77c1);
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.health-record-header {
-  text-align: center;
-  margin-bottom: 30px;
+.page-header {
+  background: linear-gradient(135deg, #56d0db, #2d77c1);
   color: white;
+  padding: 30px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.health-record-header h1 {
+.header-content h1 {
+  margin: 0 0 10px 0;
   font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 10px;
-  color: #56d0db;
 }
 
-.health-record-header p {
-  font-size: 1.1rem;
-  opacity: 0.9;
+.header-content p {
   margin: 0;
+  font-size: 1.2rem;
+  opacity: 0.9;
 }
 
-.placeholder-content {
+.header-actions {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
+  gap: 15px;
 }
 
-.placeholder-card {
-  background: white;
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  max-width: 600px;
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-}
-
-.placeholder-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(to right, #56d0db, #2d77c1);
-}
-
-.placeholder-icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
-  animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-  0%,
-  20%,
-  50%,
-  80%,
-  100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-10px);
-  }
-  60% {
-    transform: translateY(-5px);
-  }
-}
-
-.placeholder-card h2 {
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 15px;
-  font-weight: 600;
-}
-
-.placeholder-card p {
-  color: #666;
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
-
-.feature-list {
-  text-align: left;
-  margin: 20px 0;
-  padding: 0;
-  list-style: none;
-}
-
-.feature-list li {
-  padding: 8px 0;
-  color: #555;
+.add-record-btn,
+.export-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
   font-size: 1rem;
-  position: relative;
-  padding-left: 30px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
-.feature-list li::before {
-  content: "✓";
-  position: absolute;
-  left: 0;
-  color: #667eea;
-  font-weight: bold;
+.add-record-btn:hover,
+.export-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Stats Cards */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+  font-size: 3rem;
+  margin-right: 20px;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+}
+
+.stat-card.total .stat-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stat-card.active .stat-icon {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.stat-card.monitoring .stat-icon {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+}
+
+.stat-card.high-priority .stat-icon {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+}
+
+.stat-content h3 {
+  margin: 0 0 8px 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2d77c1;
+}
+
+.stat-content p {
+  margin: 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+/* Filter Section */
+.filter-section {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.filter-section h3 {
+  margin: 0 0 20px 0;
+  color: #2d77c1;
+  font-size: 1.5rem;
+}
+
+.class-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.class-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.class-btn:hover,
+.class-btn.active {
+  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  color: white;
+  transform: translateY(-2px);
+  border-color: transparent;
+}
+
+.class-icon {
   font-size: 1.2rem;
 }
 
-.coming-soon {
-  margin-top: 30px;
+.student-count {
+  font-size: 0.9rem;
+  opacity: 0.8;
 }
 
-.badge {
-  background: linear-gradient(to right, #56d0db, #2d77c1);
-  color: white;
-  padding: 8px 20px;
-  border-radius: 25px;
+/* Students Section */
+.students-section {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.section-header h3 {
+  margin: 0;
+  color: #2d77c1;
+  font-size: 1.5rem;
+}
+
+.students-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+/* Student Card */
+.student-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.student-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-color: #56d0db;
+}
+
+.student-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.student-avatar {
+  font-size: 3rem;
+  margin-right: 15px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  border-radius: 50%;
+}
+
+.student-info h4 {
+  margin: 0 0 5px 0;
+  color: #2d77c1;
+  font-size: 1.3rem;
+}
+
+.student-code,
+.student-birth {
+  margin: 2px 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.student-class {
+  margin: 2px 0;
+  color: #007bff;
   font-size: 0.9rem;
   font-weight: 500;
-  display: inline-block;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-  animation: glow 2s ease-in-out infinite alternate;
 }
 
-@keyframes glow {
-  from {
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+.student-status {
+  margin-left: auto;
+}
+
+.health-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.student-details {
+  margin-bottom: 15px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #555;
+}
+
+.student-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.view-btn {
+  flex: 1;
+  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(45, 119, 193, 0.3);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 15px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.large-modal {
+  max-width: 1000px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px;
+  border-bottom: 1px solid #eee;
+  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  color: white;
+  border-radius: 15px 15px 0 0;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background 0.3s ease;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+  padding: 25px;
+}
+
+/* Student Info Section */
+.student-info-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.info-item label {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.info-item span {
+  color: #333;
+}
+
+/* Health Records Section */
+.health-records-section h4 {
+  margin: 0 0 20px 0;
+  color: #2d77c1;
+  font-size: 1.3rem;
+}
+
+.records-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.record-item {
+  background: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.record-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.record-title h5 {
+  margin: 0 0 5px 0;
+  color: #2d77c1;
+  font-size: 1.1rem;
+}
+
+.record-type {
+  background: #e9ecef;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.record-meta {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.severity-badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.record-date {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.record-content p {
+  margin: 8px 0;
+  color: #555;
+  line-height: 1.5;
+}
+
+.record-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.edit-btn {
+  background: #ffc107;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.edit-btn:hover {
+  background: #e0a800;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #56d0db;
+  box-shadow: 0 0 0 3px rgba(86, 208, 219, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  padding-top: 25px;
+  border-top: 1px solid #eee;
+  margin-top: 25px;
+}
+
+.btn-secondary,
+.btn-primary {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(45, 119, 193, 0.3);
+}
+
+.no-data,
+.no-records {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+.no-records p {
+  margin: 0;
+  font-style: italic;
+}
+
+@media (max-width: 1024px) {
+  .students-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
-  to {
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+
+  .modal-content {
+    margin: 10px;
+    max-height: 95vh;
   }
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
-  .health-record-container {
+  .manage-health-records-container {
     padding: 15px;
   }
 
-  .health-record-header h1 {
+  .page-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .header-content h1 {
     font-size: 2rem;
   }
 
-  .placeholder-card {
-    padding: 30px 20px;
-    margin: 0 10px;
+  .stats-cards {
+    grid-template-columns: 1fr;
   }
 
-  .placeholder-card h2 {
-    font-size: 1.6rem;
+  .students-grid {
+    grid-template-columns: 1fr;
   }
 
-  .placeholder-icon {
-    font-size: 3rem;
+  .class-buttons {
+    flex-direction: column;
   }
 
-  .feature-list li {
-    font-size: 0.9rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .health-record-header h1 {
-    font-size: 1.8rem;
+  .class-btn {
+    justify-content: center;
   }
 
-  .health-record-header p {
-    font-size: 1rem;
+  .info-grid {
+    grid-template-columns: 1fr;
   }
 
-  .placeholder-card {
-    padding: 25px 15px;
+  .form-grid {
+    grid-template-columns: 1fr;
   }
 
-  .placeholder-card h2 {
-    font-size: 1.4rem;
-  }
-
-  .placeholder-card p {
-    font-size: 1rem;
+  .modal-actions {
+    flex-direction: column;
   }
 }

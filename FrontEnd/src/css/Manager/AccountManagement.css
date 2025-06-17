@@ -270,6 +270,28 @@
 .action-buttons {
   display: flex;
   gap: 8px;
+  align-items: center;
+}
+
+.status-select-inline {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+  background-color: white;
+  cursor: pointer;
+  min-width: 100px;
+  height: 32px;
+}
+
+.status-select-inline:hover {
+  border-color: #007bff;
+}
+
+.status-select-inline:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 /* No Data */

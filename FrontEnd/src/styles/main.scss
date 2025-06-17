@@ -1,0 +1,39 @@
+// ==========================================
+// MAIN SCSS FILE
+// ==========================================
+
+// Core imports
+@use './variables' as *;
+@use './mixins' as *;
+@use './components' as *;
+
+// Reset và base styles
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+body {
+  font-family: $font-family;
+  color: $text-primary;
+  background-color: $bg-secondary;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Link styles
+a {
+  color: $primary-color;
+  text-decoration: none;
+  transition: $transition-base;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+} 

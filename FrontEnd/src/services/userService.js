@@ -236,6 +236,44 @@ const userService = {
     localStorage.removeItem("rememberedAccounts");
   },
 
+  // Send reset password email
+  sendResetPasswordEmail: async (email) => {
+    const response = await axios.post(
+      "https://api-schoolhealth.purintech.id.vn/api/Email/sendEmail",
+      {
+        to: email,
+        subject: "Đặt lại mật khẩu - Medlearn",
+        body: "demo",
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
+  },
+
+  // Verify reset code (mock function - replace with real API when available)
+  verifyResetCode: async (email, code) => {
+    // Mock verification - replace with real API call
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    if (code.length !== 6) {
+      throw new Error("Mã xác nhận không hợp lệ");
+    }
+
+    return { success: true, message: "Mã xác nhận hợp lệ" };
+  },
+
+  // Reset password (mock function - replace with real API when available)
+  resetPassword: async (email, verificationCode, newPassword) => {
+    // Mock reset - replace with real API call
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    return { success: true, message: "Đặt lại mật khẩu thành công" };
+  },
+
   // Logout function
   logout: () => {
     localStorage.removeItem("token");
