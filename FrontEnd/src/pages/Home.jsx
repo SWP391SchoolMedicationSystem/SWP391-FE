@@ -379,81 +379,285 @@ export default function Home() {
       <Container maxWidth="lg" sx={{ py: 6 }}>
         <Box sx={{ textAlign: "center", mb: 4 }}>
           <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-            Our <span style={{ color: "#56D0DB" }}>Main Services</span>
+            Các <span style={{ color: "#56D0DB" }}>Dịch vụ Chính</span>
           </Typography>
           <Typography
             variant="h6"
             sx={{ fontWeight: "bold", color: "text.secondary" }}
           >
-            Categories
+            Danh mục dịch vụ
           </Typography>
         </Box>
 
-        <Grid container spacing={0} alignItems="stretch">
-          {mainServices.map((service, index) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={6}
-              key={index}
-              sx={{
-                display: "flex",
-                alignItems: "stretch",
-              }}
-            >
-              <Box sx={{ width: "100%", display: "flex" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {/* First row - 2 services with gap */}
+          <Grid container spacing={10} sx={{ justifyContent: "center" }}>
+            {mainServices.slice(0, 2).map((service, index) => (
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                md={3}
+                key={index}
+              >
                 <Card
                   sx={{
                     width: "100%",
+                    height: "350px",
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-between",
+                    alignItems: "center",
                     textAlign: "center",
                     background: service.bgColor,
-                    borderRadius: 3,
-                    flexGrow: 1,
+                    borderRadius: 4,
                     cursor: "pointer",
                     border: "none",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+                    position: "relative",
+                    overflow: "hidden",
+                    transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                     "&:hover": {
-                      transform: "translateY(-8px)",
-                      boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
+                      transform: "translateY(-12px) scale(1.02)",
+                      boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+                    },
+                    "&::before": {
+                      content: '""',
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: index === 1 ? 
+                        "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)" :
+                        "linear-gradient(135deg, rgba(86,208,219,0.05) 0%, rgba(45,119,193,0.05) 100%)",
+                      zIndex: 1,
                     },
                     p: 4,
                   }}
                 >
-                  <Box>{service.icon}</Box>
-                  <Box>
+                  {/* Icon Section */}
+                  <Box sx={{ 
+                    zIndex: 2, 
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    pt: 2
+                  }}>
+                    <Box sx={{ 
+                      width: 80,
+                      height: 80,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: "50%", 
+                      background: index === 1 ? 
+                        "rgba(255,255,255,0.15)" : 
+                        index === 0 ? "rgba(25,118,210,0.1)" : "rgba(46,125,50,0.1)",
+                      backdropFilter: "blur(10px)",
+                      border: index === 1 ? 
+                        "2px solid rgba(255,255,255,0.2)" : 
+                        index === 0 ? "2px solid rgba(25,118,210,0.1)" : "2px solid rgba(46,125,50,0.1)",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        transform: "rotate(10deg) scale(1.1)",
+                        background: index === 1 ? 
+                          "rgba(255,255,255,0.25)" : 
+                          index === 0 ? "rgba(25,118,210,0.15)" : "rgba(46,125,50,0.15)",
+                      }
+                    }}>
+                      {React.cloneElement(service.icon, {
+                        sx: { 
+                          fontSize: 40, 
+                          color: index === 1 ? "white" : 
+                                 index === 0 ? "#1976D2" : "#2E7D32"
+                        }
+                      })}
+                    </Box>
+                  </Box>
+
+                  {/* Content Section */}
+                  <Box sx={{ 
+                    zIndex: 2, 
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                    px: 2,
+                    pb: 2
+                  }}>
                     <Typography
-                      variant="h6"
+                      variant="h5"
                       sx={{
                         fontWeight: "bold",
-                        mt: 2,
-                        mb: 1,
-                        color: index === 1 ? "white" : "text.primary",
+                        mb: 2,
+                        color: index === 1 ? "white" : "#1a237e",
+                        fontSize: "1.3rem",
+                        lineHeight: 1.2,
                       }}
                     >
                       {service.title}
                     </Typography>
                     <Typography
-                      variant="body2"
+                      variant="body1"
                       sx={{
-                        color:
-                          index === 1
-                            ? "rgba(255,255,255,0.9)"
-                            : "text.secondary",
+                        color: index === 1 ? "rgba(255,255,255,0.9)" : "#4a5568",
+                        lineHeight: 1.5,
+                        fontSize: "0.9rem",
+                        textAlign: "center",
+                        maxWidth: "200px",
                       }}
                     >
                       {service.description}
                     </Typography>
                   </Box>
+
+                  {/* Decorative element */}
+                  <Box sx={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: "4px",
+                    background: index === 1 ? 
+                      "linear-gradient(90deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%)" :
+                      "linear-gradient(90deg, #56D0DB 0%, #2D77C1 100%)",
+                    zIndex: 2,
+                  }} />
                 </Card>
-              </Box>
+              </Grid>
+            ))}
+          </Grid>
+          
+          {/* Second row - 1 service centered */}
+          <Grid container sx={{ justifyContent: "center" }}>
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+            >
+              <Card
+                sx={{
+                  width: "100%",
+                  height: "350px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  textAlign: "center",
+                  background: mainServices[2].bgColor,
+                  borderRadius: 4,
+                  cursor: "pointer",
+                  border: "none",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+                  position: "relative",
+                  overflow: "hidden",
+                  transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                  "&:hover": {
+                    transform: "translateY(-12px) scale(1.02)",
+                    boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+                  },
+                  "&::before": {
+                    content: '""',
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: "linear-gradient(135deg, rgba(86,208,219,0.05) 0%, rgba(45,119,193,0.05) 100%)",
+                    zIndex: 1,
+                  },
+                  p: 4,
+                }}
+              >
+                {/* Icon Section */}
+                <Box sx={{ 
+                  zIndex: 2, 
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  pt: 2
+                }}>
+                  <Box sx={{ 
+                    width: 80,
+                    height: 80,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "50%", 
+                    background: "rgba(46,125,50,0.1)",
+                    backdropFilter: "blur(10px)",
+                    border: "2px solid rgba(46,125,50,0.1)",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      transform: "rotate(10deg) scale(1.1)",
+                      background: "rgba(46,125,50,0.15)",
+                    }
+                  }}>
+                    {React.cloneElement(mainServices[2].icon, {
+                      sx: { 
+                        fontSize: 40, 
+                        color: "#2E7D32"
+                      }
+                    })}
+                  </Box>
+                </Box>
+
+                {/* Content Section */}
+                <Box sx={{ 
+                  zIndex: 2, 
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  textAlign: "center",
+                  px: 2,
+                  pb: 2
+                }}>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: "bold",
+                      mb: 2,
+                      color: "#1a237e",
+                      fontSize: "1.3rem",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {mainServices[2].title}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: "#4a5568",
+                      lineHeight: 1.5,
+                      fontSize: "0.9rem",
+                      textAlign: "center",
+                      maxWidth: "200px",
+                    }}
+                  >
+                    {mainServices[2].description}
+                  </Typography>
+                </Box>
+
+                {/* Decorative element */}
+                <Box sx={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: "4px",
+                  background: "linear-gradient(90deg, #56D0DB 0%, #2D77C1 100%)",
+                  zIndex: 2,
+                }} />
+              </Card>
             </Grid>
-          ))}
-        </Grid>
+          </Grid>
+        </Box>
       </Container>
 
       {/* Service Categories Detail - Fixed height and alignment */}
@@ -462,9 +666,9 @@ export default function Home() {
           {["vaccination", "healthCheckup", "medicinesSupplies"].map(
             (key, i) => {
               const titles = {
-                vaccination: "Vaccination Schedule",
-                healthCheckup: "Health Checkup Schedule",
-                medicinesSupplies: "Medicines & Supplies",
+                vaccination: "Lịch Tiêm Chủng",
+                healthCheckup: "Lịch Khám Sức Khỏe", 
+                medicinesSupplies: "Thuốc & Vật Tư Y Tế",
               };
               const icons = {
                 vaccination: (
@@ -544,10 +748,10 @@ export default function Home() {
                       }}
                     >
                       {key === "vaccination"
-                        ? "SEE VACCINATION SCHEDULE"
+                        ? "XEM LỊCH TIÊM CHỦNG"
                         : key === "healthCheckup"
-                        ? "SEE CHECKUP SCHEDULE"
-                        : "SEE MEDICAL SUPPLIES"}
+                        ? "XEM LỊCH KHÁM SỨC KHỎE"
+                        : "XEM VẬT TƯ Y TẾ"}
                     </Button>
                   </Paper>
                 </Grid>
@@ -557,7 +761,6 @@ export default function Home() {
         </Grid>
       </Container>
 
-            
       {/* Our Doctors Section */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Grid container spacing={4} alignItems="center">
@@ -632,7 +835,7 @@ export default function Home() {
               }}
             >
               <Avatar
-                src="https://randomuser.me/api/portraits/women/44.jpg" // bạn có thể thay bằng hình bác sĩ thật của bạn
+                src="https://randomuser.me/api/portraits/women/44.jpg"
                 alt="Doctor"
                 sx={{
                   width: "100%",
@@ -705,12 +908,12 @@ export default function Home() {
           }}
         >
           <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-            Get started with <span style={{ color: "#FFE082" }}>MedLearn</span>
+            Bắt đầu với <span style={{ color: "#FFE082" }}>MedLearn</span>
           </Typography>
           <Typography variant="body1" sx={{ mb: 4, opacity: 0.9 }}>
-            Join thousands of schools already using our comprehensive medical
-            management system. Start managing student health records,
-            vaccination schedules, and medical monitoring with ease.
+            Tham gia cùng hàng nghìn trường học đã sử dụng hệ thống quản lý y tế 
+            toàn diện của chúng tôi. Bắt đầu quản lý hồ sơ sức khỏe học sinh,
+            lịch tiêm chủng và giám sát y tế một cách dễ dàng.
           </Typography>
           <Button
             variant="contained"
@@ -726,7 +929,7 @@ export default function Home() {
               },
             }}
           >
-            Get Started
+            Bắt đầu ngay
           </Button>
         </Paper>
       </Container>
