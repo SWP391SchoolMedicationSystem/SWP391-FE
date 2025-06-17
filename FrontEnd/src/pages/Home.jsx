@@ -412,7 +412,7 @@ export default function Home() {
                     background: service.bgColor,
                     borderRadius: 4,
                     cursor: "pointer",
-                    border: "none",
+                    border: index === 1 ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(86,208,219,0.1)",
                     boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
                     position: "relative",
                     overflow: "hidden",
@@ -420,6 +420,7 @@ export default function Home() {
                     "&:hover": {
                       transform: "translateY(-12px) scale(1.02)",
                       boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+                      border: index === 1 ? "1px solid rgba(255,255,255,0.2)" : "1px solid rgba(86,208,219,0.2)",
                     },
                     "&::before": {
                       content: '""',
@@ -432,6 +433,19 @@ export default function Home() {
                         "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)" :
                         "linear-gradient(135deg, rgba(86,208,219,0.05) 0%, rgba(45,119,193,0.05) 100%)",
                       zIndex: 1,
+                    },
+                    "&::after": {
+                      content: '""',
+                      position: "absolute",
+                      top: -2,
+                      right: -2,
+                      width: "40px",
+                      height: "40px",
+                      background: index === 1 ? 
+                        "radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)" :
+                        "radial-gradient(circle, rgba(86,208,219,0.3) 0%, transparent 70%)",
+                      borderRadius: "50%",
+                      zIndex: 2,
                     },
                     p: 4,
                   }}
@@ -459,21 +473,49 @@ export default function Home() {
                       border: index === 1 ? 
                         "2px solid rgba(255,255,255,0.2)" : 
                         index === 0 ? "2px solid rgba(25,118,210,0.1)" : "2px solid rgba(46,125,50,0.1)",
+                      boxShadow: index === 1 ? 
+                        "0 8px 20px rgba(255,255,255,0.1)" :
+                        "0 8px 20px rgba(86,208,219,0.2)",
                       transition: "all 0.3s ease",
                       "&:hover": {
                         transform: "rotate(10deg) scale(1.1)",
                         background: index === 1 ? 
                           "rgba(255,255,255,0.25)" : 
                           index === 0 ? "rgba(25,118,210,0.15)" : "rgba(46,125,50,0.15)",
+                        boxShadow: index === 1 ? 
+                          "0 12px 30px rgba(255,255,255,0.2)" :
+                          "0 12px 30px rgba(86,208,219,0.3)",
                       }
                     }}>
                       {React.cloneElement(service.icon, {
                         sx: { 
                           fontSize: 40, 
                           color: index === 1 ? "white" : 
-                                 index === 0 ? "#1976D2" : "#2E7D32"
+                                 index === 0 ? "#1976D2" : "#2E7D32",
+                          filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))"
                         }
                       })}
+                    </Box>
+                    
+                    {/* Small indicator dots */}
+                    <Box sx={{ 
+                      display: "flex", 
+                      gap: 0.5, 
+                      mt: 2,
+                      opacity: 0.6
+                    }}>
+                      {[1, 2, 3].map((dot) => (
+                        <Box
+                          key={dot}
+                          sx={{
+                            width: 4,
+                            height: 4,
+                            borderRadius: "50%",
+                            background: index === 1 ? "white" : "#56D0DB",
+                            opacity: dot === index + 1 ? 1 : 0.3,
+                          }}
+                        />
+                      ))}
                     </Box>
                   </Box>
 
@@ -492,10 +534,11 @@ export default function Home() {
                       variant="h5"
                       sx={{
                         fontWeight: "bold",
-                        mb: 2,
+                        mb: 1.5,
                         color: index === 1 ? "white" : "#1a237e",
                         fontSize: "1.3rem",
                         lineHeight: 1.2,
+                        textShadow: index === 1 ? "0 2px 4px rgba(0,0,0,0.1)" : "none",
                       }}
                     >
                       {service.title}
@@ -508,10 +551,39 @@ export default function Home() {
                         fontSize: "0.9rem",
                         textAlign: "center",
                         maxWidth: "200px",
+                        mb: 2,
                       }}
                     >
                       {service.description}
                     </Typography>
+                    
+                    {/* Action button */}
+                    <Box
+                      sx={{
+                        px: 3,
+                        py: 1,
+                        borderRadius: "20px",
+                        background: index === 1 ? 
+                          "rgba(255,255,255,0.2)" : 
+                          "rgba(86,208,219,0.1)",
+                        border: index === 1 ? 
+                          "1px solid rgba(255,255,255,0.3)" : 
+                          "1px solid rgba(86,208,219,0.2)",
+                        color: index === 1 ? "white" : "#2D77C1",
+                        fontSize: "0.8rem",
+                        fontWeight: 500,
+                        cursor: "pointer",
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          background: index === 1 ? 
+                            "rgba(255,255,255,0.3)" : 
+                            "rgba(86,208,219,0.2)",
+                          transform: "translateY(-2px)",
+                        }
+                      }}
+                    >
+                      Tìm hiểu thêm
+                    </Box>
                   </Box>
 
                   {/* Decorative element */}
@@ -520,10 +592,14 @@ export default function Home() {
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    height: "4px",
+                    height: "6px",
                     background: index === 1 ? 
-                      "linear-gradient(90deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%)" :
-                      "linear-gradient(90deg, #56D0DB 0%, #2D77C1 100%)",
+                      "linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.4) 100%)" :
+                      "linear-gradient(90deg, #56D0DB 0%, #2D77C1 50%, #56D0DB 100%)",
+                    borderRadius: "0 0 4px 4px",
+                    boxShadow: index === 1 ? 
+                      "0 -2px 8px rgba(255,255,255,0.2)" :
+                      "0 -2px 8px rgba(86,208,219,0.3)",
                     zIndex: 2,
                   }} />
                 </Card>
@@ -551,7 +627,7 @@ export default function Home() {
                   background: mainServices[2].bgColor,
                   borderRadius: 4,
                   cursor: "pointer",
-                  border: "none",
+                  border: "1px solid rgba(86,208,219,0.1)",
                   boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
                   position: "relative",
                   overflow: "hidden",
@@ -559,6 +635,7 @@ export default function Home() {
                   "&:hover": {
                     transform: "translateY(-12px) scale(1.02)",
                     boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+                    border: "1px solid rgba(86,208,219,0.2)",
                   },
                   "&::before": {
                     content: '""',
@@ -569,6 +646,17 @@ export default function Home() {
                     bottom: 0,
                     background: "linear-gradient(135deg, rgba(86,208,219,0.05) 0%, rgba(45,119,193,0.05) 100%)",
                     zIndex: 1,
+                  },
+                  "&::after": {
+                    content: '""',
+                    position: "absolute",
+                    top: -2,
+                    right: -2,
+                    width: "40px",
+                    height: "40px",
+                    background: "radial-gradient(circle, rgba(86,208,219,0.3) 0%, transparent 70%)",
+                    borderRadius: "50%",
+                    zIndex: 2,
                   },
                   p: 4,
                 }}
@@ -592,18 +680,42 @@ export default function Home() {
                     background: "rgba(46,125,50,0.1)",
                     backdropFilter: "blur(10px)",
                     border: "2px solid rgba(46,125,50,0.1)",
+                    boxShadow: "0 8px 20px rgba(86,208,219,0.2)",
                     transition: "all 0.3s ease",
                     "&:hover": {
                       transform: "rotate(10deg) scale(1.1)",
                       background: "rgba(46,125,50,0.15)",
+                      boxShadow: "0 12px 30px rgba(86,208,219,0.3)",
                     }
                   }}>
                     {React.cloneElement(mainServices[2].icon, {
                       sx: { 
                         fontSize: 40, 
-                        color: "#2E7D32"
+                        color: "#2E7D32",
+                        filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))"
                       }
                     })}
+                  </Box>
+                  
+                  {/* Small indicator dots */}
+                  <Box sx={{ 
+                    display: "flex", 
+                    gap: 0.5, 
+                    mt: 2,
+                    opacity: 0.6
+                  }}>
+                    {[1, 2, 3].map((dot) => (
+                      <Box
+                        key={dot}
+                        sx={{
+                          width: 4,
+                          height: 4,
+                          borderRadius: "50%",
+                          background: "#56D0DB",
+                          opacity: dot === 3 ? 1 : 0.3,
+                        }}
+                      />
+                    ))}
                   </Box>
                 </Box>
 
@@ -622,7 +734,7 @@ export default function Home() {
                     variant="h5"
                     sx={{
                       fontWeight: "bold",
-                      mb: 2,
+                      mb: 1.5,
                       color: "#1a237e",
                       fontSize: "1.3rem",
                       lineHeight: 1.2,
@@ -638,10 +750,33 @@ export default function Home() {
                       fontSize: "0.9rem",
                       textAlign: "center",
                       maxWidth: "200px",
+                      mb: 2,
                     }}
                   >
                     {mainServices[2].description}
                   </Typography>
+                  
+                  {/* Action button */}
+                  <Box
+                    sx={{
+                      px: 3,
+                      py: 1,
+                      borderRadius: "20px",
+                      background: "rgba(86,208,219,0.1)",
+                      border: "1px solid rgba(86,208,219,0.2)",
+                      color: "#2D77C1",
+                      fontSize: "0.8rem",
+                      fontWeight: 500,
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        background: "rgba(86,208,219,0.2)",
+                        transform: "translateY(-2px)",
+                      }
+                    }}
+                  >
+                    Tìm hiểu thêm
+                  </Box>
                 </Box>
 
                 {/* Decorative element */}
@@ -650,8 +785,10 @@ export default function Home() {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: "4px",
-                  background: "linear-gradient(90deg, #56D0DB 0%, #2D77C1 100%)",
+                  height: "6px",
+                  background: "linear-gradient(90deg, #56D0DB 0%, #2D77C1 50%, #56D0DB 100%)",
+                  borderRadius: "0 0 4px 4px",
+                  boxShadow: "0 -2px 8px rgba(86,208,219,0.3)",
                   zIndex: 2,
                 }} />
               </Card>
