@@ -403,47 +403,80 @@ export default function Home() {
                 <Card
                   sx={{
                     width: "100%",
-                    height: "280px",
+                    height: "320px",
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
                     textAlign: "center",
                     background: service.bgColor,
-                    borderRadius: 3,
+                    borderRadius: 4,
                     cursor: "pointer",
                     border: "none",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+                    position: "relative",
+                    overflow: "hidden",
+                    transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                     "&:hover": {
-                      transform: "translateY(-8px)",
-                      boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
+                      transform: "translateY(-12px) scale(1.02)",
+                      boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
                     },
-                    p: 3,
+                    "&::before": {
+                      content: '""',
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: index === 1 ? 
+                        "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)" :
+                        "linear-gradient(135deg, rgba(86,208,219,0.05) 0%, rgba(45,119,193,0.05) 100%)",
+                      zIndex: 1,
+                    },
+                    p: 4,
                   }}
                 >
-                  <Box sx={{ mb: 3 }}>
-                    {service.icon}
+                  <Box sx={{ mb: 3, zIndex: 2, position: "relative" }}>
+                    <Box sx={{ 
+                      p: 2, 
+                      borderRadius: "50%", 
+                      background: index === 1 ? 
+                        "rgba(255,255,255,0.2)" : 
+                        "rgba(86,208,219,0.1)",
+                      mb: 2,
+                      transition: "transform 0.3s ease",
+                      "&:hover": {
+                        transform: "rotate(10deg) scale(1.1)"
+                      }
+                    }}>
+                      {service.icon}
+                    </Box>
                   </Box>
                   <Typography
-                    variant="h6"
+                    variant="h5"
                     sx={{
                       fontWeight: "bold",
                       mb: 2,
-                      color: index === 1 ? "white" : "text.primary",
+                      color: index === 1 ? "white" : "#1a237e",
+                      zIndex: 2,
+                      position: "relative",
+                      fontSize: "1.4rem",
                     }}
                   >
                     {service.title}
                   </Typography>
                   <Typography
-                    variant="body2"
+                    variant="body1"
                     sx={{
                       color:
                         index === 1
                           ? "rgba(255,255,255,0.9)"
-                          : "text.secondary",
-                      lineHeight: 1.5,
+                          : "#4a5568",
+                      lineHeight: 1.6,
                       px: 1,
+                      zIndex: 2,
+                      position: "relative",
+                      fontSize: "0.95rem",
                     }}
                   >
                     {service.description}
@@ -464,44 +497,73 @@ export default function Home() {
               <Card
                 sx={{
                   width: "100%",
-                  height: "280px",
+                  height: "320px",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
                   textAlign: "center",
                   background: mainServices[2].bgColor,
-                  borderRadius: 3,
+                  borderRadius: 4,
                   cursor: "pointer",
                   border: "none",
-                  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+                  position: "relative",
+                  overflow: "hidden",
+                  transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                   "&:hover": {
-                    transform: "translateY(-8px)",
-                    boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
+                    transform: "translateY(-12px) scale(1.02)",
+                    boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
                   },
-                  p: 3,
+                  "&::before": {
+                    content: '""',
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: "linear-gradient(135deg, rgba(86,208,219,0.05) 0%, rgba(45,119,193,0.05) 100%)",
+                    zIndex: 1,
+                  },
+                  p: 4,
                 }}
               >
-                <Box sx={{ mb: 3 }}>
-                  {mainServices[2].icon}
+                <Box sx={{ mb: 3, zIndex: 2, position: "relative" }}>
+                  <Box sx={{ 
+                    p: 2, 
+                    borderRadius: "50%", 
+                    background: "rgba(46,125,50,0.1)",
+                    mb: 2,
+                    transition: "transform 0.3s ease",
+                    "&:hover": {
+                      transform: "rotate(10deg) scale(1.1)"
+                    }
+                  }}>
+                    {mainServices[2].icon}
+                  </Box>
                 </Box>
                 <Typography
-                  variant="h6"
+                  variant="h5"
                   sx={{
                     fontWeight: "bold",
                     mb: 2,
-                    color: "text.primary",
+                    color: "#1a237e",
+                    zIndex: 2,
+                    position: "relative",
+                    fontSize: "1.4rem",
                   }}
                 >
                   {mainServices[2].title}
                 </Typography>
                 <Typography
-                  variant="body2"
+                  variant="body1"
                   sx={{
-                    color: "text.secondary",
-                    lineHeight: 1.5,
+                    color: "#4a5568",
+                    lineHeight: 1.6,
                     px: 1,
+                    zIndex: 2,
+                    position: "relative",
+                    fontSize: "0.95rem",
                   }}
                 >
                   {mainServices[2].description}
