@@ -15,45 +15,49 @@ import {
   Avatar,
 } from "@mui/material";
 import {
-  People,
-  MedicalServices,
+  Home,
   Article,
-  Chat,
+  MedicalServices,
   Notifications,
+  Chat,
+  FolderShared,
+  PersonalVideo,
+  Add,
+  Edit,
   Menu,
   Logout,
   ChatBubbleOutline,
-  VaccinesOutlined,
-  Medication,
-  Assignment,
+  Search,
 } from "@mui/icons-material";
 import userService from "../../services/userService";
 
 const drawerWidth = 240;
 
 const navItems = [
-  { to: "/nurse", label: "Danh Sách Tiêm Chủng", icon: <VaccinesOutlined /> },
+  { to: "/parent", label: "Trang Chủ", icon: <Home /> },
+  { to: "/parent/blog", label: "Xem Blog", icon: <Article /> },
   {
-    to: "/nurse/medication-schedule",
-    label: "Lịch Uống Thuốc",
-    icon: <Medication />,
-  },
-  {
-    to: "/nurse/handle-medicine",
-    label: "Xử Lý Thuốc",
+    to: "/parent/health-history",
+    label: "Lịch Sử Khám Sức Khỏe",
     icon: <MedicalServices />,
   },
-  { to: "/nurse/blog", label: "Blog", icon: <Article /> },
-  { to: "/nurse/chat", label: "Chat Phụ Huynh", icon: <Chat /> },
-  { to: "/nurse/student-list", label: "Danh Sách Học Sinh", icon: <People /> },
+  { to: "/parent/notifications", label: "Thông Báo", icon: <Notifications /> },
+  { to: "/parent/consultation", label: "Tư Vấn Y Tế", icon: <PersonalVideo /> },
+  { to: "/parent/chat", label: "Chat Với Y Tá", icon: <Chat /> },
   {
-    to: "/nurse/health-records",
+    to: "/parent/health-records",
     label: "Hồ Sơ Sức Khỏe",
-    icon: <Assignment />,
+    icon: <FolderShared />,
+  },
+  { to: "/parent/health-records/add", label: "Thêm Hồ Sơ", icon: <Add /> },
+  {
+    to: "/parent/health-records/edit",
+    label: "Cập Nhật Hồ Sơ",
+    icon: <Edit />,
   },
 ];
 
-export default function NurseLayout() {
+export default function ParentLayout() {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState(null);
 
@@ -77,13 +81,13 @@ export default function NurseLayout() {
 
   // Get user display info
   const getUserDisplayName = () => {
-    if (!userInfo) return "Y Tá";
-    return userInfo.userName || userInfo.email?.split("@")[0] || "Y Tá";
+    if (!userInfo) return "Phụ Huynh";
+    return userInfo.userName || userInfo.email?.split("@")[0] || "Phụ Huynh";
   };
 
   const getUserEmail = () => {
-    if (!userInfo) return "nurse@example.com";
-    return userInfo.email || "nurse@example.com";
+    if (!userInfo) return "parent@example.com";
+    return userInfo.email || "parent@example.com";
   };
 
   const getUserAvatar = () => {
@@ -108,14 +112,14 @@ export default function NurseLayout() {
         }}
       >
         <Toolbar sx={{ fontWeight: "bold", fontSize: 20, color: "#2D77C1" }}>
-          MedNurse 👩‍⚕️
+          Parent Portal 👨‍👩‍👧‍👦
         </Toolbar>
         <List>
           {navItems.map(({ to, label, icon }) => (
             <NavLink
               to={to}
               key={to}
-              end={to === "/nurse"} // chỉ dùng end cho trang chính
+              end={to === "/parent"} // chỉ dùng end cho trang chủ
               style={{ textDecoration: "none" }}
             >
               {({ isActive }) => (
@@ -221,7 +225,7 @@ export default function NurseLayout() {
                 }}
               >
                 <InputBase
-                  placeholder="Tìm kiếm thông tin, học sinh, etc."
+                  placeholder="Tìm kiếm thông tin sức khỏe, blog..."
                   sx={{ pl: 2, pr: 2, py: 0.5, width: "100%" }}
                 />
               </Box>

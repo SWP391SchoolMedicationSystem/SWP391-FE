@@ -1,236 +1,214 @@
-import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../css/Manager/Dashboard.css";
 
 function Dashboard() {
-  // Mock data for dashboard statistics
-  const dashboardStats = {
-    totalUsers: {
-      value: 3782,
+  const navigate = useNavigate();
+
+  // Enhanced dashboard statistics
+  const dashboardStats = [
+    {
+      title: "Tổng Người Dùng",
+      value: "3,782",
       change: "+11.01%",
       changeType: "positive",
+      icon: "👥",
+      color: "blue",
+      description: "Tổng số người dùng trong hệ thống",
     },
-    activeManagers: {
-      value: 45,
-      change: "+6.08%",
+    {
+      title: "Học Sinh Đang Học",
+      value: "2,456",
+      change: "+8.2%",
       changeType: "positive",
+      icon: "🎓",
+      color: "green",
+      description: "Số học sinh hiện tại",
     },
-    formCategories: {
-      value: 28,
-      change: "+9.45%",
+    {
+      title: "Lịch Tiêm Hôm Nay",
+      value: "24",
+      change: "+15.3%",
       changeType: "positive",
+      icon: "💉",
+      color: "purple",
+      description: "Lịch tiêm chủng hôm nay",
     },
-    systemHealth: {
+    {
+      title: "Tình Trạng Hệ Thống",
       value: "99.9%",
       change: "-0.05%",
       changeType: "negative",
+      icon: "⚡",
+      color: "orange",
+      description: "Thời gian hoạt động hệ thống",
     },
+  ];
+
+  // Quick actions for easy navigation
+  const quickActions = [
+    {
+      title: "Quản Lý Tài Khoản",
+      description: "Thêm, sửa, xóa tài khoản người dùng",
+      icon: "👤",
+      color: "blue",
+      path: "/manager/accounts",
+    },
+    {
+      title: "Quản Lý Blog",
+      description: "Tạo và quản lý bài viết blog",
+      icon: "📝",
+      color: "green",
+      path: "/manager/blogs",
+    },
+    {
+      title: "Danh Sách Tiêm Chủng",
+      description: "Theo dõi lịch tiêm chủng học sinh",
+      icon: "💉",
+      color: "purple",
+      path: "/manager/vaccinations",
+    },
+    {
+      title: "Danh Sách Học Sinh",
+      description: "Quản lý thông tin học sinh",
+      icon: "🎓",
+      color: "orange",
+      path: "/manager/StudentList",
+    },
+  ];
+
+  // Recent activities
+  const recentActivities = [
+    {
+      type: "user",
+      message: "Tài khoản mới được tạo: Nguyễn Văn A (Phụ huynh)",
+      time: "2 giờ trước",
+      icon: "👤",
+    },
+    {
+      type: "vaccination",
+      message: "Lịch tiêm chủng mới được thêm cho lớp 6A",
+      time: "3 giờ trước",
+      icon: "💉",
+    },
+    {
+      type: "blog",
+      message: "Bài viết mới: 'Hướng dẫn chăm sóc sức khỏe học sinh'",
+      time: "5 giờ trước",
+      icon: "📝",
+    },
+    {
+      type: "system",
+      message: "Sao lưu dữ liệu hoàn tất thành công",
+      time: "6 giờ trước",
+      icon: "💾",
+    },
+  ];
+
+  const handleQuickAction = (path) => {
+    navigate(path);
   };
-
-  // Mock data for user growth trend (monthly)
-  const userGrowthData = [
-    { month: "Jan", managers: 8, nurses: 15, parents: 25 },
-    { month: "Feb", managers: 10, nurses: 18, parents: 30 },
-    { month: "Mar", managers: 12, nurses: 22, parents: 35 },
-    { month: "Apr", managers: 15, nurses: 25, parents: 40 },
-    { month: "May", managers: 18, nurses: 28, parents: 45 },
-    { month: "Jun", managers: 20, nurses: 30, parents: 50 },
-  ];
-
-  // Mock data for system activity (daily)
-  const systemActivityData = [
-    { day: "Mon", activity: 450 },
-    { day: "Tue", activity: 480 },
-    { day: "Wed", activity: 420 },
-    { day: "Thu", activity: 650 },
-    { day: "Fri", activity: 580 },
-    { day: "Sat", activity: 320 },
-    { day: "Sun", activity: 380 },
-  ];
 
   return (
     <div className="dashboard-container">
-      {/* Header Section */}
-      <div className="dashboard-header">
-        <h1 className="dashboard-title">Bảng Điều Khiển Quản Trị</h1>
-        <p className="dashboard-subtitle">
-          Quản lý toàn bộ hệ thống y tế từ bảng điều khiển quản trị trung tâm
-          này.
-        </p>
+      {/* Welcome Header */}
+      <div className="dashboard-welcome">
+        <div className="welcome-content">
+          <h1>Chào mừng trở lại! 👋</h1>
+          <p>Quản lý hệ thống y tế trường học một cách hiệu quả</p>
+        </div>
+        <div className="welcome-date">
+          <div className="current-date">
+            {new Date().toLocaleDateString("vi-VN", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Statistics Cards */}
-      <div className="stats-grid">
-        <div className="stat-card total-users">
-          <div className="stat-header">
-            <h3>Tổng Người Dùng</h3>
-          </div>
-          <div className="stat-content">
-            <div className="stat-value">
-              {dashboardStats.totalUsers.value.toLocaleString()}
+      <div className="stats-section">
+        <h2 className="section-title">Thống Kê Tổng Quan</h2>
+        <div className="stats-grid">
+          {dashboardStats.map((stat, index) => (
+            <div key={index} className={`stat-card ${stat.color}`}>
+              <div className="stat-icon">{stat.icon}</div>
+              <div className="stat-content">
+                <div className="stat-value">{stat.value}</div>
+                <div className="stat-title">{stat.title}</div>
+                <div className="stat-description">{stat.description}</div>
+                <div className={`stat-change ${stat.changeType}`}>
+                  {stat.change}
+                </div>
+              </div>
             </div>
-            <div
-              className={`stat-change ${dashboardStats.totalUsers.changeType}`}
-            >
-              {dashboardStats.totalUsers.change}
-            </div>
-          </div>
-        </div>
-
-        <div className="stat-card active-managers">
-          <div className="stat-header">
-            <h3>Quản Lý Hoạt Động</h3>
-          </div>
-          <div className="stat-content">
-            <div className="stat-value">
-              {dashboardStats.activeManagers.value}
-            </div>
-            <div
-              className={`stat-change ${dashboardStats.activeManagers.changeType}`}
-            >
-              {dashboardStats.activeManagers.change}
-            </div>
-          </div>
-        </div>
-
-        <div className="stat-card form-categories">
-          <div className="stat-header">
-            <h3>Danh Mục Biểu Mẫu</h3>
-          </div>
-          <div className="stat-content">
-            <div className="stat-value">
-              {dashboardStats.formCategories.value}
-            </div>
-            <div
-              className={`stat-change ${dashboardStats.formCategories.changeType}`}
-            >
-              {dashboardStats.formCategories.change}
-            </div>
-          </div>
-        </div>
-
-        <div className="stat-card system-health">
-          <div className="stat-header">
-            <h3>Tình Trạng Hệ Thống</h3>
-          </div>
-          <div className="stat-content">
-            <div className="stat-value">
-              {dashboardStats.systemHealth.value}
-            </div>
-            <div
-              className={`stat-change ${dashboardStats.systemHealth.changeType}`}
-            >
-              {dashboardStats.systemHealth.change}
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
-      {/* Charts Section */}
-      <div className="charts-section">
-        <div className="chart-container user-growth">
-          <div className="chart-header">
-            <h3>Xu Hướng Tăng Trưởng Người Dùng</h3>
-            <p>Đăng ký người dùng hàng tháng theo từng vai trò</p>
-          </div>
-          <div className="chart-placeholder">
-            <div className="chart-legend">
-              <div className="legend-item">
-                <span className="legend-color managers"></span>
-                <span>Quản Lý</span>
+      {/* Quick Actions */}
+      <div className="quick-actions-section">
+        <h2 className="section-title">Thao Tác Nhanh</h2>
+        <div className="quick-actions-grid">
+          {quickActions.map((action, index) => (
+            <div
+              key={index}
+              className={`quick-action-card ${action.color}`}
+              onClick={() => handleQuickAction(action.path)}
+            >
+              <div className="action-icon">{action.icon}</div>
+              <div className="action-content">
+                <h3>{action.title}</h3>
+                <p>{action.description}</p>
               </div>
-              <div className="legend-item">
-                <span className="legend-color nurses"></span>
-                <span>Y Tá</span>
-              </div>
-              <div className="legend-item">
-                <span className="legend-color parents"></span>
-                <span>Phụ Huynh</span>
-              </div>
+              <div className="action-arrow">→</div>
             </div>
-            <div className="chart-data">
-              {/* Placeholder for chart - will be replaced with actual chart later */}
-              <div className="chart-bars">
-                {userGrowthData.map((data, index) => (
-                  <div key={index} className="chart-bar-group">
-                    <div className="month-label">{data.month}</div>
-                    <div className="bars">
-                      <div
-                        className="bar managers"
-                        style={{ height: `${data.managers * 3}px` }}
-                        title={`Managers: ${data.managers}`}
-                      ></div>
-                      <div
-                        className="bar nurses"
-                        style={{ height: `${data.nurses * 3}px` }}
-                        title={`Nurses: ${data.nurses}`}
-                      ></div>
-                      <div
-                        className="bar parents"
-                        style={{ height: `${data.parents * 3}px` }}
-                        title={`Parents: ${data.parents}`}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="chart-container system-activity">
-          <div className="chart-header">
-            <h3>Tổng Quan Hoạt Động Hệ Thống</h3>
-            <p>Sử dụng và hoạt động hệ thống hàng ngày</p>
-          </div>
-          <div className="chart-placeholder">
-            <div className="activity-chart">
-              {/* Placeholder for activity chart */}
-              <div className="activity-data">
-                {systemActivityData.map((data, index) => (
-                  <div key={index} className="activity-point">
-                    <div className="day-label">{data.day}</div>
-                    <div
-                      className="activity-bar"
-                      style={{ height: `${data.activity / 10}px` }}
-                      title={`${data.day}: ${data.activity} activities`}
-                    ></div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
-      {/* Additional Information Section */}
-      <div className="dashboard-info">
-        <div className="info-card recent-activities">
-          <h4>Recent Activities</h4>
-          <ul>
-            <li>New user registration: John Doe (Parent) - 2 hours ago</li>
-            <li>Form submitted: Medical History Update - 3 hours ago</li>
-            <li>System backup completed successfully - 5 hours ago</li>
-            <li>New appointment scheduled - 6 hours ago</li>
-          </ul>
+      {/* Recent Activities & System Status */}
+      <div className="bottom-section">
+        <div className="recent-activities">
+          <h3>Hoạt Động Gần Đây</h3>
+          <div className="activities-list">
+            {recentActivities.map((activity, index) => (
+              <div key={index} className="activity-item">
+                <div className="activity-icon">{activity.icon}</div>
+                <div className="activity-content">
+                  <p>{activity.message}</p>
+                  <span className="activity-time">{activity.time}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="info-card system-status">
-          <h4>System Status</h4>
-          <div className="status-item">
-            <span className="status-indicator online"></span>
-            <span>Database: Online</span>
-          </div>
-          <div className="status-item">
-            <span className="status-indicator online"></span>
-            <span>API Services: Online</span>
-          </div>
-          <div className="status-item">
-            <span className="status-indicator online"></span>
-            <span>File Storage: Online</span>
-          </div>
-          <div className="status-item">
-            <span className="status-indicator warning"></span>
-            <span>Email Service: Limited</span>
+        <div className="system-status">
+          <h3>Trạng Thái Hệ Thống</h3>
+          <div className="status-list">
+            <div className="status-item">
+              <div className="status-indicator online"></div>
+              <span>Cơ sở dữ liệu</span>
+              <span className="status-text">Hoạt động</span>
+            </div>
+            <div className="status-item">
+              <div className="status-indicator online"></div>
+              <span>API Services</span>
+              <span className="status-text">Hoạt động</span>
+            </div>
+            <div className="status-item">
+              <div className="status-indicator online"></div>
+              <span>Lưu trữ file</span>
+              <span className="status-text">Hoạt động</span>
+            </div>
+            <div className="status-item">
+              <div className="status-indicator warning"></div>
+              <span>Email Service</span>
+              <span className="status-text">Hạn chế</span>
+            </div>
           </div>
         </div>
       </div>
