@@ -1,0 +1,233 @@
+/* File: src/css/HomePage.css */
+
+/* CSS Variables */
+:root {
+  --accent-color-main: #56d0db;
+  --accent-color-dark: #2d77c1;
+  --text-light-color: #333;
+  --text-description-color: #666;
+  --tagline-color: #888;
+  --header-bg-color: #fff;
+  --overview-bg-color: #f8f9fa;
+  --card-heading-color: #333;
+  --card-text-color: #666;
+  --card-border-radius: 12px;
+  --card-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --card-hover-box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* HEADER */
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 10%;
+  background: var(--header-bg-color);
+  border-bottom: none;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--accent-color-main);
+}
+
+.tagline {
+  font-size: 1rem;
+  color: var(--tagline-color);
+  margin-left: 8px;
+  font-weight: normal;
+}
+
+.nav-links a {
+  margin-left: 30px;
+  color: var(--text-light-color);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: var(--accent-color-main);
+}
+
+/* HERO SECTION */
+.hero-section {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 50px 0;
+  min-height: 80vh;
+  color: var(--text-light-color);
+  background-color: #f8f9fa;
+}
+
+.hero-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+
+.hero-text {
+  flex: 1;
+  max-width: 500px;
+  text-align: left;
+  z-index: 2;
+  position: relative;
+}
+
+.hero-text h1 {
+  font-size: 3.5rem;
+  line-height: 1.2;
+  margin-bottom: 20px;
+  color: var(--text-light-color);
+}
+
+.hero-text .highlight {
+  color: var(--accent-color-main);
+}
+
+.hero-text p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  color: var(--text-description-color);
+}
+
+.learn-more {
+  background-color: var(--accent-color-main);
+  color: #ffffff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.learn-more:hover {
+  background-color: var(--accent-color-dark);
+  transform: translateY(-2px);
+}
+
+.hero-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-image img {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* OVERVIEW SECTION */
+.system-overview {
+  padding: 50px 10%;
+  text-align: left;
+  background: var(--overview-bg-color);
+}
+
+.system-overview h2 {
+  font-size: 2.5rem;
+  color: var(--card-heading-color);
+  margin-bottom: 10px;
+}
+
+.system-overview > p {
+  font-size: 1.1rem;
+  color: var(--card-text-color);
+  margin-bottom: 40px;
+}
+
+.overview-cards {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.card {
+  background: var(--text-light-color);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-box-shadow);
+  padding: 25px;
+  flex: 1;
+  min-width: 220px;
+  max-width: 280px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--card-hover-box-shadow);
+}
+
+.card h3 {
+  font-size: 1.4rem;
+  color: var(--accent-color-main);
+  margin-bottom: 10px;
+}
+
+.card .number {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: var(--card-heading-color);
+  margin-bottom: 5px;
+}
+
+.card .note {
+  font-size: 0.9rem;
+  color: var(--card-text-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .hero-section {
+    justify-content: center;
+    text-align: center;
+    padding: 50px 5%;
+  }
+  .hero-text {
+    max-width: 100%;
+  }
+  .hero-text h1 {
+    font-size: 2.8rem;
+  }
+  .overview-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+  .card {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 600px) {
+  .main-header,
+  .system-overview {
+    padding: 15px 5%;
+  }
+  .main-header {
+    flex-direction: column;
+  }
+  .nav-links {
+    margin-top: 15px;
+  }
+  .nav-links a {
+    margin: 0 10px;
+  }
+  .hero-text h1 {
+    font-size: 2.2rem;
+  }
+}

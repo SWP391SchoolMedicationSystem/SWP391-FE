@@ -1,3 +1,25 @@
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Global fix for search input icons */
+input[type="search"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+
+/* Fix for any search inputs */
+input[placeholder*="search" i],
+input[placeholder*="tìm" i] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }

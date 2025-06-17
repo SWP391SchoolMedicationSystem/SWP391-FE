@@ -1,18 +1,119 @@
-import React, { useState } from "react";
+// import React, { useState } from "react";
 import "./App.css";
-
-import { Routes, Route, BrowserRouter } from "react-router-dom";
-import MedlearnLoginPage from "./pages/Login"; // Đảm bảo đúng đường dẫn
+import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
+import Login from "./pages/Login";
+import ManagerLayout from "./components/layout/ManagerLayout";
+import Dashboard from "./pages/Manager/Dashboard";
+import AccountManagement from "./pages/Manager/AccountManagement";
+import BlogManagement from "./pages/Manager/BlogManagement";
+import VaccinationList from "./pages/Manager/VaccinationList";
+import Notifications from "./pages/Manager/Notifications";
+import CategoryForms from "./pages/Manager/CategoryForms";
+import ViewInformation from "./pages/Manager/ViewInformation";
+import Settings from "./pages/Manager/Settings";
+import StudentList from "./pages/Manager/StudentList";
+import ProtectedRoute from "./components/ProtectedRoute";
+// Nurse imports
+import NurseLayout from "./components/layout/NurseLayout";
+import NurseVaccinationList from "./pages/Nurse/VaccinationList";
+import MedicationSchedule from "./pages/Nurse/MedicationSchedule";
+import HandleMedicine from "./pages/Nurse/HandleMedicine";
+import NurseStudentList from "./pages/Nurse/StudentList";
+import NurseBlog from "./pages/Nurse/Blog";
+import ChatWithParents from "./pages/Nurse/ChatWithParents";
+import StudentHealthRecord from "./pages/Nurse/StudentHealthRecord";
+
+// Parent imports
+import ParentLayout from "./components/layout/ParentLayout";
+import ParentDashboard from "./pages/Parent/Dashboard";
+import ViewBlog from "./pages/Parent/ViewBlog";
+import HealthHistory from "./pages/Parent/HealthHistory";
+import ParentNotifications from "./pages/Parent/Notifications";
+import Consultation from "./pages/Parent/Consultation";
+import ChatWithNurse from "./pages/Parent/ChatWithNurse";
+import ManageHealthRecords from "./pages/Parent/ManageHealthRecords";
+import AdminPlaceholder from "./pages/AdminPlaceholder";
 
 function App() {
   return (
-    <>
+    <div className="App">
       <Routes>
-        <Route path="/" element={<MedlearnLoginPage />} />
+        {/* Public routes */}
         <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Login />} />
+
+        {/* Admin placeholder route */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <AdminPlaceholder />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Manager routes */}
+        <Route
+          path="/manager"
+          element={
+            <ProtectedRoute allowedRoles={["Manager"]}>
+              <ManagerLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Dashboard />} />
+          <Route path="accounts" element={<AccountManagement />} />
+          <Route path="blogs" element={<BlogManagement />} />
+          <Route path="vaccinations" element={<VaccinationList />} />
+          <Route path="StudentList" element={<StudentList />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="forms" element={<CategoryForms />} />
+          <Route path="info" element={<ViewInformation />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
+
+        {/* Nurse routes */}
+        <Route
+          path="/nurse"
+          element={
+            <ProtectedRoute allowedRoles={["Nurse"]}>
+              <NurseLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<NurseVaccinationList />} />
+          <Route path="medication-schedule" element={<MedicationSchedule />} />
+          <Route path="handle-medicine" element={<HandleMedicine />} />
+          <Route path="student-list" element={<NurseStudentList />} />
+          <Route path="blog" element={<NurseBlog />} />
+          <Route path="chat" element={<ChatWithParents />} />
+          <Route path="health-records" element={<StudentHealthRecord />} />
+        </Route>
+
+        {/* Parent routes */}
+        <Route
+          path="/parent"
+          element={
+            <ProtectedRoute allowedRoles={["Parent"]}>
+              <ParentLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<ParentDashboard />} />
+          <Route path="dashboard" element={<ParentDashboard />} />
+          <Route path="view-blog" element={<ViewBlog />} />
+          <Route path="health-history" element={<HealthHistory />} />
+          <Route path="notifications" element={<ParentNotifications />} />
+          <Route path="consultation" element={<Consultation />} />
+          <Route path="chat-nurse" element={<ChatWithNurse />} />
+          <Route
+            path="manage-health-records"
+            element={<ManageHealthRecords />}
+          />
+        </Route>
       </Routes>
-    </>
+    </div>
   );
 }
 
