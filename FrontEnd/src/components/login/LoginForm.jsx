@@ -280,26 +280,6 @@ export default function LoginForm() {
                 </>
               ) : (
                 <>
-                  <h2>Thông tin người dùng</h2>
-                  <img
-                    src={user.picture}
-                    alt="avatar"
-                    style={{ borderRadius: "50%" }}
-                  />
-                  <p>
-                    <strong>Họ tên:</strong> {user.name}
-                  </p>
-                  <p>
-                    <strong>Email:</strong> {user.email}
-                  </p>
-                  <button
-                    onClick={() => {
-                      googleLogout();
-                      setUser(null);
-                    }}
-                  >
-                    Logout
-                  </button>
                 </>
               )}
             </div>
