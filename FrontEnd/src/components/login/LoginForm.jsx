@@ -216,7 +216,7 @@ export default function LoginForm() {
                 ></Typography>
                 <Link
                   component={RouterLink}
-                  to="#"
+                  to="/reset-password"
                   variant="body2"
                   sx={{ textDecoration: "none" }}
                 >

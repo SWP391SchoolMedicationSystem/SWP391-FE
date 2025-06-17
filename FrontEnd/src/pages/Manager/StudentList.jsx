@@ -125,10 +125,16 @@ function StudentList() {
   const [filterClass, setFilterClass] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [currentStudent, setCurrentStudent] = useState(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importError, setImportError] = useState("");
+  const [importSuccess, setImportSuccess] = useState("");
   const fileInputRef = useRef(null);
 
   // Available classes for preschool
   const classes = ["Mầm", "Chồi", "Lá 1", "Lá 2", "Lá 3"];
+
+  // API endpoint - để trống theo yêu cầu
+  const API_ENDPOINT = ""; // Thêm đường dẫn API ở đây
 
   // Filter students based on search and class filter
   const filteredStudents = students.filter((student) => {
@@ -149,20 +155,122 @@ function StudentList() {
 
   // Handle file import
   const handleFileImport = () => {
+    // Reset previous messages
+    setImportError("");
+    setImportSuccess("");
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      // Here you would normally send the file to your backend API
-      console.log("File selected:", file.name);
-      alert(`Đã chọn file: ${file.name}\nSẽ gửi đến API backend để xử lý.`);
+  // Validate file type and size
+  const validateFile = (file) => {
+    const allowedTypes = [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+      "application/vnd.ms-excel", // .xls
+      "text/csv", // .csv
+    ];
 
+    const maxSize = 10 * 1024 * 1024; // 10MB
+
+    if (!allowedTypes.includes(file.type)) {
+      return "Chỉ chấp nhận file Excel (.xlsx, .xls) hoặc CSV (.csv)";
+    }
+
+    if (file.size > maxSize) {
+      return "File quá lớn. Vui lòng chọn file nhỏ hơn 10MB";
+    }
+
+    return null;
+  };
+
+  // API call to import file
+  const importStudentFile = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", "student_import");
+
+    try {
+      const response = await fetch(API_ENDPOINT, {
+        method: "POST",
+        body: formData,
+        headers: {
+          // Don't set Content-Type header, let browser set it with boundary for multipart/form-data
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Thêm token nếu cần
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
+      }
+
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error("Import error:", error);
+      throw error;
+    }
+  };
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Reset previous messages
+    setImportError("");
+    setImportSuccess("");
+
+    // Validate file
+    const validationError = validateFile(file);
+    if (validationError) {
+      setImportError(validationError);
+      event.target.value = "";
+      return;
+    }
+
+    // Start importing
+    setIsImporting(true);
+
+    try {
+      const result = await importStudentFile(file);
+
+      // Handle success
+      setImportSuccess(
+        `Import thành công! Đã thêm ${result.importedCount || 0} học sinh.`
+      );
+
+      // Optional: Refresh student list or update state
+      // You might want to call a function to refresh the student list here
+      console.log("Import result:", result);
+    } catch (error) {
+      // Handle error
+      setImportError(`Lỗi import file: ${error.message}`);
+    } finally {
+      setIsImporting(false);
       // Reset file input
       event.target.value = "";
     }
   };
+
+  // Clear messages after some time
+  React.useEffect(() => {
+    if (importSuccess) {
+      const timer = setTimeout(() => {
+        setImportSuccess("");
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [importSuccess]);
+
+  React.useEffect(() => {
+    if (importError) {
+      const timer = setTimeout(() => {
+        setImportError("");
+      }, 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [importError]);
 
   // Get health status badge class
   const getHealthStatusClass = (status) => {
@@ -184,6 +292,22 @@ function StudentList() {
         <h1>Danh Sách Học Sinh</h1>
         <p>Quản lý thông tin học sinh trường mầm non</p>
       </div>
+
+      {/* Import Messages */}
+      {(importError || importSuccess || isImporting) && (
+        <div className="import-messages">
+          {isImporting && (
+            <div className="message importing">
+              <span className="loading-spinner">⏳</span>
+              Đang import file, vui lòng đợi...
+            </div>
+          )}
+          {importSuccess && (
+            <div className="message success">✅ {importSuccess}</div>
+          )}
+          {importError && <div className="message error">❌ {importError}</div>}
+        </div>
+      )}
 
       {/* Controls */}
       <div className="controls-section">
@@ -211,8 +335,12 @@ function StudentList() {
             </select>
           </div>
 
-          <button className="import-btn" onClick={handleFileImport}>
-            📁 Import File
+          <button
+            className={`import-btn ${isImporting ? "importing" : ""}`}
+            onClick={handleFileImport}
+            disabled={isImporting}
+          >
+            {isImporting ? "⏳ Đang import..." : "📁 Import File"}
           </button>
           <input
             type="file"
@@ -220,6 +348,7 @@ function StudentList() {
             onChange={handleFileChange}
             accept=".xlsx,.xls,.csv"
             style={{ display: "none" }}
+            disabled={isImporting}
           />
         </div>
       </div>

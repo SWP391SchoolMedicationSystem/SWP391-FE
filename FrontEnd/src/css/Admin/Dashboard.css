@@ -1,0 +1,144 @@
+.admin-dashboard {
+  padding: 24px;
+  min-height: 100vh;
+  background-color: #f7f7f7;
+}
+
+.dashboard-header {
+  margin-bottom: 32px;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  color: #1f2937;
+  font-weight: 700;
+}
+
+.stat-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.stat-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  color: white;
+}
+
+.stat-info h4 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.stat-info .MuiTypography-body2 {
+  margin: 4px 0 0 0;
+  font-weight: 500;
+}
+
+.quick-actions-card,
+.activities-card,
+.system-health-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+}
+
+.quick-actions .MuiButton-root {
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.activities-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-icon {
+  font-size: 20px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9fafb;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.system-health-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.health-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.health-item:last-child {
+  border-bottom: none;
+}
+
+.health-info {
+  flex: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-dashboard {
+    padding: 16px;
+  }
+
+  .dashboard-header {
+    margin-bottom: 24px;
+  }
+
+  .stat-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+  }
+}

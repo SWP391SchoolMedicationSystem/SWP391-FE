@@ -2,369 +2,357 @@ import React, { useState } from "react";
 import "../../css/Parent/ManageHealthRecords.css";
 
 function ManageHealthRecords() {
-  const [selectedRecord, setSelectedRecord] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const [selectedChild, setSelectedChild] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
-  // Mock data
-  const healthRecords = [
+  // Mock data - Danh sách con em của phụ huynh đăng nhập
+  const myChildren = [
     {
       id: 1,
-      studentName: "Nguyễn Minh Khôi",
-      recordType: "Tiền sử bệnh",
-      title: "Dị ứng thức ăn",
-      description: "Dị ứng với tôm cua và các loại hải sản",
-      severity: "medium",
-      date: "2024-01-15",
-      status: "active",
-      doctor: "BS. Nguyễn Thị Lan",
-      medications: ["Thuốc chống dị ứng Cetirizine"],
-      notes: "Tránh tiếp xúc với hải sản, luôn mang theo thuốc",
+      name: "Nguyễn Minh An",
+      studentCode: "MN001",
+      dateOfBirth: "2020-05-15",
+      gender: "Nam",
+      className: "Lớp Mầm",
+      address: "123 Đường ABC, Quận 1, TP.HCM",
+      healthStatus: "Bình thường",
+      avatar: "👶",
+      healthRecords: [
+        {
+          id: 1,
+          type: "Dị ứng",
+          title: "Dị ứng sữa bò",
+          description: "Dị ứng với protein sữa bò, gây nôn và tiêu chảy",
+          severity: "Trung bình",
+          date: "2024-01-15",
+          doctor: "BS. Nguyễn Thị Lan",
+          medications: ["Sữa không lactose"],
+          notes: "Cho uống sữa đặc biệt, không cho sữa bò thường",
+          status: "Đang theo dõi",
+        },
+        {
+          id: 2,
+          type: "Khám định kỳ",
+          title: "Tiêm chủng định kỳ",
+          description: "Tiêm vaccine phòng bệnh theo lịch",
+          severity: "Bình thường",
+          date: "2024-03-10",
+          doctor: "BS. Phạm Văn Minh",
+          medications: [],
+          notes: "Đã tiêm đủ vaccine theo độ tuổi",
+          status: "Hoàn thành",
+        },
+      ],
     },
     {
       id: 2,
-      studentName: "Nguyễn Minh Khôi",
-      recordType: "Bệnh mãn tính",
-      title: "Hen suyễn nhẹ",
-      description: "Hen suyễn do vận động mạnh",
-      severity: "low",
-      date: "2023-09-10",
-      status: "monitoring",
-      doctor: "BS. Phạm Văn Minh",
-      medications: ["Bình xịt Ventolin"],
-      notes: "Tránh vận động quá sức, nghỉ ngơi khi khó thở",
-    },
-    {
-      id: 3,
-      studentName: "Nguyễn Minh Khôi",
-      recordType: "Thông tin sức khỏe",
-      title: "Nhóm máu",
-      description: "Nhóm máu O+",
-      severity: "info",
-      date: "2023-08-01",
-      status: "active",
-      doctor: "Y tá Lê Thị Hoa",
-      medications: [],
-      notes: "Thông tin nhóm máu cho trường hợp cấp cứu",
+      name: "Nguyễn Thị Bé",
+      studentCode: "MN008",
+      dateOfBirth: "2019-08-22",
+      gender: "Nữ",
+      className: "Lớp Chồi",
+      address: "123 Đường ABC, Quận 1, TP.HCM",
+      healthStatus: "Tốt",
+      avatar: "👧",
+      healthRecords: [
+        {
+          id: 3,
+          type: "Khám định kỳ",
+          title: "Kiểm tra sức khỏe tổng quát",
+          description: "Khám sức khỏe định kỳ cho trẻ mầm non",
+          severity: "Bình thường",
+          date: "2024-02-20",
+          doctor: "BS. Lê Thị Mai",
+          medications: [],
+          notes: "Sức khỏe tốt, phát triển bình thường",
+          status: "Hoàn thành",
+        },
+      ],
     },
   ];
 
-  const recordTypes = [
-    { id: "medical_history", name: "Tiền sử bệnh", icon: "📋" },
-    { id: "chronic_disease", name: "Bệnh mãn tính", icon: "🏥" },
-    { id: "allergy", name: "Dị ứng", icon: "⚠️" },
-    { id: "medication", name: "Thuốc đang dùng", icon: "💊" },
-    { id: "health_info", name: "Thông tin sức khỏe", icon: "📄" },
-  ];
-
-  const getSeverityColor = (severity) => {
+  const getHealthStatusColor = (status) => {
     const colors = {
-      high: "#dc3545",
-      medium: "#ffc107",
-      low: "#28a745",
-      info: "#17a2b8",
-    };
-    return colors[severity] || "#6c757d";
-  };
-
-  const getSeverityText = (severity) => {
-    const texts = {
-      high: "Cao",
-      medium: "Trung bình",
-      low: "Thấp",
-      info: "Thông tin",
-    };
-    return texts[severity] || severity;
-  };
-
-  const getStatusColor = (status) => {
-    const colors = {
-      active: "#28a745",
-      monitoring: "#ffc107",
-      resolved: "#6c757d",
+      Tốt: "#28a745",
+      "Bình thường": "#17a2b8",
+      "Cần chú ý": "#ffc107",
+      "Nghiêm trọng": "#dc3545",
     };
     return colors[status] || "#6c757d";
   };
 
-  const getStatusText = (status) => {
-    const texts = {
-      active: "Đang theo dõi",
-      monitoring: "Cần giám sát",
-      resolved: "Đã khỏi",
+  const getSeverityColor = (severity) => {
+    const colors = {
+      Nhẹ: "#28a745",
+      "Trung bình": "#ffc107",
+      Nặng: "#dc3545",
+      "Bình thường": "#17a2b8",
     };
-    return texts[status] || status;
+    return colors[severity] || "#6c757d";
   };
 
-  const handleViewRecord = (record) => {
-    setSelectedRecord(record);
-    setShowModal(true);
+  const handleViewChild = (child) => {
+    setSelectedChild(child);
+    setShowDetailModal(true);
   };
+
+  const totalRecords = myChildren.reduce(
+    (sum, child) => sum + child.healthRecords.length,
+    0
+  );
 
   return (
-    <div className="manage-health-records-container">
+    <div className="parent-health-records-container">
       {/* Header */}
       <div className="page-header">
         <div className="header-content">
-          <h1>📋 Quản Lý Hồ Sơ Sức Khỏe</h1>
-          <p>Quản lý và theo dõi hồ sơ sức khỏe của con em</p>
-        </div>
-        <div className="header-actions">
-          <button className="add-record-btn">➕ Thêm hồ sơ mới</button>
-          <button className="export-btn">📊 Xuất báo cáo</button>
+          <h1>👨‍👩‍👧‍👦 Hồ Sơ Sức Khỏe Con Em</h1>
+          <p>Theo dõi tình trạng sức khỏe và hồ sơ y tế của con em</p>
         </div>
       </div>
 
       {/* Quick Stats */}
       <div className="stats-cards">
         <div className="stat-card total">
-          <div className="stat-icon">📋</div>
+          <div className="stat-icon">👶</div>
           <div className="stat-content">
-            <h3>{healthRecords.length}</h3>
-            <p>Tổng số hồ sơ</p>
+            <h3>{myChildren.length}</h3>
+            <p>Số con em</p>
           </div>
         </div>
         <div className="stat-card active">
-          <div className="stat-icon">🔴</div>
+          <div className="stat-icon">📋</div>
           <div className="stat-content">
-            <h3>{healthRecords.filter((r) => r.status === "active").length}</h3>
-            <p>Đang theo dõi</p>
+            <h3>{totalRecords}</h3>
+            <p>Tổng hồ sơ y tế</p>
           </div>
         </div>
         <div className="stat-card monitoring">
-          <div className="stat-icon">🟡</div>
+          <div className="stat-icon">💚</div>
           <div className="stat-content">
             <h3>
-              {healthRecords.filter((r) => r.status === "monitoring").length}
+              {
+                myChildren.filter((child) => child.healthStatus === "Tốt")
+                  .length
+              }
             </h3>
-            <p>Cần giám sát</p>
+            <p>Sức khỏe tốt</p>
           </div>
         </div>
         <div className="stat-card high-priority">
           <div className="stat-icon">⚠️</div>
           <div className="stat-content">
-            <h3>{healthRecords.filter((r) => r.severity === "high").length}</h3>
-            <p>Mức độ cao</p>
+            <h3>
+              {
+                myChildren.filter((child) => child.healthStatus === "Cần chú ý")
+                  .length
+              }
+            </h3>
+            <p>Cần chú ý</p>
           </div>
         </div>
       </div>
 
-      {/* Record Types Filter */}
-      <div className="filter-section">
-        <h3>📂 Phân loại hồ sơ</h3>
-        <div className="record-types">
-          {recordTypes.map((type) => (
-            <button key={type.id} className="type-btn">
-              <span className="type-icon">{type.icon}</span>
-              <span>{type.name}</span>
-            </button>
-          ))}
+      {/* Children List */}
+      <div className="children-section">
+        <div className="section-header">
+          <h3>👨‍👩‍👧‍👦 Danh sách con em</h3>
         </div>
-      </div>
 
-      {/* Health Records List */}
-      <div className="records-section">
-        <h3>📋 Danh sách hồ sơ sức khỏe</h3>
-        <div className="records-grid">
-          {healthRecords.map((record) => (
-            <div key={record.id} className="record-card">
-              <div className="record-header">
-                <div className="record-title">
-                  <h4>{record.title}</h4>
-                  <span className="record-type">{record.recordType}</span>
+        <div className="children-grid">
+          {myChildren.map((child) => (
+            <div key={child.id} className="child-card">
+              <div className="child-header">
+                <div className="child-avatar">{child.avatar}</div>
+                <div className="child-info">
+                  <h4>{child.name}</h4>
+                  <p className="child-code">{child.studentCode}</p>
+                  <p className="child-birth">Sinh: {child.dateOfBirth}</p>
+                  <p className="child-class">🏫 {child.className}</p>
                 </div>
-                <div className="record-meta">
+                <div className="child-status">
                   <span
-                    className="severity-badge"
+                    className="health-badge"
                     style={{
-                      backgroundColor: getSeverityColor(record.severity),
+                      backgroundColor: getHealthStatusColor(child.healthStatus),
                     }}
                   >
-                    {getSeverityText(record.severity)}
-                  </span>
-                  <span
-                    className="status-badge"
-                    style={{ backgroundColor: getStatusColor(record.status) }}
-                  >
-                    {getStatusText(record.status)}
+                    {child.healthStatus}
                   </span>
                 </div>
               </div>
 
-              <div className="record-content">
-                <p className="record-description">{record.description}</p>
-
-                <div className="record-details">
-                  <div className="detail-item">
-                    <span className="detail-label">📅 Ngày tạo:</span>
-                    <span>{record.date}</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-label">👨‍⚕️ Bác sĩ:</span>
-                    <span>{record.doctor}</span>
-                  </div>
-                  {record.medications.length > 0 && (
-                    <div className="detail-item">
-                      <span className="detail-label">💊 Thuốc:</span>
-                      <span>{record.medications.join(", ")}</span>
-                    </div>
-                  )}
+              <div className="child-details">
+                <div className="detail-row">
+                  <span className="detail-label">⚧️ Giới tính:</span>
+                  <span>{child.gender}</span>
                 </div>
-
-                <div className="record-notes">
-                  <strong>📝 Ghi chú:</strong>
-                  <p>{record.notes}</p>
+                <div className="detail-row">
+                  <span className="detail-label">📋 Hồ sơ y tế:</span>
+                  <span>{child.healthRecords.length} bản ghi</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">📅 Cập nhật gần nhất:</span>
+                  <span>
+                    {child.healthRecords.length > 0
+                      ? child.healthRecords[child.healthRecords.length - 1].date
+                      : "Chưa có"}
+                  </span>
                 </div>
               </div>
 
-              <div className="record-actions">
+              <div className="child-actions">
                 <button
                   className="view-btn"
-                  onClick={() => handleViewRecord(record)}
+                  onClick={() => handleViewChild(child)}
                 >
-                  👁️ Xem chi tiết
+                  👁️ Xem hồ sơ chi tiết
                 </button>
-                <button className="edit-btn">✏️ Chỉnh sửa</button>
-                <button className="share-btn">📤 Chia sẻ</button>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Important Health Information */}
-      <div className="important-info">
-        <h3>⚠️ Thông tin quan trọng</h3>
-        <div className="info-grid">
-          <div className="info-card emergency">
-            <div className="info-header">
-              <span className="info-icon">🚨</span>
-              <h4>Thông tin cấp cứu</h4>
-            </div>
-            <div className="info-content">
-              <p>
-                <strong>Dị ứng:</strong> Hải sản (tôm, cua)
-              </p>
-              <p>
-                <strong>Nhóm máu:</strong> O+
-              </p>
-              <p>
-                <strong>Thuốc cần thiết:</strong> Cetirizine, Ventolin
-              </p>
-            </div>
-          </div>
-          <div className="info-card contact">
-            <div className="info-header">
-              <span className="info-icon">📞</span>
-              <h4>Liên hệ khẩn cấp</h4>
-            </div>
-            <div className="info-content">
-              <p>
-                <strong>Phụ huynh:</strong> 0901-234-567
-              </p>
-              <p>
-                <strong>Bác sĩ gia đình:</strong> 0912-345-678
-              </p>
-              <p>
-                <strong>Y tế trường:</strong> 1900-1234
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* View Record Modal */}
-      {showModal && selectedRecord && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      {/* Child Detail Modal */}
+      {showDetailModal && selectedChild && (
+        <div className="modal-overlay">
+          <div className="modal-content large-modal">
             <div className="modal-header">
-              <h3>📋 Chi tiết hồ sơ sức khỏe</h3>
+              <h3>📋 Hồ sơ sức khỏe - {selectedChild.name}</h3>
               <button
                 className="modal-close"
-                onClick={() => setShowModal(false)}
+                onClick={() => setShowDetailModal(false)}
               >
-                ×
+                ✕
               </button>
             </div>
 
             <div className="modal-body">
-              <div className="record-detail">
-                <div className="detail-section">
-                  <h4>📄 Thông tin cơ bản</h4>
-                  <div className="detail-grid">
-                    <div className="detail-item">
-                      <label>Tiêu đề:</label>
-                      <span>{selectedRecord.title}</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Loại hồ sơ:</label>
-                      <span>{selectedRecord.recordType}</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Mức độ:</label>
-                      <span
-                        style={{
-                          color: getSeverityColor(selectedRecord.severity),
-                        }}
-                      >
-                        {getSeverityText(selectedRecord.severity)}
-                      </span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Trạng thái:</label>
-                      <span
-                        style={{ color: getStatusColor(selectedRecord.status) }}
-                      >
-                        {getStatusText(selectedRecord.status)}
-                      </span>
-                    </div>
+              {/* Child Info */}
+              <div className="child-info-section">
+                <div className="info-grid">
+                  <div className="info-item">
+                    <label>👤 Họ và tên:</label>
+                    <span>{selectedChild.name}</span>
                   </div>
-                </div>
-
-                <div className="detail-section">
-                  <h4>📝 Mô tả chi tiết</h4>
-                  <p>{selectedRecord.description}</p>
-                </div>
-
-                {selectedRecord.medications.length > 0 && (
-                  <div className="detail-section">
-                    <h4>💊 Thuốc đang sử dụng</h4>
-                    <ul>
-                      {selectedRecord.medications.map((med, index) => (
-                        <li key={index}>{med}</li>
-                      ))}
-                    </ul>
+                  <div className="info-item">
+                    <label>🏷️ Mã học sinh:</label>
+                    <span>{selectedChild.studentCode}</span>
                   </div>
-                )}
-
-                <div className="detail-section">
-                  <h4>📋 Ghi chú và hướng dẫn</h4>
-                  <p>{selectedRecord.notes}</p>
-                </div>
-
-                <div className="detail-section">
-                  <h4>👨‍⚕️ Thông tin y tế</h4>
-                  <div className="detail-grid">
-                    <div className="detail-item">
-                      <label>Ngày tạo:</label>
-                      <span>{selectedRecord.date}</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Bác sĩ phụ trách:</label>
-                      <span>{selectedRecord.doctor}</span>
-                    </div>
+                  <div className="info-item">
+                    <label>🎂 Ngày sinh:</label>
+                    <span>{selectedChild.dateOfBirth}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>⚧️ Giới tính:</label>
+                    <span>{selectedChild.gender}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>🏫 Lớp học:</label>
+                    <span>{selectedChild.className}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>🏠 Địa chỉ:</label>
+                    <span>{selectedChild.address}</span>
+                  </div>
+                  <div className="info-item">
+                    <label>💚 Tình trạng sức khỏe:</label>
+                    <span
+                      className="health-badge"
+                      style={{
+                        backgroundColor: getHealthStatusColor(
+                          selectedChild.healthStatus
+                        ),
+                      }}
+                    >
+                      {selectedChild.healthStatus}
+                    </span>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="modal-actions">
-              <button
-                className="btn-secondary"
-                onClick={() => setShowModal(false)}
-              >
-                Đóng
-              </button>
-              <button className="btn-primary">✏️ Chỉnh sửa</button>
-              <button className="btn-success">📤 Chia sẻ với y tá</button>
+              {/* Health Records */}
+              <div className="health-records-section">
+                <h4>📋 Hồ sơ y tế</h4>
+
+                {selectedChild.healthRecords.length > 0 ? (
+                  <div className="records-list">
+                    {selectedChild.healthRecords.map((record) => (
+                      <div key={record.id} className="record-item">
+                        <div className="record-header">
+                          <div className="record-title">
+                            <h5>{record.title}</h5>
+                            <span className="record-type">{record.type}</span>
+                          </div>
+                          <div className="record-meta">
+                            <span
+                              className="severity-badge"
+                              style={{
+                                backgroundColor: getSeverityColor(
+                                  record.severity
+                                ),
+                              }}
+                            >
+                              {record.severity}
+                            </span>
+                            <span className="record-date">{record.date}</span>
+                          </div>
+                        </div>
+
+                        <div className="record-content">
+                          <p>
+                            <strong>Mô tả:</strong> {record.description}
+                          </p>
+                          <p>
+                            <strong>Bác sĩ:</strong> {record.doctor}
+                          </p>
+                          {record.medications.length > 0 && (
+                            <p>
+                              <strong>Thuốc:</strong>{" "}
+                              {record.medications.join(", ")}
+                            </p>
+                          )}
+                          <p>
+                            <strong>Ghi chú:</strong> {record.notes}
+                          </p>
+                          <p>
+                            <strong>Trạng thái:</strong> {record.status}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-records">
+                    <p>Chưa có hồ sơ y tế nào</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Contact Info */}
+              <div className="contact-section">
+                <h4>📞 Liên hệ y tá trường</h4>
+                <div className="contact-info">
+                  <p>
+                    <strong>📱 Hotline:</strong> 1900 1234
+                  </p>
+                  <p>
+                    <strong>📧 Email:</strong> nurse@school.edu.vn
+                  </p>
+                  <p>
+                    <strong>🕐 Giờ làm việc:</strong> 7:00 - 17:00 (Thứ 2 - Thứ
+                    6)
+                  </p>
+                  <p className="note">
+                    💡{" "}
+                    <em>
+                      Vui lòng liên hệ y tá trường nếu có thắc mắc về sức khỏe
+                      của con em
+                    </em>
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -1,8 +1,9 @@
 // import React, { useState } from "react";
-import "./App.css";
+import "./styles/main.scss";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import ResetPassword from "./pages/ResetPassword";
 import ManagerLayout from "./components/layout/ManagerLayout";
 import Dashboard from "./pages/Manager/Dashboard";
 import AccountManagement from "./pages/Manager/AccountManagement";
@@ -14,6 +15,15 @@ import ViewInformation from "./pages/Manager/ViewInformation";
 import Settings from "./pages/Manager/Settings";
 import StudentList from "./pages/Manager/StudentList";
 import ProtectedRoute from "./components/ProtectedRoute";
+
+// Admin imports
+import AdminLayout from "./components/layout/AdminLayout";
+import AdminDashboard from "./pages/Admin/Dashboard";
+import ManageManagers from "./pages/Admin/ManageManagers";
+import SystemLogs from "./pages/Admin/SystemLogs";
+import FormCategories from "./pages/Admin/FormCategories";
+import AdminSettings from "./pages/Admin/Settings";
+
 // Nurse imports
 import NurseLayout from "./components/layout/NurseLayout";
 import NurseVaccinationList from "./pages/Nurse/VaccinationList";
@@ -33,7 +43,6 @@ import ParentNotifications from "./pages/Parent/Notifications";
 import Consultation from "./pages/Parent/Consultation";
 import ChatWithNurse from "./pages/Parent/ChatWithNurse";
 import ManageHealthRecords from "./pages/Parent/ManageHealthRecords";
-import AdminPlaceholder from "./pages/AdminPlaceholder";
 
 function App() {
   return (
@@ -42,16 +51,23 @@ function App() {
         {/* Public routes */}
         <Route path="/home" element={<Home />} />
         <Route path="/" element={<Login />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
-        {/* Admin placeholder route */}
+        {/* Admin routes */}
         <Route
           path="/admin"
           element={
             <ProtectedRoute allowedRoles={["Admin"]}>
-              <AdminPlaceholder />
+              <AdminLayout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="manage-managers" element={<ManageManagers />} />
+          <Route path="system-logs" element={<SystemLogs />} />
+          <Route path="form-categories" element={<FormCategories />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
 
         {/* Manager routes */}
         <Route
@@ -107,6 +123,7 @@ function App() {
           <Route path="notifications" element={<ParentNotifications />} />
           <Route path="consultation" element={<Consultation />} />
           <Route path="chat-nurse" element={<ChatWithNurse />} />
+          <Route path="health-records" element={<ManageHealthRecords />} />
           <Route
             path="manage-health-records"
             element={<ManageHealthRecords />}
