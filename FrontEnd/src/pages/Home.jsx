@@ -379,40 +379,38 @@ export default function Home() {
       <Container maxWidth="lg" sx={{ py: 6 }}>
         <Box sx={{ textAlign: "center", mb: 4 }}>
           <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-            Our <span style={{ color: "#56D0DB" }}>Main Services</span>
+            Các <span style={{ color: "#56D0DB" }}>Dịch vụ Chính</span>
           </Typography>
           <Typography
             variant="h6"
             sx={{ fontWeight: "bold", color: "text.secondary" }}
           >
-            Categories
+            Danh mục dịch vụ
           </Typography>
         </Box>
 
-        <Grid container spacing={0} alignItems="stretch">
-          {mainServices.map((service, index) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={6}
-              key={index}
-              sx={{
-                display: "flex",
-                alignItems: "stretch",
-              }}
-            >
-              <Box sx={{ width: "100%", display: "flex" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {/* First row - 2 services with gap */}
+          <Grid container spacing={10} sx={{ justifyContent: "center" }}>
+            {mainServices.slice(0, 2).map((service, index) => (
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                md={3}
+                key={index}
+              >
                 <Card
                   sx={{
                     width: "100%",
+                    height: "280px",
                     display: "flex",
                     flexDirection: "column",
-                    justifyContent: "space-between",
+                    justifyContent: "center",
+                    alignItems: "center",
                     textAlign: "center",
                     background: service.bgColor,
                     borderRadius: 3,
-                    flexGrow: 1,
                     cursor: "pointer",
                     border: "none",
                     boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
@@ -421,39 +419,97 @@ export default function Home() {
                       transform: "translateY(-8px)",
                       boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
                     },
-                    p: 4,
+                    p: 3,
                   }}
                 >
-                  <Box>{service.icon}</Box>
-                  <Box>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: "bold",
-                        mt: 2,
-                        mb: 1,
-                        color: index === 1 ? "white" : "text.primary",
-                      }}
-                    >
-                      {service.title}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color:
-                          index === 1
-                            ? "rgba(255,255,255,0.9)"
-                            : "text.secondary",
-                      }}
-                    >
-                      {service.description}
-                    </Typography>
+                  <Box sx={{ mb: 3 }}>
+                    {service.icon}
                   </Box>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: "bold",
+                      mb: 2,
+                      color: index === 1 ? "white" : "text.primary",
+                    }}
+                  >
+                    {service.title}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color:
+                        index === 1
+                          ? "rgba(255,255,255,0.9)"
+                          : "text.secondary",
+                      lineHeight: 1.5,
+                      px: 1,
+                    }}
+                  >
+                    {service.description}
+                  </Typography>
                 </Card>
-              </Box>
+              </Grid>
+            ))}
+          </Grid>
+          
+          {/* Second row - 1 service centered */}
+          <Grid container sx={{ justifyContent: "center" }}>
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+            >
+              <Card
+                sx={{
+                  width: "100%",
+                  height: "280px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  textAlign: "center",
+                  background: mainServices[2].bgColor,
+                  borderRadius: 3,
+                  cursor: "pointer",
+                  border: "none",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                  "&:hover": {
+                    transform: "translateY(-8px)",
+                    boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
+                  },
+                  p: 3,
+                }}
+              >
+                <Box sx={{ mb: 3 }}>
+                  {mainServices[2].icon}
+                </Box>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: "bold",
+                    mb: 2,
+                    color: "text.primary",
+                  }}
+                >
+                  {mainServices[2].title}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "text.secondary",
+                    lineHeight: 1.5,
+                    px: 1,
+                  }}
+                >
+                  {mainServices[2].description}
+                </Typography>
+              </Card>
             </Grid>
-          ))}
-        </Grid>
+          </Grid>
+        </Box>
       </Container>
 
       {/* Service Categories Detail - Fixed height and alignment */}
@@ -462,9 +518,9 @@ export default function Home() {
           {["vaccination", "healthCheckup", "medicinesSupplies"].map(
             (key, i) => {
               const titles = {
-                vaccination: "Vaccination Schedule",
-                healthCheckup: "Health Checkup Schedule",
-                medicinesSupplies: "Medicines & Supplies",
+                vaccination: "Lịch Tiêm Chủng",
+                healthCheckup: "Lịch Khám Sức Khỏe", 
+                medicinesSupplies: "Thuốc & Vật Tư Y Tế",
               };
               const icons = {
                 vaccination: (
@@ -544,10 +600,10 @@ export default function Home() {
                       }}
                     >
                       {key === "vaccination"
-                        ? "SEE VACCINATION SCHEDULE"
+                        ? "XEM LỊCH TIÊM CHỦNG"
                         : key === "healthCheckup"
-                        ? "SEE CHECKUP SCHEDULE"
-                        : "SEE MEDICAL SUPPLIES"}
+                        ? "XEM LỊCH KHÁM SỨC KHỎE"
+                        : "XEM VẬT TƯ Y TẾ"}
                     </Button>
                   </Paper>
                 </Grid>
@@ -557,7 +613,6 @@ export default function Home() {
         </Grid>
       </Container>
 
-            
       {/* Our Doctors Section */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Grid container spacing={4} alignItems="center">
@@ -632,7 +687,7 @@ export default function Home() {
               }}
             >
               <Avatar
-                src="https://randomuser.me/api/portraits/women/44.jpg" // bạn có thể thay bằng hình bác sĩ thật của bạn
+                src="https://randomuser.me/api/portraits/women/44.jpg"
                 alt="Doctor"
                 sx={{
                   width: "100%",
@@ -705,12 +760,12 @@ export default function Home() {
           }}
         >
           <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-            Get started with <span style={{ color: "#FFE082" }}>MedLearn</span>
+            Bắt đầu với <span style={{ color: "#FFE082" }}>MedLearn</span>
           </Typography>
           <Typography variant="body1" sx={{ mb: 4, opacity: 0.9 }}>
-            Join thousands of schools already using our comprehensive medical
-            management system. Start managing student health records,
-            vaccination schedules, and medical monitoring with ease.
+            Tham gia cùng hàng nghìn trường học đã sử dụng hệ thống quản lý y tế 
+            toàn diện của chúng tôi. Bắt đầu quản lý hồ sơ sức khỏe học sinh,
+            lịch tiêm chủng và giám sát y tế một cách dễ dàng.
           </Typography>
           <Button
             variant="contained"
@@ -726,7 +781,7 @@ export default function Home() {
               },
             }}
           >
-            Get Started
+            Bắt đầu ngay
           </Button>
         </Paper>
       </Container>
