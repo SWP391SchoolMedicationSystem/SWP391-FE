@@ -13,6 +13,7 @@ import {
   IconButton,
   InputBase,
   Avatar,
+  Typography,
 } from "@mui/material";
 import {
   Dashboard,
@@ -29,6 +30,7 @@ import {
   BarChart,
 } from "@mui/icons-material";
 import userService from "../../services/userService";
+import MedlearnLogo from "../../assets/images/Medlearn-logo.png";
 
 const drawerWidth = 240;
 
@@ -110,8 +112,56 @@ export default function ManagerLayout() {
           },
         }}
       >
-        <Toolbar sx={{ fontWeight: "bold", fontSize: 20, color: "#2D77C1" }}>
-          MedManager 🛡
+        <Toolbar
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            py: 1,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 0.5,
+            }}
+          >
+            <Box sx={{ width: "40px", height: "40px" }}>
+              <img
+                src={MedlearnLogo}
+                alt="Medlearn Logo"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                }}
+              />
+            </Box>
+            <Box sx={{ textAlign: "center" }}>
+              <Typography
+                sx={{
+                  fontSize: "0.75rem",
+                  fontWeight: "bold",
+                  color: "#2D77C1",
+                  lineHeight: 1,
+                }}
+              >
+                MEDLEARN
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "0.6rem",
+                  color: "#2D77C1",
+                  lineHeight: 1,
+                  fontWeight: "600",
+                }}
+              >
+                Manager
+              </Typography>
+            </Box>
+          </Box>
         </Toolbar>
         <List>
           {navItems.map(({ to, label, icon }) => (

@@ -13,6 +13,7 @@ import {
   IconButton,
   InputBase,
   Avatar,
+  Typography,
 } from "@mui/material";
 import {
   Home,
@@ -22,20 +23,19 @@ import {
   Chat,
   FolderShared,
   PersonalVideo,
-  Add,
-  Edit,
   Menu,
   Logout,
   ChatBubbleOutline,
   Search,
 } from "@mui/icons-material";
 import userService from "../../services/userService";
+import MedlearnLogo from "../../assets/images/Medlearn-logo.png";
 
 const drawerWidth = 240;
 
 const navItems = [
   { to: "/parent", label: "Trang Chủ", icon: <Home /> },
-  { to: "/parent/blog", label: "Xem Blog", icon: <Article /> },
+  { to: "/parent/view-blog", label: "Xem Blog", icon: <Article /> },
   {
     to: "/parent/health-history",
     label: "Lịch Sử Khám Sức Khỏe",
@@ -43,17 +43,11 @@ const navItems = [
   },
   { to: "/parent/notifications", label: "Thông Báo", icon: <Notifications /> },
   { to: "/parent/consultation", label: "Tư Vấn Y Tế", icon: <PersonalVideo /> },
-  { to: "/parent/chat", label: "Chat Với Y Tá", icon: <Chat /> },
+  { to: "/parent/chat-nurse", label: "Chat Với Y Tá", icon: <Chat /> },
   {
     to: "/parent/health-records",
     label: "Hồ Sơ Sức Khỏe",
     icon: <FolderShared />,
-  },
-  { to: "/parent/health-records/add", label: "Thêm Hồ Sơ", icon: <Add /> },
-  {
-    to: "/parent/health-records/edit",
-    label: "Cập Nhật Hồ Sơ",
-    icon: <Edit />,
   },
 ];
 
@@ -211,33 +205,55 @@ export default function ParentLayout() {
             justifyContent: "center",
           }}
         >
-          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <IconButton>
-                <Menu />
-              </IconButton>
-              <Box
-                sx={{
-                  position: "relative",
-                  width: 300,
-                  bgcolor: "#f0f0f0",
-                  borderRadius: 1,
-                }}
-              >
-                <InputBase
-                  placeholder="Tìm kiếm thông tin sức khỏe, blog..."
-                  sx={{ pl: 2, pr: 2, py: 0.5, width: "100%" }}
+          <Toolbar
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              py: 1,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 0.5,
+              }}
+            >
+              <Box sx={{ width: "40px", height: "40px" }}>
+                <img
+                  src={MedlearnLogo}
+                  alt="Medlearn Logo"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                  }}
                 />
               </Box>
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <IconButton>
-                <Notifications />
-              </IconButton>
-              <IconButton>
-                <ChatBubbleOutline />
-              </IconButton>
-              <Avatar sx={{ bgcolor: "#2D77C1" }}>{getUserAvatar()}</Avatar>
+              <Box sx={{ textAlign: "center" }}>
+                <Typography
+                  sx={{
+                    fontSize: "0.75rem",
+                    fontWeight: "bold",
+                    color: "#2D77C1",
+                    lineHeight: 1,
+                  }}
+                >
+                  MEDLEARN
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "0.6rem",
+                    color: "#2D77C1",
+                    lineHeight: 1,
+                    fontWeight: "600",
+                  }}
+                >
+                  Parents
+                </Typography>
+              </Box>
             </Box>
           </Toolbar>
         </AppBar>

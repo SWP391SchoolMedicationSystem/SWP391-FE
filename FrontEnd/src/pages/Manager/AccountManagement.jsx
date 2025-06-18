@@ -114,7 +114,6 @@ function AccountManagement() {
   const handleStatusChange = async (accountId, newStatus) => {
     try {
       await crud.update(accountId, { status: newStatus });
-      console.log("Account status updated successfully");
     } catch (error) {
       console.error("Error updating account status:", error);
     }
@@ -124,10 +123,8 @@ function AccountManagement() {
     try {
       if (modal.mode === "create") {
         await crud.create(accountData);
-        console.log("Account created successfully");
       } else if (modal.mode === "edit") {
         await crud.update(accountData.id, accountData);
-        console.log("Account updated successfully");
       }
       modal.close();
     } catch (error) {

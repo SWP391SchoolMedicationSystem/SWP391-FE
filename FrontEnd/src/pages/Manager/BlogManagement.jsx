@@ -1,95 +1,28 @@
 import React, { useState } from "react";
 import "../../css/Manager/BlogManagement.css";
+import {
+  useManagerBlogs,
+  useManagerActions,
+} from "../../utils/hooks/useManager";
 
 function BlogManagement() {
-  // Mock data for blog posts
-  const [blogPosts, setBlogPosts] = useState([
-    {
-      id: 1,
-      title: "Hướng dẫn chăm sóc trẻ em mùa đông",
-      excerpt:
-        "Những lưu ý quan trọng khi chăm sóc sức khỏe trẻ em trong mùa đông lạnh giá...",
-      content: "Nội dung chi tiết về cách chăm sóc trẻ em mùa đông...",
-      author: "Dr. Nguyễn Văn A",
-      category: "Sức khỏe",
-      status: "Published",
-      approvalStatus: "Approved",
-      featured: true,
-      createdDate: "2024-03-10",
-      publishedDate: "2024-03-12",
-      views: 1250,
-      approvedBy: "Manager",
-      tags: ["sức khỏe", "trẻ em", "mùa đông"],
-    },
-    {
-      id: 2,
-      title: "Dinh dưỡng cân bằng cho trẻ mầm non",
-      excerpt:
-        "Cách xây dựng chế độ dinh dưỡng phù hợp cho trẻ em độ tuổi mầm non...",
-      content: "Nội dung chi tiết về dinh dưỡng trẻ em...",
-      author: "Y tá Trần Thị B",
-      category: "Dinh dưỡng",
-      status: "Published",
-      approvalStatus: "Approved",
-      featured: false,
-      createdDate: "2024-03-08",
-      publishedDate: "2024-03-09",
-      views: 890,
-      approvedBy: "Manager",
-      tags: ["dinh dưỡng", "trẻ em"],
-    },
-    {
-      id: 3,
-      title: "Phòng ngừa các bệnh truyền nhiễm",
-      excerpt:
-        "Các biện pháp phòng ngừa hiệu quả để bảo vệ trẻ khỏi các bệnh truyền nhiễm...",
-      content: "Nội dung chi tiết về phòng ngừa bệnh tật...",
-      author: "Dr. Lê Văn C",
-      category: "Phòng bệnh",
-      status: "Draft",
-      approvalStatus: "Pending",
-      featured: false,
-      createdDate: "2024-03-15",
-      publishedDate: null,
-      views: 0,
-      approvedBy: null,
-      tags: ["phòng bệnh", "truyền nhiễm"],
-    },
-    {
-      id: 4,
-      title: "Tầm quan trọng của việc tiêm chủng",
-      excerpt:
-        "Lý do tại sao việc tiêm chủng đầy đủ là cần thiết cho sức khỏe trẻ em...",
-      content: "Nội dung chi tiết về tiêm chủng...",
-      author: "Y tá Phạm Thị D",
-      category: "Tiêm chủng",
-      status: "Published",
-      approvalStatus: "Approved",
-      featured: true,
-      createdDate: "2024-03-05",
-      publishedDate: "2024-03-06",
-      views: 2100,
-      approvedBy: "Manager",
-      tags: ["tiêm chủng", "vaccine"],
-    },
-    {
-      id: 5,
-      title: "Chăm sóc răng miệng cho trẻ nhỏ",
-      excerpt:
-        "Hướng dẫn chi tiết cách chăm sóc răng miệng cho trẻ em từ sớm...",
-      content: "Nội dung chi tiết về chăm sóc răng miệng...",
-      author: "Dr. Hoàng Văn E",
-      category: "Nha khoa",
-      status: "Published",
-      approvalStatus: "Approved",
-      featured: false,
-      createdDate: "2024-03-01",
-      publishedDate: "2024-03-02",
-      views: 750,
-      approvedBy: "Manager",
-      tags: ["nha khoa", "răng miệng"],
-    },
-  ]);
+  // Use API hooks
+  const { data: blogs, loading, error, refetch } = useManagerBlogs();
+  const {
+    approveBlog,
+    rejectBlog,
+    loading: actionLoading,
+  } = useManagerActions();
+
+  // State for blog posts (for local updates)
+  const [localBlogPosts, setLocalBlogPosts] = useState([]);
+
+  // Update local posts when API data changes
+  React.useEffect(() => {
+    if (blogs) {
+      setLocalBlogPosts(blogs);
+    }
+  }, [blogs]);
 
   // Available categories and statuses
   const categories = [
@@ -125,6 +58,25 @@ function BlogManagement() {
     approvalStatus: "Approved",
     rejectionReason: "",
   });
+
+  // Filter blogs based on search and filters
+  const filteredBlogs = localBlogPosts
+    ? localBlogPosts.filter((blog) => {
+        const matchesSearch =
+          blog.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          blog.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          blog.content?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory =
+          filterCategory === "" || blog.category === filterCategory;
+        const matchesStatus =
+          filterStatus === "" || blog.status === filterStatus;
+        const matchesApproval =
+          filterApproval === "" || blog.approvalStatus === filterApproval;
+        return (
+          matchesSearch && matchesCategory && matchesStatus && matchesApproval
+        );
+      })
+    : [];
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -190,80 +142,82 @@ function BlogManagement() {
     setShowModal(true);
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (modalMode === "add") {
+      // Create new post
       const newPost = {
-        id: blogPosts.length + 1,
+        id: Date.now(),
         ...formData,
-        author: "Current User",
+        author: "Current User", // Get from user context
         createdDate: new Date().toISOString().split("T")[0],
+        publishedDate:
+          formData.status === "Published"
+            ? new Date().toISOString().split("T")[0]
+            : null,
         views: 0,
         approvalStatus: "Pending",
         approvedBy: null,
-        approvedDate: null,
+        tags: [],
       };
-      setBlogPosts((prev) => [...prev, newPost]);
+      setLocalBlogPosts([...localBlogPosts, newPost]);
     } else if (modalMode === "edit") {
-      setBlogPosts((prev) =>
-        prev.map((post) =>
+      // Update existing post
+      setLocalBlogPosts(
+        localBlogPosts.map((post) =>
           post.id === currentPost.id ? { ...post, ...formData } : post
         )
       );
     }
-
     setShowModal(false);
   };
 
-  // Handle approval submission
-  const handleApprovalSubmit = (e) => {
+  const handleApprovalSubmit = async (e) => {
     e.preventDefault();
-
-    setBlogPosts((prev) =>
-      prev.map((post) =>
-        post.id === currentPost.id
-          ? {
-              ...post,
-              approvalStatus: approvalData.approvalStatus,
-              approvedBy: "Current User",
-              approvedDate: new Date().toISOString().split("T")[0],
-              rejectionReason:
-                approvalData.approvalStatus === "Rejected"
-                  ? approvalData.rejectionReason
-                  : null,
-            }
-          : post
-      )
-    );
-
-    setShowModal(false);
-  };
-
-  // Handle delete post
-  const handleDeletePost = (postId) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
-      setBlogPosts((prev) => prev.filter((post) => post.id !== postId));
+    try {
+      if (approvalData.approvalStatus === "Approved") {
+        await approveBlog(currentPost.id);
+        setLocalBlogPosts(
+          localBlogPosts.map((post) =>
+            post.id === currentPost.id
+              ? {
+                  ...post,
+                  approvalStatus: "Approved",
+                  status: "Published",
+                  publishedDate: new Date().toISOString().split("T")[0],
+                  approvedBy: "Manager", // Get from user context
+                }
+              : post
+          )
+        );
+      } else if (approvalData.approvalStatus === "Rejected") {
+        await rejectBlog(currentPost.id, approvalData.rejectionReason);
+        setLocalBlogPosts(
+          localBlogPosts.map((post) =>
+            post.id === currentPost.id
+              ? {
+                  ...post,
+                  approvalStatus: "Rejected",
+                  rejectionReason: approvalData.rejectionReason,
+                }
+              : post
+          )
+        );
+      }
+      setShowModal(false);
+      refetch(); // Refresh data from API
+    } catch (error) {
+      console.error("Error processing approval:", error);
+      // Handle error - show toast or alert
     }
   };
 
-  // Filter posts based on search and filters
-  const filteredPosts = blogPosts.filter((post) => {
-    const matchesSearch =
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.author.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      filterCategory === "" || post.category === filterCategory;
-    const matchesStatus = filterStatus === "" || post.status === filterStatus;
-    const matchesApproval =
-      filterApproval === "" || post.approvalStatus === filterApproval;
+  const handleDeletePost = (postId) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
+      setLocalBlogPosts(localBlogPosts.filter((post) => post.id !== postId));
+    }
+  };
 
-    return matchesSearch && matchesCategory && matchesStatus && matchesApproval;
-  });
-
-  // Get status badge class
   const getStatusBadgeClass = (status) => {
     switch (status) {
       case "Published":
@@ -275,11 +229,10 @@ function BlogManagement() {
       case "Archived":
         return "status-archived";
       default:
-        return "status-default";
+        return "status-draft";
     }
   };
 
-  // Get approval badge class
   const getApprovalBadgeClass = (status) => {
     switch (status) {
       case "Approved":
@@ -289,15 +242,15 @@ function BlogManagement() {
       case "Rejected":
         return "approval-rejected";
       default:
-        return "approval-default";
+        return "approval-pending";
     }
   };
 
-  // Truncate content for display
   const truncateContent = (content, maxLength = 100) => {
-    return content.length > maxLength
-      ? content.substring(0, maxLength) + "..."
-      : content;
+    if (!content) return "";
+    return content.length <= maxLength
+      ? content
+      : content.substring(0, maxLength) + "...";
   };
 
   return (
@@ -305,266 +258,206 @@ function BlogManagement() {
       {/* Header */}
       <div className="page-header">
         <div className="header-content">
-          <h1>Quản Lý Blog</h1>
-          <p>Manage blog posts, articles, and content with approval workflow</p>
+          <h1>📝 Quản Lý Blog</h1>
+          <p>Quản lý các bài viết blog sức khỏe và thông tin y tế</p>
         </div>
         <button className="btn btn-primary" onClick={handleAddPost}>
-          <i className="icon-plus"></i>➕ Add New Post
+          ➕ Tạo Bài Viết Mới
         </button>
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="loading-state">
+          <p>⏳ Đang tải danh sách blog...</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="error-state">
+          <p>❌ Lỗi khi tải danh sách blog: {error}</p>
+          <button onClick={refetch} className="retry-btn">
+            🔄 Thử lại
+          </button>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && !error && (!blogs || blogs.length === 0) && (
+        <div className="empty-state">
+          <p>📭 Chưa có blog nào trong hệ thống</p>
+          <button onClick={refetch} className="retry-btn">
+            🔄 Tải lại
+          </button>
+        </div>
+      )}
+
       {/* Filters and Search */}
-      <div className="filters-section">
-        <div className="search-box">
-          <input
-            type="text"
-            placeholder="Search posts, authors, content..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-        </div>
-
-        <div className="filter-group">
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="filter-select"
-          >
-            <option value="">All Categories</option>
-            {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="filter-select"
-          >
-            <option value="">All Status</option>
-            {statuses.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={filterApproval}
-            onChange={(e) => setFilterApproval(e.target.value)}
-            className="filter-select"
-          >
-            <option value="">All Approval</option>
-            {approvalStatuses.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Blog Posts Grid */}
-      <div className="posts-grid">
-        {filteredPosts.map((post) => (
-          <div
-            key={post.id}
-            className={`post-card ${post.featured ? "featured" : ""}`}
-          >
-            {post.featured && <div className="featured-badge">⭐ Featured</div>}
-
-            <div className="post-header">
-              <div className="post-meta">
-                <span className="category">{post.category}</span>
-                <span className={`status ${getStatusBadgeClass(post.status)}`}>
-                  {post.status}
-                </span>
-                <span
-                  className={`approval-status ${getApprovalBadgeClass(
-                    post.approvalStatus
-                  )}`}
-                >
-                  {post.approvalStatus}
-                </span>
-              </div>
+      {!loading && !error && blogs && blogs.length > 0 && (
+        <>
+          <div className="search-filter-container">
+            <div className="search-box">
+              <input
+                type="text"
+                placeholder="Tìm kiếm theo tiêu đề, tác giả, nội dung..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
             </div>
-
-            <div className="post-content">
-              <h3 className="post-title" onClick={() => handleViewPost(post)}>
-                {post.title}
-              </h3>
-              <p className="post-excerpt">
-                {truncateContent(post.content, 120)}
-              </p>
-
-              <div className="post-info">
-                <div className="author-info">
-                  <span className="author">👤 {post.author}</span>
-                  <span className="date">📅 {post.createdDate}</span>
-                </div>
-                <div className="post-stats">
-                  <span className="views">👁 {post.views} views</span>
-                </div>
-              </div>
-
-              {post.approvalStatus === "Rejected" && post.rejectionReason && (
-                <div className="rejection-reason">
-                  <strong>❌ Rejection Reason:</strong> {post.rejectionReason}
-                </div>
-              )}
-            </div>
-
-            <div className="post-footer">
-              <div className="action-buttons">
-                <button
-                  className="btn btn-sm btn-view"
-                  onClick={() => handleViewPost(post)}
-                >
-                  👁 View
-                </button>
-                <button
-                  className="btn btn-sm btn-edit"
-                  onClick={() => handleEditPost(post)}
-                >
-                  ✏️ Edit
-                </button>
-                <button
-                  className="btn btn-sm btn-approve"
-                  onClick={() => handleApprovePost(post)}
-                >
-                  ✅ Approve
-                </button>
-                <button
-                  className="btn btn-sm btn-delete"
-                  onClick={() => handleDeletePost(post.id)}
-                >
-                  🗑️ Delete
-                </button>
-              </div>
+            <div className="filter-controls">
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="filter-select"
+              >
+                <option value="">Tất cả danh mục</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="filter-select"
+              >
+                <option value="">Tất cả trạng thái</option>
+                {statuses.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={filterApproval}
+                onChange={(e) => setFilterApproval(e.target.value)}
+                className="filter-select"
+              >
+                <option value="">Tất cả phê duyệt</option>
+                {approvalStatuses.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
-        ))}
-      </div>
 
-      {filteredPosts.length === 0 && (
-        <div className="no-data">
-          <p>📝 No blog posts found matching your criteria.</p>
-        </div>
+          {/* Blog Posts Table */}
+          <div className="table-container">
+            <table className="blog-table">
+              <thead>
+                <tr>
+                  <th>Tiêu đề</th>
+                  <th>Tác giả</th>
+                  <th>Danh mục</th>
+                  <th>Trạng thái</th>
+                  <th>Phê duyệt</th>
+                  <th>Ngày tạo</th>
+                  <th>Lượt xem</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredBlogs.map((post) => (
+                  <tr key={post.id}>
+                    <td className="blog-title-cell">
+                      <div className="blog-title-wrapper">
+                        <h4>{post.title}</h4>
+                        <p className="blog-excerpt">
+                          {truncateContent(post.excerpt || post.content)}
+                        </p>
+                        {post.featured && (
+                          <span className="featured-badge">⭐ Nổi bật</span>
+                        )}
+                      </div>
+                    </td>
+                    <td>{post.author}</td>
+                    <td className="category-cell">
+                      <span className="category-badge">{post.category}</span>
+                    </td>
+                    <td>
+                      <span
+                        className={`status-badge ${getStatusBadgeClass(
+                          post.status
+                        )}`}
+                      >
+                        {post.status}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`approval-badge ${getApprovalBadgeClass(
+                          post.approvalStatus
+                        )}`}
+                      >
+                        {post.approvalStatus}
+                      </span>
+                    </td>
+                    <td>{post.createdDate}</td>
+                    <td className="views-cell">{post.views}</td>
+                    <td>
+                      <div className="action-buttons">
+                        <button
+                          onClick={() => handleViewPost(post)}
+                          className="btn btn-view"
+                          title="Xem chi tiết"
+                        >
+                          👁️
+                        </button>
+                        <button
+                          onClick={() => handleEditPost(post)}
+                          className="btn btn-edit"
+                          title="Chỉnh sửa"
+                        >
+                          ✏️
+                        </button>
+                        {post.approvalStatus === "Pending" && (
+                          <button
+                            onClick={() => handleApprovePost(post)}
+                            className="btn btn-approve"
+                            title="Phê duyệt"
+                            disabled={actionLoading}
+                          >
+                            {actionLoading ? "⏳" : "✅"}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDeletePost(post.id)}
+                          className="btn btn-delete"
+                          title="Xóa"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {filteredBlogs.length === 0 && (
+              <div className="no-data">
+                <p>Không tìm thấy blog phù hợp với bộ lọc</p>
+                <button
+                  onClick={() => {
+                    setSearchTerm("");
+                    setFilterCategory("");
+                    setFilterStatus("");
+                    setFilterApproval("");
+                  }}
+                  className="retry-btn"
+                >
+                  🔄 Đặt lại bộ lọc
+                </button>
+              </div>
+            )}
+          </div>
+        </>
       )}
-
-      {/* Pending Approval Section */}
-      {blogPosts.filter((p) => p.approvalStatus === "Pending").length > 0 && (
-        <div className="pending-approval-section">
-          <div className="section-header">
-            <h2>⏳ Blog đang chờ được duyệt</h2>
-            <p>Các bài viết cần được xem xét và phê duyệt</p>
-            <span className="pending-count">
-              {blogPosts.filter((p) => p.approvalStatus === "Pending").length}{" "}
-              bài viết
-            </span>
-          </div>
-
-          <div className="pending-posts-grid">
-            {blogPosts
-              .filter((post) => post.approvalStatus === "Pending")
-              .map((post) => (
-                <div key={post.id} className="pending-post-card">
-                  <div className="pending-post-header">
-                    <div className="pending-post-meta">
-                      <span className="category">{post.category}</span>
-                      <span className="pending-badge">⏳ Pending</span>
-                    </div>
-                    <div className="pending-post-date">
-                      📅 {post.createdDate}
-                    </div>
-                  </div>
-
-                  <div className="pending-post-content">
-                    <h4
-                      className="pending-post-title"
-                      onClick={() => handleViewPost(post)}
-                    >
-                      {post.title}
-                    </h4>
-                    <p className="pending-post-excerpt">
-                      {truncateContent(post.content, 80)}
-                    </p>
-
-                    <div className="pending-post-info">
-                      <div className="pending-author">👤 {post.author}</div>
-                      <div className="pending-status">🏷️ {post.status}</div>
-                    </div>
-                  </div>
-
-                  <div className="pending-post-actions">
-                    <button
-                      className="btn btn-sm btn-approve-quick"
-                      onClick={() => {
-                        setBlogPosts((prev) =>
-                          prev.map((p) =>
-                            p.id === post.id
-                              ? {
-                                  ...p,
-                                  approvalStatus: "Approved",
-                                  approvedBy: "Current User",
-                                  approvedDate: new Date()
-                                    .toISOString()
-                                    .split("T")[0],
-                                }
-                              : p
-                          )
-                        );
-                      }}
-                    >
-                      ✅ Quick Approve
-                    </button>
-                    <button
-                      className="btn btn-sm btn-view"
-                      onClick={() => handleViewPost(post)}
-                    >
-                      👁 View
-                    </button>
-                    <button
-                      className="btn btn-sm btn-approve"
-                      onClick={() => handleApprovePost(post)}
-                    >
-                      ⚖️ Review
-                    </button>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-      )}
-
-      {/* Summary Stats */}
-      <div className="summary-stats">
-        <div className="stat-item">
-          <span className="stat-label">Total Posts:</span>
-          <span className="stat-value">{blogPosts.length}</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-label">Published:</span>
-          <span className="stat-value">
-            {blogPosts.filter((p) => p.status === "Published").length}
-          </span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-label">Pending Approval:</span>
-          <span className="stat-value">
-            {blogPosts.filter((p) => p.approvalStatus === "Pending").length}
-          </span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-label">Featured:</span>
-          <span className="stat-value">
-            {blogPosts.filter((p) => p.featured).length}
-          </span>
-        </div>
-      </div>
 
       {/* Modal */}
       {showModal && (

@@ -1,123 +1,105 @@
-import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import API_CONFIG from "./config";
+import apiClient, { API_ENDPOINTS } from "./config";
 
 const userService = {
   // Login user
   login: async (email, password, rememberMe = false) => {
-    const response = await axios.post(
-      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER_LOGIN}`,
-      {
+    try {
+      // Call real login API
+      const response = await apiClient.post(API_ENDPOINTS.USER.LOGIN, {
         email,
         password,
-      }
-    );
+      });
 
-    const data = response.data;
+      const data = response; // apiClient already returns response.data
 
-    // If response contains a token, decode it to get user info and role
-    if (data.token) {
-      try {
-        const decodedToken = jwtDecode(data.token);
+      // If we get a token, decode it to get user info
+      if (data.token || data.accessToken || data.access_token) {
+        const token = data.token || data.accessToken || data.access_token;
 
-        // Extract role from JWT token
-        // The role might be in different fields depending on JWT structure
-        const role =
-          decodedToken.role ||
-          decodedToken.Role ||
-          decodedToken[
-            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-          ] ||
-          decodedToken["role"] ||
-          null;
+        try {
+          const decodedToken = jwtDecode(token);
 
-        // Extract other user info from token
-        const userId =
-          decodedToken.sub ||
-          decodedToken.userId ||
-          decodedToken.nameid ||
-          decodedToken[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-          ] ||
-          null;
+          const loginData = {
+            success: true,
+            token: token,
+            userId: decodedToken.Id || decodedToken.id || decodedToken.userId,
+            email: decodedToken.Email || decodedToken.email || email,
+            role: decodedToken.Role || decodedToken.role,
+            fullname:
+              decodedToken.Fullname ||
+              decodedToken.fullname ||
+              decodedToken.name,
+            phone: decodedToken.Phone || decodedToken.phone,
+            status: decodedToken.Status || decodedToken.status,
+            isStaff: decodedToken.Role !== "Parent",
+            userData: decodedToken,
+            decodedToken: decodedToken,
+          };
 
-        const userName =
-          decodedToken.name ||
-          decodedToken.username ||
-          decodedToken[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
-          ] ||
-          email;
+          // Handle Remember Me functionality
+          if (rememberMe) {
+            this.saveRememberedAccount(email, password, loginData);
+          }
 
-        const loginData = {
-          ...data,
-          role: role,
-          userId: userId,
-          userName: userName,
-          email: email,
-          decodedToken: decodedToken,
-        };
-
-        // Handle Remember Me functionality
-        if (rememberMe) {
-          this.saveRememberedAccount(email, password, loginData);
+          return loginData;
+        } catch (error) {
+          console.error("Error decoding JWT token:", error);
+          // Return raw response if token decode fails
+          return {
+            success: true,
+            ...data,
+            email: email,
+          };
         }
-
-        // Return enhanced data with decoded token info
-        return loginData;
-      } catch (error) {
-        console.error("Error decoding JWT token:", error);
-        // If token decode fails, return original data
-        return data;
-      }
-    }
-
-    // Check if login was successful without token (fallback)
-    if (data && data.userId) {
-      // Determine role based on isStaff field
-      let role = "parent"; // default role
-      if (data.isStaff) {
-        // You might need to add more logic here to determine specific staff roles
-        // For now, defaulting to admin for staff users
-        role = "admin";
       }
 
-      const loginData = {
+      // If no token but response is successful
+      return {
         success: true,
-        userId: data.userId,
-        email: data.email,
-        isStaff: data.isStaff,
-        role: role,
-        token: null, // No JWT token from this API
-        userData: data,
+        ...data,
+        email: email,
       };
+    } catch (error) {
+      console.error("Login error:", error);
 
-      // Handle Remember Me functionality
-      if (rememberMe) {
-        this.saveRememberedAccount(email, password, loginData);
+      // If API call fails, throw appropriate error
+      if (error.response?.status === 401) {
+        throw new Error("Email hoặc mật khẩu không đúng");
+      } else if (error.response?.status === 404) {
+        throw new Error("Endpoint login không tìm thấy");
+      } else if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      } else {
+        throw new Error("Không thể kết nối đến server. Vui lòng thử lại.");
       }
-
-      // Return user info without JWT token
-      return loginData;
     }
-
-    return data;
   },
 
   // Get all users
   getAllUsers: async () => {
-    const response = await axios.get(
-      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_ALL_USERS}`
-    );
-    return response.data;
+    const response = await apiClient.get(API_ENDPOINTS.USER.GET_ALL);
+    return response.value || response; // Return the users array
   },
 
   // Helper function to get role from stored token
   getCurrentUserRole: () => {
     const token = localStorage.getItem("token");
+    const userInfo = localStorage.getItem("userInfo");
+
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
+        const currentTime = Date.now() / 1000;
+
+        // Kiểm tra token có hết hạn không
+        if (decodedToken.exp <= currentTime) {
+          // Token hết hạn, xóa dữ liệu
+          localStorage.removeItem("token");
+          localStorage.removeItem("userInfo");
+          return null;
+        }
+
         return (
           decodedToken.role ||
           decodedToken.Role ||
@@ -128,40 +110,70 @@ const userService = {
         );
       } catch (error) {
         console.error("Error decoding stored token:", error);
+        // Token không hợp lệ, xóa dữ liệu
+        localStorage.removeItem("token");
+        localStorage.removeItem("userInfo");
         return null;
       }
     }
 
     // Fallback to userInfo if no token
-    const userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
       try {
         const user = JSON.parse(userInfo);
         return user.role || null;
       } catch (error) {
         console.error("Error parsing stored user info:", error);
+        localStorage.removeItem("userInfo");
         return null;
       }
     }
+
     return null;
   },
 
   // Helper function to check if user is authenticated
   isAuthenticated: () => {
     const token = localStorage.getItem("token");
+    const userInfo = localStorage.getItem("userInfo");
+
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
         const currentTime = Date.now() / 1000;
-        return decodedToken.exp > currentTime;
-      } catch {
+
+        // Kiểm tra token có hết hạn không
+        if (decodedToken.exp <= currentTime) {
+          // Token hết hạn, xóa dữ liệu
+          localStorage.removeItem("token");
+          localStorage.removeItem("userInfo");
+          return false;
+        }
+
+        return true;
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        // Token không hợp lệ, xóa dữ liệu
+        localStorage.removeItem("token");
+        localStorage.removeItem("userInfo");
         return false;
       }
     }
 
-    // Fallback to userInfo if no token
-    const userInfo = localStorage.getItem("userInfo");
-    return userInfo !== null;
+    // Fallback: kiểm tra userInfo (cho trường hợp không có token)
+    if (userInfo) {
+      try {
+        const user = JSON.parse(userInfo);
+        // Kiểm tra xem có đủ thông tin cần thiết không
+        return !!(user && (user.role || user.email));
+      } catch (error) {
+        console.error("Error parsing user info:", error);
+        localStorage.removeItem("userInfo");
+        return false;
+      }
+    }
+
+    return false;
   },
 
   // Remember Me functionality
@@ -238,20 +250,12 @@ const userService = {
 
   // Send reset password email
   sendResetPasswordEmail: async (email) => {
-    const response = await axios.post(
-      "https://api-schoolhealth.purintech.id.vn/api/Email/sendEmail",
-      {
-        to: email,
-        subject: "Đặt lại mật khẩu - Medlearn",
-        body: "demo",
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    return response.data;
+    const response = await apiClient.post(API_ENDPOINTS.EMAIL.SEND, {
+      to: email,
+      subject: "Đặt lại mật khẩu - Medlearn",
+      body: "demo",
+    });
+    return response; // apiClient already returns response.data
   },
 
   // Verify reset code (mock function - replace with real API when available)
@@ -267,7 +271,7 @@ const userService = {
   },
 
   // Reset password (mock function - replace with real API when available)
-  resetPassword: async (email, verificationCode, newPassword) => {
+  resetPassword: async (/* email, verificationCode, newPassword */) => {
     // Mock reset - replace with real API call
     await new Promise((resolve) => setTimeout(resolve, 2000));
 

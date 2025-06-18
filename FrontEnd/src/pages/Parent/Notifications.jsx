@@ -1,73 +1,22 @@
 import React, { useState } from "react";
 import "../../css/Parent/Notifications.css";
+import {
+  useParentNotifications,
+  useParentActions,
+} from "../../utils/hooks/useParent";
 
 function Notifications() {
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [showUnreadOnly, setShowUnreadOnly] = useState(false);
 
-  // Mock data cho thông báo
-  const notifications = [
-    {
-      id: 1,
-      title: "Lịch tiêm vaccine sởi - rubella cho học sinh lớp 5",
-      content:
-        "Thông báo về lịch tiêm vaccine sởi - rubella dành cho các em học sinh lớp 5. Thời gian: 8h00 ngày 20/03/2024. Địa điểm: Phòng y tế trường. Phụ huynh lưu ý cho con em ăn sáng đầy đủ trước khi đến trường.",
-      type: "vaccination",
-      priority: "high",
-      date: "2024-03-15",
-      time: "08:30",
-      isRead: false,
-      sender: "Y tế trường",
-    },
-    {
-      id: 2,
-      title: "Kết quả khám sức khỏe định kỳ",
-      content:
-        "Kết quả khám sức khỏe định kỳ của con em đã được cập nhật. Tình trạng sức khỏe: Bình thường. Chiều cao: 135cm, Cân nặng: 32kg. Phụ huynh có thể xem chi tiết tại mục Lịch sử khám sức khỏe.",
-      type: "health",
-      priority: "medium",
-      date: "2024-03-12",
-      time: "14:20",
-      isRead: true,
-      sender: "BS. Nguyễn Thị Lan",
-    },
-    {
-      id: 3,
-      title: "Sự kiện: Ngày hội sức khỏe học đường 2024",
-      content:
-        "Trường tổ chức Ngày hội sức khỏe học đường 2024. Thời gian: 8h00-16h00 ngày 25/03/2024. Các hoạt động: Tập thể dục, kiểm tra sức khỏe miễn phí, tư vấn dinh dưỡng. Mời phụ huynh và học sinh tham gia.",
-      type: "event",
-      priority: "medium",
-      date: "2024-03-10",
-      time: "09:00",
-      isRead: true,
-      sender: "Ban tổ chức",
-    },
-    {
-      id: 4,
-      title: "Cảnh báo dịch tay chân miệng",
-      content:
-        "Hiện tại trong khu vực đang có dịch tay chân miệng. Phụ huynh lưu ý quan sát con em, nếu có biểu hiện sốt, ban đỏ ở tay chân miệng thì cho nghỉ học và đưa đến cơ sở y tế khám.",
-      type: "health",
-      priority: "high",
-      date: "2024-03-08",
-      time: "07:45",
-      isRead: false,
-      sender: "Y tế trường",
-    },
-    {
-      id: 5,
-      title: "Thông báo nghỉ học do thời tiết",
-      content:
-        "Do ảnh hưởng của bão số 3, trường thông báo học sinh nghỉ học ngày 5/03/2024. Phụ huynh lưu ý giữ an toàn cho con em trong thời gian nghỉ học.",
-      type: "general",
-      priority: "high",
-      date: "2024-03-04",
-      time: "20:30",
-      isRead: true,
-      sender: "Ban giám hiệu",
-    },
-  ];
+  // Use API hooks
+  const {
+    data: notifications,
+    loading,
+    error,
+    refetch,
+  } = useParentNotifications();
+  const { markNotificationAsRead, loading: actionLoading } = useParentActions();
 
   const filterTypes = [
     { id: "all", name: "Tất cả", icon: "📋", color: "#56D0DB" },
@@ -77,12 +26,14 @@ function Notifications() {
     { id: "general", name: "Thông báo chung", icon: "📢", color: "#6f42c1" },
   ];
 
-  const filteredNotifications = notifications.filter((notification) => {
-    const matchesFilter =
-      selectedFilter === "all" || notification.type === selectedFilter;
-    const matchesReadStatus = !showUnreadOnly || !notification.isRead;
-    return matchesFilter && matchesReadStatus;
-  });
+  const filteredNotifications = notifications
+    ? notifications.filter((notification) => {
+        const matchesFilter =
+          selectedFilter === "all" || notification.type === selectedFilter;
+        const matchesReadStatus = !showUnreadOnly || !notification.isRead;
+        return matchesFilter && matchesReadStatus;
+      })
+    : [];
 
   const getPriorityColor = (priority) => {
     const colors = {
@@ -112,17 +63,35 @@ function Notifications() {
     return colors[type] || "#f5f5f5";
   };
 
-  const markAsRead = (id) => {
-    // Logic để đánh dấu đã đọc
-    console.log("Marking notification as read:", id);
+  const markAsRead = async (id) => {
+    try {
+      await markNotificationAsRead(id);
+      refetch(); // Refresh notifications after marking as read
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
   };
 
-  const markAllAsRead = () => {
-    // Logic để đánh dấu tất cả đã đọc
-    console.log("Marking all notifications as read");
+  const markAllAsRead = async () => {
+    if (!notifications) return;
+
+    try {
+      // Mark all unread notifications as read
+      const unreadNotifications = notifications.filter((n) => !n.isRead);
+      await Promise.all(
+        unreadNotifications.map((notification) =>
+          markNotificationAsRead(notification.id)
+        )
+      );
+      refetch(); // Refresh notifications after marking all as read
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+    }
   };
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const unreadCount = notifications
+    ? notifications.filter((n) => !n.isRead).length
+    : 0;
 
   return (
     <div className="notifications-container">
@@ -134,8 +103,12 @@ function Notifications() {
         </div>
         <div className="header-actions">
           <span className="unread-count">{unreadCount} thông báo chưa đọc</span>
-          <button className="mark-all-read-btn" onClick={markAllAsRead}>
-            ✅ Đánh dấu tất cả đã đọc
+          <button
+            className="mark-all-read-btn"
+            onClick={markAllAsRead}
+            disabled={actionLoading || !notifications || unreadCount === 0}
+          >
+            {actionLoading ? "⏳ Đang xử lý..." : "✅ Đánh dấu tất cả đã đọc"}
           </button>
         </div>
       </div>
@@ -163,96 +136,131 @@ function Notifications() {
           ))}
         </div>
 
-        <div className="filter-options">
-          <label className="unread-filter">
+        <div className="toggle-controls">
+          <label className="toggle-label">
             <input
               type="checkbox"
               checked={showUnreadOnly}
               onChange={(e) => setShowUnreadOnly(e.target.checked)}
             />
-            Chỉ hiện thông báo chưa đọc
+            <span>Chỉ hiển thị chưa đọc</span>
           </label>
         </div>
       </div>
 
-      {/* Notifications List */}
-      <div className="notifications-list">
-        {filteredNotifications.map((notification) => (
-          <div
-            key={notification.id}
-            className={`notification-card ${
-              !notification.isRead ? "unread" : ""
-            }`}
-            style={{ backgroundColor: getTypeColor(notification.type) }}
-          >
-            <div className="notification-header">
-              <div className="notification-meta">
-                <span className="notification-sender">
-                  👤 {notification.sender}
-                </span>
-                <span className="notification-datetime">
-                  📅 {notification.date} • ⏰ {notification.time}
-                </span>
-                <span
-                  className="notification-priority"
-                  style={{
-                    backgroundColor: getPriorityColor(notification.priority),
-                    color: "white",
-                  }}
-                >
-                  {getPriorityText(notification.priority)}
-                </span>
-              </div>
-              {!notification.isRead && (
-                <div className="unread-indicator">●</div>
-              )}
-            </div>
-
-            <div className="notification-body">
-              <h3 className="notification-title">{notification.title}</h3>
-              <p className="notification-content">{notification.content}</p>
-            </div>
-
-            <div className="notification-actions">
-              {!notification.isRead && (
-                <button
-                  className="mark-read-btn"
-                  onClick={() => markAsRead(notification.id)}
-                >
-                  ✅ Đánh dấu đã đọc
-                </button>
-              )}
-              <button className="reply-btn">💬 Phản hồi</button>
-              <button className="save-btn">💾 Lưu</button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {filteredNotifications.length === 0 && (
-        <div className="no-notifications">
-          <div className="no-notifications-icon">📭</div>
-          <p>Không có thông báo nào phù hợp với bộ lọc đã chọn</p>
+      {/* Loading State */}
+      {loading && (
+        <div className="loading-state">
+          <p>⏳ Đang tải thông báo...</p>
         </div>
       )}
 
-      {/* Quick Stats */}
-      <div className="notification-stats">
-        <div className="stat-item">
-          <span className="stat-number">{notifications.length}</span>
-          <span className="stat-label">Tổng thông báo</span>
+      {/* Error State */}
+      {error && (
+        <div className="error-state">
+          <p>❌ Lỗi khi tải thông báo: {error}</p>
+          <button onClick={refetch} className="retry-btn">
+            🔄 Thử lại
+          </button>
         </div>
-        <div className="stat-item">
-          <span className="stat-number">{unreadCount}</span>
-          <span className="stat-label">Chưa đọc</span>
+      )}
+
+      {/* Empty State */}
+      {!loading && !error && (!notifications || notifications.length === 0) && (
+        <div className="empty-state">
+          <p>📭 Chưa có thông báo nào</p>
+          <button onClick={refetch} className="retry-btn">
+            🔄 Tải lại
+          </button>
         </div>
-        <div className="stat-item">
-          <span className="stat-number">
-            {notifications.filter((n) => n.priority === "high").length}
-          </span>
-          <span className="stat-label">Ưu tiên cao</span>
+      )}
+
+      {/* Notifications List */}
+      {!loading && !error && notifications && notifications.length > 0 && (
+        <div className="notifications-list">
+          {filteredNotifications.length > 0 ? (
+            filteredNotifications.map((notification) => (
+              <div
+                key={notification.id}
+                className={`notification-card ${
+                  !notification.isRead ? "unread" : ""
+                }`}
+              >
+                <div className="notification-header">
+                  <div className="notification-meta">
+                    <span
+                      className="notification-type"
+                      style={{
+                        backgroundColor: getTypeColor(notification.type),
+                      }}
+                    >
+                      {
+                        filterTypes.find((f) => f.id === notification.type)
+                          ?.icon
+                      }{" "}
+                      {
+                        filterTypes.find((f) => f.id === notification.type)
+                          ?.name
+                      }
+                    </span>
+                    <span
+                      className="notification-priority"
+                      style={{
+                        color: getPriorityColor(notification.priority),
+                      }}
+                    >
+                      🚩 {getPriorityText(notification.priority)}
+                    </span>
+                  </div>
+                  <div className="notification-date">
+                    <span>📅 {notification.date}</span>
+                    <span>🕒 {notification.time}</span>
+                  </div>
+                </div>
+
+                <div className="notification-content">
+                  <h3 className="notification-title">
+                    {!notification.isRead && (
+                      <span className="unread-dot">🔴</span>
+                    )}
+                    {notification.title}
+                  </h3>
+                  <p className="notification-text">{notification.content}</p>
+                  <div className="notification-sender">
+                    <span>👤 Từ: {notification.sender}</span>
+                  </div>
+                </div>
+
+                <div className="notification-actions">
+                  {!notification.isRead && (
+                    <button
+                      onClick={() => markAsRead(notification.id)}
+                      className="mark-read-btn"
+                      disabled={actionLoading}
+                    >
+                      {actionLoading ? "⏳" : "✅"} Đánh dấu đã đọc
+                    </button>
+                  )}
+                  <button className="archive-btn">📁 Lưu trữ</button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="empty-state">
+              <p>📭 Không có thông báo nào phù hợp với bộ lọc</p>
+              <button
+                onClick={() => {
+                  setSelectedFilter("all");
+                  setShowUnreadOnly(false);
+                }}
+                className="retry-btn"
+              >
+                🔄 Đặt lại bộ lọc
+              </button>
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </div>
   );
 }

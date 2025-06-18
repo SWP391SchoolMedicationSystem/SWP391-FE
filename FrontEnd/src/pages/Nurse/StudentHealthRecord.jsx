@@ -277,7 +277,6 @@ function StudentHealthRecord() {
   };
 
   const handleSaveRecord = (recordData) => {
-    console.log("Saving record:", recordData);
     // TODO: Call API to save record
     setShowEditModal(false);
     setEditingRecord(null);

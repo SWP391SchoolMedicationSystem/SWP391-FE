@@ -62,7 +62,6 @@ function ChatWithNurse() {
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (message.trim()) {
-      console.log("Sending message:", message);
       setMessage("");
     }
   };

@@ -187,13 +187,13 @@ function SystemLogs() {
 
   const handleExport = () => {
     // Export logs functionality
-    console.log("Exporting logs...");
+
     alert("Tính năng xuất logs sẽ được triển khai!");
   };
 
   const handleRefresh = () => {
     // Refresh logs functionality
-    console.log("Refreshing logs...");
+
     alert("Đã làm mới logs!");
   };
 

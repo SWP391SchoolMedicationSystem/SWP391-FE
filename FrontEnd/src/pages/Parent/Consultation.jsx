@@ -1,9 +1,55 @@
 import React, { useState } from "react";
-import "../../css/Parent/Consultation.css";
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Button,
+  Container,
+  Paper,
+  Grid,
+  Chip,
+  Avatar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Divider,
+  Stack,
+  Alert,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  IconButton,
+  Fab,
+} from "@mui/material";
+import {
+  PersonalVideo,
+  Add,
+  Schedule,
+  CheckCircle,
+  Cancel,
+  Phone,
+  Email,
+  LocalHospital,
+  AccessTime,
+  Person,
+  MedicalServices,
+  EventNote,
+  Warning,
+  Info,
+  Assignment,
+  Close,
+} from "@mui/icons-material";
 
 function Consultation() {
   const [showForm, setShowForm] = useState(false);
-  const [selectedConsultation, setSelectedConsultation] = useState(null);
 
   // Mock data
   const consultationRequests = [
@@ -48,7 +94,7 @@ function Consultation() {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    console.log("Submitting consultation request:", formData);
+
     setShowForm(false);
     // Reset form
     setFormData({
@@ -64,12 +110,22 @@ function Consultation() {
 
   const getStatusColor = (status) => {
     const colors = {
-      pending: "#ffc107",
-      scheduled: "#17a2b8",
-      completed: "#28a745",
-      cancelled: "#dc3545",
+      pending: "#ff9800",
+      scheduled: "#2196f3",
+      completed: "#4caf50",
+      cancelled: "#f44336",
     };
-    return colors[status] || "#6c757d";
+    return colors[status] || "#9e9e9e";
+  };
+
+  const getStatusIcon = (status) => {
+    const icons = {
+      pending: <Schedule />,
+      scheduled: <EventNote />,
+      completed: <CheckCircle />,
+      cancelled: <Cancel />,
+    };
+    return icons[status] || <Info />;
   };
 
   const getStatusText = (status) => {
@@ -82,6 +138,15 @@ function Consultation() {
     return texts[status] || status;
   };
 
+  const getPriorityColor = (priority) => {
+    const colors = {
+      high: "#f44336",
+      medium: "#ff9800",
+      low: "#4caf50",
+    };
+    return colors[priority] || "#9e9e9e";
+  };
+
   const getPriorityText = (priority) => {
     const texts = {
       high: "Khẩn cấp",
@@ -92,185 +157,364 @@ function Consultation() {
   };
 
   return (
-    <div className="consultation-container">
+    <Container maxWidth="lg" sx={{ py: 3 }}>
       {/* Header */}
-      <div className="page-header">
-        <div className="header-content">
-          <h1>💬 Tư Vấn Y Tế Riêng Tư</h1>
-          <p>Đặt lịch tư vấn riêng với bác sĩ trường</p>
-        </div>
-        <button className="new-request-btn" onClick={() => setShowForm(true)}>
-          ➕ Gửi yêu cầu mới
-        </button>
-      </div>
+      <Paper
+        elevation={1}
+        sx={{
+          p: 3,
+          mb: 3,
+          backgroundColor: "linear-gradient(135deg, #2D77C1 0%, #56D0DB 100%)",
+          borderRadius: 3,
+        }}
+      >
+        <Typography
+          variant="h4"
+          sx={{ color: "white", fontWeight: "bold", mb: 1 }}
+        >
+          💬 Tư Vấn Y Tế
+        </Typography>
+        <Typography variant="body1" sx={{ color: "rgba(255,255,255,0.9)" }}>
+          Đặt lịch tư vấn riêng với bác sĩ trường
+        </Typography>
+      </Paper>
 
-      {/* Quick Info */}
-      <div className="info-cards">
-        <div className="info-card">
-          <div className="info-icon">⏰</div>
-          <div className="info-content">
-            <h3>Thời gian làm việc</h3>
-            <p>Thứ 2 - Thứ 6: 8:00 - 17:00</p>
-            <p>Thứ 7: 8:00 - 12:00</p>
-          </div>
-        </div>
-        <div className="info-card">
-          <div className="info-icon">📞</div>
-          <div className="info-content">
-            <h3>Liên hệ khẩn cấp</h3>
-            <p>Hotline: 1900-1234</p>
-            <p>Email: yte@truong.edu.vn</p>
-          </div>
-        </div>
-        <div className="info-card">
-          <div className="info-icon">👨‍⚕️</div>
-          <div className="info-content">
-            <h3>Đội ngũ bác sĩ</h3>
-            <p>3 bác sĩ chuyên khoa</p>
-            <p>2 y tá điều dưỡng</p>
-          </div>
-        </div>
-      </div>
+      {/* Quick Info Cards */}
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid item xs={12} md={4}>
+          <Card elevation={2} sx={{ borderRadius: 3, height: "100%" }}>
+            <CardContent sx={{ textAlign: "center", p: 3 }}>
+              <Avatar
+                sx={{
+                  bgcolor: "#2D77C1",
+                  width: 56,
+                  height: 56,
+                  mx: "auto",
+                  mb: 2,
+                }}
+              >
+                <AccessTime />
+              </Avatar>
+              <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>
+                Thời gian làm việc
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Thứ 2 - Thứ 6: 8:00 - 17:00
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Thứ 7: 8:00 - 12:00
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <Card elevation={2} sx={{ borderRadius: 3, height: "100%" }}>
+            <CardContent sx={{ textAlign: "center", p: 3 }}>
+              <Avatar
+                sx={{
+                  bgcolor: "#4caf50",
+                  width: 56,
+                  height: 56,
+                  mx: "auto",
+                  mb: 2,
+                }}
+              >
+                <Phone />
+              </Avatar>
+              <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>
+                Liên hệ khẩn cấp
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Hotline: 1900-1234
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Email: yte@truong.edu.vn
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <Card elevation={2} sx={{ borderRadius: 3, height: "100%" }}>
+            <CardContent sx={{ textAlign: "center", p: 3 }}>
+              <Avatar
+                sx={{
+                  bgcolor: "#ff9800",
+                  width: 56,
+                  height: 56,
+                  mx: "auto",
+                  mb: 2,
+                }}
+              >
+                <MedicalServices />
+              </Avatar>
+              <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>
+                Đội ngũ bác sĩ
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                3 bác sĩ chuyên khoa
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                2 y tá điều dưỡng
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
       {/* Consultation Requests List */}
-      <div className="requests-section">
-        <h3>📋 Lịch sử yêu cầu tư vấn</h3>
-        <div className="requests-list">
+      <Paper elevation={1} sx={{ p: 3, borderRadius: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 3,
+          }}
+        >
+          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+            📋 Lịch sử yêu cầu tư vấn
+          </Typography>
+          <Chip
+            label={`${consultationRequests.length} yêu cầu`}
+            color="primary"
+            variant="outlined"
+          />
+        </Box>
+
+        <Stack spacing={3}>
           {consultationRequests.map((request) => (
-            <div key={request.id} className="request-card">
-              <div className="request-header">
-                <div className="request-info">
-                  <h4>{request.concern}</h4>
-                  <span className="request-student">
-                    👦 {request.studentName}
-                  </span>
-                </div>
-                <div className="request-meta">
-                  <span
-                    className="request-status"
-                    style={{ backgroundColor: getStatusColor(request.status) }}
-                  >
-                    {getStatusText(request.status)}
-                  </span>
-                  <span className="request-priority">
-                    🔹 {getPriorityText(request.priority)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="request-content">
-                <p>
-                  <strong>Mô tả:</strong> {request.description}
-                </p>
-                <div className="request-details">
-                  <span>📅 Ngày gửi: {request.requestDate}</span>
-                  {request.appointmentDate && (
-                    <span>
-                      🗓️ Lịch hẹn: {request.appointmentDate} -{" "}
-                      {request.appointmentTime}
-                    </span>
-                  )}
-                  <span>👨‍⚕️ Bác sĩ: {request.doctor}</span>
-                </div>
-                {request.result && (
-                  <div className="request-result">
-                    <strong>Kết quả tư vấn:</strong>
-                    <p>{request.result}</p>
-                  </div>
-                )}
-              </div>
-
-              <div className="request-actions">
-                <button
-                  className="view-detail-btn"
-                  onClick={() => setSelectedConsultation(request)}
+            <Card
+              key={request.id}
+              elevation={2}
+              sx={{ borderRadius: 3, border: "1px solid #e0e0e0" }}
+            >
+              <CardContent sx={{ p: 3 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    mb: 2,
+                  }}
                 >
-                  👁️ Xem chi tiết
-                </button>
-                {request.status === "scheduled" && (
-                  <>
-                    <button className="reschedule-btn">📅 Đổi lịch</button>
-                    <button className="cancel-btn">❌ Hủy</button>
-                  </>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>
+                      {request.concern}
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        mb: 2,
+                      }}
+                    >
+                      <Chip
+                        icon={<Person />}
+                        label={request.studentName}
+                        size="small"
+                        variant="outlined"
+                      />
+                      <Chip
+                        icon={getStatusIcon(request.status)}
+                        label={getStatusText(request.status)}
+                        size="small"
+                        sx={{
+                          backgroundColor: getStatusColor(request.status),
+                          color: "white",
+                        }}
+                      />
+                      <Chip
+                        label={getPriorityText(request.priority)}
+                        size="small"
+                        sx={{
+                          backgroundColor: getPriorityColor(request.priority),
+                          color: "white",
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+
+                <Typography
+                  variant="body1"
+                  sx={{ mb: 2, color: "text.secondary" }}
+                >
+                  <strong>Mô tả:</strong> {request.description}
+                </Typography>
+
+                <Grid container spacing={2} sx={{ mb: 2 }}>
+                  <Grid item xs={12} sm={4}>
+                    <Typography variant="body2" color="text.secondary">
+                      📅 <strong>Ngày gửi:</strong> {request.requestDate}
+                    </Typography>
+                  </Grid>
+                  {request.appointmentDate && (
+                    <Grid item xs={12} sm={4}>
+                      <Typography variant="body2" color="text.secondary">
+                        🗓️ <strong>Lịch hẹn:</strong> {request.appointmentDate}{" "}
+                        - {request.appointmentTime}
+                      </Typography>
+                    </Grid>
+                  )}
+                  <Grid item xs={12} sm={4}>
+                    <Typography variant="body2" color="text.secondary">
+                      👨‍⚕️ <strong>Bác sĩ:</strong> {request.doctor}
+                    </Typography>
+                  </Grid>
+                </Grid>
+
+                {request.result && (
+                  <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }}>
+                    <Typography variant="body2">
+                      <strong>Kết quả tư vấn:</strong> {request.result}
+                    </Typography>
+                  </Alert>
                 )}
-              </div>
-            </div>
+
+                <Divider sx={{ my: 2 }} />
+
+                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<Assignment />}
+                    size="small"
+                  >
+                    Xem chi tiết
+                  </Button>
+                  {request.status === "scheduled" && (
+                    <>
+                      <Button
+                        variant="outlined"
+                        startIcon={<Schedule />}
+                        color="warning"
+                        size="small"
+                      >
+                        Đổi lịch
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        startIcon={<Cancel />}
+                        color="error"
+                        size="small"
+                      >
+                        Hủy
+                      </Button>
+                    </>
+                  )}
+                </Box>
+              </CardContent>
+            </Card>
           ))}
-        </div>
-      </div>
+        </Stack>
+      </Paper>
 
-      {/* New Request Form Modal */}
-      {showForm && (
-        <div className="modal-overlay" onClick={() => setShowForm(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>📝 Gửi yêu cầu tư vấn mới</h3>
-              <button
-                className="modal-close"
-                onClick={() => setShowForm(false)}
-              >
-                ×
-              </button>
-            </div>
+      {/* Floating Action Button */}
+      <Fab
+        color="primary"
+        sx={{
+          position: "fixed",
+          bottom: 24,
+          right: 24,
+          background: "linear-gradient(135deg, #2D77C1 0%, #56D0DB 100%)",
+        }}
+        onClick={() => setShowForm(true)}
+      >
+        <Add />
+      </Fab>
 
-            <form onSubmit={handleFormSubmit} className="consultation-form">
-              <div className="form-group">
-                <label>Học sinh</label>
-                <select
+      {/* New Request Dialog */}
+      <Dialog
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: 3 } }}
+      >
+        <DialogTitle sx={{ borderBottom: "1px solid #e0e0e0", pb: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              ➕ Gửi yêu cầu tư vấn mới
+            </Typography>
+            <IconButton onClick={() => setShowForm(false)}>
+              <Close />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+
+        <form onSubmit={handleFormSubmit}>
+          <DialogContent sx={{ p: 3 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Tên học sinh"
                   value={formData.studentName}
                   onChange={(e) =>
                     setFormData({ ...formData, studentName: e.target.value })
                   }
-                  required
-                >
-                  <option value="Nguyễn Minh Khôi">Nguyễn Minh Khôi</option>
-                </select>
-              </div>
+                  disabled
+                  variant="outlined"
+                />
+              </Grid>
 
-              <div className="form-group">
-                <label>Vấn đề quan tâm *</label>
-                <input
-                  type="text"
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Vấn đề cần tư vấn"
                   value={formData.concern}
                   onChange={(e) =>
                     setFormData({ ...formData, concern: e.target.value })
                   }
-                  placeholder="Ví dụ: Đau bụng, kiểm tra sức khỏe..."
                   required
+                  variant="outlined"
                 />
-              </div>
+              </Grid>
 
-              <div className="form-group">
-                <label>Mô tả chi tiết *</label>
-                <textarea
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Mô tả chi tiết"
                   value={formData.description}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
                   }
-                  placeholder="Mô tả chi tiết về triệu chứng, thời gian xuất hiện..."
-                  rows="4"
+                  multiline
+                  rows={4}
                   required
+                  variant="outlined"
                 />
-              </div>
+              </Grid>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Mức độ khẩn cấp</label>
-                  <select
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>Mức độ ưu tiên</InputLabel>
+                  <Select
                     value={formData.urgency}
                     onChange={(e) =>
                       setFormData({ ...formData, urgency: e.target.value })
                     }
+                    label="Mức độ ưu tiên"
                   >
-                    <option value="low">Không gấp</option>
-                    <option value="medium">Bình thường</option>
-                    <option value="high">Khẩn cấp</option>
-                  </select>
-                </div>
+                    <MenuItem value="low">Không gấp</MenuItem>
+                    <MenuItem value="medium">Bình thường</MenuItem>
+                    <MenuItem value="high">Khẩn cấp</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
 
-                <div className="form-group">
-                  <label>Phương thức liên hệ</label>
-                  <select
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>Phương thức liên hệ</InputLabel>
+                  <Select
                     value={formData.contactMethod}
                     onChange={(e) =>
                       setFormData({
@@ -278,69 +522,63 @@ function Consultation() {
                         contactMethod: e.target.value,
                       })
                     }
+                    label="Phương thức liên hệ"
                   >
-                    <option value="phone">Điện thoại</option>
-                    <option value="email">Email</option>
-                    <option value="inperson">Gặp trực tiếp</option>
-                  </select>
-                </div>
-              </div>
+                    <MenuItem value="phone">Điện thoại</MenuItem>
+                    <MenuItem value="email">Email</MenuItem>
+                    <MenuItem value="in-person">Trực tiếp tại trường</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Ngày mong muốn</label>
-                  <input
-                    type="date"
-                    value={formData.preferredDate}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        preferredDate: e.target.value,
-                      })
-                    }
-                    min={new Date().toISOString().split("T")[0]}
-                  />
-                </div>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  type="date"
+                  label="Ngày mong muốn"
+                  value={formData.preferredDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, preferredDate: e.target.value })
+                  }
+                  InputLabelProps={{ shrink: true }}
+                  variant="outlined"
+                />
+              </Grid>
 
-                <div className="form-group">
-                  <label>Giờ mong muốn</label>
-                  <select
-                    value={formData.preferredTime}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        preferredTime: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="">Chọn giờ</option>
-                    <option value="08:00">08:00</option>
-                    <option value="09:00">09:00</option>
-                    <option value="10:00">10:00</option>
-                    <option value="14:00">14:00</option>
-                    <option value="15:00">15:00</option>
-                    <option value="16:00">16:00</option>
-                  </select>
-                </div>
-              </div>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  type="time"
+                  label="Giờ mong muốn"
+                  value={formData.preferredTime}
+                  onChange={(e) =>
+                    setFormData({ ...formData, preferredTime: e.target.value })
+                  }
+                  InputLabelProps={{ shrink: true }}
+                  variant="outlined"
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
 
-              <div className="form-actions">
-                <button
-                  type="button"
-                  className="cancel-btn"
-                  onClick={() => setShowForm(false)}
-                >
-                  Hủy
-                </button>
-                <button type="submit" className="submit-btn">
-                  ✅ Gửi yêu cầu
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
+          <DialogActions sx={{ p: 3, borderTop: "1px solid #e0e0e0" }}>
+            <Button onClick={() => setShowForm(false)} color="inherit">
+              Hủy
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                background: "linear-gradient(135deg, #2D77C1 0%, #56D0DB 100%)",
+                "&:hover": { opacity: 0.9 },
+              }}
+            >
+              Gửi yêu cầu
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+    </Container>
   );
 }
 

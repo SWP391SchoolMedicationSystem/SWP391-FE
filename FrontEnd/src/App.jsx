@@ -22,6 +22,7 @@ import AdminDashboard from "./pages/Admin/Dashboard";
 import ManageManagers from "./pages/Admin/ManageManagers";
 import SystemLogs from "./pages/Admin/SystemLogs";
 import FormCategories from "./pages/Admin/FormCategories";
+import EmailTemplates from "./pages/Admin/EmailTemplates";
 import AdminSettings from "./pages/Admin/Settings";
 
 // Nurse imports
@@ -66,6 +67,7 @@ function App() {
           <Route path="manage-managers" element={<ManageManagers />} />
           <Route path="system-logs" element={<SystemLogs />} />
           <Route path="form-categories" element={<FormCategories />} />
+          <Route path="email-templates" element={<EmailTemplates />} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>
 
