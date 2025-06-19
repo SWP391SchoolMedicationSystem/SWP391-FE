@@ -23,7 +23,11 @@ import {
 } from "@mui/icons-material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import {
+  GoogleOAuthProvider,
+  GoogleLogin,
+  googleLogout,
+} from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import userService from "../../services/userService";
 const clientId =
@@ -49,50 +53,33 @@ export default function LoginForm() {
 
     if (token && userInfo) {
       try {
-        // Kiểm tra token có hợp lệ không
-        const isAuthenticated = userService.isAuthenticated();
-
-        if (!isAuthenticated) {
-          // Token hết hạn hoặc không hợp lệ, xóa localStorage
-          localStorage.removeItem("token");
-          localStorage.removeItem("userInfo");
-          return;
-        }
-
         const userData = JSON.parse(userInfo);
         const role = userData.role;
 
-        // Chỉ redirect nếu đang ở trang login (/)
-        if (
-          window.location.pathname === "/" ||
-          window.location.pathname === "/login"
-        ) {
-          // Redirect based on role
-          switch (role) {
-            case "Manager":
-              navigate("/manager", { replace: true });
-              break;
-            case "Nurse":
-              navigate("/nurse", { replace: true });
-              break;
-            case "Parent":
-              navigate("/parent", { replace: true });
-              break;
-            case "Admin":
-              navigate("/admin", { replace: true });
-              break;
-            default:
-              // Fallback logic
-              if (userData.isStaff) {
-                navigate("/manager", { replace: true });
-              } else {
-                navigate("/parent", { replace: true });
-              }
-              break;
-          }
+        // Redirect based on role
+        switch (role) {
+          case "Manager":
+            navigate("/manager");
+            break;
+          case "Nurse":
+            navigate("/nurse");
+            break;
+          case "Parent":
+            navigate("/parent");
+            break;
+          case "Admin":
+            navigate("/admin");
+            break;
+          default:
+            // Fallback logic
+            if (userData.isStaff) {
+              navigate("/manager");
+            } else {
+              navigate("/parent");
+            }
+            break;
         }
-      } catch (error) {
-        console.error("Error parsing user info:", error);
+      } catch {
         // If userInfo is corrupted, clear localStorage
         localStorage.removeItem("token");
         localStorage.removeItem("userInfo");
@@ -114,6 +101,7 @@ export default function LoginForm() {
 
     try {
       const data = await userService.login(formData.email, formData.password);
+      console.log("Login success:", data);
 
       // Lưu thông tin user và token nếu có
       localStorage.setItem("userInfo", JSON.stringify(data));
@@ -123,26 +111,27 @@ export default function LoginForm() {
 
       // Điều hướng dựa trên role từ JWT token
       const role = data.role;
+      console.log("User role:", role);
 
       switch (role) {
         case "Manager":
-          navigate("/manager", { replace: true });
+          navigate("/manager");
           break;
         case "Nurse":
-          navigate("/nurse", { replace: true });
+          navigate("/nurse");
           break;
         case "Parent":
-          navigate("/parent", { replace: true });
+          navigate("/parent");
           break;
         case "Admin":
-          navigate("/admin", { replace: true });
+          navigate("/admin"); // Trang admin placeholder
           break;
         default:
           // Fallback: nếu không có role hoặc role không xác định
           if (data.isStaff) {
-            navigate("/manager", { replace: true });
+            navigate("/manager"); // Backup cho staff
           } else {
-            navigate("/parent", { replace: true });
+            navigate("/parent"); // Backup cho parent
           }
           break;
       }
@@ -321,12 +310,13 @@ export default function LoginForm() {
                       navigate("/parent");
                     }}
                     onError={() => {
-                      setError("Đăng nhập Google thất bại. Vui lòng thử lại.");
+                      console.log("Login Failed");
                     }}
                   />
                 </>
               ) : (
-                <></>
+                <>
+                </>
               )}
             </div>
           </GoogleOAuthProvider>
