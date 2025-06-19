@@ -5,7 +5,12 @@ import { useNurseBlogs, useNurseActions } from "../../utils/hooks/useNurse";
 function Blog() {
   // Use API hooks
   const { data: blogs, loading, error, refetch } = useNurseBlogs();
-  const { createBlog, updateBlog, loading: actionLoading } = useNurseActions();
+  const {
+    createBlog,
+    updateBlog,
+    deleteBlog,
+    loading: actionLoading,
+  } = useNurseActions();
 
   // Mock blog data - remove this when API is working
   const [mockBlogs] = useState([
@@ -53,6 +58,7 @@ function Blog() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [showDeleted, setShowDeleted] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -96,7 +102,8 @@ function Blog() {
     const matchesCategory =
       filterCategory === "" || blog.category === filterCategory;
     const matchesStatus = filterStatus === "" || blog.status === filterStatus;
-    return matchesSearch && matchesCategory && matchesStatus;
+    const matchesDeleted = showDeleted ? blog.isDeleted : !blog.isDeleted;
+    return matchesSearch && matchesCategory && matchesStatus && matchesDeleted;
   });
 
   const handleViewBlog = (blog) => {
@@ -141,6 +148,8 @@ function Blog() {
       const blogData = {
         title: formData.title,
         content: formData.content,
+        status: "Draft",
+        isDeleted: false,
         createdBy: userId,
         createdAt: new Date().toISOString(),
       };
@@ -148,7 +157,9 @@ function Blog() {
       console.log("Sending blog data:", blogData);
 
       if (isEditing) {
-        await updateBlog(selectedBlog.id, blogData);
+        const blogId =
+          selectedBlog?.id ?? selectedBlog?.blogid ?? selectedBlog?.blogId;
+        await updateBlog(blogId, blogData);
         alert("Đã cập nhật blog thành công!");
       } else {
         await createBlog(blogData);
@@ -160,6 +171,20 @@ function Blog() {
     } catch (error) {
       console.error("Error saving blog:", error);
       alert("Có lỗi xảy ra khi lưu blog. Vui lòng thử lại!");
+    }
+  };
+
+  const handleDeleteBlog = async (blog) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa blog này?")) {
+      try {
+        const blogId = blog?.id ?? blog?.blogid ?? blog?.blogId;
+        await deleteBlog(blogId);
+        alert("Đã xóa blog thành công!");
+        refetch();
+      } catch (error) {
+        console.error("Error deleting blog:", error);
+        alert("Có lỗi xảy ra khi xóa blog.");
+      }
     }
   };
 
@@ -299,15 +324,26 @@ function Blog() {
           </div>
         </div>
 
-        <button className="create-blog-btn" onClick={handleCreateBlog}>
-          ➕ Tạo blog mới
-        </button>
+        <div style={{ display: "flex", gap: "12px" }}>
+          <button
+            className="btn-toggle"
+            onClick={() => setShowDeleted((prev) => !prev)}
+          >
+            {showDeleted ? "↩️ Hoạt động" : "🗑️ Đã xóa"}
+          </button>
+          <button className="create-blog-btn" onClick={handleCreateBlog}>
+            ➕ Tạo blog mới
+          </button>
+        </div>
       </div>
 
       {/* Blog List */}
       <div className="blog-list">
         {filteredBlogs.map((blog) => (
-          <div key={blog.id} className="blog-card">
+          <div
+            key={blog.id}
+            className={`blog-card ${blog.isDeleted ? "deleted" : ""}`}
+          >
             <div className="blog-header-section">
               <div className="blog-meta">
                 <span
@@ -347,6 +383,9 @@ function Blog() {
 
             <div className="blog-footer-section">
               <div className="blog-info">
+                {blog.isDeleted && (
+                  <span className="deleted-badge">Đã xóa</span>
+                )}
                 <span className="author">{blog.author}</span>
                 <span className="date">{blog.createdDate}</span>
                 {blog.updatedDate !== blog.createdDate && (
@@ -368,6 +407,13 @@ function Blog() {
                   title="Chỉnh sửa"
                 >
                   ✏️
+                </button>
+                <button
+                  className="btn-delete"
+                  onClick={() => handleDeleteBlog(blog)}
+                  title="Xóa"
+                >
+                  🗑️
                 </button>
               </div>
             </div>

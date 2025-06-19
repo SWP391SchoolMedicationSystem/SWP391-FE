@@ -28,31 +28,21 @@ function BlogManagement() {
     }
   }, [blogs]);
 
-  // Available categories and statuses
-  const categories = [
-    "Tiêm chủng",
-    "Dinh dưỡng",
-    "Phòng bệnh",
-    "Sức khỏe tổng quát",
-    "Chăm sóc trẻ em",
-  ];
+  // Available statuses
   const statuses = ["Draft", "Published", "Scheduled", "Archived"];
-  const approvalStatuses = ["Pending", "Approved", "Rejected"];
 
   // Modal and form states
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState("add"); // 'add', 'edit', 'view', 'approve'
   const [currentPost, setCurrentPost] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterCategory, setFilterCategory] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-  const [filterApproval, setFilterApproval] = useState("");
+  const [showDeleted, setShowDeleted] = useState(false);
 
   // Form data
   const [formData, setFormData] = useState({
     title: "",
     content: "",
-    category: "Tiêm chủng",
     status: "Draft",
     featured: false,
   });
@@ -70,15 +60,10 @@ function BlogManagement() {
           blog.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           blog.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           blog.content?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory =
-          filterCategory === "" || blog.category === filterCategory;
         const matchesStatus =
           filterStatus === "" || blog.status === filterStatus;
-        const matchesApproval =
-          filterApproval === "" || blog.approvalStatus === filterApproval;
-        return (
-          matchesSearch && matchesCategory && matchesStatus && matchesApproval
-        );
+        const matchesDeleted = showDeleted ? blog.isDeleted : !blog.isDeleted;
+        return matchesSearch && matchesStatus && matchesDeleted;
       })
     : [];
 
@@ -106,7 +91,6 @@ function BlogManagement() {
     setFormData({
       title: "",
       content: "",
-      category: "Tiêm chủng",
       status: "Draft",
       featured: false,
     });
@@ -120,7 +104,6 @@ function BlogManagement() {
     setFormData({
       title: post.title,
       content: post.content,
-      category: post.category,
       status: post.status,
       featured: post.featured,
     });
@@ -161,8 +144,10 @@ function BlogManagement() {
         await createBlog(formData);
         alert("Tạo bài viết thành công!");
       } else if (modalMode === "edit") {
-        // Update existing post via API
-        await updateBlog(currentPost.id, formData);
+        // Update existing post via API (fallback các field id khác)
+        const blogId =
+          currentPost?.id ?? currentPost?.blogid ?? currentPost?.blogId;
+        await updateBlog(blogId, formData);
         alert("Cập nhật bài viết thành công!");
       }
       setShowModal(false);
@@ -216,7 +201,8 @@ function BlogManagement() {
   const handleDeletePost = async (postId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
       try {
-        await deleteBlog(postId);
+        const idValue = postId ?? postId?.blogid ?? postId?.blogId;
+        await deleteBlog(idValue);
         alert("Xóa bài viết thành công!");
         refetch(); // Refresh data from API
       } catch (error) {
@@ -241,19 +227,6 @@ function BlogManagement() {
     }
   };
 
-  const getApprovalBadgeClass = (status) => {
-    switch (status) {
-      case "Approved":
-        return "approval-approved";
-      case "Pending":
-        return "approval-pending";
-      case "Rejected":
-        return "approval-rejected";
-      default:
-        return "approval-pending";
-    }
-  };
-
   const truncateContent = (content, maxLength = 100) => {
     if (!content) return "";
     return content.length <= maxLength
@@ -269,9 +242,17 @@ function BlogManagement() {
           <h1>📝 Quản Lý Blog</h1>
           <p>Quản lý các bài viết blog sức khỏe và thông tin y tế</p>
         </div>
-        <button className="btn btn-primary" onClick={handleAddPost}>
-          ➕ Tạo Bài Viết Mới
-        </button>
+        <div style={{ display: "flex", gap: "12px" }}>
+          <button
+            className="btn btn-sm btn-toggle"
+            onClick={() => setShowDeleted((prev) => !prev)}
+          >
+            {showDeleted ? "↩️ Hoạt động" : "🗑️ Đã xóa"}
+          </button>
+          <button className="btn btn-primary" onClick={handleAddPost}>
+            ➕ Tạo Bài Viết Mới
+          </button>
+        </div>
       </div>
 
       {/* Loading State */}
@@ -316,36 +297,12 @@ function BlogManagement() {
             </div>
             <div className="filter-controls">
               <select
-                value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value)}
-                className="filter-select"
-              >
-                <option value="">Tất cả danh mục</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-              <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="filter-select"
               >
                 <option value="">Tất cả trạng thái</option>
                 {statuses.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={filterApproval}
-                onChange={(e) => setFilterApproval(e.target.value)}
-                className="filter-select"
-              >
-                <option value="">Tất cả phê duyệt</option>
-                {approvalStatuses.map((status) => (
                   <option key={status} value={status}>
                     {status}
                   </option>
@@ -359,19 +316,22 @@ function BlogManagement() {
             <table className="blog-table">
               <thead>
                 <tr>
+                  <th>ID</th>
                   <th>Tiêu đề</th>
                   <th>Tác giả</th>
-                  <th>Danh mục</th>
                   <th>Trạng thái</th>
-                  <th>Phê duyệt</th>
                   <th>Ngày tạo</th>
-                  <th>Lượt xem</th>
+                  <th>Đã xóa</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredBlogs.map((post) => (
-                  <tr key={post.id}>
+                  <tr
+                    key={post.id}
+                    className={post.isDeleted ? "deleted-row" : ""}
+                  >
+                    <td>{post.id}</td>
                     <td className="blog-title-cell">
                       <div className="blog-title-wrapper">
                         <h4>{post.title}</h4>
@@ -384,9 +344,6 @@ function BlogManagement() {
                       </div>
                     </td>
                     <td>{post.author}</td>
-                    <td className="category-cell">
-                      <span className="category-badge">{post.category}</span>
-                    </td>
                     <td>
                       <span
                         className={`status-badge ${getStatusBadgeClass(
@@ -396,17 +353,16 @@ function BlogManagement() {
                         {post.status}
                       </span>
                     </td>
+                    <td>{post.createdDate}</td>
                     <td>
                       <span
-                        className={`approval-badge ${getApprovalBadgeClass(
-                          post.approvalStatus
-                        )}`}
+                        className={`deleted-badge ${
+                          post.isDeleted ? "deleted-true" : "deleted-false"
+                        }`}
                       >
-                        {post.approvalStatus}
+                        {post.isDeleted ? "Đã xóa" : "Hoạt động"}
                       </span>
                     </td>
-                    <td>{post.createdDate}</td>
-                    <td className="views-cell">{post.views}</td>
                     <td>
                       <div className="action-buttons">
                         <button
@@ -453,9 +409,7 @@ function BlogManagement() {
                 <button
                   onClick={() => {
                     setSearchTerm("");
-                    setFilterCategory("");
                     setFilterStatus("");
-                    setFilterApproval("");
                   }}
                   className="retry-btn"
                 >
@@ -491,7 +445,6 @@ function BlogManagement() {
                 <div className="view-header">
                   <h3>{currentPost.title}</h3>
                   <div className="view-meta">
-                    <span className="category">{currentPost.category}</span>
                     <span
                       className={`status ${getStatusBadgeClass(
                         currentPost.status
@@ -499,20 +452,13 @@ function BlogManagement() {
                     >
                       {currentPost.status}
                     </span>
-                    <span
-                      className={`approval-status ${getApprovalBadgeClass(
-                        currentPost.approvalStatus
-                      )}`}
-                    >
-                      {currentPost.approvalStatus}
-                    </span>
-                    {currentPost.featured && (
-                      <span className="featured-tag">Featured</span>
-                    )}
                   </div>
                 </div>
 
                 <div className="view-info">
+                  <p>
+                    <strong>ID:</strong> {currentPost.id}
+                  </p>
                   <p>
                     <strong>Author:</strong> {currentPost.author}
                   </p>
@@ -520,7 +466,8 @@ function BlogManagement() {
                     <strong>Created:</strong> {currentPost.createdDate}
                   </p>
                   <p>
-                    <strong>Views:</strong> {currentPost.views}
+                    <strong>Deleted:</strong>{" "}
+                    {currentPost.isDeleted ? "Đã xóa" : "Hoạt động"}
                   </p>
                   {currentPost.approvedBy && (
                     <p>
@@ -552,13 +499,10 @@ function BlogManagement() {
                     <strong>Title:</strong> {currentPost.title}
                   </p>
                   <p>
+                    <strong>ID:</strong> {currentPost.id}
+                  </p>
+                  <p>
                     <strong>Author:</strong> {currentPost.author}
-                  </p>
-                  <p>
-                    <strong>Category:</strong> {currentPost.category}
-                  </p>
-                  <p>
-                    <strong>Created:</strong> {currentPost.createdDate}
                   </p>
                 </div>
 
@@ -625,24 +569,6 @@ function BlogManagement() {
                 </div>
 
                 <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="category">Category:</label>
-                    <select
-                      id="category"
-                      name="category"
-                      value={formData.category}
-                      onChange={handleInputChange}
-                      className="form-select"
-                      required
-                    >
-                      {categories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
                   <div className="form-group">
                     <label htmlFor="status">Status:</label>
                     <select
