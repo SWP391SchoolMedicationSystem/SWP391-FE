@@ -1,124 +1,15 @@
 import React, { useState, useRef } from "react";
 import "../../css/Manager/StudentList.css";
+import {
+  useManagerStudents,
+  // useManagerActions, // Comment out unused actions for now
+} from "../../utils/hooks/useManager";
 
 function StudentList() {
-  // Mock data for preschool students
-  const [students] = useState([
-    {
-      id: 1,
-      studentId: "MN001",
-      fullName: "Nguyễn Văn An",
-      dateOfBirth: "2020-05-15",
-      gender: "Nam",
-      className: "Mầm",
-      parentName: "Nguyễn Thị Hoa",
-      parentPhone: "0912345678",
-      address: "123 Đường ABC, Quận 1, TP.HCM",
-      healthStatus: "Bình thường",
-      allergies: "Không",
-      emergencyContact: "0987654321",
-      enrollmentDate: "2024-01-15",
-      bloodType: "O+",
-      height: "95cm",
-      weight: "14kg",
-      notes: "Bé khỏe mạnh, hoạt bát",
-    },
-    {
-      id: 2,
-      studentId: "MN002",
-      fullName: "Trần Thị Bình",
-      dateOfBirth: "2020-08-22",
-      gender: "Nữ",
-      className: "Chồi",
-      parentName: "Trần Văn Nam",
-      parentPhone: "0923456789",
-      address: "456 Đường DEF, Quận 2, TP.HCM",
-      healthStatus: "Có dị ứng",
-      allergies: "Dị ứng với sữa bò",
-      emergencyContact: "0976543210",
-      enrollmentDate: "2024-01-20",
-      bloodType: "A+",
-      height: "92cm",
-      weight: "13.5kg",
-      notes: "Cần chú ý chế độ ăn",
-    },
-    {
-      id: 3,
-      studentId: "MN003",
-      fullName: "Lê Minh Cường",
-      dateOfBirth: "2019-12-10",
-      gender: "Nam",
-      className: "Lá 1",
-      parentName: "Lê Thị Mai",
-      parentPhone: "0934567890",
-      address: "789 Đường GHI, Quận 3, TP.HCM",
-      healthStatus: "Bình thường",
-      allergies: "Không",
-      emergencyContact: "0965432109",
-      enrollmentDate: "2023-09-01",
-      bloodType: "B+",
-      height: "98cm",
-      weight: "15kg",
-      notes: "Bé thông minh, ham học hỏi",
-    },
-    {
-      id: 4,
-      studentId: "MN004",
-      fullName: "Phạm Thị Diệu",
-      dateOfBirth: "2019-03-08",
-      gender: "Nữ",
-      className: "Lá 2",
-      parentName: "Phạm Văn Hùng",
-      parentPhone: "0945678901",
-      address: "321 Đường JKL, Quận 4, TP.HCM",
-      healthStatus: "Cần theo dõi",
-      allergies: "Dị ứng phấn hoa",
-      emergencyContact: "0954321098",
-      enrollmentDate: "2023-09-01",
-      bloodType: "AB+",
-      height: "102cm",
-      weight: "16kg",
-      notes: "Cần chú ý khi ra ngoài trời",
-    },
-    {
-      id: 5,
-      studentId: "MN005",
-      fullName: "Hoàng Văn Em",
-      dateOfBirth: "2019-07-30",
-      gender: "Nam",
-      className: "Lá 3",
-      parentName: "Hoàng Thị Lan",
-      parentPhone: "0956789012",
-      address: "654 Đường MNO, Quận 5, TP.HCM",
-      healthStatus: "Bình thường",
-      allergies: "Không",
-      emergencyContact: "0943210987",
-      enrollmentDate: "2023-09-01",
-      bloodType: "O-",
-      height: "105cm",
-      weight: "17kg",
-      notes: "Bé năng động, thích chơi thể thao",
-    },
-    {
-      id: 6,
-      studentId: "MN006",
-      fullName: "Võ Thị Phượng",
-      dateOfBirth: "2020-11-18",
-      gender: "Nữ",
-      className: "Chồi",
-      parentName: "Võ Văn Giang",
-      parentPhone: "0967890123",
-      address: "987 Đường PQR, Quận 6, TP.HCM",
-      healthStatus: "Bình thường",
-      allergies: "Không",
-      emergencyContact: "0932109876",
-      enrollmentDate: "2024-01-15",
-      bloodType: "A-",
-      height: "90cm",
-      weight: "13kg",
-      notes: "Bé nhút nhát, cần khuyến khích",
-    },
-  ]);
+  // Use API hooks
+  const { data: students, loading, error, refetch } = useManagerStudents();
+  // Uncomment when implementing CRUD operations
+  // const { createStudent, updateStudent, deleteStudent, loading: actionLoading } = useManagerActions();
 
   // State management
   const [searchTerm, setSearchTerm] = useState("");
@@ -130,22 +21,31 @@ function StudentList() {
   const [importSuccess, setImportSuccess] = useState("");
   const fileInputRef = useRef(null);
 
-  // Available classes for preschool
-  const classes = ["Mầm", "Chồi", "Lá 1", "Lá 2", "Lá 3"];
+  // Available classes for preschool (updated to match API classid)
+  const classes = [
+    { value: "", label: "Tất cả lớp" },
+    { value: "1", label: "Lớp 1" },
+    { value: "2", label: "Lớp 2" },
+    { value: "3", label: "Lớp 3" },
+    { value: "4", label: "Lớp 4" },
+    { value: "5", label: "Lớp 5" },
+  ];
 
   // API endpoint - để trống theo yêu cầu
   const API_ENDPOINT = ""; // Thêm đường dẫn API ở đây
 
   // Filter students based on search and class filter
-  const filteredStudents = students.filter((student) => {
-    const matchesSearch =
-      student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.studentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.parentName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesClass =
-      filterClass === "" || student.className === filterClass;
-    return matchesSearch && matchesClass;
-  });
+  const filteredStudents = students
+    ? students.filter((student) => {
+        const matchesSearch =
+          student.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          student.studentId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          student.parentName?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesClass =
+          filterClass === "" || student.classId?.toString() === filterClass;
+        return matchesSearch && matchesClass;
+      })
+    : [];
 
   // Handle viewing student information
   const handleViewStudent = (student) => {
@@ -240,9 +140,8 @@ function StudentList() {
         `Import thành công! Đã thêm ${result.importedCount || 0} học sinh.`
       );
 
-      // Optional: Refresh student list or update state
-      // You might want to call a function to refresh the student list here
-      console.log("Import result:", result);
+      // Refresh student list
+      refetch();
     } catch (error) {
       // Handle error
       setImportError(`Lỗi import file: ${error.message}`);
@@ -272,19 +171,19 @@ function StudentList() {
     }
   }, [importError]);
 
-  // Get health status badge class
-  const getHealthStatusClass = (status) => {
-    switch (status) {
-      case "Bình thường":
-        return "status-normal";
-      case "Cần theo dõi":
-        return "status-watch";
-      case "Có dị ứng":
-        return "status-allergy";
-      default:
-        return "status-normal";
-    }
-  };
+  // Get health status badge class (commented out as not used currently)
+  // const getHealthStatusClass = (status) => {
+  //   switch (status) {
+  //     case "Bình thường":
+  //       return "status-normal";
+  //     case "Cần theo dõi":
+  //       return "status-watch";
+  //     case "Có dị ứng":
+  //       return "status-allergy";
+  //     default:
+  //       return "status-normal";
+  //   }
+  // };
 
   return (
     <div className="student-list-container">
@@ -326,10 +225,9 @@ function StudentList() {
               value={filterClass}
               onChange={(e) => setFilterClass(e.target.value)}
             >
-              <option value="">Tất cả lớp</option>
-              {classes.map((className) => (
-                <option key={className} value={className}>
-                  {className}
+              {classes.map((classOption) => (
+                <option key={classOption.value} value={classOption.value}>
+                  {classOption.label}
                 </option>
               ))}
             </select>
@@ -353,71 +251,98 @@ function StudentList() {
         </div>
       </div>
 
-      {/* Student Table */}
-      <div className="table-container">
-        <table className="student-table">
-          <thead>
-            <tr>
-              <th>Mã HS</th>
-              <th>Họ tên</th>
-              <th>Lớp</th>
-              <th>Phụ huynh</th>
-              <th>Ngày sinh</th>
-              <th>Giới tính</th>
-              <th>Sức khỏe</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredStudents.map((student) => (
-              <tr key={student.id}>
-                <td className="student-id">{student.studentId}</td>
-                <td>
-                  <div className="student-info">
-                    <strong>{student.fullName}</strong>
-                    <small>{student.bloodType}</small>
-                  </div>
-                </td>
-                <td className="class-name">{student.className}</td>
-                <td>
-                  <div className="parent-info">
-                    <div>{student.parentName}</div>
-                    <small>{student.parentPhone}</small>
-                  </div>
-                </td>
-                <td>{student.dateOfBirth}</td>
-                <td>{student.gender}</td>
-                <td>
-                  <span
-                    className={`health-status ${getHealthStatusClass(
-                      student.healthStatus
-                    )}`}
-                  >
-                    {student.healthStatus}
-                  </span>
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    <button
-                      className="btn-view"
-                      onClick={() => handleViewStudent(student)}
-                      title="Xem chi tiết"
-                    >
-                      👁️
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Loading State */}
+      {loading && (
+        <div className="loading-state">
+          <p>⏳ Đang tải danh sách học sinh...</p>
+        </div>
+      )}
 
-        {filteredStudents.length === 0 && (
-          <div className="no-data">
-            <p>Không tìm thấy dữ liệu phù hợp</p>
-          </div>
-        )}
-      </div>
+      {/* Error State */}
+      {error && (
+        <div className="error-state">
+          <p>❌ Lỗi khi tải danh sách học sinh: {error}</p>
+          <button onClick={refetch} className="retry-btn">
+            🔄 Thử lại
+          </button>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && !error && (!students || students.length === 0) && (
+        <div className="empty-state">
+          <p>📭 Chưa có học sinh nào trong hệ thống</p>
+          <button onClick={refetch} className="retry-btn">
+            🔄 Tải lại
+          </button>
+        </div>
+      )}
+
+      {/* Student Table */}
+      {!loading && !error && students && students.length > 0 && (
+        <div className="table-container">
+          <table className="student-table">
+            <thead>
+              <tr>
+                <th>Mã HS</th>
+                <th>Họ tên</th>
+                <th>Lớp</th>
+                <th>Tuổi</th>
+                <th>Ngày sinh</th>
+                <th>Giới tính</th>
+                <th>Nhóm máu</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredStudents.map((student) => (
+                <tr key={student.id}>
+                  <td className="student-id">{student.studentId}</td>
+                  <td>
+                    <div className="student-info">
+                      <strong>{student.fullName}</strong>
+                      <small>ID: {student.id}</small>
+                    </div>
+                  </td>
+                  <td className="class-name">{student.className}</td>
+                  <td>{student.age} tuổi</td>
+                  <td>{student.dateOfBirth}</td>
+                  <td>{student.gender}</td>
+                  <td>
+                    <span className="blood-type">{student.bloodType}</span>
+                  </td>
+                  <td>
+                    <div className="action-buttons">
+                      <button
+                        className="btn-view"
+                        onClick={() => handleViewStudent(student)}
+                        title="Xem chi tiết"
+                      >
+                        👁️
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {filteredStudents.length === 0 && (
+            <div className="no-data">
+              <p>Không tìm thấy dữ liệu phù hợp với bộ lọc</p>
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setFilterClass("");
+                }}
+                className="retry-btn"
+              >
+                🔄 Đặt lại bộ lọc
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Student Detail Modal */}
       {showModal && currentStudent && (
@@ -449,6 +374,10 @@ function StudentList() {
                     <span>{currentStudent.dateOfBirth}</span>
                   </div>
                   <div className="detail-item">
+                    <label>Tuổi:</label>
+                    <span>{currentStudent.age} tuổi</span>
+                  </div>
+                  <div className="detail-item">
                     <label>Giới tính:</label>
                     <span>{currentStudent.gender}</span>
                   </div>
@@ -457,45 +386,27 @@ function StudentList() {
                     <span>{currentStudent.className}</span>
                   </div>
                   <div className="detail-item">
+                    <label>Nhóm máu:</label>
+                    <span>{currentStudent.bloodType}</span>
+                  </div>
+                  <div className="detail-item">
                     <label>Ngày nhập học:</label>
                     <span>{currentStudent.enrollmentDate}</span>
                   </div>
                   <div className="detail-item">
+                    <label>ID phụ huynh:</label>
+                    <span>{currentStudent.parentId}</span>
+                  </div>
+                  <div className="detail-item">
                     <label>Tình trạng sức khỏe:</label>
-                    <span
-                      className={`health-status ${getHealthStatusClass(
-                        currentStudent.healthStatus
-                      )}`}
-                    >
-                      {currentStudent.healthStatus}
-                    </span>
+                    <span>{currentStudent.healthStatus}</span>
                   </div>
                   <div className="detail-item">
                     <label>Dị ứng:</label>
                     <span>{currentStudent.allergies}</span>
                   </div>
                   <div className="detail-item">
-                    <label>Nhóm máu:</label>
-                    <span>{currentStudent.bloodType}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Chiều cao:</label>
-                    <span>{currentStudent.height}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Cân nặng:</label>
-                    <span>{currentStudent.weight}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Tên phụ huynh:</label>
-                    <span>{currentStudent.parentName}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>SĐT phụ huynh:</label>
-                    <span>{currentStudent.parentPhone}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>SĐT khẩn cấp:</label>
+                    <label>Liên hệ khẩn cấp:</label>
                     <span>{currentStudent.emergencyContact}</span>
                   </div>
                   <div className="detail-item">

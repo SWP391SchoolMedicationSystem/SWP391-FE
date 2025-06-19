@@ -13,6 +13,7 @@ import {
   IconButton,
   InputBase,
   Avatar,
+  Typography,
 } from "@mui/material";
 import {
   Dashboard,
@@ -25,6 +26,7 @@ import {
   AdminPanelSettings,
 } from "@mui/icons-material";
 import userService from "../../services/userService";
+import MedlearnLogo from "../../assets/images/Medlearn-logo.png";
 
 const drawerWidth = 240;
 
@@ -40,6 +42,11 @@ const navItems = [
     to: "/admin/form-categories",
     label: "Danh Mục Biểu Mẫu",
     icon: <Category />,
+  },
+  {
+    to: "/admin/email-templates",
+    label: "Email Templates",
+    icon: <AdminPanelSettings />,
   },
   { to: "/admin/settings", label: "Cài Đặt", icon: <Settings /> },
 ];
@@ -98,9 +105,56 @@ export default function AdminLayout() {
           },
         }}
       >
-        <Toolbar sx={{ fontWeight: "bold", fontSize: 20, color: "#DC2626" }}>
-          <AdminPanelSettings sx={{ mr: 1 }} />
-          AdminPanel
+        <Toolbar
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            py: 1,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 0.5,
+            }}
+          >
+            <Box sx={{ width: "40px", height: "40px" }}>
+              <img
+                src={MedlearnLogo}
+                alt="Medlearn Logo"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                }}
+              />
+            </Box>
+            <Box sx={{ textAlign: "center" }}>
+              <Typography
+                sx={{
+                  fontSize: "0.75rem",
+                  fontWeight: "bold",
+                  color: "#2D77C1",
+                  lineHeight: 1,
+                }}
+              >
+                MEDLEARN
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "0.6rem",
+                  color: "#DC2626",
+                  lineHeight: 1,
+                  fontWeight: "600",
+                }}
+              >
+                Admin Panel
+              </Typography>
+            </Box>
+          </Box>
         </Toolbar>
         <List>
           {navItems.map(({ to, label, icon }) => (

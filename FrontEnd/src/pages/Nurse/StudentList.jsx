@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import "../../css/Nurse/StudentList.css";
+import { useNurseStudents } from "../../utils/hooks/useNurse";
 
 function StudentList() {
-  // Mock data for students (read-only for nurse)
-  const [students] = useState([
+  // Use API hooks
+  const { data: students, loading, error, refetch } = useNurseStudents();
+
+  // Mock data for fallback (remove when API is stable)
+  const [mockStudents] = useState([
     {
       id: 1,
       studentId: "MN001",
@@ -126,12 +130,22 @@ function StudentList() {
   const genders = ["Nam", "Nữ"];
   const healthStatuses = ["Tốt", "Bình thường", "Yếu"];
 
-  // Filter students
-  const filteredStudents = students.filter((student) => {
+  // Use real students or fallback to mock data
+  const studentData = students || mockStudents;
+
+  // Debug API response
+  console.log("API students response:", students);
+  console.log("Using studentData:", studentData);
+
+  // Filter students with safety checks
+  const filteredStudents = studentData.filter((student) => {
     const matchesSearch =
-      student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.studentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.parentName.toLowerCase().includes(searchTerm.toLowerCase());
+      (student.fullName &&
+        student.fullName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (student.studentId &&
+        student.studentId.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (student.parentName &&
+        student.parentName.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesClass =
       filterClass === "" || student.className === filterClass;
     const matchesGender =
@@ -175,17 +189,47 @@ function StudentList() {
 
   // Statistics
   const stats = {
-    total: students.length,
-    male: students.filter((s) => s.gender === "Nam").length,
-    female: students.filter((s) => s.gender === "Nữ").length,
-    healthy: students.filter((s) => s.healthStatus === "Tốt").length,
+    total: studentData.length,
+    male: studentData.filter((s) => s.gender === "Nam").length,
+    female: studentData.filter((s) => s.gender === "Nữ").length,
+    healthy: studentData.filter((s) => s.healthStatus === "Tốt").length,
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="student-list-container">
+        <div className="loading-state">
+          <p>⏳ Đang tải danh sách học sinh...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="student-list-container">
+        <div className="error-state">
+          <p>❌ Lỗi khi tải danh sách học sinh: {error}</p>
+          <button onClick={refetch} className="retry-btn">
+            🔄 Thử lại
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="student-list-container">
       <div className="page-header">
-        <h1>👥 Danh Sách Học Sinh</h1>
-        <p>Xem thông tin học sinh trong trường</p>
+        <div className="header-content">
+          <h1>👥 Danh Sách Học Sinh</h1>
+          <p>Xem thông tin học sinh trong trường</p>
+        </div>
+        <button onClick={refetch} className="refresh-btn">
+          🔄 Tải lại
+        </button>
       </div>
 
       {/* Statistics Cards */}
