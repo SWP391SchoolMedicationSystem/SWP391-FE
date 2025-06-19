@@ -1,5 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 import apiClient, { API_ENDPOINTS } from "./config";
+import { parentService } from "./parentService";
 
 const userService = {
   // Login user
@@ -283,6 +284,29 @@ const userService = {
     localStorage.removeItem("token");
     localStorage.removeItem("userInfo");
     // Note: We don't remove remembered accounts on logout
+  },
+
+  // Update user profile
+  updateProfile: async (userData) => {
+    try {
+      const userRole = userService.getCurrentUserRole();
+      
+      if (userRole === "Parent") {
+        const response = await parentService.updateProfile(userData);
+        
+        // Update local storage with new data
+        const currentUserInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+        const updatedUserInfo = { ...currentUserInfo, ...userData };
+        localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
+        
+        return response;
+      }
+      
+      throw new Error("Chức năng này chỉ dành cho phụ huynh");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      throw error;
+    }
   },
 };
 

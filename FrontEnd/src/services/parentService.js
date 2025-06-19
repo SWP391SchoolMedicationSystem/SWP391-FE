@@ -16,9 +16,18 @@ export const parentService = {
   // Update parent profile
   updateProfile: async (parentData) => {
     try {
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      const payload = {
+        parentid: userInfo.userId || 0,
+        fullname: parentData.fullname || "",
+        email: parentData.email || "",
+        phone: parentData.phone || "",
+        address: parentData.address || ""
+      };
+      
       const response = await apiClient.put(
-        API_ENDPOINTS.PARENT.UPDATE,
-        parentData
+        "https://api-schoolhealth.purintech.id.vn/api/Parent/parent",
+        payload
       );
       return response;
     } catch (error) {

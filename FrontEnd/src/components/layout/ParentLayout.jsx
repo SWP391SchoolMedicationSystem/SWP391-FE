@@ -1,5 +1,5 @@
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Drawer,
@@ -59,8 +59,22 @@ const navItems = [
 
 export default function ParentLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [userInfo, setUserInfo] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
+
+  const fetchUserInfo = async () => {
+    try {
+      const response = await userService.getUserInfo();
+      if (response.data) {
+        const updatedInfo = response.data;
+        setUserInfo(updatedInfo);
+        localStorage.setItem("userInfo", JSON.stringify(updatedInfo));
+      }
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
+  };
 
   useEffect(() => {
     // Lấy thông tin user từ localStorage
@@ -74,6 +88,21 @@ export default function ParentLayout() {
       }
     }
   }, []);
+
+  // Handle profile updates
+  useEffect(() => {
+    const state = location.state;
+    if (state?.fromUpdate) {
+      if (state.updatedUserInfo) {
+        setUserInfo(state.updatedUserInfo);
+      }
+      if (state.showProfileAfterUpdate) {
+        setShowProfile(true);
+      }
+      // Clear the state after using it
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state]);
 
   const handleLogout = () => {
     userService.logout();
@@ -100,6 +129,11 @@ export default function ParentLayout() {
     const displayName = getUserDisplayName();
     return displayName.charAt(0).toUpperCase();
   };
+
+  const handleUpdateProfile = useCallback(() => {
+    setShowProfile(false);
+    navigate('/parent/update-profile');
+  }, [navigate]);
 
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
@@ -344,78 +378,34 @@ export default function ParentLayout() {
 
               {/* Info Cards */}
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    p: 2,
-                    bgcolor: "white",
-                    borderRadius: 2,
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                    border: "1px solid #e0e0e0",
-                  }}
-                >
+                {[
+                  {
+                    icon: "🆔",
+                    label: "Mã số",
+                    value: userInfo.userId || userInfo.id || "N/A",
+                    bgColor: "#FFF3E0"
+                  },
+                  {
+                    icon: "📧",
+                    label: "Email",
+                    value: userInfo.email || "N/A",
+                    bgColor: "#E8F5E8"
+                  },
+                  {
+                    icon: "📱",
+                    label: "Số điện thoại",
+                    value: userInfo.phone || "N/A",
+                    bgColor: "#E3F2FD"
+                  },
+                  {
+                    icon: "👨‍👩‍👧‍👦",
+                    label: "Vai trò",
+                    value: userInfo.role || "Phụ huynh",
+                    bgColor: "#F3E5F5"
+                  }
+                ].map((item, index) => (
                   <Box
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: "50%",
-                      bgcolor: "#FFF3E0",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mr: 2,
-                    }}
-                  >
-                    🆔
-                  </Box>
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Mã số
-                    </Typography>
-                    <Typography variant="body1" fontWeight="600">
-                      {userInfo.userId || userInfo.id || "N/A"}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    p: 2,
-                    bgcolor: "white",
-                    borderRadius: 2,
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                    border: "1px solid #e0e0e0",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: "50%",
-                      bgcolor: "#E8F5E8",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mr: 2,
-                    }}
-                  >
-                    📧
-                  </Box>
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Email
-                    </Typography>
-                    <Typography variant="body1" fontWeight="600">
-                      {userInfo.email || "N/A"}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {userInfo.phone && (
-                  <Box
+                    key={index}
                     sx={{
                       display: "flex",
                       alignItems: "center",
@@ -424,6 +414,12 @@ export default function ParentLayout() {
                       borderRadius: 2,
                       boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                       border: "1px solid #e0e0e0",
+                      minHeight: "72px", // Ensure consistent height
+                      transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                      "&:hover": {
+                        transform: "translateY(-2px)",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                      }
                     }}
                   >
                     <Box
@@ -431,62 +427,43 @@ export default function ParentLayout() {
                         width: 40,
                         height: 40,
                         borderRadius: "50%",
-                        bgcolor: "#E3F2FD",
+                        bgcolor: item.bgColor,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         mr: 2,
+                        fontSize: "1.2rem"
                       }}
                     >
-                      📱
+                      {item.icon}
                     </Box>
-                    <Box>
-                      <Typography variant="body2" color="text.secondary">
-                        Số điện thoại
+                    <Box sx={{ flex: 1 }}>
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ 
+                          fontSize: "0.875rem",
+                          mb: 0.5
+                        }}
+                      >
+                        {item.label}
                       </Typography>
-                      <Typography variant="body1" fontWeight="600">
-                        {userInfo.phone}
+                      <Typography 
+                        variant="body1" 
+                        fontWeight="600"
+                        sx={{
+                          fontSize: "1rem",
+                          color: "#2D77C1",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap"
+                        }}
+                      >
+                        {item.value}
                       </Typography>
                     </Box>
                   </Box>
-                )}
-
-                {userInfo.role && (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      p: 2,
-                      bgcolor: "white",
-                      borderRadius: 2,
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      border: "1px solid #e0e0e0",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: "50%",
-                        bgcolor: "#F3E5F5",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mr: 2,
-                      }}
-                    >
-                      👨‍👩‍👧‍👦
-                    </Box>
-                    <Box>
-                      <Typography variant="body2" color="text.secondary">
-                        Vai trò
-                      </Typography>
-                      <Typography variant="body1" fontWeight="600">
-                        {userInfo.role}
-                      </Typography>
-                    </Box>
-                  </Box>
-                )}
+                ))}
               </Box>
             </Box>
           ) : (
@@ -497,7 +474,27 @@ export default function ParentLayout() {
             </Box>
           )}
         </DialogContent>
-        <DialogActions sx={{ p: 2, justifyContent: "center" }}>
+        <DialogActions sx={{ p: 2, justifyContent: "center", gap: 2 }}>
+          <Button
+            onClick={handleUpdateProfile}
+            variant="outlined"
+            sx={{
+              borderColor: "#56D0DB",
+              color: "#2D77C1",
+              px: 4,
+              py: 1,
+              borderRadius: 2,
+              fontWeight: "bold",
+              "&:hover": {
+                borderColor: "#2D77C1",
+                background: "rgba(86, 208, 219, 0.1)",
+                transform: "translateY(-1px)",
+              },
+              transition: "all 0.3s ease",
+            }}
+          >
+            Cập nhật thông tin
+          </Button>
           <Button
             onClick={() => setShowProfile(false)}
             variant="contained"
