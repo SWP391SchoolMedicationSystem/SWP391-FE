@@ -1,8 +1,21 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  useParentNotifications,
+  useParentBlogs,
+} from "../../utils/hooks/useParent";
 import "../../css/Parent/Dashboard.css";
 
 function ParentDashboard() {
-  // Mock data
+  const navigate = useNavigate();
+  const [quickStats, setQuickStats] = useState([]);
+
+  // Get real data from APIs
+  const { data: notifications, loading: notificationsLoading } =
+    useParentNotifications();
+  const { data: blogs, loading: blogsLoading } = useParentBlogs();
+
+  // Mock data for features not yet available via API
   const studentInfo = {
     name: "Nguyễn Minh Khôi",
     class: "5A",
@@ -17,56 +30,109 @@ function ParentDashboard() {
     healthStatus: "Khỏe mạnh",
   };
 
-  const recentNotifications = [
-    {
-      id: 1,
-      title: "Lịch tiêm vaccine mới",
-      content: "Thông báo lịch tiêm vaccine sởi - rubella cho học sinh lớp 5",
-      date: "2024-03-15",
-      type: "vaccination",
-    },
-    {
-      id: 2,
-      title: "Kết quả khám sức khỏe định kỳ",
-      content: "Kết quả khám sức khỏe của con em đã được cập nhật",
-      date: "2024-03-12",
-      type: "health",
-    },
-    {
-      id: 3,
-      title: "Sự kiện sức khỏe trường học",
-      content: "Chương trình tập thể dục buổi sáng dành cho học sinh",
-      date: "2024-03-08",
-      type: "event",
-    },
-  ];
+  // Calculate real statistics
+  useEffect(() => {
+    const calculateStats = () => {
+      const totalNotifications = notifications ? notifications.length : 0;
+      const unreadNotifications = notifications
+        ? notifications.filter((n) => !n.isRead).length
+        : 0;
+      const totalBlogs = blogs ? blogs.length : 0;
 
-  const quickStats = [
-    {
-      title: "Tổng số lần khám",
-      value: "12",
-      icon: "🏥",
-      color: "stat-health",
-    },
-    {
-      title: "Vaccine đã tiêm",
-      value: "8/8",
-      icon: "💉",
-      color: "stat-vaccine",
-    },
-    {
-      title: "Thông báo mới",
-      value: "3",
-      icon: "🔔",
-      color: "stat-notification",
-    },
-    {
-      title: "Tin nhắn chưa đọc",
-      value: "1",
-      icon: "💬",
-      color: "stat-message",
-    },
-  ];
+      const stats = [
+        {
+          title: "Thông báo mới",
+          value: unreadNotifications.toString(),
+          icon: "🔔",
+          color: "stat-notification",
+        },
+        {
+          title: "Tổng thông báo",
+          value: totalNotifications.toString(),
+          icon: "📬",
+          color: "stat-health",
+        },
+        {
+          title: "Bài viết sức khỏe",
+          value: totalBlogs.toString(),
+          icon: "📰",
+          color: "stat-vaccine",
+        },
+        {
+          title: "Tin nhắn chưa đọc",
+          value: "1", // Mock data - chat API not available
+          icon: "💬",
+          color: "stat-message",
+        },
+      ];
+
+      setQuickStats(stats);
+    };
+
+    if (!notificationsLoading && !blogsLoading) {
+      calculateStats();
+    }
+  }, [notifications, blogs, notificationsLoading, blogsLoading]);
+
+  // Get recent notifications from real data
+  const getRecentNotifications = () => {
+    if (!notifications || notifications.length === 0) {
+      // Return mock data if no real notifications
+      return [
+        {
+          id: 1,
+          title: "Lịch tiêm vaccine mới",
+          content:
+            "Thông báo lịch tiêm vaccine sởi - rubella cho học sinh lớp 5",
+          date: "2024-03-15",
+          type: "vaccination",
+        },
+        {
+          id: 2,
+          title: "Kết quả khám sức khỏe định kỳ",
+          content: "Kết quả khám sức khỏe của con em đã được cập nhật",
+          date: "2024-03-12",
+          type: "health",
+        },
+      ];
+    }
+
+    // Use real notifications data
+    return notifications
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date)
+      )
+      .slice(0, 3)
+      .map((notification) => ({
+        id: notification.id,
+        title: notification.title,
+        content: notification.content,
+        date: notification.date,
+        type: notification.type,
+        isRead: notification.isRead,
+      }));
+  };
+
+  const handleViewAllNotifications = () => {
+    navigate("/parent/notifications");
+  };
+
+  const handleViewBlogs = () => {
+    navigate("/parent/blogs");
+  };
+
+  const handleViewHealthHistory = () => {
+    navigate("/parent/health-history");
+  };
+
+  const handleConsultation = () => {
+    navigate("/parent/consultation");
+  };
+
+  const handleChatWithNurse = () => {
+    navigate("/parent/chat");
+  };
 
   return (
     <div className="parent-dashboard-container">
@@ -90,15 +156,21 @@ function ParentDashboard() {
 
       {/* Quick Stats */}
       <div className="stats-grid">
-        {quickStats.map((stat, index) => (
-          <div key={index} className={`stat-card ${stat.color}`}>
-            <div className="stat-icon">{stat.icon}</div>
-            <div className="stat-content">
-              <h3>{stat.value}</h3>
-              <p>{stat.title}</p>
-            </div>
+        {notificationsLoading || blogsLoading ? (
+          <div className="loading-stats">
+            <p>⏳ Đang tải thống kê...</p>
           </div>
-        ))}
+        ) : (
+          quickStats.map((stat, index) => (
+            <div key={index} className={`stat-card ${stat.color}`}>
+              <div className="stat-icon">{stat.icon}</div>
+              <div className="stat-content">
+                <h3>{stat.value}</h3>
+                <p>{stat.title}</p>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Main Content Grid */}
@@ -165,14 +237,21 @@ function ParentDashboard() {
         <div className="info-card notifications-card">
           <div className="card-header">
             <h3>🔔 Thông Báo Gần Đây</h3>
-            <button className="view-all-btn">Xem tất cả</button>
+            <button
+              className="view-all-btn"
+              onClick={handleViewAllNotifications}
+            >
+              Xem tất cả
+            </button>
           </div>
           <div className="card-content">
             <div className="notifications-list">
-              {recentNotifications.map((notification) => (
+              {getRecentNotifications().map((notification) => (
                 <div
                   key={notification.id}
-                  className={`notification-item ${notification.type}`}
+                  className={`notification-item ${notification.type} ${
+                    !notification.isRead ? "unread" : ""
+                  }`}
                 >
                   <div className="notification-content">
                     <h4>{notification.title}</h4>
@@ -195,19 +274,25 @@ function ParentDashboard() {
       <div className="quick-actions">
         <h3>⚡ Thao Tác Nhanh</h3>
         <div className="actions-grid">
-          <button className="action-btn health-btn">
+          <button
+            className="action-btn health-btn"
+            onClick={handleViewHealthHistory}
+          >
             <span className="action-icon">📋</span>
             <span>Xem Hồ Sơ Sức Khỏe</span>
           </button>
-          <button className="action-btn consultation-btn">
+          <button
+            className="action-btn consultation-btn"
+            onClick={handleConsultation}
+          >
             <span className="action-icon">💬</span>
             <span>Đặt Lịch Tư Vấn</span>
           </button>
-          <button className="action-btn chat-btn">
+          <button className="action-btn chat-btn" onClick={handleChatWithNurse}>
             <span className="action-icon">🗨️</span>
             <span>Chat Với Y Tá</span>
           </button>
-          <button className="action-btn blog-btn">
+          <button className="action-btn blog-btn" onClick={handleViewBlogs}>
             <span className="action-icon">📰</span>
             <span>Đọc Blog Sức Khỏe</span>
           </button>

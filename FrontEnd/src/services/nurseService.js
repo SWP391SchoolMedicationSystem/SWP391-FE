@@ -92,13 +92,44 @@ export const nurseBlogService = {
   },
 };
 
+// Data mapping function for student data
+const mapStudentDataForNurse = (apiStudent) => {
+  return {
+    id: apiStudent.studentid,
+    studentId: apiStudent.studentCode || `ST${apiStudent.studentid}`,
+    fullName: apiStudent.fullname,
+    dateOfBirth: apiStudent.dob,
+    age: apiStudent.age,
+    gender: apiStudent.gender === true ? "Nam" : "Nữ",
+    bloodType: apiStudent.bloodType || "Chưa có thông tin",
+    classId: apiStudent.classid,
+    parentId: apiStudent.parentid,
+    className: `Lớp ${apiStudent.classid}`,
+    parentName: "Chưa có thông tin", // API doesn't return parent info
+    parentPhone: "Chưa có thông tin",
+    healthStatus: "Bình thường", // Default value
+    enrollmentDate: apiStudent.createdAt
+      ? apiStudent.createdAt.split("T")[0]
+      : "Chưa có thông tin",
+    allergies: "Chưa có thông tin",
+    emergencyContact: "Chưa có thông tin",
+    height: "Chưa có thông tin",
+    weight: "Chưa có thông tin",
+    notes: "Chưa có thông tin",
+  };
+};
+
 // Nurse Student Services
 export const nurseStudentService = {
   // Get all students
   getAllStudents: async () => {
     try {
       const response = await apiClient.get(API_ENDPOINTS.STUDENT.GET_ALL);
-      return response;
+      // Transform API response to match component expected structure
+      if (Array.isArray(response)) {
+        return response.map(mapStudentDataForNurse);
+      }
+      return [];
     } catch (error) {
       console.error("Error getting all students:", error);
       throw error;

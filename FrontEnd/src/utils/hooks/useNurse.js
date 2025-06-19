@@ -1,42 +1,88 @@
 import { useApi, useApiCall } from "./useApi";
+import { useState, useCallback } from "react";
 import {
-  nurseHealthRecordService,
+  nurseHealthService,
   nurseBlogService,
   nurseStudentService,
   nurseNotificationService,
-  medicationService,
+  nurseMedicationService,
   nurseVaccinationService,
   nurseChatService,
 } from "../../services/nurseService";
 
 // Hook for nurse health records
 export const useNurseHealthRecords = () => {
-  return useApi(nurseHealthRecordService.getHealthRecords);
+  return useApi(nurseHealthService.getAllHealthRecords);
 };
 
 // Hook for nurse blog management
 export const useNurseBlogs = () => {
-  return useApi(nurseBlogService.getBlogs);
+  return useApi(nurseBlogService.getAllBlogs);
 };
 
 // Hook for nurse student management
 export const useNurseStudents = () => {
-  return useApi(nurseStudentService.getStudents);
+  return useApi(nurseStudentService.getAllStudents);
 };
 
-// Hook for nurse notifications
+// Hook for nurse notifications with enhanced functionality
 export const useNurseNotifications = () => {
-  return useApi(nurseNotificationService.getNotifications);
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchNotifications = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const data = await nurseNotificationService.getNotifications();
+      setNotifications(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to fetch nurse notifications:", err);
+      setError("Failed to load notifications");
+      setNotifications([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const markAsRead = useCallback(
+    async (notificationId) => {
+      try {
+        await nurseNotificationService.markAsRead(notificationId);
+        // Refresh notifications after marking as read
+        await fetchNotifications();
+      } catch (err) {
+        console.error("Failed to mark notification as read:", err);
+        throw err;
+      }
+    },
+    [fetchNotifications]
+  );
+
+  const refetch = useCallback(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
+  return {
+    data: notifications,
+    loading,
+    error,
+    fetchNotifications,
+    markAsRead,
+    refetch,
+  };
 };
 
 // Hook for medication management
 export const useMedications = () => {
-  return useApi(medicationService.getMedications);
+  return useApi(nurseMedicationService.getMedicationSchedule);
 };
 
 // Hook for vaccination management
 export const useNurseVaccinations = () => {
-  return useApi(nurseVaccinationService.getVaccinations);
+  return useApi(nurseVaccinationService.getVaccinationList);
 };
 
 // Hook for nurse chat

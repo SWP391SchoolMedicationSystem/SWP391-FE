@@ -53,6 +53,11 @@ const navItems = [
     label: "Hồ Sơ Sức Khỏe",
     icon: <Assignment />,
   },
+  {
+    to: "/nurse/notifications",
+    label: "Thông Báo",
+    icon: <Notifications />,
+  },
 ];
 
 export default function NurseLayout() {

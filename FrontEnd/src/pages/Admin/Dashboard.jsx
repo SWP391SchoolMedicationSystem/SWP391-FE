@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Grid,
@@ -19,75 +20,131 @@ import {
   Notifications,
   Analytics,
 } from "@mui/icons-material";
+import {
+  useAdminStaff,
+  useAdminBlogs,
+  useSystemLogs,
+  useSystemStatistics,
+} from "../../utils/hooks/useAdmin";
 import "../../css/Admin/Dashboard.css";
 
 function AdminDashboard() {
-  // Mock data for admin dashboard
-  const stats = [
-    {
-      title: "Tổng Manager",
-      value: "12",
-      change: "+2",
-      changeType: "increase",
-      icon: <SupervisorAccount />,
-      color: "#3B82F6",
-    },
-    {
-      title: "System Logs",
-      value: "1,234",
-      change: "+45",
-      changeType: "increase",
-      icon: <Assignment />,
-      color: "#10B981",
-    },
-    {
-      title: "Danh Mục Form",
-      value: "8",
-      change: "+1",
-      changeType: "increase",
-      icon: <Category />,
-      color: "#F59E0B",
-    },
-    {
-      title: "Hoạt Động",
-      value: "98%",
-      change: "+2%",
-      changeType: "increase",
-      icon: <TrendingUp />,
-      color: "#EF4444",
-    },
-  ];
+  const navigate = useNavigate();
+  const [dashboardStats, setDashboardStats] = useState([]);
 
-  const recentActivities = [
-    {
-      id: 1,
-      action: "Tạo tài khoản Manager mới",
-      user: "Admin",
-      time: "2 phút trước",
-      type: "create",
-    },
-    {
-      id: 2,
-      action: "Cập nhật danh mục biểu mẫu",
-      user: "Admin",
-      time: "15 phút trước",
-      type: "update",
-    },
-    {
-      id: 3,
-      action: "Xem system logs",
-      user: "Admin",
-      time: "1 giờ trước",
-      type: "view",
-    },
-    {
-      id: 4,
-      action: "Xóa tài khoản Manager",
-      user: "Admin",
-      time: "2 giờ trước",
-      type: "delete",
-    },
-  ];
+  // Get real data from APIs
+  const { data: staff, loading: staffLoading } = useAdminStaff();
+  const { data: blogs, loading: blogsLoading } = useAdminBlogs();
+  const { data: systemLogs, loading: logsLoading } = useSystemLogs();
+  const { data: statistics, loading: statsLoading } = useSystemStatistics();
+
+  // Calculate real statistics
+  useEffect(() => {
+    const calculateStats = () => {
+      const totalStaff = staff ? staff.length : 0;
+      const totalBlogs = blogs ? blogs.length : 0;
+      const pendingBlogs = blogs
+        ? blogs.filter((b) => b.status === "pending").length
+        : 0;
+      const totalLogs = systemLogs ? systemLogs.length : 0;
+
+      const stats = [
+        {
+          title: "Tổng Nhân Viên",
+          value: totalStaff.toString(),
+          change: "+2", // Mock change
+          changeType: "increase",
+          icon: <SupervisorAccount />,
+          color: "#3B82F6",
+        },
+        {
+          title: "System Logs",
+          value: totalLogs.toString(),
+          change: "+45", // Mock change
+          changeType: "increase",
+          icon: <Assignment />,
+          color: "#10B981",
+        },
+        {
+          title: "Tổng Bài Viết",
+          value: totalBlogs.toString(),
+          change:
+            pendingBlogs > 0 ? `${pendingBlogs} chờ duyệt` : "Đã duyệt hết",
+          changeType: pendingBlogs > 0 ? "warning" : "increase",
+          icon: <Category />,
+          color: "#F59E0B",
+        },
+        {
+          title: "Hoạt Động",
+          value: "98%", // Mock system uptime
+          change: "+2%",
+          changeType: "increase",
+          icon: <TrendingUp />,
+          color: "#EF4444",
+        },
+      ];
+
+      setDashboardStats(stats);
+    };
+
+    if (!staffLoading && !blogsLoading && !logsLoading) {
+      calculateStats();
+    }
+  }, [staff, blogs, systemLogs, staffLoading, blogsLoading, logsLoading]);
+
+  // Get recent activities from real data
+  const getRecentActivities = () => {
+    const activities = [];
+
+    // Add recent staff activities
+    if (staff && staff.length > 0) {
+      const recentStaff = staff
+        .filter((s) => s.createdAt)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 2);
+
+      recentStaff.forEach((staffMember) => {
+        activities.push({
+          id: staffMember.id,
+          action: `Tạo tài khoản: ${staffMember.fullName || staffMember.name}`,
+          user: "Admin",
+          time: new Date(staffMember.createdAt).toLocaleDateString("vi-VN"),
+          type: "create",
+        });
+      });
+    }
+
+    // Add recent blog activities
+    if (blogs && blogs.length > 0) {
+      const recentBlogs = blogs
+        .filter((b) => b.createdAt)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 1);
+
+      recentBlogs.forEach((blog) => {
+        activities.push({
+          id: `blog_${blog.id}`,
+          action: `Bài viết mới: "${blog.title}"`,
+          user: "Admin",
+          time: new Date(blog.createdAt).toLocaleDateString("vi-VN"),
+          type: "update",
+        });
+      });
+    }
+
+    // Add mock activities if not enough real data
+    while (activities.length < 4) {
+      activities.push({
+        id: `mock_${activities.length}`,
+        action: "Xem system logs",
+        user: "Admin",
+        time: "1 giờ trước",
+        type: "view",
+      });
+    }
+
+    return activities.slice(0, 4);
+  };
 
   const systemHealth = [
     { service: "Database", status: "healthy", uptime: "99.9%" },
@@ -124,6 +181,10 @@ function AdminDashboard() {
     }
   };
 
+  const handleQuickAction = (path) => {
+    navigate(path);
+  };
+
   return (
     <div className="admin-dashboard">
       <div className="dashboard-header">
@@ -141,46 +202,58 @@ function AdminDashboard() {
 
       {/* Statistics Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        {stats.map((stat, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card className="stat-card">
+        {staffLoading || blogsLoading || logsLoading ? (
+          <Grid item xs={12}>
+            <Card>
               <CardContent>
-                <Box className="stat-content">
-                  <div
-                    className="stat-icon"
-                    style={{ backgroundColor: stat.color }}
-                  >
-                    {stat.icon}
-                  </div>
-                  <div className="stat-info">
-                    <Typography
-                      variant="h4"
-                      component="div"
-                      sx={{ fontWeight: "bold" }}
-                    >
-                      {stat.value}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {stat.title}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color:
-                          stat.changeType === "increase"
-                            ? "#10B981"
-                            : "#EF4444",
-                        fontWeight: "medium",
-                      }}
-                    >
-                      {stat.change} từ tháng trước
-                    </Typography>
-                  </div>
-                </Box>
+                <Typography>⏳ Đang tải thống kê...</Typography>
               </CardContent>
             </Card>
           </Grid>
-        ))}
+        ) : (
+          dashboardStats.map((stat, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index}>
+              <Card className="stat-card">
+                <CardContent>
+                  <Box className="stat-content">
+                    <div
+                      className="stat-icon"
+                      style={{ backgroundColor: stat.color }}
+                    >
+                      {stat.icon}
+                    </div>
+                    <div className="stat-info">
+                      <Typography
+                        variant="h4"
+                        component="div"
+                        sx={{ fontWeight: "bold" }}
+                      >
+                        {stat.value}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {stat.title}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color:
+                            stat.changeType === "increase"
+                              ? "#10B981"
+                              : stat.changeType === "warning"
+                              ? "#F59E0B"
+                              : "#EF4444",
+                          fontWeight: "medium",
+                        }}
+                      >
+                        {stat.change}
+                      </Typography>
+                    </div>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))
+        )}
       </Grid>
 
       <Grid container spacing={3}>
@@ -200,7 +273,7 @@ function AdminDashboard() {
                   variant="contained"
                   startIcon={<SupervisorAccount />}
                   sx={{ mb: 2, width: "100%" }}
-                  href="/admin/manage-managers"
+                  onClick={() => handleQuickAction("/admin/manage-managers")}
                 >
                   Quản Lý Manager
                 </Button>
@@ -208,7 +281,7 @@ function AdminDashboard() {
                   variant="outlined"
                   startIcon={<Assignment />}
                   sx={{ mb: 2, width: "100%" }}
-                  href="/admin/system-logs"
+                  onClick={() => handleQuickAction("/admin/system-logs")}
                 >
                   Xem System Logs
                 </Button>
@@ -216,7 +289,7 @@ function AdminDashboard() {
                   variant="outlined"
                   startIcon={<Category />}
                   sx={{ width: "100%" }}
-                  href="/admin/form-categories"
+                  onClick={() => handleQuickAction("/admin/form-categories")}
                 >
                   Quản Lý Danh Mục
                 </Button>
@@ -237,7 +310,7 @@ function AdminDashboard() {
                 Hoạt Động Gần Đây
               </Typography>
               <Box className="activities-list">
-                {recentActivities.map((activity) => (
+                {getRecentActivities().map((activity) => (
                   <Box key={activity.id} className="activity-item">
                     <Box className="activity-icon">
                       {getActivityIcon(activity.type)}

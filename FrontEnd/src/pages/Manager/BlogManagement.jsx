@@ -11,6 +11,10 @@ function BlogManagement() {
   const {
     approveBlog,
     rejectBlog,
+    createBlog,
+    updateBlog,
+    deleteBlog,
+    getBlogById,
     loading: actionLoading,
   } = useManagerActions();
 
@@ -125,9 +129,16 @@ function BlogManagement() {
   };
 
   // Open modal for viewing post
-  const handleViewPost = (post) => {
+  const handleViewPost = async (post) => {
     setModalMode("view");
-    setCurrentPost(post);
+    try {
+      // Get fresh data from API for viewing
+      const blogData = await getBlogById(post.id);
+      setCurrentPost(blogData || post);
+    } catch (error) {
+      console.error("Error fetching blog details:", error);
+      setCurrentPost(post); // Fallback to current data
+    }
     setShowModal(true);
   };
 
@@ -142,34 +153,24 @@ function BlogManagement() {
     setShowModal(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (modalMode === "add") {
-      // Create new post
-      const newPost = {
-        id: Date.now(),
-        ...formData,
-        author: "Current User", // Get from user context
-        createdDate: new Date().toISOString().split("T")[0],
-        publishedDate:
-          formData.status === "Published"
-            ? new Date().toISOString().split("T")[0]
-            : null,
-        views: 0,
-        approvalStatus: "Pending",
-        approvedBy: null,
-        tags: [],
-      };
-      setLocalBlogPosts([...localBlogPosts, newPost]);
-    } else if (modalMode === "edit") {
-      // Update existing post
-      setLocalBlogPosts(
-        localBlogPosts.map((post) =>
-          post.id === currentPost.id ? { ...post, ...formData } : post
-        )
-      );
+    try {
+      if (modalMode === "add") {
+        // Create new post via API
+        await createBlog(formData);
+        alert("Tạo bài viết thành công!");
+      } else if (modalMode === "edit") {
+        // Update existing post via API
+        await updateBlog(currentPost.id, formData);
+        alert("Cập nhật bài viết thành công!");
+      }
+      setShowModal(false);
+      refetch(); // Refresh data from API
+    } catch (error) {
+      console.error("Error saving blog:", error);
+      alert("Có lỗi xảy ra khi lưu bài viết. Vui lòng thử lại!");
     }
-    setShowModal(false);
   };
 
   const handleApprovalSubmit = async (e) => {
@@ -212,9 +213,16 @@ function BlogManagement() {
     }
   };
 
-  const handleDeletePost = (postId) => {
+  const handleDeletePost = async (postId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
-      setLocalBlogPosts(localBlogPosts.filter((post) => post.id !== postId));
+      try {
+        await deleteBlog(postId);
+        alert("Xóa bài viết thành công!");
+        refetch(); // Refresh data from API
+      } catch (error) {
+        console.error("Error deleting blog:", error);
+        alert("Có lỗi xảy ra khi xóa bài viết. Vui lòng thử lại!");
+      }
     }
   };
 

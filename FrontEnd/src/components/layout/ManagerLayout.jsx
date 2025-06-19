@@ -21,9 +21,6 @@ import {
   Article,
   Vaccines,
   Notifications,
-  Description,
-  Info,
-  Settings,
   Menu,
   Logout,
   ChatBubbleOutline,
@@ -53,9 +50,6 @@ const navItems = [
     label: "Thông Báo",
     icon: <Notifications />,
   },
-  { to: "/manager/forms", label: "Biểu Mẫu Danh Mục", icon: <Description /> },
-  { to: "/manager/info", label: "Xem Thông Tin", icon: <Info /> },
-  { to: "/manager/settings", label: "Cài Đặt", icon: <Settings /> },
 ];
 
 export default function ManagerLayout() {

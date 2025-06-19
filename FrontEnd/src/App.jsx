@@ -10,9 +10,7 @@ import AccountManagement from "./pages/Manager/AccountManagement";
 import BlogManagement from "./pages/Manager/BlogManagement";
 import VaccinationList from "./pages/Manager/VaccinationList";
 import Notifications from "./pages/Manager/Notifications";
-import CategoryForms from "./pages/Manager/CategoryForms";
-import ViewInformation from "./pages/Manager/ViewInformation";
-import Settings from "./pages/Manager/Settings";
+
 import StudentList from "./pages/Manager/StudentList";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -34,6 +32,7 @@ import NurseStudentList from "./pages/Nurse/StudentList";
 import NurseBlog from "./pages/Nurse/Blog";
 import ChatWithParents from "./pages/Nurse/ChatWithParents";
 import StudentHealthRecord from "./pages/Nurse/StudentHealthRecord";
+import NurseNotifications from "./pages/Nurse/Notifications";
 
 // Parent imports
 import ParentLayout from "./components/layout/ParentLayout";
@@ -86,9 +85,6 @@ function App() {
           <Route path="vaccinations" element={<VaccinationList />} />
           <Route path="StudentList" element={<StudentList />} />
           <Route path="notifications" element={<Notifications />} />
-          <Route path="forms" element={<CategoryForms />} />
-          <Route path="info" element={<ViewInformation />} />
-          <Route path="settings" element={<Settings />} />
         </Route>
 
         {/* Nurse routes */}
@@ -107,6 +103,7 @@ function App() {
           <Route path="blog" element={<NurseBlog />} />
           <Route path="chat" element={<ChatWithParents />} />
           <Route path="health-records" element={<StudentHealthRecord />} />
+          <Route path="notifications" element={<NurseNotifications />} />
         </Route>
 
         {/* Parent routes */}

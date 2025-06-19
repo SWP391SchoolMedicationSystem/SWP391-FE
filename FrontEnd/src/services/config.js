@@ -19,7 +19,11 @@ apiClient.interceptors.request.use(
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log("Request: Token added to headers");
+    } else {
+      console.warn("Request: No token found in localStorage");
     }
+    console.log("Request:", config.method?.toUpperCase(), config.url);
     return config;
   },
   (error) => {
@@ -30,15 +34,22 @@ apiClient.interceptors.request.use(
 // Response interceptor for error handling
 apiClient.interceptors.response.use(
   (response) => {
+    console.log("Response: Success", response.status, response.config.url);
     return response.data;
   },
   (error) => {
     // Log error for debugging
     console.error("API Error:", error);
+    console.error("Response Status:", error.response?.status);
+    console.error("Response Data:", error.response?.data);
+    console.error("Request URL:", error.config?.url);
+    console.error("Request Method:", error.config?.method);
+    console.error("Request Data:", error.config?.data);
 
     // Handle common errors
     if (error.response?.status === 401) {
       // Unauthorized - redirect to login
+      console.error("Unauthorized access - redirecting to login");
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.href = "/login";
@@ -65,10 +76,13 @@ export const API_ENDPOINTS = {
   // Blog (5/7 - workflow: Nurse create → Manager approve → Parent view)
   BLOG: {
     GET_ALL: "/Blog/getAll", // Manager xem all blogs
+    GET_BY_ID: "/Blog/getById", // Get blog by ID
     GET_PUBLISHED: "/Blog/GetPublishedBlogs", // Parent xem approved blogs
     ADD: "/Blog/add", // Nurse tạo blog
     UPDATE: "/Blog/update", // Manager/Nurse edit blog
+    DELETE: "/Blog/delete", // Manager delete blog
     APPROVE: "/Blog/ApproveBlog", // Manager approve blog
+    REJECT: "/Blog/RejectBlog", // Manager reject blog
   },
 
   // Email (5/7 - including admin features)
@@ -99,17 +113,19 @@ export const API_ENDPOINTS = {
 
   // Parent (3/5)
   PARENT: {
-    GET: "/Parent/parent", // Get parent profile
-    UPDATE: "/Parent/parent", // Update parent profile
-    REGISTER: "/Parent/registration", // Parent registration
+    GET_ALL: "/Parent/parent", // GET all parents
+    GET_BY_ID: "/Parent/parent/{id}", // GET parent by ID
+    UPDATE: "/Parent/parent", // PUT update parent
+    DELETE: "/Parent/parent/{id}", // DELETE parent
+    REGISTER: "/Parent/registration", // POST register parent
   },
 
   // Staff (4/5)
   STAFF: {
-    GET_ALL: "/Staff/staff", // Get all staff (Admin)
-    REGISTER: "/Staff/registration", // Staff registration (Admin)
-    UPDATE: "/Staff/staff", // Update staff info
-    DELETE: "/Staff/staff", // Delete staff (Admin)
+    GET_ALL: "/Staff/staff", // GET all staff
+    UPDATE: "/Staff/staff", // PUT update staff
+    DELETE: "/Staff/staff/{id}", // DELETE staff
+    REGISTER: "/Staff/registration", // POST register staff
   },
 
   // Student (6/6 - all endpoints needed)
@@ -125,6 +141,9 @@ export const API_ENDPOINTS = {
 
 // Helper function to build URL with ID
 export const buildApiUrl = (endpoint, id = null) => {
+  if (id && endpoint.includes("{id}")) {
+    return endpoint.replace("{id}", id);
+  }
   return id ? `${endpoint}/${id}` : endpoint;
 };
 

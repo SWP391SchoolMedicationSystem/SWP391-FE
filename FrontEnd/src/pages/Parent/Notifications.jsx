@@ -1,9 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../css/Parent/Notifications.css";
-import {
-  useParentNotifications,
-  useParentActions,
-} from "../../utils/hooks/useParent";
+import { useParentNotifications } from "../../utils/hooks/useParent";
 
 function Notifications() {
   const [selectedFilter, setSelectedFilter] = useState("all");
@@ -15,8 +12,14 @@ function Notifications() {
     loading,
     error,
     refetch,
+    fetchNotifications,
+    markAsRead: markNotificationAsRead,
   } = useParentNotifications();
-  const { markNotificationAsRead, loading: actionLoading } = useParentActions();
+
+  // Fetch notifications on component mount
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
 
   const filterTypes = [
     { id: "all", name: "Tất cả", icon: "📋", color: "#56D0DB" },
@@ -66,7 +69,7 @@ function Notifications() {
   const markAsRead = async (id) => {
     try {
       await markNotificationAsRead(id);
-      refetch(); // Refresh notifications after marking as read
+      // No need to call refetch as the hook handles it automatically
     } catch (error) {
       console.error("Error marking notification as read:", error);
     }
@@ -83,7 +86,7 @@ function Notifications() {
           markNotificationAsRead(notification.id)
         )
       );
-      refetch(); // Refresh notifications after marking all as read
+      // No need to call refetch as the hook handles it automatically
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
     }
@@ -106,9 +109,9 @@ function Notifications() {
           <button
             className="mark-all-read-btn"
             onClick={markAllAsRead}
-            disabled={actionLoading || !notifications || unreadCount === 0}
+            disabled={loading || !notifications || unreadCount === 0}
           >
-            {actionLoading ? "⏳ Đang xử lý..." : "✅ Đánh dấu tất cả đã đọc"}
+            {loading ? "⏳ Đang xử lý..." : "✅ Đánh dấu tất cả đã đọc"}
           </button>
         </div>
       </div>
@@ -236,12 +239,11 @@ function Notifications() {
                     <button
                       onClick={() => markAsRead(notification.id)}
                       className="mark-read-btn"
-                      disabled={actionLoading}
+                      disabled={loading}
                     >
-                      {actionLoading ? "⏳" : "✅"} Đánh dấu đã đọc
+                      {loading ? "⏳" : "✅"} Đánh dấu đã đọc
                     </button>
                   )}
-                  <button className="archive-btn">📁 Lưu trữ</button>
                 </div>
               </div>
             ))

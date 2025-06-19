@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import "../../css/Nurse/NurseBlog.css";
+import { useNurseBlogs, useNurseActions } from "../../utils/hooks/useNurse";
 
 function Blog() {
-  // Mock blog data
-  const [blogs] = useState([
+  // Use API hooks
+  const { data: blogs, loading, error, refetch } = useNurseBlogs();
+  const { createBlog, updateBlog, loading: actionLoading } = useNurseActions();
+
+  // Mock blog data - remove this when API is working
+  const [mockBlogs] = useState([
     {
       id: 1,
       title: "Hướng dẫn chăm sóc trẻ bị sốt tại trường",
@@ -57,12 +62,9 @@ function Blog() {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
-    category: "",
-    tags: "",
-    status: "Bản nháp",
   });
 
-  // Available options
+  // Available options (keep for mock data compatibility)
   const categories = [
     "Sức khỏe",
     "Dinh dưỡng",
@@ -72,14 +74,25 @@ function Blog() {
   ];
   const statuses = ["Bản nháp", "Đã đăng"];
 
+  // Use real blogs or fallback to mock data
+  const blogData = blogs || mockBlogs;
+
+  // Debug API response
+  console.log("API blogs response:", blogs);
+  console.log("Using blogData:", blogData);
+
   // Filter blogs
-  const filteredBlogs = blogs.filter((blog) => {
+  const filteredBlogs = blogData.filter((blog) => {
     const matchesSearch =
-      blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      blog.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      blog.tags.some((tag) =>
-        tag.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      (blog.title &&
+        blog.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (blog.content &&
+        blog.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (blog.tags &&
+        Array.isArray(blog.tags) &&
+        blog.tags.some((tag) =>
+          tag.toLowerCase().includes(searchTerm.toLowerCase())
+        ));
     const matchesCategory =
       filterCategory === "" || blog.category === filterCategory;
     const matchesStatus = filterStatus === "" || blog.status === filterStatus;
@@ -95,9 +108,6 @@ function Blog() {
     setFormData({
       title: "",
       content: "",
-      category: "",
-      tags: "",
-      status: "Bản nháp",
     });
     setIsEditing(false);
     setShowCreateModal(true);
@@ -107,9 +117,6 @@ function Blog() {
     setFormData({
       title: blog.title,
       content: blog.content,
-      category: blog.category,
-      tags: blog.tags.join(", "),
-      status: blog.status,
     });
     setSelectedBlog(blog);
     setIsEditing(true);
@@ -124,15 +131,36 @@ function Blog() {
     }));
   };
 
-  const handleSubmitForm = (e) => {
+  const handleSubmitForm = async (e) => {
     e.preventDefault();
-    // Mock submit functionality
-    if (isEditing) {
-      alert("Đã cập nhật blog thành công!");
-    } else {
-      alert("Đã tạo blog mới thành công!");
+    try {
+      // Get user info from localStorage
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      const userId = userInfo.userId || userInfo.id || 1;
+
+      const blogData = {
+        title: formData.title,
+        content: formData.content,
+        createdBy: userId,
+        createdAt: new Date().toISOString(),
+      };
+
+      console.log("Sending blog data:", blogData);
+
+      if (isEditing) {
+        await updateBlog(selectedBlog.id, blogData);
+        alert("Đã cập nhật blog thành công!");
+      } else {
+        await createBlog(blogData);
+        alert("Đã tạo blog mới thành công!");
+      }
+
+      setShowCreateModal(false);
+      refetch(); // Refresh data from API
+    } catch (error) {
+      console.error("Error saving blog:", error);
+      alert("Có lỗi xảy ra khi lưu blog. Vui lòng thử lại!");
     }
-    setShowCreateModal(false);
   };
 
   const getStatusClass = (status) => {
@@ -159,11 +187,36 @@ function Blog() {
 
   // Statistics
   const stats = {
-    total: blogs.length,
-    published: blogs.filter((b) => b.status === "Đã đăng").length,
-    draft: blogs.filter((b) => b.status === "Bản nháp").length,
-    totalReads: blogs.reduce((sum, blog) => sum + blog.readCount, 0),
+    total: blogData.length,
+    published: blogData.filter((b) => b.status === "Đã đăng").length,
+    draft: blogData.filter((b) => b.status === "Bản nháp").length,
+    totalReads: blogData.reduce((sum, blog) => sum + (blog.readCount || 0), 0),
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="nurse-blog-container">
+        <div className="loading-state">
+          <p>⏳ Đang tải danh sách blog...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="nurse-blog-container">
+        <div className="error-state">
+          <p>❌ Lỗi khi tải blog: {error}</p>
+          <button onClick={refetch} className="retry-btn">
+            🔄 Thử lại
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="nurse-blog-container">
@@ -282,11 +335,13 @@ function Blog() {
               </p>
 
               <div className="blog-tags">
-                {blog.tags.map((tag, index) => (
-                  <span key={index} className="tag">
-                    #{tag}
-                  </span>
-                ))}
+                {blog.tags &&
+                  Array.isArray(blog.tags) &&
+                  blog.tags.map((tag, index) => (
+                    <span key={index} className="tag">
+                      #{tag}
+                    </span>
+                  ))}
               </div>
             </div>
 
@@ -385,11 +440,13 @@ function Blog() {
 
               <div className="blog-tags-section">
                 <span className="tags-label">Tags:</span>
-                {selectedBlog.tags.map((tag, index) => (
-                  <span key={index} className="tag">
-                    #{tag}
-                  </span>
-                ))}
+                {selectedBlog.tags &&
+                  Array.isArray(selectedBlog.tags) &&
+                  selectedBlog.tags.map((tag, index) => (
+                    <span key={index} className="tag">
+                      #{tag}
+                    </span>
+                  ))}
               </div>
             </div>
           </div>
@@ -428,53 +485,6 @@ function Blog() {
                     required
                     placeholder="Nhập tiêu đề blog..."
                   />
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Danh mục *</label>
-                    <select
-                      name="category"
-                      value={formData.category}
-                      onChange={handleInputChange}
-                      required
-                    >
-                      <option value="">Chọn danh mục</option>
-                      {categories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Trạng thái *</label>
-                    <select
-                      name="status"
-                      value={formData.status}
-                      onChange={handleInputChange}
-                      required
-                    >
-                      {statuses.map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label>Tags</label>
-                  <input
-                    type="text"
-                    name="tags"
-                    value={formData.tags}
-                    onChange={handleInputChange}
-                    placeholder="Nhập tags, cách nhau bằng dấu phẩy..."
-                  />
-                  <small>Ví dụ: sức khỏe, dinh dưỡng, chăm sóc trẻ</small>
                 </div>
 
                 <div className="form-group">

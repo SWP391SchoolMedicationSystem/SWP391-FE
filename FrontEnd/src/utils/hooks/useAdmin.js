@@ -3,9 +3,8 @@ import {
   adminStaffService,
   adminEmailService,
   adminBlogService,
-  systemLogsService,
-  statisticsService,
-  healthCategoriesService,
+  adminSystemService,
+  adminCategoryService,
 } from "../../services/adminService";
 
 // Hook for admin staff management
@@ -25,17 +24,17 @@ export const useAdminBlogs = () => {
 
 // Hook for system logs (mock data)
 export const useSystemLogs = () => {
-  return useApi(systemLogsService.getSystemLogs);
+  return useApi(adminSystemService.getSystemLogs);
 };
 
 // Hook for system statistics (mock data)
 export const useSystemStatistics = () => {
-  return useApi(statisticsService.getStatistics);
+  return useApi(adminSystemService.getSystemStats);
 };
 
 // Hook for health categories (mock data)
 export const useHealthCategories = () => {
-  return useApi(healthCategoriesService.getCategories);
+  return useApi(adminCategoryService.getHealthCategories);
 };
 
 // Hook for admin actions
@@ -43,11 +42,11 @@ export const useAdminActions = () => {
   const { execute, loading, error } = useApiCall();
 
   const createStaff = async (staffData) => {
-    return execute(() => adminStaffService.createStaff(staffData));
+    return execute(() => adminStaffService.registerStaff(staffData));
   };
 
-  const updateStaff = async (staffId, staffData) => {
-    return execute(() => adminStaffService.updateStaff(staffId, staffData));
+  const updateStaff = async (staffData) => {
+    return execute(() => adminStaffService.updateStaff(staffData));
   };
 
   const deleteStaff = async (staffId) => {
@@ -75,17 +74,19 @@ export const useAdminActions = () => {
   };
 
   const createHealthCategory = async (categoryData) => {
-    return execute(() => healthCategoriesService.createCategory(categoryData));
+    return execute(() =>
+      adminCategoryService.createHealthCategory(categoryData)
+    );
   };
 
   const updateHealthCategory = async (categoryId, categoryData) => {
     return execute(() =>
-      healthCategoriesService.updateCategory(categoryId, categoryData)
+      adminCategoryService.updateHealthCategory(categoryId, categoryData)
     );
   };
 
   const deleteHealthCategory = async (categoryId) => {
-    return execute(() => healthCategoriesService.deleteCategory(categoryId));
+    return execute(() => adminCategoryService.deleteHealthCategory(categoryId));
   };
 
   return {

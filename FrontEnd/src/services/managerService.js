@@ -54,6 +54,18 @@ export const managerBlogService = {
     }
   },
 
+  // Reject blog
+  rejectBlog: async (blogId, reason) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.BLOG.REJECT, blogId);
+      const response = await apiClient.post(url, { reason });
+      return response;
+    } catch (error) {
+      console.error("Error rejecting blog:", error);
+      throw error;
+    }
+  },
+
   // Create blog post
   createBlog: async (blogData) => {
     try {
@@ -73,6 +85,30 @@ export const managerBlogService = {
       return response;
     } catch (error) {
       console.error("Error updating blog:", error);
+      throw error;
+    }
+  },
+
+  // Delete blog post
+  deleteBlog: async (blogId) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.BLOG.DELETE, blogId);
+      const response = await apiClient.delete(url);
+      return response;
+    } catch (error) {
+      console.error("Error deleting blog:", error);
+      throw error;
+    }
+  },
+
+  // Get blog by ID
+  getBlogById: async (blogId) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.BLOG.GET_BY_ID, blogId);
+      const response = await apiClient.get(url);
+      return response;
+    } catch (error) {
+      console.error("Error getting blog by ID:", error);
       throw error;
     }
   },
@@ -235,13 +271,23 @@ export const managerNotificationService = {
   // Create notification for parents
   createNotificationForParents: async (notificationData) => {
     try {
+      console.log("Service: Creating notification for parents");
+      console.log(
+        "Service: Endpoint:",
+        API_ENDPOINTS.NOTIFICATION.CREATE_FOR_PARENT
+      );
+      console.log("Service: Data:", notificationData);
+
       const response = await apiClient.post(
         API_ENDPOINTS.NOTIFICATION.CREATE_FOR_PARENT,
         notificationData
       );
+
+      console.log("Service: Response received:", response);
       return response;
     } catch (error) {
       console.error("Error creating notification for parents:", error);
+      console.error("Error details:", error.response?.data || error.message);
       throw error;
     }
   },
@@ -249,13 +295,23 @@ export const managerNotificationService = {
   // Create notification for staff
   createNotificationForStaff: async (notificationData) => {
     try {
+      console.log("Service: Creating notification for staff");
+      console.log(
+        "Service: Endpoint:",
+        API_ENDPOINTS.NOTIFICATION.CREATE_FOR_STAFF
+      );
+      console.log("Service: Data:", notificationData);
+
       const response = await apiClient.post(
         API_ENDPOINTS.NOTIFICATION.CREATE_FOR_STAFF,
         notificationData
       );
+
+      console.log("Service: Response received:", response);
       return response;
     } catch (error) {
       console.error("Error creating notification for staff:", error);
+      console.error("Error details:", error.response?.data || error.message);
       throw error;
     }
   },
@@ -320,51 +376,112 @@ export const managerEmailService = {
 
 // Manager Account Management Services
 export const managerAccountService = {
-  // Get all parents - MOCK DATA (API có thể chưa ready)
+  // Get all parents
   getAllParents: async () => {
     try {
-      // TODO: Kiểm tra xem có API GET all parents không
-      // Tạo mock data tạm thời
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve([
-            {
-              parentid: 1,
-              fullname: "Nguyễn Thị Lan",
-              email: "lan.nguyen@email.com",
-              phone: "0901234567",
-              address: "123 Nguyễn Trãi, Hà Nội",
-              createdDate: "2024-01-15",
-              isDeleted: false,
-              students: [
-                {
-                  studentid: 1,
-                  fullname: "Nguyễn Văn An",
-                  classname: "Lớp 1A",
-                },
-              ],
-            },
-            {
-              parentid: 2,
-              fullname: "Trần Văn Nam",
-              email: "nam.tran@email.com",
-              phone: "0907654321",
-              address: "456 Lê Lợi, TP.HCM",
-              createdDate: "2024-02-20",
-              isDeleted: false,
-              students: [
-                {
-                  studentid: 2,
-                  fullname: "Trần Thị Bình",
-                  classname: "Lớp 2B",
-                },
-              ],
-            },
-          ]);
-        }, 500);
-      });
+      const response = await apiClient.get(API_ENDPOINTS.PARENT.GET_ALL);
+      return response;
     } catch (error) {
       console.error("Error getting all parents:", error);
+      throw error;
+    }
+  },
+
+  // Get parent by ID
+  getParentById: async (parentId) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.PARENT.GET_BY_ID, parentId);
+      const response = await apiClient.get(url);
+      return response;
+    } catch (error) {
+      console.error("Error getting parent by ID:", error);
+      throw error;
+    }
+  },
+
+  // Update parent
+  updateParent: async (parentData) => {
+    try {
+      const response = await apiClient.put(
+        API_ENDPOINTS.PARENT.UPDATE,
+        parentData
+      );
+      return response;
+    } catch (error) {
+      console.error("Error updating parent:", error);
+      throw error;
+    }
+  },
+
+  // Get all staff
+  getAllStaff: async () => {
+    try {
+      const response = await apiClient.get(API_ENDPOINTS.STAFF.GET_ALL);
+      return response;
+    } catch (error) {
+      console.error("Error getting all staff:", error);
+      throw error;
+    }
+  },
+
+  // Update staff
+  updateStaff: async (staffData) => {
+    try {
+      const response = await apiClient.put(
+        API_ENDPOINTS.STAFF.UPDATE,
+        staffData
+      );
+      return response;
+    } catch (error) {
+      console.error("Error updating staff:", error);
+      throw error;
+    }
+  },
+
+  // Delete parent
+  deleteParent: async (parentId) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.PARENT.DELETE, parentId);
+      const response = await apiClient.delete(url);
+      return response;
+    } catch (error) {
+      console.error("Error deleting parent:", error);
+      throw error;
+    }
+  },
+
+  // Delete staff
+  deleteStaff: async (staffId) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.STAFF.DELETE, staffId);
+      const response = await apiClient.delete(url);
+      return response;
+    } catch (error) {
+      console.error("Error deleting staff:", error);
+      throw error;
+    }
+  },
+
+  // Toggle parent status (using delete API for soft delete/activate)
+  toggleParentStatus: async (parentId) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.PARENT.DELETE, parentId);
+      const response = await apiClient.delete(url);
+      return response;
+    } catch (error) {
+      console.error("Error toggling parent status:", error);
+      throw error;
+    }
+  },
+
+  // Toggle staff status (using delete API for soft delete/activate)
+  toggleStaffStatus: async (staffId) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.STAFF.DELETE, staffId);
+      const response = await apiClient.delete(url);
+      return response;
+    } catch (error) {
+      console.error("Error toggling staff status:", error);
       throw error;
     }
   },
