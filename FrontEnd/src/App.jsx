@@ -43,6 +43,7 @@ import ParentNotifications from "./pages/Parent/Notifications";
 import Consultation from "./pages/Parent/Consultation";
 import ChatWithNurse from "./pages/Parent/ChatWithNurse";
 import ManageHealthRecords from "./pages/Parent/ManageHealthRecords";
+import UpdateProfile from "./pages/Parent/UpdateProfile";
 
 function App() {
   return (
@@ -123,10 +124,8 @@ function App() {
           <Route path="consultation" element={<Consultation />} />
           <Route path="chat-nurse" element={<ChatWithNurse />} />
           <Route path="health-records" element={<ManageHealthRecords />} />
-          <Route
-            path="manage-health-records"
-            element={<ManageHealthRecords />}
-          />
+          <Route path="manage-health-records" element={<ManageHealthRecords />} />
+          <Route path="update-profile" element={<UpdateProfile />} />
         </Route>
       </Routes>
     </div>
