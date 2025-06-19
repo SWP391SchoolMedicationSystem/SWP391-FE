@@ -55,13 +55,27 @@ export const nurseHealthService = {
   },
 };
 
+// Mapping function để chuẩn hoá dữ liệu blog cho Nurse UI
+const mapBlogData = (apiBlog) => ({
+  id: apiBlog.id || apiBlog.blogid || apiBlog.blogId,
+  title: apiBlog.title,
+  content: apiBlog.content,
+  author: apiBlog.author || apiBlog.createdByName || "Unknown",
+  category: apiBlog.category || "N/A",
+  status: apiBlog.status,
+  createdDate: apiBlog.createdAt?.split("T")[0] || apiBlog.createdDate || "N/A",
+  views: apiBlog.views || apiBlog.readCount || 0,
+  featured: apiBlog.featured || false,
+  isDeleted: apiBlog.isDeleted ?? apiBlog.isdeleted ?? false,
+});
+
 // Nurse Blog Services
 export const nurseBlogService = {
   // Get all blogs (for nurse to see their own posts)
   getAllBlogs: async () => {
     try {
       const response = await apiClient.get(API_ENDPOINTS.BLOG.GET_ALL);
-      return response;
+      return Array.isArray(response) ? response.map(mapBlogData) : [];
     } catch (error) {
       console.error("Error getting all blogs:", error);
       throw error;
@@ -83,10 +97,50 @@ export const nurseBlogService = {
   updateBlog: async (blogId, blogData) => {
     try {
       const url = buildApiUrl(API_ENDPOINTS.BLOG.UPDATE, blogId);
-      const response = await apiClient.put(url, blogData);
+
+      const { title, content, status, image, updatedBy, isDeleted } = blogData;
+
+      const payload = {
+        title,
+        content,
+        status,
+        image,
+        isDeleted: typeof isDeleted === "boolean" ? isDeleted : false,
+        updatedBy:
+          updatedBy ||
+          JSON.parse(localStorage.getItem("userInfo") || "{}").userId ||
+          0,
+        updatedAt: new Date().toISOString(),
+      };
+
+      const response = await apiClient.put(url, payload);
       return response;
     } catch (error) {
       console.error("Error updating blog:", error);
+      throw error;
+    }
+  },
+
+  // Delete blog post
+  deleteBlog: async (blogId) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.BLOG.DELETE, blogId);
+      const response = await apiClient.delete(url);
+      return response;
+    } catch (error) {
+      console.error("Error deleting blog:", error);
+      throw error;
+    }
+  },
+
+  // Get blog by ID (for editing/view)
+  getBlogById: async (blogId) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.BLOG.GET_BY_ID, blogId);
+      const response = await apiClient.get(url);
+      return mapBlogData(response);
+    } catch (error) {
+      console.error("Error getting blog by ID:", error);
       throw error;
     }
   },

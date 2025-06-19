@@ -29,13 +29,51 @@ const mapStudentData = (apiStudent) => {
   };
 };
 
+// Mapping function for blog data (ensures unified fields)
+const mapBlogData = (apiBlog) => {
+  return {
+    id: apiBlog.id || apiBlog.blogid || apiBlog.blogId,
+    title: apiBlog.title,
+    content: apiBlog.content,
+    author: "", // to be filled later
+    category: apiBlog.category || "N/A",
+    status: apiBlog.status,
+    createdDate:
+      apiBlog.createdAt?.split("T")[0] || apiBlog.createdDate || "N/A",
+    featured: apiBlog.featured || false,
+    isDeleted: apiBlog.isDeleted ?? apiBlog.isdeleted ?? false,
+    createdById: apiBlog.createdBy || apiBlog.createdby || apiBlog.authorId,
+  };
+};
+
 // Manager Blog Services
 export const managerBlogService = {
   // Get all blogs (including pending ones for approval)
   getAllBlogs: async () => {
     try {
       const response = await apiClient.get(API_ENDPOINTS.BLOG.GET_ALL);
-      return response;
+      if (!Array.isArray(response)) return [];
+
+      // Fetch staff list once
+      let staffMap = {};
+      try {
+        const staffList = await apiClient.get(API_ENDPOINTS.STAFF.GET_ALL);
+        if (Array.isArray(staffList)) {
+          staffMap = staffList.reduce((acc, s) => {
+            acc[s.staffid] = s.fullname;
+            return acc;
+          }, {});
+        }
+      } catch (err) {
+        console.warn("Cannot fetch staff list", err);
+      }
+
+      return response.map((b) => {
+        const mapped = mapBlogData(b);
+        mapped.author =
+          staffMap[mapped.createdById] || `User #${mapped.createdById || "?"}`;
+        return mapped;
+      });
     } catch (error) {
       console.error("Error getting all blogs:", error);
       throw error;
@@ -81,7 +119,24 @@ export const managerBlogService = {
   updateBlog: async (blogId, blogData) => {
     try {
       const url = buildApiUrl(API_ENDPOINTS.BLOG.UPDATE, blogId);
-      const response = await apiClient.put(url, blogData);
+
+      // API hiện tại chỉ chấp nhận các field cụ thể, loại bỏ các field dư
+      const { title, content, status, image, updatedBy, isDeleted } = blogData;
+
+      const payload = {
+        title,
+        content,
+        status,
+        image,
+        isDeleted: typeof isDeleted === "boolean" ? isDeleted : false,
+        updatedBy:
+          updatedBy ||
+          JSON.parse(localStorage.getItem("userInfo") || "{}").userId ||
+          0,
+        updatedAt: new Date().toISOString(),
+      };
+
+      const response = await apiClient.put(url, payload);
       return response;
     } catch (error) {
       console.error("Error updating blog:", error);
@@ -106,7 +161,7 @@ export const managerBlogService = {
     try {
       const url = buildApiUrl(API_ENDPOINTS.BLOG.GET_BY_ID, blogId);
       const response = await apiClient.get(url);
-      return response;
+      return mapBlogData(response);
     } catch (error) {
       console.error("Error getting blog by ID:", error);
       throw error;

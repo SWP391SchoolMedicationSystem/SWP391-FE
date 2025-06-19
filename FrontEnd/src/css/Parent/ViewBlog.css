@@ -94,8 +94,8 @@
 
 .featured-articles {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25px;
 }
 
 .featured-article {
@@ -173,8 +173,8 @@
 
 .blog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
 }
 
 .blog-card {
@@ -423,12 +423,12 @@
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .featured-articles {
+  .blog-grid {
     grid-template-columns: 1fr;
   }
 
-  .blog-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  .featured-articles {
+    grid-template-columns: 1fr;
   }
 }
 
