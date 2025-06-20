@@ -99,6 +99,26 @@
   box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
 }
 
+.download-template-btn {
+  padding: 12px 25px;
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.download-template-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(52, 211, 153, 0.3);
+}
+
 /* Table Styles */
 .table-container {
   background: white;
@@ -471,9 +491,15 @@
 }
 
 .import-messages .message.error {
-  background-color: #ffebee;
-  color: #c62828;
-  border: 1px solid #ffcdd2;
+  background: #fee2e2;
+  color: #991b1b;
+  border-left: 4px solid #ef4444;
+  white-space: pre-line;
+  text-align: left;
+  line-height: 1.6;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .loading-spinner {

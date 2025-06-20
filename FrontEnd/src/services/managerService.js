@@ -213,6 +213,31 @@ export const managerStudentService = {
     }
   },
 
+  // Import students from Excel file
+  importStudentsExcel: async (file) => {
+    try {
+      // Validate file
+      if (!file || !(file instanceof File)) {
+        throw new Error("Invalid file object");
+      }
+
+      // Create FormData with file
+      const formData = new FormData();
+      formData.append("file", file, file.name);
+
+      // Call API
+      const response = await apiClient.post(
+        "/api/Student/ImportExcel", // Updated endpoint for backend
+        formData
+      );
+
+      return response;
+    } catch (error) {
+      console.error("Error importing students from Excel:", error);
+      throw error;
+    }
+  },
+
   // Bulk add students
   bulkAddStudents: async (studentsData) => {
     try {

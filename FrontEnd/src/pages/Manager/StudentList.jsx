@@ -2,14 +2,13 @@ import React, { useState, useRef } from "react";
 import "../../css/Manager/StudentList.css";
 import {
   useManagerStudents,
-  // useManagerActions, // Comment out unused actions for now
+  useManagerActions,
 } from "../../utils/hooks/useManager";
 
 function StudentList() {
   // Use API hooks
   const { data: students, loading, error, refetch } = useManagerStudents();
-  // Uncomment when implementing CRUD operations
-  // const { createStudent, updateStudent, deleteStudent, loading: actionLoading } = useManagerActions();
+  const { importStudentsExcel } = useManagerActions();
 
   // State management
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,9 +29,6 @@ function StudentList() {
     { value: "4", label: "Lớp 4" },
     { value: "5", label: "Lớp 5" },
   ];
-
-  // API endpoint - để trống theo yêu cầu
-  const API_ENDPOINT = ""; // Thêm đường dẫn API ở đây
 
   // Filter students based on search and class filter
   const filteredStudents = students
@@ -67,12 +63,22 @@ function StudentList() {
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
       "application/vnd.ms-excel", // .xls
       "text/csv", // .csv
+      "application/csv", // .csv alternative
+      "text/plain", // Sometimes CSV is detected as plain text
+      "", // Some browsers don't set type for certain files
     ];
 
+    const allowedExtensions = ["xlsx", "xls", "csv"];
+    const fileExtension = file.name.split(".").pop()?.toLowerCase();
     const maxSize = 10 * 1024 * 1024; // 10MB
 
-    if (!allowedTypes.includes(file.type)) {
-      return "Chỉ chấp nhận file Excel (.xlsx, .xls) hoặc CSV (.csv)";
+    // Check by extension if type check fails
+    const isValidType =
+      allowedTypes.includes(file.type) ||
+      allowedExtensions.includes(fileExtension);
+
+    if (!isValidType) {
+      return `File không được hỗ trợ. Chỉ chấp nhận: .xlsx, .xls, .csv`;
     }
 
     if (file.size > maxSize) {
@@ -80,37 +86,6 @@ function StudentList() {
     }
 
     return null;
-  };
-
-  // API call to import file
-  const importStudentFile = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("type", "student_import");
-
-    try {
-      const response = await fetch(API_ENDPOINT, {
-        method: "POST",
-        body: formData,
-        headers: {
-          // Don't set Content-Type header, let browser set it with boundary for multipart/form-data
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Thêm token nếu cần
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || `HTTP error! status: ${response.status}`
-        );
-      }
-
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      console.error("Import error:", error);
-      throw error;
-    }
   };
 
   const handleFileChange = async (event) => {
@@ -133,23 +108,120 @@ function StudentList() {
     setIsImporting(true);
 
     try {
-      const result = await importStudentFile(file);
+      const result = await importStudentsExcel(file);
 
       // Handle success
       setImportSuccess(
-        `Import thành công! Đã thêm ${result.importedCount || 0} học sinh.`
+        `Import thành công! Đã thêm ${
+          result.importedCount || result.count || "nhiều"
+        } học sinh.`
       );
 
       // Refresh student list
       refetch();
     } catch (error) {
-      // Handle error
-      setImportError(`Lỗi import file: ${error.message}`);
+      console.error("Import error:", error);
+
+      // Handle specific error types
+      let errorMessage = "Không thể import file";
+
+      if (error.response?.status === 415) {
+        errorMessage = `API chưa hỗ trợ import file Excel. Vui lòng liên hệ Backend team để thêm endpoint /api/Student/ImportExcel`;
+      } else if (error.response?.status === 400) {
+        errorMessage = `Dữ liệu không hợp lệ: ${
+          error.response?.data?.message ||
+          "Kiểm tra lại format dữ liệu trong file"
+        }`;
+      } else if (error.response?.status === 413) {
+        errorMessage =
+          "File quá lớn. Vui lòng chọn file nhỏ hơn hoặc chia nhỏ dữ liệu";
+      } else if (error.response?.status === 401) {
+        errorMessage = "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại";
+      } else if (error.response?.status === 403) {
+        errorMessage = "Bạn không có quyền import dữ liệu";
+      } else if (error.response?.status >= 500) {
+        errorMessage = "Lỗi server. Vui lòng thử lại sau hoặc liên hệ admin";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      setImportError(errorMessage);
     } finally {
       setIsImporting(false);
       // Reset file input
       event.target.value = "";
     }
+  };
+
+  // Download Excel template
+  const downloadTemplate = () => {
+    // Create Excel template data with proper structure
+    const templateData = [
+      {
+        "Họ và tên": "Nguyễn Văn A",
+        "Mã học sinh": "HS001",
+        "Ngày sinh": "01/01/2018",
+        "Giới tính": "Nam",
+        Lớp: "1",
+        "Tên phụ huynh": "Nguyễn Văn B",
+        "Số điện thoại": "0123456789",
+        "Email phụ huynh": "parent1@example.com",
+        "Địa chỉ": "123 Đường ABC, Quận XYZ",
+      },
+      {
+        "Họ và tên": "Trần Thị C",
+        "Mã học sinh": "HS002",
+        "Ngày sinh": "15/06/2019",
+        "Giới tính": "Nữ",
+        Lớp: "2",
+        "Tên phụ huynh": "Trần Văn D",
+        "Số điện thoại": "0987654321",
+        "Email phụ huynh": "parent2@example.com",
+        "Địa chỉ": "456 Đường XYZ, Quận ABC",
+      },
+      {
+        "Họ và tên": "Lê Minh E",
+        "Mã học sinh": "HS003",
+        "Ngày sinh": "30/12/2017",
+        "Giới tính": "Nam",
+        Lớp: "3",
+        "Tên phụ huynh": "Lê Thị F",
+        "Số điện thoại": "0369852147",
+        "Email phụ huynh": "parent3@example.com",
+        "Địa chỉ": "789 Đường DEF, Quận MNO",
+      },
+    ];
+
+    // Convert to CSV format with UTF-8 BOM for Excel compatibility
+    const headers = Object.keys(templateData[0]);
+    const csvContent = [
+      headers.join(","),
+      ...templateData.map((row) =>
+        headers
+          .map((header) => {
+            const value = row[header];
+            // Wrap in quotes and escape internal quotes
+            return `"${String(value).replace(/"/g, '""')}"`;
+          })
+          .join(",")
+      ),
+    ].join("\r\n"); // Use Windows line endings for better Excel compatibility
+
+    // Create and download file with proper CSV encoding
+    const BOM = "\uFEFF"; // UTF-8 BOM for Excel to recognize UTF-8
+    const blob = new Blob([BOM + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "template_danh_sach_hoc_sinh.csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   // Clear messages after some time
@@ -240,11 +312,20 @@ function StudentList() {
           >
             {isImporting ? "⏳ Đang import..." : "📁 Import File"}
           </button>
+
+          <button
+            className="download-template-btn"
+            onClick={downloadTemplate}
+            title="Tải file mẫu Excel"
+          >
+            📥 Tải file mẫu
+          </button>
+
           <input
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept=".xlsx,.xls,.csv"
+            accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
             style={{ display: "none" }}
             disabled={isImporting}
           />

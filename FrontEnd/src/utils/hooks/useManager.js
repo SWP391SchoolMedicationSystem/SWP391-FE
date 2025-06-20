@@ -150,6 +150,10 @@ export const useManagerActions = () => {
     return execute(() => managerStudentService.deleteStudent(studentId));
   };
 
+  const importStudentsExcel = async (file) => {
+    return execute(() => managerStudentService.importStudentsExcel(file));
+  };
+
   const createStaff = async (staffData) => {
     return execute(() => managerStaffService.createStaff(staffData));
   };
@@ -204,6 +208,7 @@ export const useManagerActions = () => {
     createStudent,
     updateStudent,
     deleteStudent,
+    importStudentsExcel,
     createStaff,
     updateStaff,
     deleteStaff,

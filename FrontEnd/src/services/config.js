@@ -19,11 +19,13 @@ apiClient.interceptors.request.use(
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log("Request: Token added to headers");
-    } else {
-      console.warn("Request: No token found in localStorage");
     }
-    console.log("Request:", config.method?.toUpperCase(), config.url);
+
+    // Handle FormData properly - don't set Content-Type for FormData
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+    }
+
     return config;
   },
   (error) => {
@@ -34,31 +36,15 @@ apiClient.interceptors.request.use(
 // Response interceptor for error handling
 apiClient.interceptors.response.use(
   (response) => {
-    console.log("Response: Success", response.status, response.config.url);
     return response.data;
   },
   (error) => {
-    // Log error for debugging
-    console.error("API Error:", error);
-    console.error("Response Status:", error.response?.status);
-    console.error("Response Data:", error.response?.data);
-    console.error("Request URL:", error.config?.url);
-    console.error("Request Method:", error.config?.method);
-    console.error("Request Data:", error.config?.data);
-
     // Handle common errors
     if (error.response?.status === 401) {
       // Unauthorized - redirect to login
-      console.error("Unauthorized access - redirecting to login");
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.href = "/login";
-    } else if (error.response?.status === 403) {
-      // Forbidden
-      console.error("Access denied");
-    } else if (error.response?.status >= 500) {
-      // Server error
-      console.error("Server error occurred");
     }
 
     return Promise.reject(error);
@@ -134,6 +120,7 @@ export const API_ENDPOINTS = {
     GET_BY_ID: "/Student/GetStudentById", // Get student details
     ADD: "/Student/AddStudent", // Add single student
     BULK_ADD: "/Student/student", // Bulk import students
+    IMPORT_EXCEL: "/Student/student", // Import Excel file for students
     UPDATE: "/Student/UpdateStudent", // Update student
     DELETE: "/Student/DeleteStudent", // Delete student
   },
