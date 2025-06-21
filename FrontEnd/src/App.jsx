@@ -1,19 +1,28 @@
 // import React, { useState } from "react";
-import "./App.css";
+import "./styles/main.scss";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import ResetPassword from "./pages/ResetPassword";
 import ManagerLayout from "./components/layout/ManagerLayout";
 import Dashboard from "./pages/Manager/Dashboard";
 import AccountManagement from "./pages/Manager/AccountManagement";
 import BlogManagement from "./pages/Manager/BlogManagement";
 import VaccinationList from "./pages/Manager/VaccinationList";
 import Notifications from "./pages/Manager/Notifications";
-import CategoryForms from "./pages/Manager/CategoryForms";
-import ViewInformation from "./pages/Manager/ViewInformation";
-import Settings from "./pages/Manager/Settings";
+
 import StudentList from "./pages/Manager/StudentList";
 import ProtectedRoute from "./components/ProtectedRoute";
+
+// Admin imports
+import AdminLayout from "./components/layout/AdminLayout";
+import AdminDashboard from "./pages/Admin/Dashboard";
+import ManageManagers from "./pages/Admin/ManageManagers";
+import SystemLogs from "./pages/Admin/SystemLogs";
+import FormCategories from "./pages/Admin/FormCategories";
+import EmailTemplates from "./pages/Admin/EmailTemplates";
+import AdminSettings from "./pages/Admin/Settings";
+
 // Nurse imports
 import NurseLayout from "./components/layout/NurseLayout";
 import NurseVaccinationList from "./pages/Nurse/VaccinationList";
@@ -23,6 +32,7 @@ import NurseStudentList from "./pages/Nurse/StudentList";
 import NurseBlog from "./pages/Nurse/Blog";
 import ChatWithParents from "./pages/Nurse/ChatWithParents";
 import StudentHealthRecord from "./pages/Nurse/StudentHealthRecord";
+import NurseNotifications from "./pages/Nurse/Notifications";
 
 // Parent imports
 import ParentLayout from "./components/layout/ParentLayout";
@@ -33,7 +43,7 @@ import ParentNotifications from "./pages/Parent/Notifications";
 import Consultation from "./pages/Parent/Consultation";
 import ChatWithNurse from "./pages/Parent/ChatWithNurse";
 import ManageHealthRecords from "./pages/Parent/ManageHealthRecords";
-import AdminPlaceholder from "./pages/AdminPlaceholder";
+import UpdateProfile from "./pages/Parent/UpdateProfile";
 
 function App() {
   return (
@@ -42,16 +52,24 @@ function App() {
         {/* Public routes */}
         <Route path="/home" element={<Home />} />
         <Route path="/" element={<Login />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
-        {/* Admin placeholder route */}
+        {/* Admin routes */}
         <Route
           path="/admin"
           element={
             <ProtectedRoute allowedRoles={["Admin"]}>
-              <AdminPlaceholder />
+              <AdminLayout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="manage-managers" element={<ManageManagers />} />
+          <Route path="system-logs" element={<SystemLogs />} />
+          <Route path="form-categories" element={<FormCategories />} />
+          <Route path="email-templates" element={<EmailTemplates />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
 
         {/* Manager routes */}
         <Route
@@ -68,9 +86,6 @@ function App() {
           <Route path="vaccinations" element={<VaccinationList />} />
           <Route path="StudentList" element={<StudentList />} />
           <Route path="notifications" element={<Notifications />} />
-          <Route path="forms" element={<CategoryForms />} />
-          <Route path="info" element={<ViewInformation />} />
-          <Route path="settings" element={<Settings />} />
         </Route>
 
         {/* Nurse routes */}
@@ -89,6 +104,7 @@ function App() {
           <Route path="blog" element={<NurseBlog />} />
           <Route path="chat" element={<ChatWithParents />} />
           <Route path="health-records" element={<StudentHealthRecord />} />
+          <Route path="notifications" element={<NurseNotifications />} />
         </Route>
 
         {/* Parent routes */}
@@ -107,10 +123,9 @@ function App() {
           <Route path="notifications" element={<ParentNotifications />} />
           <Route path="consultation" element={<Consultation />} />
           <Route path="chat-nurse" element={<ChatWithNurse />} />
-          <Route
-            path="manage-health-records"
-            element={<ManageHealthRecords />}
-          />
+          <Route path="health-records" element={<ManageHealthRecords />} />
+          <Route path="manage-health-records" element={<ManageHealthRecords />} />
+          <Route path="update-profile" element={<UpdateProfile />} />
         </Route>
       </Routes>
     </div>

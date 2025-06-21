@@ -27,7 +27,6 @@
   left: 0;
   right: 0;
   height: 5px;
- 
 }
 
 .header-content h1 {
@@ -1258,4 +1257,100 @@
 
 .modal-content::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* Deleted state styles */
+.deleted-row {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.deleted-badge {
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+.deleted-true {
+  background: #ef4444; /* red */
+}
+
+.deleted-false {
+  background: #10b981; /* green */
+}
+
+/* Enhanced Blog Table */
+.blog-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.blog-table thead th {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(135deg, #56d0db 0%, #2d77c1 100%);
+  color: #ffffff;
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.blog-table tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: top;
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+.blog-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.blog-title-cell h4 {
+  margin: 0 0 6px 0;
+  font-size: 1.05rem;
+  color: #111827;
+}
+
+.blog-excerpt {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+/* ID column narrower */
+.blog-table td:first-child,
+.blog-table th:first-child {
+  width: 60px;
+  text-align: center;
+}
+
+/* Deleted toggle button */
+.btn-toggle {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  color: #ffffff;
+}
+
+.btn-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+/* Adjust existing delete button small variant */
+.btn.btn-sm.btn-delete {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #ffffff;
+}
+
+/* Hide category badge column if empty */
+.category-badge:empty {
+  display: none;
 }

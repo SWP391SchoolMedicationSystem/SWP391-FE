@@ -1,0 +1,275 @@
+// ==========================================
+// SCSS MIXINS
+// ==========================================
+
+@use 'sass:color';
+@use './variables' as *;
+
+// Flexbox mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Button mixins
+@mixin button-base {
+  padding: $spacing-md $spacing-xl;
+  border: none;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  cursor: pointer;
+  transition: $transition-base;
+  @include flex-center;
+  gap: $spacing-sm;
+  text-decoration: none;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-primary {
+  @include button-base;
+  background: $primary-gradient;
+  color: $bg-primary;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+@mixin button-secondary {
+  @include button-base;
+  background: $bg-light;
+  color: $text-primary;
+  border: 1px solid $border-light;
+  
+  &:hover:not(:disabled) {
+    background: $border-light;
+  }
+}
+
+@mixin button-danger {
+  @include button-base;
+  background: $error-color;
+  color: $bg-primary;
+  
+  &:hover:not(:disabled) {
+    background: color.adjust($error-color, $lightness: -10%);
+  }
+}
+
+@mixin button-sm {
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-xs;
+}
+
+// Input mixins
+@mixin input-base {
+  width: 100%;
+  padding: $spacing-md $spacing-lg;
+  border: 2px solid $border-light;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  transition: $transition-base;
+  background: $bg-primary;
+  
+  &:focus {
+    outline: none;
+    border-color: $accent-color;
+    box-shadow: 0 0 0 3px rgba($accent-color, 0.1);
+  }
+  
+  &::placeholder {
+    color: $text-muted;
+  }
+}
+
+// Card mixins
+@mixin card-base {
+  background: $bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+}
+
+@mixin card-header {
+  @include flex-between;
+  padding: $spacing-2xl;
+  border-bottom: 1px solid $border-light;
+  
+  h1, h2, h3 {
+    margin: 0;
+    color: $text-primary;
+  }
+}
+
+@mixin card-body {
+  padding: $spacing-2xl;
+}
+
+// Table mixins
+@mixin table-base {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th {
+    background: $bg-light;
+    padding: $spacing-lg $spacing-md;
+    text-align: left;
+    font-weight: 600;
+    color: $text-primary;
+    border-bottom: 2px solid $border-light;
+    font-size: $font-size-sm;
+  }
+  
+  td {
+    padding: $spacing-lg $spacing-md;
+    border-bottom: 1px solid $border-light;
+    font-size: $font-size-sm;
+    color: $text-secondary;
+  }
+  
+  tbody tr:hover {
+    background: $bg-light;
+  }
+}
+
+// Modal mixins
+@mixin modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  @include flex-center;
+  z-index: $z-modal;
+  padding: $spacing-xl;
+}
+
+@mixin modal-content {
+  @include card-base;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: $shadow-xl;
+}
+
+@mixin modal-header {
+  @include flex-between;
+  padding: $spacing-2xl;
+  border-bottom: 1px solid $border-light;
+  
+  h2, h3 {
+    font-size: $font-size-xl;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+  }
+}
+
+@mixin modal-close {
+  background: none;
+  border: none;
+  font-size: $font-size-2xl;
+  color: $text-secondary;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  @include flex-center;
+  border-radius: $radius-full;
+  transition: $transition-base;
+  
+  &:hover {
+    background: $bg-light;
+  }
+}
+
+// Status badge mixins
+@mixin status-badge {
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-xl;
+  font-size: $font-size-xs;
+  font-weight: 500;
+  display: inline-block;
+}
+
+@mixin status-success {
+  @include status-badge;
+  background: rgba($success-color, 0.1);
+  color: $success-color;
+}
+
+@mixin status-warning {
+  @include status-badge;
+  background: rgba($warning-color, 0.1);
+  color: $warning-color;
+}
+
+@mixin status-error {
+  @include status-badge;
+  background: rgba($error-color, 0.1);
+  color: $error-color;
+}
+
+// Responsive mixins
+@mixin mobile {
+  @media (max-width: $breakpoint-md - 1px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: $breakpoint-md) and (max-width: $breakpoint-lg - 1px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+// Utility mixins
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+} 

@@ -13,6 +13,13 @@ import {
   IconButton,
   InputBase,
   Avatar,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import {
   Dashboard,
@@ -20,15 +27,13 @@ import {
   Article,
   Vaccines,
   Notifications,
-  Description,
-  Info,
-  Settings,
   Menu,
   Logout,
   ChatBubbleOutline,
   BarChart,
 } from "@mui/icons-material";
 import userService from "../../services/userService";
+import MedlearnLogo from "../../assets/images/Medlearn-logo.png";
 
 const drawerWidth = 240;
 
@@ -51,14 +56,12 @@ const navItems = [
     label: "Thông Báo",
     icon: <Notifications />,
   },
-  { to: "/manager/forms", label: "Biểu Mẫu Danh Mục", icon: <Description /> },
-  { to: "/manager/info", label: "Xem Thông Tin", icon: <Info /> },
-  { to: "/manager/settings", label: "Cài Đặt", icon: <Settings /> },
 ];
 
 export default function ManagerLayout() {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState(null);
+  const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => {
     // Lấy thông tin user từ localStorage
@@ -81,7 +84,12 @@ export default function ManagerLayout() {
   // Get user display info
   const getUserDisplayName = () => {
     if (!userInfo) return "Manager";
-    return userInfo.userName || userInfo.email?.split("@")[0] || "Manager";
+    return (
+      userInfo.userName ||
+      userInfo.fullname ||
+      userInfo.email?.split("@")[0] ||
+      "Manager"
+    );
   };
 
   const getUserEmail = () => {
@@ -110,8 +118,56 @@ export default function ManagerLayout() {
           },
         }}
       >
-        <Toolbar sx={{ fontWeight: "bold", fontSize: 20, color: "#2D77C1" }}>
-          MedManager 🛡
+        <Toolbar
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            py: 1,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 0.5,
+            }}
+          >
+            <Box sx={{ width: "40px", height: "40px" }}>
+              <img
+                src={MedlearnLogo}
+                alt="Medlearn Logo"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                }}
+              />
+            </Box>
+            <Box sx={{ textAlign: "center" }}>
+              <Typography
+                sx={{
+                  fontSize: "0.75rem",
+                  fontWeight: "bold",
+                  color: "#2D77C1",
+                  lineHeight: 1,
+                }}
+              >
+                MEDLEARN
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "0.6rem",
+                  color: "#2D77C1",
+                  lineHeight: 1,
+                  fontWeight: "600",
+                }}
+              >
+                Manager
+              </Typography>
+            </Box>
+          </Box>
         </Toolbar>
         <List>
           {navItems.map(({ to, label, icon }) => (
@@ -161,7 +217,9 @@ export default function ManagerLayout() {
             gap: 2,
           }}
         >
-          <Avatar sx={{ bgcolor: "#56D0DB" }}>{getUserAvatar()}</Avatar>
+          <IconButton onClick={() => setShowProfile(true)}>
+            <Avatar sx={{ bgcolor: "#56D0DB" }}>{getUserAvatar()}</Avatar>
+          </IconButton>
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <div
               style={{
@@ -236,7 +294,9 @@ export default function ManagerLayout() {
               <IconButton>
                 <ChatBubbleOutline />
               </IconButton>
-              <Avatar sx={{ bgcolor: "#2D77C1" }}>{getUserAvatar()}</Avatar>
+              <IconButton onClick={() => setShowProfile(true)}>
+                <Avatar sx={{ bgcolor: "#2D77C1" }}>{getUserAvatar()}</Avatar>
+              </IconButton>
             </Box>
           </Toolbar>
         </AppBar>
@@ -246,6 +306,249 @@ export default function ManagerLayout() {
           <Outlet />
         </Box>
       </Box>
+
+      {/* User Profile Dialog */}
+      <Dialog
+        open={showProfile}
+        onClose={() => setShowProfile(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            width: "100%",
+            maxWidth: 450,
+            background: "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            textAlign: "center",
+            pb: 1,
+            background: "linear-gradient(135deg, #2196f3 0%, #1976d2 100%)",
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "1.3rem",
+          }}
+        >
+          👨‍💼 Thông Tin Quản Lý
+        </DialogTitle>
+        <DialogContent sx={{ p: 0 }}>
+          {userInfo ? (
+            <Box sx={{ p: 3 }}>
+              {/* Avatar Section */}
+              <Box sx={{ textAlign: "center", mb: 3 }}>
+                <Avatar
+                  sx={{
+                    width: 80,
+                    height: 80,
+                    margin: "0 auto",
+                    bgcolor: "#2196f3",
+                    fontSize: "2rem",
+                    fontWeight: "bold",
+                    boxShadow: "0 4px 20px rgba(33, 150, 243, 0.3)",
+                  }}
+                >
+                  {getUserAvatar()}
+                </Avatar>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    mt: 2,
+                    fontWeight: "bold",
+                    color: "#1976d2",
+                  }}
+                >
+                  {getUserDisplayName()}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#666",
+                    fontStyle: "italic",
+                  }}
+                >
+                  Quản lý hệ thống
+                </Typography>
+              </Box>
+
+              {/* Info Cards */}
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    p: 2,
+                    bgcolor: "white",
+                    borderRadius: 2,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                    border: "1px solid #e0e0e0",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: "50%",
+                      bgcolor: "#E3F2FD",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mr: 2,
+                    }}
+                  >
+                    🆔
+                  </Box>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Mã số
+                    </Typography>
+                    <Typography variant="body1" fontWeight="600">
+                      {userInfo.userId || userInfo.id || "N/A"}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    p: 2,
+                    bgcolor: "white",
+                    borderRadius: 2,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                    border: "1px solid #e0e0e0",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: "50%",
+                      bgcolor: "#E8F5E8",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mr: 2,
+                    }}
+                  >
+                    📧
+                  </Box>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Email
+                    </Typography>
+                    <Typography variant="body1" fontWeight="600">
+                      {userInfo.email || "N/A"}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                {userInfo.phone && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      p: 2,
+                      bgcolor: "white",
+                      borderRadius: 2,
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      border: "1px solid #e0e0e0",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: "50%",
+                        bgcolor: "#FFF3E0",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        mr: 2,
+                      }}
+                    >
+                      📱
+                    </Box>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        Số điện thoại
+                      </Typography>
+                      <Typography variant="body1" fontWeight="600">
+                        {userInfo.phone}
+                      </Typography>
+                    </Box>
+                  </Box>
+                )}
+
+                {userInfo.role && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      p: 2,
+                      bgcolor: "white",
+                      borderRadius: 2,
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      border: "1px solid #e0e0e0",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: "50%",
+                        bgcolor: "#E8EAF6",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        mr: 2,
+                      }}
+                    >
+                      👨‍💼
+                    </Box>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        Vai trò
+                      </Typography>
+                      <Typography variant="body1" fontWeight="600">
+                        {userInfo.role}
+                      </Typography>
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+            </Box>
+          ) : (
+            <Box sx={{ p: 4, textAlign: "center" }}>
+              <Typography color="text.secondary">
+                Không có thông tin người dùng.
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, justifyContent: "center" }}>
+          <Button
+            onClick={() => setShowProfile(false)}
+            variant="contained"
+            sx={{
+              background: "linear-gradient(135deg, #2196f3 0%, #1976d2 100%)",
+              color: "white",
+              px: 4,
+              py: 1,
+              borderRadius: 2,
+              fontWeight: "bold",
+              "&:hover": {
+                background: "linear-gradient(135deg, #1e88e5 0%, #1565c0 100%)",
+                transform: "translateY(-1px)",
+                boxShadow: "0 4px 12px rgba(33, 150, 243, 0.3)",
+              },
+              transition: "all 0.3s ease",
+            }}
+          >
+            Đóng
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
