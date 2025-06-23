@@ -361,6 +361,22 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
+.blog-actions .btn-delete {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #ffffff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.blog-actions .btn-delete:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
 .no-data {
   text-align: center;
   padding: 60px 20px;
@@ -584,6 +600,38 @@
 .btn-save:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+}
+
+/* Toggle Deleted Button */
+.btn-toggle {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  color: #ffffff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+/* Deleted state presentation */
+.blog-card.deleted {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.deleted-badge {
+  background: #ef4444;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
 }
 
 /* Responsive Design */

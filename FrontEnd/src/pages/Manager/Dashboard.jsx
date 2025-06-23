@@ -1,48 +1,89 @@
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import {
+  useManagerStudents,
+  useManagerBlogs,
+} from "../../utils/hooks/useManager";
 import "../../css/Manager/Dashboard.css";
 
 function Dashboard() {
   const navigate = useNavigate();
+  const [dashboardStats, setDashboardStats] = useState([]);
 
-  // Enhanced dashboard statistics
-  const dashboardStats = [
-    {
-      title: "Tổng Người Dùng",
-      value: "3,782",
-      change: "+11.01%",
-      changeType: "positive",
-      icon: "👥",
-      color: "blue",
-      description: "Tổng số người dùng trong hệ thống",
-    },
-    {
-      title: "Học Sinh Đang Học",
-      value: "2,456",
-      change: "+8.2%",
-      changeType: "positive",
-      icon: "🎓",
-      color: "green",
-      description: "Số học sinh hiện tại",
-    },
-    {
-      title: "Lịch Tiêm Hôm Nay",
-      value: "24",
-      change: "+15.3%",
-      changeType: "positive",
-      icon: "💉",
-      color: "purple",
-      description: "Lịch tiêm chủng hôm nay",
-    },
-    {
-      title: "Tình Trạng Hệ Thống",
-      value: "99.9%",
-      change: "-0.05%",
-      changeType: "negative",
-      icon: "⚡",
-      color: "orange",
-      description: "Thời gian hoạt động hệ thống",
-    },
-  ];
+  // Get real data from APIs
+  const { data: students, loading: studentsLoading } = useManagerStudents();
+  const { data: blogs, loading: blogsLoading } = useManagerBlogs();
+
+  // Calculate real statistics
+  useEffect(() => {
+    const calculateStats = () => {
+      const totalStudents = students ? students.length : 0;
+      const maleStudents = students
+        ? students.filter((s) => s.gender === "Nam").length
+        : 0;
+      const femaleStudents = students
+        ? students.filter((s) => s.gender === "Nữ").length
+        : 0;
+      const totalBlogs = blogs ? blogs.length : 0;
+      const pendingBlogs = blogs
+        ? blogs.filter((b) => b.status === "pending").length
+        : 0;
+
+      const stats = [
+        {
+          title: "Tổng Học Sinh",
+          value: totalStudents.toString(),
+          change: "+8.2%", // Mock percentage
+          changeType: "positive",
+          icon: "🎓",
+          color: "blue",
+          description: "Số học sinh trong hệ thống",
+        },
+        {
+          title: "Học Sinh Nam",
+          value: maleStudents.toString(),
+          change: `${
+            totalStudents > 0
+              ? ((maleStudents / totalStudents) * 100).toFixed(1)
+              : 0
+          }%`,
+          changeType: "neutral",
+          icon: "👦",
+          color: "green",
+          description: "Tỷ lệ học sinh nam",
+        },
+        {
+          title: "Học Sinh Nữ",
+          value: femaleStudents.toString(),
+          change: `${
+            totalStudents > 0
+              ? ((femaleStudents / totalStudents) * 100).toFixed(1)
+              : 0
+          }%`,
+          changeType: "neutral",
+          icon: "👧",
+          color: "purple",
+          description: "Tỷ lệ học sinh nữ",
+        },
+        {
+          title: "Tổng Bài Viết",
+          value: totalBlogs.toString(),
+          change:
+            pendingBlogs > 0 ? `${pendingBlogs} chờ duyệt` : "Đã duyệt hết",
+          changeType: pendingBlogs > 0 ? "warning" : "positive",
+          icon: "📝",
+          color: "orange",
+          description: "Bài viết trong hệ thống",
+        },
+      ];
+
+      setDashboardStats(stats);
+    };
+
+    if (!studentsLoading && !blogsLoading) {
+      calculateStats();
+    }
+  }, [students, blogs, studentsLoading, blogsLoading]);
 
   // Quick actions for easy navigation
   const quickActions = [
@@ -76,33 +117,63 @@ function Dashboard() {
     },
   ];
 
-  // Recent activities
-  const recentActivities = [
-    {
-      type: "user",
-      message: "Tài khoản mới được tạo: Nguyễn Văn A (Phụ huynh)",
-      time: "2 giờ trước",
-      icon: "👤",
-    },
-    {
-      type: "vaccination",
-      message: "Lịch tiêm chủng mới được thêm cho lớp 6A",
-      time: "3 giờ trước",
-      icon: "💉",
-    },
-    {
-      type: "blog",
-      message: "Bài viết mới: 'Hướng dẫn chăm sóc sức khỏe học sinh'",
-      time: "5 giờ trước",
-      icon: "📝",
-    },
-    {
-      type: "system",
-      message: "Sao lưu dữ liệu hoàn tất thành công",
-      time: "6 giờ trước",
-      icon: "💾",
-    },
-  ];
+  // Recent activities - combine real data with mock data
+  const getRecentActivities = () => {
+    const activities = [];
+
+    // Add recent blog activities if available
+    if (blogs && blogs.length > 0) {
+      const recentBlogs = blogs
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 2);
+
+      recentBlogs.forEach((blog) => {
+        activities.push({
+          type: "blog",
+          message: `Bài viết mới: "${blog.title}"`,
+          time: new Date(blog.createdAt).toLocaleDateString("vi-VN"),
+          icon: "📝",
+        });
+      });
+    }
+
+    // Add recent student activities if available
+    if (students && students.length > 0) {
+      const recentStudents = students
+        .filter(
+          (s) => s.enrollmentDate && s.enrollmentDate !== "Chưa có thông tin"
+        )
+        .sort((a, b) => new Date(b.enrollmentDate) - new Date(a.enrollmentDate))
+        .slice(0, 1);
+
+      recentStudents.forEach((student) => {
+        activities.push({
+          type: "student",
+          message: `Học sinh mới: ${student.fullName} (${student.className})`,
+          time: new Date(student.enrollmentDate).toLocaleDateString("vi-VN"),
+          icon: "🎓",
+        });
+      });
+    }
+
+    // Add mock activities for features not yet available
+    activities.push(
+      {
+        type: "vaccination",
+        message: "Lịch tiêm chủng mới được thêm cho lớp 6A",
+        time: "3 giờ trước",
+        icon: "💉",
+      },
+      {
+        type: "system",
+        message: "Sao lưu dữ liệu hoàn tất thành công",
+        time: "6 giờ trước",
+        icon: "💾",
+      }
+    );
+
+    return activities.slice(0, 4); // Return max 4 activities
+  };
 
   const handleQuickAction = (path) => {
     navigate(path);
@@ -132,19 +203,25 @@ function Dashboard() {
       <div className="stats-section">
         <h2 className="section-title">Thống Kê Tổng Quan</h2>
         <div className="stats-grid">
-          {dashboardStats.map((stat, index) => (
-            <div key={index} className={`stat-card ${stat.color}`}>
-              <div className="stat-icon">{stat.icon}</div>
-              <div className="stat-content">
-                <div className="stat-value">{stat.value}</div>
-                <div className="stat-title">{stat.title}</div>
-                <div className="stat-description">{stat.description}</div>
-                <div className={`stat-change ${stat.changeType}`}>
-                  {stat.change}
+          {studentsLoading || blogsLoading ? (
+            <div className="loading-stats">
+              <p>⏳ Đang tải thống kê...</p>
+            </div>
+          ) : (
+            dashboardStats.map((stat, index) => (
+              <div key={index} className={`stat-card ${stat.color}`}>
+                <div className="stat-icon">{stat.icon}</div>
+                <div className="stat-content">
+                  <div className="stat-value">{stat.value}</div>
+                  <div className="stat-title">{stat.title}</div>
+                  <div className="stat-description">{stat.description}</div>
+                  <div className={`stat-change ${stat.changeType}`}>
+                    {stat.change}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -174,7 +251,7 @@ function Dashboard() {
         <div className="recent-activities">
           <h3>Hoạt Động Gần Đây</h3>
           <div className="activities-list">
-            {recentActivities.map((activity, index) => (
+            {getRecentActivities().map((activity, index) => (
               <div key={index} className="activity-item">
                 <div className="activity-icon">{activity.icon}</div>
                 <div className="activity-content">

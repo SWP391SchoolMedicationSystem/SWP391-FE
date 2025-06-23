@@ -1,9 +1,8 @@
 import { Link as RouterLink } from "react-router-dom";
 import { Box, Button, Container, Link, Typography } from "@mui/material";
-import { AddCircleOutline } from "@mui/icons-material";
+import MedlearnLogo from "../../assets/images/medlearn-logo.png";
 
 export default function Header() {
-  
   return (
     <Box component="header" sx={{ py: 2, fontFamily: "Poppins, sans-serif" }}>
       <Container maxWidth="lg">
@@ -19,36 +18,45 @@ export default function Header() {
             to="#"
             sx={{ textDecoration: "none", color: "inherit" }}
           >
-            <Box sx={{ position: "relative" }}>
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Typography
-                  variant="h4"
-                  component="span"
-                  sx={{ fontWeight: "bold", color: "text.primary" }}
-                >
-                  Medlearn
-                </Typography>
-                <AddCircleOutline
-                  sx={{
-                    color: "info.main",
-                    fontSize: "1.2rem",
-                    ml: 0.5,
-                    mb: 2,
+            <Box sx={{ 
+              position: "relative", 
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 0.5
+            }}>
+              <Box sx={{ width: "50px", height: "50px" }}>
+                <img
+                  src={MedlearnLogo}
+                  alt="Medlearn Logo"
+                  style={{ 
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain"
                   }}
                 />
               </Box>
-              <Typography
-                variant="caption"
-                sx={{
-                  position: "absolute",
-                  top: "100%",
-                  left: 0,
-                  mt: -1.5,
-                  color: "text.secondary",
-                }}
-              >
-                Medical Education
-              </Typography>
+              <Box sx={{ textAlign: "center" }}>
+                <Typography 
+                  sx={{ 
+                    fontSize: "1rem", 
+                    fontWeight: "bold",
+                    color: "#2D77C1",
+                    lineHeight: 1
+                  }}
+                >
+                  MEDLEARN
+                </Typography>
+                <Typography 
+                  sx={{ 
+                    fontSize: "0.7rem",
+                    color: "#666",
+                    lineHeight: 1
+                  }}
+                >
+                  Medical Education
+                </Typography>
+              </Box>
             </Box>
           </Link>
           <Box
@@ -100,10 +108,11 @@ export default function Header() {
               },
             }}
           >
-            Register
+            Login
           </Button>
         </Box>
       </Container>
     </Box>
   );
 }
+  

@@ -35,6 +35,13 @@ import {
   Star,
   Info,
   Assignment,
+  EventNote,
+  Healing,
+  LocalPharmacy,
+  FormatQuote,
+  Facebook,
+  Twitter,
+  LinkedIn,
 } from "@mui/icons-material";
 
 export default function Home() {
@@ -97,43 +104,96 @@ export default function Home() {
   // Main services
   const mainServices = [
     {
-      title: "Tư vấn với bác sĩ",
-      description: "Kết nối với đội ngũ y tế để được tư vấn và hỗ trợ sức khỏe",
-      icon: <MedicalServices sx={{ fontSize: 48, color: "#1976D2" }} />,
-      bgColor: "#E3F2FD",
+      title: "Tư vấn sức khỏe",
+      description: "Kết nối với đội ngũ y tế để được tư vấn và hỗ trợ chuyên nghiệp.",
+      icon: <Healing />,
+      gradient: "linear-gradient(135deg, #42A5F5 0%, #1E88E5 100%)", // Blue
     },
     {
-      title: "Tiêm chủng",
-      description: "Quản lý và theo dõi lịch tiêm chủng cho tất cả học sinh",
-      icon: <Vaccines sx={{ fontSize: 48, color: "white" }} />,
-      bgColor: "linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)",
+      title: "Quản lý tiêm chủng",
+      description: "Theo dõi và quản lý lịch tiêm chủng cho học sinh một cách hiệu quả.",
+      icon: <Vaccines />,
+      gradient: "linear-gradient(135deg, #7986CB 0%, #5C6BC0 100%)", // Indigo
     },
     {
-      title: "Chăm sóc sức khỏe",
-      description: "Giám sát sức khỏe toàn diện và quản lý hồ sơ y tế",
-      icon: <HealthAndSafety sx={{ fontSize: 48, color: "#2E7D32" }} />,
-      bgColor: "#E8F5E8",
+      title: "Quản lý thuốc",
+      description: "Giám sát việc cấp phát và sử dụng thuốc tại trường học.",
+      icon: <LocalPharmacy />,
+      gradient: "linear-gradient(135deg, #81C784 0%, #66BB6A 100%)", // Green
     },
   ];
 
   // Service categories
-  const serviceCategories = {
-    vaccination: [
-      "Tiêm ngừa cúm mùa (15/9 - 15/10)",
-      "Vắc xin MMR (20/9 - 12/10)",
-      "Vắc xin thủy đậu (18/9 - 2/10)",
-    ],
-    healthCheckup: [
-      "Khám sức khỏe định kỳ (08/03/2019 - Hiện tại)",
-      "Kiểm tra thị lực (15/2 - Hiện tại)",
-      "Kiểm tra răng miệng (20/2 - Hiện tại)",
-    ],
-    medicinesSupplies: [
-      "Thuốc hạ sốt (7 mục)",
-      "Băng gạc y tế (2 mục)",
-      "Dung dịch sát khuẩn (3 mục)",
-    ],
-  };
+  const serviceCategories = [
+    {
+      title: "Lịch tiêm chủng",
+      icon: <Vaccines />,
+      color: "#42A5F5", // Blue
+      items: [
+        "Tiêm ngừa cúm mùa (15/9 - 15/10)",
+        "Vắc xin MMR (20/9 - 12/10)",
+        "Vắc xin thủy đậu (18/9 - 2/10)",
+      ],
+    },
+    {
+      title: "Lịch khám sức khỏe",
+      icon: <EventNote />,
+      color: "#66BB6A", // Green
+      items: [
+        "Khám sức khỏe định kỳ (08/03 - 20/03)",
+        "Kiểm tra thị lực (15/2 - 28/2)",
+        "Kiểm tra răng miệng (20/2 - 05/03)",
+      ],
+    },
+    {
+      title: "Vật tư y tế",
+      icon: <LocalPharmacy />,
+      color: "#FFA726", // Orange
+      items: [
+        "Thuốc hạ sốt (còn 7 hộp)",
+        "Băng gạc y tế (còn 2 cuộn)",
+        "Dung dịch sát khuẩn (còn 3 chai)",
+      ],
+    },
+  ];
+
+  const testimonials = [
+    {
+      quote: "Hệ thống đã giúp chúng tôi quản lý sức khỏe của con em mình một cách dễ dàng và hiệu quả hơn rất nhiều. Giao diện thân thiện và thông tin luôn được cập nhật kịp thời.",
+      author: "Chị Lan Anh",
+      role: "Phụ huynh học sinh",
+      avatar: "LA"
+    },
+    {
+      quote: "Là một y tá trường học, tôi thực sự đánh giá cao công cụ này. Nó giúp tôi tiết kiệm thời gian và giảm thiểu sai sót trong việc theo dõi hồ sơ sức khỏe của học sinh.",
+      author: "Cô Mai",
+      role: "Y tá trường THCS ABC",
+      avatar: "M"
+    }
+  ];
+
+  const nurses = [
+    {
+      name: "Y tá Trần Lan Anh",
+      specialty: "Y tá học đường",
+      initials: "LA",
+    },
+    {
+      name: "Y tá Lê Minh Khôi",
+      specialty: "Y tá chuyên khoa",
+      initials: "MK",
+    },
+    {
+      name: "Y tá Phạm Thanh Thảo",
+      specialty: "Y tá nhi khoa",
+      initials: "TT",
+    },
+    {
+        name: "Y tá Hoàng Đức Huy",
+        specialty: "Y tá cấp cứu",
+        initials: "HH",
+    }
+  ];
 
   return (
     <div className="home-page">
@@ -143,30 +203,33 @@ export default function Home() {
         <div className="hero-container">
           <div className="hero-text">
             <h1>
-              Hệ thống Y tế Trường học <br />
-              <span className="highlight">Toàn diện</span>
+              Chăm sóc <span className="highlight">sức khỏe học đường</span> chưa bao giờ dễ dàng hơn
             </h1>
             <p>
-              Giải pháp toàn diện để quản lý sức khỏe học sinh, lịch tiêm chủng
-              và theo dõi y tế tại trường học
+              Nền tảng quản lý y tế toàn diện, kết nối nhà trường, phụ huynh và nhân viên y tế để đảm bảo môi trường học tập an toàn và khỏe mạnh.
             </p>
             <Button
               variant="contained"
+              size="large"
               sx={{
                 borderRadius: "50px",
-                px: 3,
+                px: 5,
+                py: 1.5,
                 color: "white",
-                background: "linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)",
+                fontWeight: "bold",
+                background: "var(--gradient-primary)",
+                boxShadow: "0 4px 12px rgba(80, 227, 194, 0.4)",
                 "&:hover": {
-                  opacity: 0.9,
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 6px 16px rgba(80, 227, 194, 0.5)",
                 },
               }}
             >
-              Tìm hiểu thêm
+              Bắt đầu ngay
             </Button>
           </div>
           <div className="hero-image">
-            <img src={DoctorHomePageImage} alt="Nhóm bác sĩ" />
+            <img src={DoctorHomePageImage} alt="Đội ngũ y tế" />
           </div>
         </div>
       </section>
@@ -375,361 +438,228 @@ export default function Home() {
           </Grid>
         </Grid>
       </Container>
-      {/* Main Services - Fixed equal height Cards with no spacing */}
-      <Container maxWidth="lg" sx={{ py: 6 }}>
-        <Box sx={{ textAlign: "center", mb: 4 }}>
-          <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-            Our <span style={{ color: "#56D0DB" }}>Main Services</span>
-          </Typography>
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: "bold", color: "text.secondary" }}
-          >
-            Categories
-          </Typography>
-        </Box>
-
-        <Grid container spacing={0} alignItems="stretch">
-          {mainServices.map((service, index) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={6}
-              key={index}
-              sx={{
-                display: "flex",
-                alignItems: "stretch",
-              }}
-            >
-              <Box sx={{ width: "100%", display: "flex" }}>
-                <Card
-                  sx={{
-                    width: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    textAlign: "center",
-                    background: service.bgColor,
-                    borderRadius: 3,
-                    flexGrow: 1,
-                    cursor: "pointer",
-                    border: "none",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                    "&:hover": {
-                      transform: "translateY(-8px)",
-                      boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
-                    },
-                    p: 4,
-                  }}
-                >
-                  <Box>{service.icon}</Box>
+      {/* Services Section */}
+      <section className="services-section">
+        <Container maxWidth="lg">
+          <Box className="section-title">
+            <h2>
+              Các <span style={{ color: 'var(--secondary-color)' }}>dịch vụ chính</span>
+            </h2>
+            <p>Chúng tôi cung cấp các giải pháp toàn diện để quản lý sức khỏe học đường một cách hiệu quả nhất.</p>
+          </Box>
+          
+          <Grid container spacing={4} justifyContent="center">
+            {mainServices.map((service, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+                <Card sx={{ 
+                  borderRadius: 'var(--card-border-radius)', 
+                  boxShadow: 'var(--card-hover-box-shadow)', 
+                  p: 4, 
+                  textAlign: 'center', 
+                  height: '100%',
+                  background: service.gradient,
+                  color: 'white',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  transition: 'transform 0.3s',
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                  }
+                }}>
                   <Box>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: "bold",
-                        mt: 2,
-                        mb: 1,
-                        color: index === 1 ? "white" : "text.primary",
-                      }}
-                    >
+                    <Avatar sx={{ 
+                      width: 80, 
+                      height: 80, 
+                      margin: '0 auto 24px', 
+                      bgcolor: 'rgba(255, 255, 255, 0.2)' 
+                    }}>
+                      {React.cloneElement(service.icon, { sx: { fontSize: 48, color: 'white' } })}
+                    </Avatar>
+                    <Typography variant="h5" component="h3" sx={{ fontWeight: 'bold', mb: 2 }}>
                       {service.title}
                     </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color:
-                          index === 1
-                            ? "rgba(255,255,255,0.9)"
-                            : "text.secondary",
-                      }}
-                    >
+                    <Typography sx={{ opacity: 0.9 }}>
                       {service.description}
                     </Typography>
                   </Box>
-                </Card>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-
-      {/* Service Categories Detail - Fixed height and alignment */}
-      <Container maxWidth="lg" sx={{ py: 6 }}>
-        <Grid container spacing={0} alignItems="stretch">
-          {["vaccination", "healthCheckup", "medicinesSupplies"].map(
-            (key, i) => {
-              const titles = {
-                vaccination: "Vaccination Schedule",
-                healthCheckup: "Health Checkup Schedule",
-                medicinesSupplies: "Medicines & Supplies",
-              };
-              const icons = {
-                vaccination: (
-                  <Vaccines sx={{ color: "#56D0DB", fontSize: 28 }} />
-                ),
-                healthCheckup: (
-                  <LocalHospital sx={{ color: "#56D0DB", fontSize: 28 }} />
-                ),
-                medicinesSupplies: (
-                  <MedicalServices sx={{ color: "#56D0DB", fontSize: 28 }} />
-                ),
-              };
-
-              return (
-                <Grid
-                  item
-                  xs={12}
-                  sm={4}
-                  md={4}
-                  key={i}
-                  sx={{ display: "flex" }}
-                >
-                  <Paper
+                  <Button
+                    variant="contained"
                     sx={{
-                      p: 3,
-                      borderRadius: 2,
-                      height: "100%",
-                      width: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      flexGrow: 1,
-                      border: "1px solid #e0e0e0",
+                        mt: 4,
+                        bgcolor: 'rgba(255, 255, 255, 0.9)',
+                        color: 'var(--text-dark-color)',
+                        borderRadius: '50px',
+                        fontWeight: 'bold',
+                        '&:hover': {
+                            bgcolor: 'white',
+                        }
                     }}
                   >
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                      {icons[key]}
-                      <Typography
-                        variant="h6"
-                        sx={{ fontWeight: "bold", color: "#1a237e", ml: 1 }}
-                      >
-                        {titles[key]}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ flexGrow: 1 }}>
-                      <List sx={{ p: 0 }}>
-                        {serviceCategories[key].map((item, index) => (
-                          <ListItem key={index} sx={{ px: 0, py: 1.5 }}>
-                            <ListItemIcon sx={{ minWidth: 36 }}>
-                              {icons[key]}
-                            </ListItemIcon>
-                            <ListItemText
-                              primary={item}
-                              primaryTypographyProps={{
-                                fontSize: "0.9rem",
-                                color: "text.primary",
-                              }}
-                            />
-                          </ListItem>
-                        ))}
-                      </List>
-                    </Box>
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      sx={{
-                        mt: 3,
-                        background:
-                          "linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)",
-                        color: "white",
-                        py: 1.5,
-                        borderRadius: 2,
-                        textTransform: "none",
-                        fontSize: "0.9rem",
-                        fontWeight: 600,
-                        "&:hover": { opacity: 0.9 },
+                    Tìm hiểu thêm
+                  </Button>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </section>
+
+      {/* Schedule Section */}
+      <section className="schedule-section">
+        <Container maxWidth="lg">
+          <Box className="section-title">
+            <h2>
+              Lịch trình &amp; <span style={{ color: "var(--primary-color)" }}>Kế hoạch</span>
+            </h2>
+            <p>
+              Luôn cập nhật các hoạt động y tế và lịch trình chăm sóc sức khỏe sắp tới tại trường.
+            </p>
+          </Box>
+          <Grid container spacing={4}>
+            {serviceCategories.map((category, index) => (
+              <Grid item xs={12} md={4} key={index}>
+                <Paper className="schedule-card" elevation={0} sx={{ borderLeftColor: category.color }}>
+                  <Box className="schedule-card-header">
+                    {React.cloneElement(category.icon, { className: 'icon', sx: { color: category.color } })}
+                    <Typography variant="h5" component="h3">
+                      {category.title}
+                    </Typography>
+                  </Box>
+                  <List className="schedule-list">
+                    {category.items.map((item, itemIndex) => (
+                      <ListItem key={itemIndex}>
+                        <ListItemIcon>
+                          <FiberManualRecord sx={{ fontSize: 10 }} />
+                        </ListItemIcon>
+                        <ListItemText primary={item} />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </section>
+
+      {/* Our Nurses Section - NEW GRID LAYOUT */}
+      <section className="nurses-section-grid">
+        <Container maxWidth="lg">
+          <Box className="section-title" sx={{ textAlign: 'center', mb: 4 }}>
+            <Typography variant="h3" component="h2" sx={{ fontWeight: 700, mb: 2 }}>
+              Gặp gỡ <span className="highlight">Đội ngũ Y tá</span> của chúng tôi
+            </Typography>
+            <Typography variant="body1" sx={{ maxWidth: 600, mx: 'auto', color: 'text.secondary' }}>
+              Những chuyên gia tận tâm, luôn sẵn sàng chăm sóc sức khỏe cho học sinh với sự chuyên nghiệp và lòng nhân ái.
+            </Typography>
+          </Box>
+          <Grid container spacing={5} sx={{ mt: 10 }}>
+            {nurses.map((nurse, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index}>
+                <Card className="nurse-card">
+                  <Box className="nurse-image-container">
+                    <Avatar
+                      alt={nurse.name}
+                      sx={{ 
+                        width: '100%', 
+                        height: '100%',
+                        fontSize: '3.5rem',
+                        fontWeight: 'bold',
+                        color: 'white',
+                        background: 'linear-gradient(45deg, #1976d2 30%, #2196f3 90%)',
                       }}
                     >
-                      {key === "vaccination"
-                        ? "SEE VACCINATION SCHEDULE"
-                        : key === "healthCheckup"
-                        ? "SEE CHECKUP SCHEDULE"
-                        : "SEE MEDICAL SUPPLIES"}
-                    </Button>
-                  </Paper>
+                      {nurse.initials}
+                    </Avatar>
+                  </Box>
+                  <CardContent className="nurse-card-content">
+                    <Box className="avatar-spacer" />
+                    <Typography variant="h5" component="h3" className="nurse-name">
+                      {nurse.name}
+                    </Typography>
+                    <Typography className="nurse-specialty">
+                      {nurse.specialty}
+                    </Typography>
+                    <Box className="social-links">
+                      <IconButton size="small"><Facebook fontSize="small" /></IconButton>
+                      <IconButton size="small"><Twitter fontSize="small" /></IconButton>
+                      <IconButton size="small"><LinkedIn fontSize="small" /></IconButton>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="testimonials-section">
+        <Container maxWidth="lg">
+          <Box className="section-title">
+            <h2>Phụ huynh & nhân viên y tế nói gì?</h2>
+            <p>Lắng nghe những chia sẻ thực tế từ người dùng của chúng tôi.</p>
+          </Box>
+          <Grid container spacing={5} justifyContent="center">
+            {testimonials.map((testimonial, index) => (
+                <Grid item xs={12} md={5} key={index}>
+                    <Paper className="testimonial-card" elevation={0}>
+                        <Box className="quote-icon">
+                            <FormatQuote fontSize="inherit" />
+                        </Box>
+                        <Typography className="quote-text">"{testimonial.quote}"</Typography>
+                        <Box className="testimonial-author">
+                            <Avatar sx={{ bgcolor: 'var(--primary-color)', mb: 2, mx: 'auto' }}>{testimonial.avatar}</Avatar>
+                            <Box className="author-info">
+                                <Typography variant="h6" component="div" sx={{fontWeight: 'bold'}}>{testimonial.author}</Typography>
+                                <Typography variant="body2" sx={{opacity: 0.8}}>{testimonial.role}</Typography>
+                            </Box>
+                        </Box>
+                    </Paper>
                 </Grid>
-              );
-            }
-          )}
-        </Grid>
-      </Container>
-
-            
-      {/* Our Doctors Section */}
-      <Container maxWidth="lg" sx={{ py: 8 }}>
-        <Grid container spacing={4} alignItems="center">
-          {/* Text and Doctor Card */}
-          <Grid item xs={12} md={6}>
-            <Typography variant="overline" sx={{ color: "#555" }}>
-              Đội ngũ bác sĩ
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-              <span style={{ color: "#56D0DB" }}>Bác sĩ</span> đủ chuyên môn
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-              Được phụ trách trực tiếp bởi bác sĩ đa khoa và các bác sĩ chuyên
-              khoa giàu kinh nghiệm.
-            </Typography>
-
-            {/* Doctor Card */}
-            <Paper
-              elevation={3}
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                width: "100%",
-                maxWidth: 350,
-                background: "linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)",
-                color: "white",
-              }}
-            >
-              <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                Chuyên khoa chỉnh hình
-              </Typography>
-              <Typography variant="h6" sx={{ fontWeight: "bold", mt: 1 }}>
-                Bác sĩ James Wellington
-              </Typography>
-              <Button
-                variant="text"
-                size="small"
-                sx={{ mt: 2, color: "white", textTransform: "none" }}
-              >
-                Xem thêm
-              </Button>
-            </Paper>
-
-            {/* View All Doctors button */}
-            <Button
-              variant="contained"
-              sx={{
-                mt: 4,
-                background: "linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)",
-                color: "white",
-                px: 4,
-                py: 1.5,
-                borderRadius: 30,
-                textTransform: "none",
-                "&:hover": {
-                  opacity: 0.9,
-                },
-              }}
-            >
-            Xem tất cả bác sĩ 
-            </Button>
+            ))}
           </Grid>
+        </Container>
+      </section>
 
-          {/* Doctor Avatar Image */}
-          <Grid item xs={12} md={6}>
-            <Box
-              sx={{
-                position: "relative",
-                width: "100%",
-                maxWidth: 350,
-                mx: "auto",
-              }}
-            >
-              <Avatar
-                src="https://randomuser.me/api/portraits/women/44.jpg" // bạn có thể thay bằng hình bác sĩ thật của bạn
-                alt="Doctor"
-                sx={{
-                  width: "100%",
-                  height: "auto",
-                  borderRadius: "50%",
-                  border: "8px solid white",
-                  boxShadow: 3,
-                }}
-              />
-              {/* Navigation arrows */}
-              <IconButton
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: -20,
-                  transform: "translateY(-50%)",
-                  backgroundColor: "white",
-                  "&:hover": { backgroundColor: "#f0f0f0" },
-                }}
-              >
-                <ArrowForward
-                  sx={{ transform: "rotate(180deg)", color: "#56D0DB" }}
-                />
-              </IconButton>
-              <IconButton
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  right: -20,
-                  transform: "translateY(-50%)",
-                  backgroundColor: "white",
-                  "&:hover": { backgroundColor: "#f0f0f0" },
-                }}
-              >
-                <ArrowForward sx={{ color: "#56D0DB" }} />
-              </IconButton>
-
-              {/* Dot indicators */}
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  mt: 3,
-                }}
-              >
-                {[0, 1, 2, 3].map((dot, i) => (
-                  <FiberManualRecord
-                    key={i}
-                    sx={{
-                      fontSize: 10,
-                      color: i === 3 ? "#2D77C1" : "#B0BEC5",
-                      mx: 0.5,
-                    }}
-                  />
-                ))}
-              </Box>
+      {/* Get Started - New CTA Design */}
+      <section className="cta-section">
+        <Container maxWidth="lg">
+          <Paper elevation={0}>
+            <Box className="cta-content">
+              <Typography variant="h3" component="h2">
+                Bắt đầu với MedLearn ngay hôm nay
+              </Typography>
+              <Typography variant="body1">
+                Tham gia cùng hàng nghìn trường học để nâng cao chất lượng chăm sóc sức khỏe học đường.
+              </Typography>
             </Box>
-          </Grid>
-        </Grid>
-      </Container>
-      {/* Get Started */}
-      <Container maxWidth="lg" sx={{ py: 6 }}>
-        <Paper
-          sx={{
-            p: 6,
-            textAlign: "center",
-            background: "linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)",
-            color: "white",
-            borderRadius: 3,
-          }}
-        >
-          <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-            Get started with <span style={{ color: "#FFE082" }}>MedLearn</span>
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 4, opacity: 0.9 }}>
-            Join thousands of schools already using our comprehensive medical
-            management system. Start managing student health records,
-            vaccination schedules, and medical monitoring with ease.
-          </Typography>
-          <Button
-            variant="contained"
-            size="large"
-            sx={{
-              bgcolor: "white",
-              color: "#2D77C1",
-              px: 4,
-              py: 1.5,
-              "&:hover": {
-                bgcolor: "#FFE082",
-                color: "#2D77C1",
-              },
-            }}
-          >
-            Get Started
-          </Button>
-        </Paper>
-      </Container>
+            <Box className="cta-button-container">
+              <Button
+                variant="contained"
+                size="large"
+                sx={{
+                  bgcolor: 'white',
+                  color: 'var(--primary-color)',
+                  px: { xs: 3, sm: 5 },
+                  py: { xs: 1, sm: 1.5 },
+                  borderRadius: '50px',
+                  fontWeight: 'bold',
+                  '&:hover': {
+                    bgcolor: '#f0f0f0',
+                    transform: 'translateY(-2px)'
+                  },
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                }}
+              >
+                Đăng ký miễn phí
+              </Button>
+            </Box>
+          </Paper>
+        </Container>
+      </section>
       <Footer />
     </div>
   );
