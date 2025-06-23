@@ -308,6 +308,62 @@ const userService = {
       throw error;
     }
   },
+  googleLogin: async (credential) => {
+    try {
+      const response = await apiClient.post(API_ENDPOINTS.USER.GOOGLE_LOGIN, {
+        credential,
+      });
+
+      const data = response;
+
+      if (data.token || data.accessToken || data.access_token) {
+        const token = data.token || data.accessToken || data.access_token;
+
+        try {
+          const decodedToken = jwtDecode(token);
+
+          const loginData = {
+            success: true,
+            token: token,
+            userId: decodedToken.Id || decodedToken.id || decodedToken.userId,
+            email: decodedToken.Email || decodedToken.email,
+            role: decodedToken.Role || decodedToken.role,
+            fullname:
+              decodedToken.Fullname ||
+              decodedToken.fullname ||
+              decodedToken.name,
+            phone: decodedToken.Phone || decodedToken.phone,
+            status: decodedToken.Status || decodedToken.status,
+            isStaff: decodedToken.Role !== "Parent",
+            userData: decodedToken,
+            decodedToken: decodedToken,
+          };
+
+          return loginData;
+        } catch (error) {
+          console.error("Error decoding JWT token:", error);
+          return {
+            success: true,
+            ...data,
+          };
+        }
+      }
+
+      return {
+        success: true,
+        ...data,
+      };
+    } catch (error) {
+      console.error("Google login error:", error);
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      } else {
+        throw new Error(
+          "Không thể đăng nhập bằng Google. Vui lòng thử lại."
+        );
+      }
+    }
+  },
 };
 
 export default userService;

@@ -71,6 +71,7 @@ export const API_ENDPOINTS = {
   USER: {
     LOGIN: "/User/user", // POST endpoint for login
     GET_ALL: "/User/user", // GET endpoint for users list
+    GOOGLE_LOGIN: "/User/google", // POST endpoint for Google login
   },
 
   // Blog (5/7 - workflow: Nurse create → Manager approve → Parent view)
