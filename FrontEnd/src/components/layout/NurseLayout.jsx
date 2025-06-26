@@ -51,6 +51,7 @@ const navItems = [
     label: "Xử Lý Thuốc",
     icon: <MedicalServices />,
   },
+  { to: "/nurse/view-student-medicine", label: "Đơn thuốc từ phụ huynh", icon: <Medication /> },
   { to: "/nurse/blog", label: "Blog", icon: <Article /> },
   { to: "/nurse/chat", label: "Chat Phụ Huynh", icon: <Chat /> },
   { to: "/nurse/student-list", label: "Danh Sách Học Sinh", icon: <People /> },
