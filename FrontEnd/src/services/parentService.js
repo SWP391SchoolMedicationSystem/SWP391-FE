@@ -208,6 +208,73 @@ export const parentChatService = {
   },
 };
 
+// Medicine Donation Services (Need to create API endpoints)
+export const donationService = {
+  // Submit medicine donation - MOCK DATA (API chưa có)
+  submitDonation: async (donationData) => {
+    // TODO: Replace with real API call when backend creates endpoint
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          id: Date.now(),
+          ...donationData,
+          status: 'pending',
+          createdAt: new Date().toISOString(),
+          parentId: JSON.parse(localStorage.getItem("userInfo") || "{}").userId || 0
+        });
+      }, 1000);
+    });
+  },
+
+  // Get donation history for current parent - MOCK DATA (API chưa có)
+  getDonationHistory: async () => {
+    // TODO: Replace with real API call when backend creates endpoint
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve([
+          {
+            id: 1,
+            medicineName: "Paracetamol 500mg",
+            medicineType: "Thuốc giảm đau",
+            quantity: "20 viên",
+            expiryDate: "2024-12-31",
+            condition: "Còn tốt",
+            description: "Thuốc giảm đau, hạ sốt cho trẻ em",
+            status: "approved",
+            createdAt: "2024-03-10T10:30:00Z"
+          },
+          {
+            id: 2,
+            medicineName: "Vitamin C",
+            medicineType: "Vitamin",
+            quantity: "30 viên",
+            expiryDate: "2024-11-15",
+            condition: "Rất tốt",
+            description: "Vitamin C tăng cường sức đề kháng",
+            status: "completed",
+            createdAt: "2024-02-28T14:20:00Z"
+          },
+          {
+            id: 3,
+            medicineName: "Amoxicillin 250mg",
+            medicineType: "Thuốc kháng sinh",
+            quantity: "15 viên",
+            expiryDate: "2024-10-20",
+            condition: "Còn tốt",
+            description: "Thuốc kháng sinh cho trẻ em",
+            status: "pending",
+            createdAt: "2024-03-15T09:15:00Z"
+          }
+        ]);
+      }, 800);
+    });
+  }
+};
+
+// Standalone functions for easier import
+export const submitDonation = donationService.submitDonation;
+export const getDonationHistory = donationService.getDonationHistory;
+
 export default {
   parentService,
   parentNotificationService,
@@ -215,4 +282,5 @@ export default {
   parentBlogService,
   consultationService,
   parentChatService,
+  donationService,
 };

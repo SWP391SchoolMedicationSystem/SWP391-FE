@@ -33,6 +33,7 @@ import {
   Logout,
   ChatBubbleOutline,
   Search,
+  LocalPharmacy,
 } from "@mui/icons-material";
 import userService from "../../services/userService";
 import MedlearnLogo from "../../assets/images/Medlearn-logo.png";
@@ -54,6 +55,11 @@ const navItems = [
     to: "/parent/health-records",
     label: "Hồ Sơ Sức Khỏe",
     icon: <FolderShared />,
+  },
+  {
+    to: "/parent/donate-medicine",
+    label: "Gửi Thuốc Cho Học Sinh",
+    icon: <LocalPharmacy />,
   },
 ];
 
