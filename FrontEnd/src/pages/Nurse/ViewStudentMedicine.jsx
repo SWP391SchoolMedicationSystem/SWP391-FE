@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Table from '../../components/common/Table';
 import '../../css/Parent/DonateMedicine.css';
 
 // Mock data đơn thuốc gửi cho học sinh
@@ -13,9 +14,8 @@ const mockMedicineRequests = [
     quantity: '20 viên',
     expiryDate: '2024-12-31',
     condition: 'Còn tốt',
-    description: 'Thuốc giảm đau, hạ sốt cho trẻ em',
+    note: 'Thuốc giảm đau, hạ sốt cho trẻ em. Sáng 8-12h',
     contactPhone: '0123456789',
-    preferredTime: 'Sáng 8-12h',
     status: 'pending',
     createdAt: '2024-03-10T10:30:00Z',
   },
@@ -29,9 +29,8 @@ const mockMedicineRequests = [
     quantity: '30 viên',
     expiryDate: '2024-11-15',
     condition: 'Rất tốt',
-    description: 'Vitamin C tăng cường sức đề kháng',
+    note: 'Vitamin C tăng cường sức đề kháng. Chiều 14-18h',
     contactPhone: '0987654321',
-    preferredTime: 'Chiều 14-18h',
     status: 'approved',
     createdAt: '2024-02-28T14:20:00Z',
   },
@@ -92,99 +91,68 @@ const ViewStudentMedicine = () => {
     });
   };
 
+  const columns = [
+    { header: 'Học sinh', key: 'studentName', render: (v, row) => `${v} - Lớp ${row.class}` },
+    { header: 'Phụ huynh', key: 'parentName' },
+    { header: 'Tên thuốc', key: 'medicineName' },
+    { header: 'Loại thuốc', key: 'medicineType' },
+    { header: 'Số lượng', key: 'quantity' },
+    { header: 'Hạn sử dụng', key: 'expiryDate' },
+    { header: 'Tình trạng', key: 'condition' },
+    { header: 'Ghi chú', key: 'note' },
+    { header: 'SĐT liên hệ', key: 'contactPhone' },
+    {
+      header: 'Trạng thái',
+      key: 'status',
+      render: (v) => <span className={`status-badge ${statusMap[v]?.class}`}>{statusMap[v]?.text}</span>,
+    },
+    {
+      header: 'Ngày gửi',
+      key: 'createdAt',
+      render: (v) => formatDate(v),
+    },
+    {
+      header: 'Thao tác',
+      key: 'actions',
+      render: (v, row) =>
+        row.status === 'pending' ? (
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              className="submit-btn"
+              style={{ width: 90, background: '#e6f9f0', color: '#1e7e34', fontSize: 13, padding: '7px 0' }}
+              onClick={() => handleApprove(row.id)}
+              disabled={actionLoading === row.id}
+            >
+              {actionLoading === row.id ? 'Đang duyệt...' : 'Chấp thuận'}
+            </button>
+            <button
+              className="submit-btn"
+              style={{ width: 90, background: '#fbeaea', color: '#c82333', fontSize: 13, padding: '7px 0' }}
+              onClick={() => handleReject(row.id)}
+              disabled={actionLoading === row.id}
+            >
+              {actionLoading === row.id ? 'Đang xử lý...' : 'Từ chối'}
+            </button>
+          </div>
+        ) : null,
+    },
+  ];
+
   return (
     <div className="donate-medicine-container">
       <div className="donate-header">
         <div>
-          <h1>Đơn Thuốc Phụ Huynh Gửi Cho Học Sinh</h1>
+          <h1>Đơn Thuốc Từ Phụ Huynh</h1>
           <p>Xem, kiểm tra và duyệt các đơn thuốc phụ huynh gửi cho học sinh</p>
         </div>
       </div>
-      <div className="donate-history-section">
-        <div className="history-header">
-          <h3>📦 Danh Sách Đơn Thuốc Gửi</h3>
-        </div>
-        <div className="history-content">
-          {loading ? (
-            <div className="empty-history">
-              <h4>Đang tải...</h4>
-            </div>
-          ) : requests.length === 0 ? (
-            <div className="empty-history">
-              <h4>Chưa có đơn thuốc nào</h4>
-            </div>
-          ) : (
-            requests.map((req) => (
-              <div key={req.id} className="history-item">
-                <h4>{req.medicineName}</h4>
-                <div className="history-details">
-                  <div className="history-detail">
-                    <label>Học sinh:</label>
-                    <span>{req.studentName} - Lớp {req.class}</span>
-                  </div>
-                  <div className="history-detail">
-                    <label>Phụ huynh:</label>
-                    <span>{req.parentName}</span>
-                  </div>
-                  <div className="history-detail">
-                    <label>Loại thuốc:</label>
-                    <span>{req.medicineType}</span>
-                  </div>
-                  <div className="history-detail">
-                    <label>Số lượng:</label>
-                    <span>{req.quantity}</span>
-                  </div>
-                  <div className="history-detail">
-                    <label>Hạn sử dụng:</label>
-                    <span>{req.expiryDate}</span>
-                  </div>
-                  <div className="history-detail">
-                    <label>Tình trạng:</label>
-                    <span>{req.condition}</span>
-                  </div>
-                  <div className="history-detail">
-                    <label>SĐT liên hệ:</label>
-                    <span>{req.contactPhone}</span>
-                  </div>
-                  <div className="history-detail">
-                    <label>Thời gian thuận tiện:</label>
-                    <span>{req.preferredTime}</span>
-                  </div>
-                </div>
-                {req.description && (
-                  <div className="history-detail">
-                    <label>Mô tả:</label>
-                    <span>{req.description}</span>
-                  </div>
-                )}
-                <div className="history-status">
-                  <span className={`status-badge ${statusMap[req.status]?.class}`}>{statusMap[req.status]?.text}</span>
-                  <span className="history-date">{formatDate(req.createdAt)}</span>
-                </div>
-                {req.status === 'pending' && (
-                  <div style={{ marginTop: 16, display: 'flex', gap: 12 }}>
-                    <button
-                      className="submit-btn"
-                      style={{ width: 140, background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)' }}
-                      onClick={() => handleApprove(req.id)}
-                      disabled={actionLoading === req.id}
-                    >
-                      {actionLoading === req.id ? 'Đang duyệt...' : 'Chấp thuận'}
-                    </button>
-                    <button
-                      className="submit-btn"
-                      style={{ width: 140, background: 'linear-gradient(135deg, #dc3545 0%, #fd7e14 100%)' }}
-                      onClick={() => handleReject(req.id)}
-                      disabled={actionLoading === req.id}
-                    >
-                      {actionLoading === req.id ? 'Đang xử lý...' : 'Từ chối'}
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))
-          )}
-        </div>
+      <div style={{ background: 'white', borderRadius: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.08)', padding: 24, marginTop: 24 }}>
+        <Table
+          data={requests}
+          columns={columns}
+          loading={loading}
+          emptyMessage="Chưa có đơn thuốc nào từ phụ huynh."
+        />
       </div>
     </div>
   );

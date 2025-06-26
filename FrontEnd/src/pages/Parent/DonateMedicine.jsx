@@ -15,7 +15,7 @@ const DonateMedicine = () => {
     quantity: '',
     expiryDate: '',
     condition: 'good',
-    description: '',
+    note: '',
     contactPhone: '',
     preferredTime: ''
   });
@@ -86,7 +86,7 @@ const DonateMedicine = () => {
         quantity: '',
         expiryDate: '',
         condition: 'good',
-        description: '',
+        note: '',
         contactPhone: '',
         preferredTime: ''
       });
@@ -281,13 +281,13 @@ const DonateMedicine = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="description">Mô tả chi tiết (liều dùng, thời gian dùng...)</label>
+                <label htmlFor="note">Ghi chú (mô tả/thời gian thuận tiện...)</label>
                 <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
+                  id="note"
+                  name="note"
+                  value={formData.note}
                   onChange={handleInputChange}
-                  placeholder="Mô tả về thuốc, liều dùng, thời gian dùng, lưu ý cho y tế trường..."
+                  placeholder="Ghi chú về thuốc, liều dùng, thời gian dùng, lưu ý cho y tế trường..."
                 />
               </div>
 
