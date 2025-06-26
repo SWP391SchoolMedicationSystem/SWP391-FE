@@ -4,6 +4,7 @@ import {
   useManagerStudents,
   // useManagerActions, // Comment out unused actions for now
 } from "../../utils/hooks/useManager";
+import { managerHealthService } from "../../services/managerService";
 
 function StudentList() {
   // Use API hooks
@@ -20,6 +21,12 @@ function StudentList() {
   const [importError, setImportError] = useState("");
   const [importSuccess, setImportSuccess] = useState("");
   const fileInputRef = useRef(null);
+
+  // Health records state
+  const [showHealthModal, setShowHealthModal] = useState(false);
+  const [healthRecords, setHealthRecords] = useState([]);
+  const [loadingHealthRecords, setLoadingHealthRecords] = useState(false);
+  const [healthRecordsError, setHealthRecordsError] = useState("");
 
   // Available classes for preschool (updated to match API classid)
   const classes = [
@@ -51,6 +58,53 @@ function StudentList() {
   const handleViewStudent = (student) => {
     setCurrentStudent(student);
     setShowModal(true);
+  };
+
+  // Handle viewing student health records
+  const handleViewHealthRecords = async (student) => {
+    setCurrentStudent(student);
+    setShowHealthModal(true);
+    setLoadingHealthRecords(true);
+    setHealthRecordsError("");
+
+    try {
+      console.log("🔍 Fetching health records for student:", student);
+      console.log("🔍 Student ID (numeric):", student.id);
+      console.log("🔍 Student Code (string):", student.studentId);
+
+      // Use the numeric ID (student.id) for API call
+      const studentId = student.id;
+      console.log("🔍 Using student ID for API:", studentId, typeof studentId);
+
+      if (studentId === null || studentId === undefined) {
+        throw new Error("Không tìm thấy ID học sinh");
+      }
+
+      // Special handling for ID = 0 (might be invalid)
+      if (studentId === 0) {
+        console.warn(
+          "⚠️ Student ID is 0, this might be invalid. Trying anyway..."
+        );
+      }
+
+      const records = await managerHealthService.getHealthRecordsByStudent(
+        studentId
+      );
+
+      // Filter out deleted records and map for display
+      const validRecords = records.filter((record) => !record.isdeleted);
+      const mappedRecords = validRecords.map((record) =>
+        managerHealthService.mapHealthRecordData(record)
+      );
+
+      setHealthRecords(mappedRecords);
+      console.log("✅ Health records loaded:", mappedRecords);
+    } catch (error) {
+      console.error("❌ Error loading health records:", error);
+      setHealthRecordsError(`Không thể tải hồ sơ sức khỏe: ${error.message}`);
+    } finally {
+      setLoadingHealthRecords(false);
+    }
   };
 
   // Handle file import
@@ -320,6 +374,13 @@ function StudentList() {
                       >
                         👁️
                       </button>
+                      <button
+                        className="btn-health"
+                        onClick={() => handleViewHealthRecords(student)}
+                        title="Xem hồ sơ sức khỏe"
+                      >
+                        🏥
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -418,6 +479,157 @@ function StudentList() {
                     <span>{currentStudent.notes}</span>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Health Records Modal */}
+      {showHealthModal && currentStudent && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowHealthModal(false)}
+        >
+          <div
+            className="modal-content health-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h3>🏥 Hồ Sơ Sức Khỏe - {currentStudent.fullName}</h3>
+              <button
+                className="modal-close"
+                onClick={() => setShowHealthModal(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-body">
+              {/* Student Info Summary */}
+              <div className="student-summary">
+                <div className="summary-item">
+                  <strong>Mã HS:</strong> {currentStudent.studentId}
+                </div>
+                <div className="summary-item">
+                  <strong>Lớp:</strong> {currentStudent.className}
+                </div>
+                <div className="summary-item">
+                  <strong>Tuổi:</strong> {currentStudent.age} tuổi
+                </div>
+                <div className="summary-item">
+                  <strong>Nhóm máu:</strong> {currentStudent.bloodType}
+                </div>
+              </div>
+
+              {/* Health Records Section */}
+              <div className="health-records-section">
+                <div className="section-header">
+                  <h4>📋 Danh sách hồ sơ y tế</h4>
+                  <div className="records-count">
+                    {healthRecords.length} bản ghi
+                  </div>
+                </div>
+
+                {/* Loading State */}
+                {loadingHealthRecords && (
+                  <div className="loading-state">
+                    <div className="loading-spinner">⏳</div>
+                    <p>Đang tải hồ sơ sức khỏe...</p>
+                  </div>
+                )}
+
+                {/* Error State */}
+                {healthRecordsError && (
+                  <div className="error-state">
+                    <p>❌ {healthRecordsError}</p>
+                    <button
+                      onClick={() => handleViewHealthRecords(currentStudent)}
+                      className="retry-btn"
+                    >
+                      🔄 Thử lại
+                    </button>
+                  </div>
+                )}
+
+                {/* Health Records List */}
+                {!loadingHealthRecords && !healthRecordsError && (
+                  <div className="health-records-list">
+                    {healthRecords.length > 0 ? (
+                      healthRecords.map((record, index) => (
+                        <div
+                          key={`health-${record.id}-${record.studentId}-${index}`}
+                          className="health-record-item"
+                        >
+                          <div className="record-header">
+                            <div className="record-title">
+                              <h5>{record.title}</h5>
+                              <span className="record-date">{record.date}</span>
+                            </div>
+                            <div className="record-status">
+                              <span
+                                className={`status-badge ${
+                                  record.isConfirmed ? "confirmed" : "pending"
+                                }`}
+                              >
+                                {record.isConfirmed
+                                  ? "✅ Đã xác nhận"
+                                  : "⏳ Chờ xác nhận"}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="record-content">
+                            <p className="record-description">
+                              {record.description}
+                            </p>
+
+                            <div className="record-details">
+                              <div className="detail-item">
+                                <strong>Loại:</strong> {record.categoryName}
+                              </div>
+                              {record.staffId && (
+                                <div className="detail-item">
+                                  <strong>Nhân viên:</strong> ID{" "}
+                                  {record.staffId}
+                                </div>
+                              )}
+                              {record.createdBy && (
+                                <div className="detail-item">
+                                  <strong>Tạo bởi:</strong> {record.createdBy}
+                                </div>
+                              )}
+                              {record.modifiedDate && (
+                                <div className="detail-item">
+                                  <strong>Sửa lần cuối:</strong>{" "}
+                                  {record.modifiedDate}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="no-records">
+                        <div className="no-records-icon">📭</div>
+                        <p>Chưa có hồ sơ sức khỏe nào</p>
+                        <small>
+                          Học sinh chưa có bản ghi y tế trong hệ thống
+                        </small>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="modal-actions">
+                <button
+                  className="btn-close"
+                  onClick={() => setShowHealthModal(false)}
+                >
+                  Đóng
+                </button>
               </div>
             </div>
           </div>

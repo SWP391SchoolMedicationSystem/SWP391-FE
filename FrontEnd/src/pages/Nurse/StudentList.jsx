@@ -1,122 +1,11 @@
 import React, { useState } from "react";
 import "../../css/Nurse/StudentList.css";
 import { useNurseStudents } from "../../utils/hooks/useNurse";
+import { nurseHealthService } from "../../services/nurseService";
 
 function StudentList() {
   // Use API hooks
   const { data: students, loading, error, refetch } = useNurseStudents();
-
-  // Mock data for fallback (remove when API is stable)
-  const [mockStudents] = useState([
-    {
-      id: 1,
-      studentId: "MN001",
-      fullName: "Nguyễn Văn An",
-      dateOfBirth: "2020-05-15",
-      gender: "Nam",
-      className: "Mầm",
-      parentName: "Nguyễn Thị Hoa",
-      parentPhone: "0912345678",
-      healthStatus: "Tốt",
-      allergies: "Không",
-      emergencyContact: "Nguyễn Văn Nam - 0987654321",
-      enrollmentDate: "2024-01-15",
-      bloodType: "A+",
-      height: "95cm",
-      weight: "14kg",
-      notes: "Trẻ hoạt bát, thích vận động",
-    },
-    {
-      id: 2,
-      studentId: "MN002",
-      fullName: "Trần Thị Bình",
-      dateOfBirth: "2020-08-22",
-      gender: "Nữ",
-      className: "Chồi",
-      parentName: "Trần Văn Nam",
-      parentPhone: "0923456789",
-      healthStatus: "Bình thường",
-      allergies: "Dị ứng tôm cua",
-      emergencyContact: "Trần Thị Lan - 0976543210",
-      enrollmentDate: "2024-01-20",
-      bloodType: "B+",
-      height: "92cm",
-      weight: "13kg",
-      notes: "Trẻ nhút nhát, cần khuyến khích",
-    },
-    {
-      id: 3,
-      studentId: "MN003",
-      fullName: "Lê Minh Cường",
-      dateOfBirth: "2019-12-10",
-      gender: "Nam",
-      className: "Lá 1",
-      parentName: "Lê Thị Mai",
-      parentPhone: "0934567890",
-      healthStatus: "Tốt",
-      allergies: "Không",
-      emergencyContact: "Lê Văn Cường - 0965432109",
-      enrollmentDate: "2024-01-10",
-      bloodType: "O+",
-      height: "98cm",
-      weight: "15kg",
-      notes: "Trẻ thông minh, ham học hỏi",
-    },
-    {
-      id: 4,
-      studentId: "MN004",
-      fullName: "Phạm Thị Diệu",
-      dateOfBirth: "2019-03-08",
-      gender: "Nữ",
-      className: "Lá 2",
-      parentName: "Phạm Văn Hùng",
-      parentPhone: "0945678901",
-      healthStatus: "Yếu",
-      allergies: "Dị ứng phấn hoa",
-      emergencyContact: "Phạm Thị Hương - 0954321098",
-      enrollmentDate: "2024-02-01",
-      bloodType: "AB+",
-      height: "100cm",
-      weight: "16kg",
-      notes: "Trẻ hay ốm, cần chú ý sức khỏe",
-    },
-    {
-      id: 5,
-      studentId: "MN005",
-      fullName: "Hoàng Văn Em",
-      dateOfBirth: "2019-07-30",
-      gender: "Nam",
-      className: "Lá 3",
-      parentName: "Hoàng Thị Lan",
-      parentPhone: "0956789012",
-      healthStatus: "Bình thường",
-      allergies: "Dị ứng đậu phộng",
-      emergencyContact: "Hoàng Văn Tú - 0943210987",
-      enrollmentDate: "2024-01-25",
-      bloodType: "A-",
-      height: "102cm",
-      weight: "17kg",
-      notes: "Trẻ năng động, thích khám phá",
-    },
-    {
-      id: 6,
-      studentId: "MN006",
-      fullName: "Võ Thị Phượng",
-      dateOfBirth: "2020-11-18",
-      gender: "Nữ",
-      className: "Chồi",
-      parentName: "Võ Văn Giang",
-      parentPhone: "0967890123",
-      healthStatus: "Tốt",
-      allergies: "Không",
-      emergencyContact: "Võ Thị Kim - 0932109876",
-      enrollmentDate: "2024-02-10",
-      bloodType: "B-",
-      height: "90cm",
-      weight: "12kg",
-      notes: "Trẻ ngoan ngoãn, dễ bảo",
-    },
-  ]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterClass, setFilterClass] = useState("");
@@ -125,17 +14,32 @@ function StudentList() {
   const [showModal, setShowModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
+  // Health records states
+  const [showHealthModal, setShowHealthModal] = useState(false);
+  const [selectedStudentForHealth, setSelectedStudentForHealth] =
+    useState(null);
+  const [healthRecords, setHealthRecords] = useState([]);
+  const [loadingHealthRecords, setLoadingHealthRecords] = useState(false);
+  const [healthRecordsError, setHealthRecordsError] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingRecord, setEditingRecord] = useState(null);
+
   // Available options
   const classes = ["Mầm", "Chồi", "Lá 1", "Lá 2", "Lá 3"];
   const genders = ["Nam", "Nữ"];
   const healthStatuses = ["Tốt", "Bình thường", "Yếu"];
 
-  // Use real students or fallback to mock data
-  const studentData = students || mockStudents;
+  // Use real students from API
+  const studentData = students || [];
 
   // Debug API response
-  console.log("API students response:", students);
-  console.log("Using studentData:", studentData);
+  console.log("👥 API students response:", students);
+  console.log("📊 Using studentData:", studentData);
+  console.log("📈 Total students available:", studentData.length);
+
+  if (studentData.length === 0 && !loading) {
+    console.log("⚠️ No students data available - check API connection");
+  }
 
   // Filter students with safety checks
   const filteredStudents = studentData.filter((student) => {
@@ -161,6 +65,121 @@ function StudentList() {
   const handleViewStudent = (student) => {
     setSelectedStudent(student);
     setShowModal(true);
+  };
+
+  const handleViewHealthRecords = async (student) => {
+    console.log("🏥 CLICKED HEALTH RECORDS BUTTON");
+    console.log("📋 Student Object:", student);
+    console.log("🆔 Student ID:", student.id);
+    console.log("👤 Student Name:", student.fullName);
+    console.log("📝 Student Code:", student.studentId);
+
+    setSelectedStudentForHealth(student);
+    setShowHealthModal(true);
+    setLoadingHealthRecords(true);
+    setHealthRecordsError("");
+
+    try {
+      const studentId = student.id;
+      console.log("🔍 Using studentId for API call:", studentId);
+
+      if (!studentId || studentId === 0) {
+        console.error("❌ Invalid student ID:", studentId);
+        throw new Error("Không tìm thấy ID học sinh hợp lệ");
+      }
+
+      const records = await nurseHealthService.getHealthRecordsByStudent(
+        studentId
+      );
+      console.log("📊 API Response - Health Records:", records);
+      console.log("📈 Total records received:", records?.length || 0);
+
+      // Filter out deleted records and format for UI
+      const validRecords = records.filter((record) => !record.isDeleted);
+      console.log("✅ Valid records (not deleted):", validRecords.length);
+
+      const mappedRecords = validRecords.map((record) => ({
+        id: record.id,
+        type: record.categoryName,
+        title: record.title,
+        description: record.description,
+        severity: record.isConfirmed ? "Bình thường" : "Chờ xác nhận",
+        date: record.date,
+        doctor: record.createdBy,
+        medications: [],
+        notes: record.description,
+        status: record.isConfirmed ? "Hoàn thành" : "Đang theo dõi",
+        staffId: record.staffId,
+        categoryId: record.categoryId,
+        modifiedDate: record.modifiedDate,
+      }));
+
+      console.log("🎯 Final mapped records:", mappedRecords);
+      setHealthRecords(mappedRecords);
+    } catch (error) {
+      console.error("❌ Error loading health records:", error);
+      setHealthRecordsError(`Không thể tải hồ sơ sức khỏe: ${error.message}`);
+      setHealthRecords([]);
+    } finally {
+      setLoadingHealthRecords(false);
+    }
+  };
+
+  const handleEditRecord = (record) => {
+    setEditingRecord(record);
+    setShowEditModal(true);
+  };
+
+  const handleAddRecord = () => {
+    setEditingRecord({
+      id: Date.now(),
+      type: "",
+      title: "",
+      description: "",
+      severity: "Nhẹ",
+      date: new Date().toISOString().split("T")[0],
+      doctor: "",
+      medications: [],
+      notes: "",
+      status: "Đang theo dõi",
+    });
+    setShowEditModal(true);
+  };
+
+  const handleSaveRecord = async (recordData) => {
+    try {
+      if (recordData.id === Date.now() || !recordData.title) {
+        // Create new record
+        const createData = {
+          ...recordData,
+          studentId: selectedStudentForHealth.id,
+        };
+        await nurseHealthService.createHealthRecord(createData);
+      } else {
+        // Update existing record
+        await nurseHealthService.updateHealthRecord(recordData.id, recordData);
+      }
+
+      // Refresh health records
+      if (selectedStudentForHealth) {
+        await handleViewHealthRecords(selectedStudentForHealth);
+      }
+      setShowEditModal(false);
+      setEditingRecord(null);
+    } catch (error) {
+      console.error("Error saving record:", error);
+      alert(`Không thể lưu hồ sơ y tế: ${error.message}`);
+    }
+  };
+
+  const getSeverityColor = (severity) => {
+    const colors = {
+      Nhẹ: "#28a745",
+      "Trung bình": "#ffc107",
+      Nặng: "#dc3545",
+      "Bình thường": "#17a2b8",
+    };
+    return colors[severity] || "#6c757d";
   };
 
   const getHealthStatusClass = (status) => {
@@ -372,13 +391,22 @@ function StudentList() {
                   </span>
                 </td>
                 <td>
-                  <button
-                    className="btn-view"
-                    onClick={() => handleViewStudent(student)}
-                    title="Xem chi tiết"
-                  >
-                    👁️
-                  </button>
+                  <div className="action-buttons">
+                    <button
+                      className="btn-view"
+                      onClick={() => handleViewStudent(student)}
+                      title="Xem chi tiết"
+                    >
+                      👁️
+                    </button>
+                    <button
+                      className="btn-health"
+                      onClick={() => handleViewHealthRecords(student)}
+                      title="Hồ sơ sức khỏe"
+                    >
+                      🏥
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -483,6 +511,326 @@ function StudentList() {
                   <span>{selectedStudent.notes}</span>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Health Records Modal */}
+      {showHealthModal && selectedStudentForHealth && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowHealthModal(false)}
+        >
+          <div
+            className="modal-content large-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h3>🏥 Hồ Sơ Sức Khỏe - {selectedStudentForHealth.fullName}</h3>
+              <button
+                className="modal-close"
+                onClick={() => setShowHealthModal(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-body">
+              {/* Student Basic Info */}
+              <div className="student-basic-info">
+                <div className="info-row">
+                  <span>
+                    <strong>Mã học sinh:</strong>{" "}
+                    {selectedStudentForHealth.studentId}
+                  </span>
+                  <span>
+                    <strong>Lớp:</strong> {selectedStudentForHealth.className}
+                  </span>
+                  <span>
+                    <strong>Giới tính:</strong>{" "}
+                    {selectedStudentForHealth.gender}
+                  </span>
+                </div>
+              </div>
+
+              {/* Health Records Section */}
+              <div className="health-records-section">
+                <div className="section-header">
+                  <h4>📋 Danh sách hồ sơ y tế</h4>
+                  <button className="btn-primary" onClick={handleAddRecord}>
+                    ➕ Thêm hồ sơ mới
+                  </button>
+                </div>
+
+                {/* Loading State */}
+                {loadingHealthRecords && (
+                  <div className="loading-state">
+                    <p>⏳ Đang tải hồ sơ y tế...</p>
+                  </div>
+                )}
+
+                {/* Error State */}
+                {healthRecordsError && (
+                  <div className="error-state">
+                    <p>❌ {healthRecordsError}</p>
+                    <button
+                      onClick={() =>
+                        handleViewHealthRecords(selectedStudentForHealth)
+                      }
+                      className="retry-btn"
+                    >
+                      🔄 Thử lại
+                    </button>
+                  </div>
+                )}
+
+                {/* Health Records List */}
+                {!loadingHealthRecords && !healthRecordsError && (
+                  <div className="records-list">
+                    {healthRecords.length > 0 ? (
+                      healthRecords.map((record) => (
+                        <div key={record.id} className="record-item">
+                          <div className="record-header">
+                            <div className="record-title">
+                              <h5>{record.title}</h5>
+                              <span className="record-type">{record.type}</span>
+                            </div>
+                            <div className="record-meta">
+                              <span
+                                className="severity-badge"
+                                style={{
+                                  backgroundColor: getSeverityColor(
+                                    record.severity
+                                  ),
+                                }}
+                              >
+                                {record.severity}
+                              </span>
+                              <span className="record-date">{record.date}</span>
+                            </div>
+                          </div>
+
+                          <div className="record-content">
+                            <p>
+                              <strong>Mô tả:</strong> {record.description}
+                            </p>
+                            <p>
+                              <strong>Bác sĩ/Nhân viên:</strong> {record.doctor}
+                            </p>
+                            {record.medications.length > 0 && (
+                              <p>
+                                <strong>Thuốc:</strong>{" "}
+                                {record.medications.join(", ")}
+                              </p>
+                            )}
+                            <p>
+                              <strong>Ghi chú:</strong> {record.notes}
+                            </p>
+                            <p>
+                              <strong>Trạng thái:</strong> {record.status}
+                            </p>
+                          </div>
+
+                          <div className="record-actions">
+                            <button
+                              className="edit-btn"
+                              onClick={() => handleEditRecord(record)}
+                            >
+                              ✏️ Sửa
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="no-records">
+                        <div className="no-records-icon">📭</div>
+                        <p>Chưa có hồ sơ y tế nào</p>
+                        <small>
+                          Học sinh chưa có bản ghi y tế trong hệ thống
+                        </small>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Record Modal */}
+      {showEditModal && editingRecord && (
+        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>
+                {editingRecord.id === Date.now() || !editingRecord.title
+                  ? "➕ Thêm hồ sơ mới"
+                  : "✏️ Sửa hồ sơ"}
+              </h3>
+              <button
+                className="modal-close"
+                onClick={() => setShowEditModal(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSaveRecord(editingRecord);
+                }}
+              >
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>Loại hồ sơ</label>
+                    <select
+                      value={editingRecord.type}
+                      onChange={(e) =>
+                        setEditingRecord({
+                          ...editingRecord,
+                          type: e.target.value,
+                        })
+                      }
+                      required
+                    >
+                      <option value="">Chọn loại</option>
+                      <option value="Khám định kỳ">Khám định kỳ</option>
+                      <option value="Dị ứng">Dị ứng</option>
+                      <option value="Bệnh mãn tính">Bệnh mãn tính</option>
+                      <option value="Vấn đề sức khỏe">Vấn đề sức khỏe</option>
+                      <option value="Vấn đề phát triển">
+                        Vấn đề phát triển
+                      </option>
+                      <option value="Vấn đề hành vi">Vấn đề hành vi</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Tiêu đề</label>
+                    <input
+                      type="text"
+                      value={editingRecord.title}
+                      onChange={(e) =>
+                        setEditingRecord({
+                          ...editingRecord,
+                          title: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Mức độ nghiêm trọng</label>
+                    <select
+                      value={editingRecord.severity}
+                      onChange={(e) =>
+                        setEditingRecord({
+                          ...editingRecord,
+                          severity: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="Nhẹ">Nhẹ</option>
+                      <option value="Trung bình">Trung bình</option>
+                      <option value="Nặng">Nặng</option>
+                      <option value="Bình thường">Bình thường</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Ngày</label>
+                    <input
+                      type="date"
+                      value={editingRecord.date}
+                      onChange={(e) =>
+                        setEditingRecord({
+                          ...editingRecord,
+                          date: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group full-width">
+                    <label>Mô tả</label>
+                    <textarea
+                      value={editingRecord.description}
+                      onChange={(e) =>
+                        setEditingRecord({
+                          ...editingRecord,
+                          description: e.target.value,
+                        })
+                      }
+                      rows="3"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Bác sĩ/Nhân viên</label>
+                    <input
+                      type="text"
+                      value={editingRecord.doctor}
+                      onChange={(e) =>
+                        setEditingRecord({
+                          ...editingRecord,
+                          doctor: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Trạng thái</label>
+                    <select
+                      value={editingRecord.status}
+                      onChange={(e) =>
+                        setEditingRecord({
+                          ...editingRecord,
+                          status: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="Đang theo dõi">Đang theo dõi</option>
+                      <option value="Hoàn thành">Hoàn thành</option>
+                      <option value="Cần xử lý">Cần xử lý</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group full-width">
+                    <label>Ghi chú</label>
+                    <textarea
+                      value={editingRecord.notes}
+                      onChange={(e) =>
+                        setEditingRecord({
+                          ...editingRecord,
+                          notes: e.target.value,
+                        })
+                      }
+                      rows="2"
+                    />
+                  </div>
+                </div>
+
+                <div className="modal-actions">
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() => setShowEditModal(false)}
+                  >
+                    Hủy
+                  </button>
+                  <button type="submit" className="btn-primary">
+                    Lưu
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

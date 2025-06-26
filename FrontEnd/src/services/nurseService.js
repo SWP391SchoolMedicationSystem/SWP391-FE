@@ -16,16 +16,58 @@ export const nurseHealthService = {
   // Get health records by student ID
   getHealthRecordsByStudent: async (studentId) => {
     try {
-      const url = buildApiUrl(
-        API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT,
-        studentId
-      );
+      const url = `${API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT}?studentId=${studentId}`;
       const response = await apiClient.get(url);
-      return response;
+      const records = Array.isArray(response) ? response : [];
+      return records.map(nurseHealthService.mapHealthRecordData);
     } catch (error) {
       console.error("Error getting health records by student:", error);
-      throw error;
+      return [];
     }
+  },
+
+  // Map health record data for display
+  mapHealthRecordData: (apiRecord) => {
+    const getCategoryName = (categoryId) => {
+      const categories = {
+        1: "Khám tổng quát",
+        2: "Dị ứng",
+        3: "Tiêm chủng",
+        4: "Khám định kỳ",
+        5: "Tai nạn/Chấn thương",
+        6: "Khác",
+      };
+      return categories[categoryId] || `Danh mục ${categoryId}`;
+    };
+
+    return {
+      id: apiRecord.healthrecordid || apiRecord.id,
+      studentId: apiRecord.studentid,
+      categoryId: apiRecord.healthcategoryid,
+      categoryName: getCategoryName(apiRecord.healthcategoryid),
+      date: apiRecord.healthrecorddate
+        ? new Date(apiRecord.healthrecorddate).toLocaleDateString("vi-VN", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : "Chưa có ngày",
+      title: apiRecord.healthrecordtitle || "Chưa có tiêu đề",
+      description: apiRecord.healthrecorddescription || "Chưa có mô tả",
+      staffId: apiRecord.staffid,
+      isConfirmed: apiRecord.isconfirm || false,
+      createdBy: apiRecord.createdby || "Hệ thống",
+      createdDate: apiRecord.createddate
+        ? new Date(apiRecord.createddate).toLocaleDateString("vi-VN")
+        : null,
+      modifiedBy: apiRecord.modifiedby,
+      modifiedDate: apiRecord.modifieddate
+        ? new Date(apiRecord.modifieddate).toLocaleDateString("vi-VN")
+        : null,
+      isDeleted: apiRecord.isdeleted || false,
+    };
   },
 
   // Create new health record
@@ -148,9 +190,11 @@ export const nurseBlogService = {
 
 // Data mapping function for student data
 const mapStudentDataForNurse = (apiStudent) => {
+  console.log("🔄 Mapping API student data:", apiStudent);
+
   return {
-    id: apiStudent.studentid,
-    studentId: apiStudent.studentCode || `ST${apiStudent.studentid}`,
+    id: apiStudent.studentId, // Sử dụng studentId từ API (uppercase)
+    studentId: apiStudent.studentCode || `ST${apiStudent.studentId}`,
     fullName: apiStudent.fullname,
     dateOfBirth: apiStudent.dob,
     age: apiStudent.age,
@@ -159,14 +203,14 @@ const mapStudentDataForNurse = (apiStudent) => {
     classId: apiStudent.classid,
     parentId: apiStudent.parentid,
     className: `Lớp ${apiStudent.classid}`,
-    parentName: "Chưa có thông tin", // API doesn't return parent info
-    parentPhone: "Chưa có thông tin",
-    healthStatus: "Bình thường", // Default value
+    parentName: apiStudent.listparent?.[0]?.fullname || "Chưa có thông tin",
+    parentPhone: apiStudent.listparent?.[0]?.phone || "Chưa có thông tin",
+    healthStatus: "Bình thường",
     enrollmentDate: apiStudent.createdAt
       ? apiStudent.createdAt.split("T")[0]
       : "Chưa có thông tin",
     allergies: "Chưa có thông tin",
-    emergencyContact: "Chưa có thông tin",
+    emergencyContact: apiStudent.listparent?.[0]?.phone || "Chưa có thông tin",
     height: "Chưa có thông tin",
     weight: "Chưa có thông tin",
     notes: "Chưa có thông tin",
@@ -178,14 +222,21 @@ export const nurseStudentService = {
   // Get all students
   getAllStudents: async () => {
     try {
+      console.log("🌐 Calling API:", API_ENDPOINTS.STUDENT.GET_ALL);
       const response = await apiClient.get(API_ENDPOINTS.STUDENT.GET_ALL);
-      // Transform API response to match component expected structure
+      console.log("📥 Raw API response:", response);
+      console.log("📊 Response is array?", Array.isArray(response));
+      console.log("📈 Response length:", response?.length);
+
       if (Array.isArray(response)) {
-        return response.map(mapStudentDataForNurse);
+        const mappedData = response.map(mapStudentDataForNurse);
+        console.log("✅ Mapped student data:", mappedData);
+        return mappedData;
       }
+      console.log("⚠️ Response is not an array, returning empty array");
       return [];
     } catch (error) {
-      console.error("Error getting all students:", error);
+      console.error("❌ Error getting all students:", error);
       throw error;
     }
   },

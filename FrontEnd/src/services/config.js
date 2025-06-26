@@ -128,10 +128,11 @@ export const API_ENDPOINTS = {
     REGISTER: "/Staff/registration", // POST register staff
   },
 
-  // Student (6/6 - all endpoints needed)
+  // Student (7/7 - all endpoints needed)
   STUDENT: {
     GET_ALL: "/Student/GetAllStudents", // Manager/Nurse student list
     GET_BY_ID: "/Student/GetStudentById", // Get student details
+    GET_BY_PARENT: "/Student/GetStudentByParentId/{parentId}", // Get children by parent ID
     ADD: "/Student/AddStudent", // Add single student
     BULK_ADD: "/Student/student", // Bulk import students
     UPDATE: "/Student/UpdateStudent", // Update student
@@ -139,10 +140,16 @@ export const API_ENDPOINTS = {
   },
 };
 
-// Helper function to build URL with ID
+// Helper function to build URL with ID or parameters
 export const buildApiUrl = (endpoint, id = null) => {
   if (id && endpoint.includes("{id}")) {
     return endpoint.replace("{id}", id);
+  }
+  if (id && endpoint.includes("{parentId}")) {
+    return endpoint.replace("{parentId}", id);
+  }
+  if (id && endpoint.includes("{studentId}")) {
+    return `${endpoint}?studentId=${id}`;
   }
   return id ? `${endpoint}/${id}` : endpoint;
 };

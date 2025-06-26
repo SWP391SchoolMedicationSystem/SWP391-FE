@@ -9,7 +9,7 @@ function Blog() {
     createBlog,
     updateBlog,
     deleteBlog,
-    loading: actionLoading,
+    // loading: actionLoading,
   } = useNurseActions();
 
   // Mock blog data - remove this when API is working

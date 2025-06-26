@@ -31,7 +31,7 @@ import HandleMedicine from "./pages/Nurse/HandleMedicine";
 import NurseStudentList from "./pages/Nurse/StudentList";
 import NurseBlog from "./pages/Nurse/Blog";
 import ChatWithParents from "./pages/Nurse/ChatWithParents";
-import StudentHealthRecord from "./pages/Nurse/StudentHealthRecord";
+
 import NurseNotifications from "./pages/Nurse/Notifications";
 
 // Parent imports
@@ -103,7 +103,7 @@ function App() {
           <Route path="student-list" element={<NurseStudentList />} />
           <Route path="blog" element={<NurseBlog />} />
           <Route path="chat" element={<ChatWithParents />} />
-          <Route path="health-records" element={<StudentHealthRecord />} />
+
           <Route path="notifications" element={<NurseNotifications />} />
         </Route>
 
@@ -124,7 +124,10 @@ function App() {
           <Route path="consultation" element={<Consultation />} />
           <Route path="chat-nurse" element={<ChatWithNurse />} />
           <Route path="health-records" element={<ManageHealthRecords />} />
-          <Route path="manage-health-records" element={<ManageHealthRecords />} />
+          <Route
+            path="manage-health-records"
+            element={<ManageHealthRecords />}
+          />
           <Route path="update-profile" element={<UpdateProfile />} />
         </Route>
       </Routes>
