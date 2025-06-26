@@ -146,7 +146,7 @@ const ViewStudentMedicine = () => {
           <p>Xem, kiểm tra và duyệt các đơn thuốc phụ huynh gửi cho học sinh</p>
         </div>
       </div>
-      <div style={{ background: 'white', borderRadius: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.08)', padding: 24, marginTop: 24 }}>
+      <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.08)', padding: 24, marginTop: 24 }}>
         <Table
           data={requests}
           columns={columns}
