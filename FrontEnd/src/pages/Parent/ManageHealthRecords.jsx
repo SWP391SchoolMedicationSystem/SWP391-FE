@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../../css/Parent/ManageHealthRecords.css";
 import apiClient from "../../services/config";
+import { parentService } from "../../services/parentService";
 
 function ManageHealthRecords() {
   const [children, setChildren] = useState([]);
@@ -13,6 +14,15 @@ function ManageHealthRecords() {
   const [healthRecords, setHealthRecords] = useState([]);
   const [loadingHealthRecords, setLoadingHealthRecords] = useState(false);
   const [healthRecordsError, setHealthRecordsError] = useState("");
+
+  // Edit health record states
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingRecord, setEditingRecord] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    title: "",
+    description: "",
+    categoryId: 1,
+  });
 
   useEffect(() => {
     fetchMyChildren();
@@ -131,6 +141,57 @@ function ManageHealthRecords() {
       6: "Khác",
     };
     return categories[categoryId] || `Danh mục ${categoryId}`;
+  };
+
+  // Handle edit health record
+  const handleEditRecord = (record) => {
+    console.log("✏️ Editing record:", record);
+    setEditingRecord(record);
+    setEditFormData({
+      title: record.title,
+      description: record.description,
+      categoryId: record.categoryId,
+    });
+    setShowEditModal(true);
+  };
+
+  // Handle save edited record
+  const handleSaveEditedRecord = async () => {
+    if (!editingRecord) return;
+
+    try {
+      const recordData = {
+        healthrecordtitle: editFormData.title,
+        healthrecorddescription: editFormData.description,
+        healthcategoryid: editFormData.categoryId,
+      };
+
+      console.log("💾 Saving record with data:", recordData);
+      await parentService.updateHealthRecord(editingRecord.id, recordData);
+
+      // Refresh health records
+      await handleViewHealthRecords(selectedChild);
+
+      // Close modal
+      setShowEditModal(false);
+      setEditingRecord(null);
+
+      alert("Cập nhật hồ sơ sức khỏe thành công!");
+    } catch (error) {
+      console.error("Error updating health record:", error);
+      alert("Có lỗi xảy ra khi cập nhật hồ sơ sức khỏe!");
+    }
+  };
+
+  // Handle cancel edit
+  const handleCancelEdit = () => {
+    setShowEditModal(false);
+    setEditingRecord(null);
+    setEditFormData({
+      title: "",
+      description: "",
+      categoryId: 1,
+    });
   };
 
   if (loading) {
@@ -321,14 +382,23 @@ function ManageHealthRecords() {
                             <p>{record.description}</p>
 
                             <div className="record-footer">
-                              <span className="created-by">
-                                Tạo bởi: {record.createdBy}
-                              </span>
-                              {record.modifiedDate && (
-                                <span className="modified-date">
-                                  Cập nhật: {record.modifiedDate}
+                              <div className="record-meta-info">
+                                <span className="created-by">
+                                  Tạo bởi: {record.createdBy}
                                 </span>
-                              )}
+                                {record.modifiedDate && (
+                                  <span className="modified-date">
+                                    Cập nhật: {record.modifiedDate}
+                                  </span>
+                                )}
+                              </div>
+                              <button
+                                className="edit-record-btn"
+                                onClick={() => handleEditRecord(record)}
+                                title="Chỉnh sửa hồ sơ"
+                              >
+                                ✏️ Chỉnh sửa
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -342,6 +412,89 @@ function ManageHealthRecords() {
                     )}
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Health Record Modal */}
+      {showEditModal && editingRecord && (
+        <div className="modal-overlay" onClick={handleCancelEdit}>
+          <div
+            className="modal-content edit-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h3>✏️ Chỉnh sửa hồ sơ sức khỏe</h3>
+              <button className="modal-close" onClick={handleCancelEdit}>
+                ×
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <div className="edit-form">
+                <div className="form-group">
+                  <label htmlFor="edit-title">Tiêu đề:</label>
+                  <input
+                    type="text"
+                    id="edit-title"
+                    value={editFormData.title}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        title: e.target.value,
+                      })
+                    }
+                    placeholder="Nhập tiêu đề hồ sơ"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="edit-category">Danh mục:</label>
+                  <select
+                    id="edit-category"
+                    value={editFormData.categoryId}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        categoryId: parseInt(e.target.value),
+                      })
+                    }
+                  >
+                    <option value={1}>Khám tổng quát</option>
+                    <option value={2}>Dị ứng</option>
+                    <option value={3}>Tiêm chủng</option>
+                    <option value={4}>Khám định kỳ</option>
+                    <option value={5}>Tai nạn/Chấn thương</option>
+                    <option value={6}>Khác</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="edit-description">Mô tả:</label>
+                  <textarea
+                    id="edit-description"
+                    value={editFormData.description}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        description: e.target.value,
+                      })
+                    }
+                    placeholder="Nhập mô tả chi tiết"
+                    rows={4}
+                  />
+                </div>
+
+                <div className="form-actions">
+                  <button className="cancel-btn" onClick={handleCancelEdit}>
+                    ❌ Hủy
+                  </button>
+                  <button className="save-btn" onClick={handleSaveEditedRecord}>
+                    ✅ Lưu thay đổi
+                  </button>
+                </div>
               </div>
             </div>
           </div>

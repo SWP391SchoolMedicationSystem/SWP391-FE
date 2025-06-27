@@ -54,11 +54,7 @@ const navItems = [
   { to: "/nurse/blog", label: "Blog", icon: <Article /> },
   { to: "/nurse/chat", label: "Chat Phụ Huynh", icon: <Chat /> },
   { to: "/nurse/student-list", label: "Danh Sách Học Sinh", icon: <People /> },
-  {
-    to: "/nurse/health-records",
-    label: "Hồ Sơ Sức Khỏe",
-    icon: <Assignment />,
-  },
+    
   {
     to: "/nurse/notifications",
     label: "Thông Báo",

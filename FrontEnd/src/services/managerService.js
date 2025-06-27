@@ -1,7 +1,22 @@
 import apiClient, { API_ENDPOINTS, buildApiUrl } from "./config.js";
 
+// Helper function to convert classid to className for Manager
+const getClassNameFromId = (classid) => {
+  const classMap = {
+    1: "Lớp 1",
+    2: "Lớp 2",
+    3: "Lớp 3",
+    4: "Lớp 4",
+    5: "Lớp 5",
+  };
+  return classMap[classid] || `Lớp ${classid}`;
+};
+
 // Data mapping functions
 const mapStudentData = (apiStudent) => {
+  console.log("🔄 Manager mapping API student data:", apiStudent);
+  console.log("📋 classid from API:", apiStudent.classid);
+
   // Extract parent information if available
   const firstParent =
     apiStudent.listparent && apiStudent.listparent.length > 0
@@ -18,7 +33,7 @@ const mapStudentData = (apiStudent) => {
     bloodType: apiStudent.bloodType,
     classId: apiStudent.classid,
     parentId: apiStudent.parentid,
-    className: `Lớp ${apiStudent.classid}`, // Map classid to className for now
+    className: getClassNameFromId(apiStudent.classid),
     parentName: firstParent ? firstParent.fullname : "Chưa có thông tin",
     parentPhone: firstParent ? firstParent.phone : "Chưa có thông tin",
     parentEmail: firstParent ? firstParent.email : "Chưa có thông tin",

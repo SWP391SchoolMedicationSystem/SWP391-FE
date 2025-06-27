@@ -188,6 +188,18 @@ export const nurseBlogService = {
   },
 };
 
+// Helper function to convert classid to className
+const getClassNameFromId = (classid) => {
+  const classMap = {
+    1: "Mầm",
+    2: "Chồi",
+    3: "Lá 1",
+    4: "Lá 2",
+    5: "Lá 3",
+  };
+  return classMap[classid] || `Lớp ${classid}`;
+};
+
 // Data mapping function for student data
 const mapStudentDataForNurse = (apiStudent) => {
   console.log("🔄 Mapping API student data:", apiStudent);
@@ -202,7 +214,7 @@ const mapStudentDataForNurse = (apiStudent) => {
     bloodType: apiStudent.bloodType || "Chưa có thông tin",
     classId: apiStudent.classid,
     parentId: apiStudent.parentid,
-    className: `Lớp ${apiStudent.classid}`,
+    className: getClassNameFromId(apiStudent.classid),
     parentName: apiStudent.listparent?.[0]?.fullname || "Chưa có thông tin",
     parentPhone: apiStudent.listparent?.[0]?.phone || "Chưa có thông tin",
     healthStatus: "Bình thường",

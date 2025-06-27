@@ -55,6 +55,24 @@ export const parentService = {
     }
   },
 
+  // Update health record
+  updateHealthRecord: async (recordId, recordData) => {
+    try {
+      const url = `${API_ENDPOINTS.HEALTH_RECORD.UPDATE}?id=${recordId}`;
+      console.log("🌐 Calling Update Health Record API:", url);
+      console.log("📝 Record ID:", recordId);
+      console.log("📊 Update data:", recordData);
+
+      const response = await apiClient.put(url, recordData);
+      console.log("✅ Health record updated successfully:", response);
+
+      return response;
+    } catch (error) {
+      console.error("❌ Error updating health record:", error);
+      throw error;
+    }
+  },
+
   // Map health record data for display
   mapHealthRecordData: (apiRecord) => {
     const getCategoryName = (categoryId) => {

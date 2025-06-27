@@ -28,14 +28,14 @@ function StudentList() {
   const [loadingHealthRecords, setLoadingHealthRecords] = useState(false);
   const [healthRecordsError, setHealthRecordsError] = useState("");
 
-  // Available classes for preschool (updated to match API classid)
+  // Available classes for preschool (updated to match className)
   const classes = [
     { value: "", label: "Tất cả lớp" },
-    { value: "1", label: "Lớp 1" },
-    { value: "2", label: "Lớp 2" },
-    { value: "3", label: "Lớp 3" },
-    { value: "4", label: "Lớp 4" },
-    { value: "5", label: "Lớp 5" },
+    { value: "Lớp 1", label: "Lớp 1" },
+    { value: "Lớp 2", label: "Lớp 2" },
+    { value: "Lớp 3", label: "Lớp 3" },
+    { value: "Lớp 4", label: "Lớp 4" },
+    { value: "Lớp 5", label: "Lớp 5" },
   ];
 
   // API endpoint - để trống theo yêu cầu
@@ -49,7 +49,7 @@ function StudentList() {
           student.studentId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           student.parentName?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesClass =
-          filterClass === "" || student.classId?.toString() === filterClass;
+          filterClass === "" || student.className === filterClass;
         return matchesSearch && matchesClass;
       })
     : [];
