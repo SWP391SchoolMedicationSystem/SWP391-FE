@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { submitDonation, getDonationHistory } from '../../services/parentService';
 import '../../css/Parent/DonateMedicine.css';
-import apiClient from '../../services/config';
-
-const GET_ALL_STUDENTS_API = 'https://api-schoolhealth.purintech.id.vn/api/Student/GetAllStudents';
+import apiClient, { API_ENDPOINTS } from '../../services/config';
 
 const DonateMedicine = () => {
   const navigate = useNavigate();
@@ -35,17 +33,69 @@ const DonateMedicine = () => {
     try {
       const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
       const parentId = userInfo.userId;
-      const res = await apiClient.get(GET_ALL_STUDENTS_API);
+      
+      console.log('User Info:', userInfo);
+      console.log('Parent ID:', parentId);
+      
+      if (!parentId) {
+        setMessage({ type: 'error', text: 'Không tìm thấy thông tin phụ huynh. Vui lòng đăng nhập lại.' });
+        setStudents([]);
+        return;
+      }
+      
+      const res = await apiClient.get(API_ENDPOINTS.STUDENT.GET_ALL);
+      console.log('API Response:', res);
+      console.log('Is Array:', Array.isArray(res));
+      
+      // Check if response is wrapped in data property
+      const studentData = Array.isArray(res) ? res : (Array.isArray(res.data) ? res.data : []);
+      
+      if (studentData.length === 0) {
+        setMessage({ type: 'info', text: 'Không tìm thấy học sinh nào trong hệ thống.' });
+        setStudents([]);
+        return;
+      }
+      
       // Lọc học sinh theo parentId
-      const filtered = Array.isArray(res)
-        ? res.filter(stu => String(stu.parentid) === String(parentId))
-        : [];
-      setStudents(filtered.map(stu => ({
-        id: stu.studentid,
-        name: stu.fullname,
-        class: stu.classid || '---'
-      })));
+      const filtered = studentData.filter(stu => {
+        console.log('Student:', stu, 'Parent ID from student:', stu.parentid, 'Parent ID from user:', parentId);
+        // Try multiple possible field names for parentId
+        const studentParentId = stu.parentid || stu.parentId || stu.parent_id || stu.ParentId;
+        return String(studentParentId) === String(parentId);
+      });
+      
+      console.log('Filtered students:', filtered);
+      
+      if (filtered.length === 0) {
+        setMessage({ type: 'info', text: 'Không tìm thấy học sinh nào thuộc tài khoản phụ huynh này.' });
+        setStudents([]);
+        return;
+      }
+      
+      const mappedStudents = filtered.map(stu => ({
+        id: stu.studentid || stu.studentId || stu.id,
+        name: stu.fullname || stu.fullName || stu.name || 'Không có tên',
+        class: stu.classid || stu.classId || stu.className || '---'
+      }));
+      
+      console.log('Mapped students:', mappedStudents);
+      setStudents(mappedStudents);
+      
+      // Clear any previous error messages
+      if (message.type === 'error' || message.type === 'info') {
+        setMessage({ type: '', text: '' });
+      }
     } catch (err) {
+      console.error('Error fetching students:', err);
+      if (err.response?.status === 401) {
+        setMessage({ type: 'error', text: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.' });
+      } else if (err.response?.status === 403) {
+        setMessage({ type: 'error', text: 'Không có quyền truy cập danh sách học sinh.' });
+      } else if (err.response?.status >= 500) {
+        setMessage({ type: 'error', text: 'Lỗi máy chủ. Vui lòng thử lại sau.' });
+      } else {
+        setMessage({ type: 'error', text: 'Không thể tải danh sách học sinh: ' + (err.message || 'Lỗi không xác định') });
+      }
       setStudents([]);
     }
   };
