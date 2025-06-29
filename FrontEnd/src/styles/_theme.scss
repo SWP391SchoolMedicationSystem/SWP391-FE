@@ -1,0 +1,71 @@
+/* --- Google Font Import --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* --- Theme Variables --- */
+:root {
+  /* Font */
+  --font-family-sans: 'Inter', sans-serif;
+
+  /* Colors */
+  --color-background: #F7F8FA; /* Light Gray BG */
+  --color-card-bg: #FFFFFF;    /* White for cards */
+  
+  --color-primary-dark: #0A3D2A;
+  --color-primary-main: #1D7953;
+  --color-primary-light: #29A364;
+  --color-primary-gradient: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary-light) 100%);
+
+  --color-text-primary: #1D2939;    /* For headings and important text */
+  --color-text-secondary: #667085; /* For body text, descriptions */
+  --color-text-sidebar: #475467;    /* Light green/gray for sidebar text */
+  --color-text-white: #FFFFFF;
+
+  --color-border: #EAECF0;
+  --color-input-bg: #FFFFFF;
+
+  /* Status Colors */
+  --status-success-bg: #D1FADF;
+  --status-success-text: #027A48;
+  --status-warning-bg: #FEF0C7;
+  --status-warning-text: #B54708;
+  --status-error-bg: #FEE4E2;
+  --status-error-text: #B42318;
+  --status-info-bg: #D1E9FF;
+  --status-info-text: #175CD3;
+
+  /* Component Styles */
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --box-shadow-card: 0px 4px -8px -2px rgba(29, 41, 57, 0.05), 0px 2px 4px -2px rgba(29, 41, 57, 0.06);
+  --box-shadow-button: 0px 1px 2px rgba(16, 24, 40, 0.05);
+
+  /* Transitions */
+  --transition-fast: all 0.2s ease-in-out;
+}
+
+/* --- Base Styles --- */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family-sans);
+  background-color: var(--color-background);
+  color: var(--color-text-secondary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+a {
+  color: var(--color-primary-main);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-dark);
+} 

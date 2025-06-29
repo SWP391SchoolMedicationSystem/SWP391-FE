@@ -19,9 +19,6 @@ function ViewBlog() {
     b.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const featuredBlogs = filteredBlogs.slice(0, 3);
-  const otherBlogs = filteredBlogs.slice(3);
-
   const getCategoryName = (category) => {
     const cat = categories.find((c) => c.id === category);
     return cat ? cat.name : category;
@@ -60,31 +57,6 @@ function ViewBlog() {
         </div>
       </div>
 
-      {/* Featured Section */}
-      {!loading && !error && featuredBlogs.length > 0 && (
-        <div className="featured-section">
-          <h3>🌟 Bài viết nổi bật</h3>
-          <div className="featured-articles">
-            {featuredBlogs.map((blog) => (
-              <div
-                key={blog.id}
-                className="featured-article"
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              >
-                <div className="featured-meta">
-                  <span className="featured-category">
-                    {getCategoryName(blog.category)}
-                  </span>
-                  <span>📅 {blog.date || blog.createdDate}</span>
-                </div>
-                <h4>{blog.title}</h4>
-                <p>{blog.excerpt || blog.content?.substring(0, 120) + "..."}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Loading State */}
       {loading && (
         <div className="loading-state">
@@ -112,13 +84,16 @@ function ViewBlog() {
         </div>
       )}
 
-      {/* Blog Grid */}
-      {!loading && !error && otherBlogs.length > 0 && (
+      {/* Blog Grid - Combined Featured & All Posts */}
+      {!loading && !error && filteredBlogs.length > 0 && (
         <div className="blog-section">
           <h3>📰 Tất cả bài viết</h3>
           <div className="blog-grid">
-            {otherBlogs.map((blog) => (
-              <div key={blog.id} className="blog-card">
+            {filteredBlogs.map((blog, index) => (
+              <div
+                key={blog.id}
+                className={`blog-card ${index < 3 ? "featured-post" : ""}`}
+              >
                 <div className="blog-image">
                   <div className="image-placeholder">📷</div>
                   <div
@@ -127,6 +102,9 @@ function ViewBlog() {
                   >
                     {getCategoryName(blog.category)}
                   </div>
+                  {index < 3 && (
+                    <div className="featured-badge">🌟 Nổi bật</div>
+                  )}
                 </div>
 
                 <div className="blog-content">

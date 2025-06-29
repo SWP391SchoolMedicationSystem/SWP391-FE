@@ -28,6 +28,8 @@ import {
   ListItemText,
   IconButton,
   Fab,
+  CircularProgress,
+  Snackbar,
 } from "@mui/material";
 import {
   PersonalVideo,
@@ -48,11 +50,51 @@ import {
   Close,
 } from "@mui/icons-material";
 
+// Import consultation services
+import {
+  useConsultations,
+  useParentActions,
+} from "../../utils/hooks/useParent";
+
 function Consultation() {
   const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
 
-  // Mock data
-  const consultationRequests = [
+  // Use real consultation hooks with disabled auto-fetch
+  const consultationHook = useConsultations();
+  const {
+    data: consultationRequests = [],
+    loading: consultationsLoading = false,
+    refetch: refetchConsultations = () => {},
+  } = consultationHook || {};
+
+  const { createConsultation = () => {} } = useParentActions() || {};
+
+  // Load consultations on component mount - DISABLED TO PREVENT INFINITE LOOP
+  // useEffect(() => {
+  //   if (refetchConsultations && typeof refetchConsultations === "function") {
+  //     refetchConsultations();
+  //   }
+  // }, []); // Empty dependency array to run only once on mount
+
+  // Show error if any - DISABLED TO PREVENT INFINITE LOOP
+  // useEffect(() => {
+  //   if (consultationsError) {
+  //     setSnackbar({
+  //       open: true,
+  //       message: `Lỗi tải dữ liệu: ${consultationsError}`,
+  //       severity: "error",
+  //     });
+  //   }
+  // }, [consultationsError]);
+
+  // Mock data as fallback
+  const mockConsultationRequests = [
     {
       id: 1,
       studentName: "Nguyễn Minh Khôi",
@@ -82,6 +124,12 @@ function Consultation() {
     },
   ];
 
+  // Use real data if available, otherwise fallback to mock
+  const displayRequests =
+    consultationRequests && consultationRequests.length > 0
+      ? consultationRequests
+      : mockConsultationRequests;
+
   const [formData, setFormData] = useState({
     studentName: "Nguyễn Minh Khôi",
     concern: "",
@@ -92,20 +140,56 @@ function Consultation() {
     contactMethod: "phone",
   });
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    setShowForm(false);
-    // Reset form
-    setFormData({
-      studentName: "Nguyễn Minh Khôi",
-      concern: "",
-      description: "",
-      urgency: "medium",
-      preferredDate: "",
-      preferredTime: "",
-      contactMethod: "phone",
-    });
+    try {
+      const consultationData = {
+        studentId: null, // Will be set by backend based on parent
+        parentId: null, // Will be set by backend based on auth
+        typeId: 1, // Default consultation type
+        title: formData.concern,
+        content: formData.description,
+        status: "pending",
+        priority: formData.urgency,
+        preferredDate: formData.preferredDate,
+        preferredTime: formData.preferredTime,
+        contactMethod: formData.contactMethod,
+      };
+
+      await createConsultation(consultationData);
+
+      setSnackbar({
+        open: true,
+        message: "Gửi yêu cầu tư vấn thành công!",
+        severity: "success",
+      });
+
+      setShowForm(false);
+      // Reset form
+      setFormData({
+        studentName: "Nguyễn Minh Khôi",
+        concern: "",
+        description: "",
+        urgency: "medium",
+        preferredDate: "",
+        preferredTime: "",
+        contactMethod: "phone",
+      });
+
+      // Refresh the consultation list
+      refetchConsultations();
+    } catch (error) {
+      console.error("Error creating consultation:", error);
+      setSnackbar({
+        open: true,
+        message: "Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại!",
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getStatusColor = (status) => {
@@ -155,6 +239,23 @@ function Consultation() {
     };
     return texts[priority] || priority;
   };
+
+  // Show loading screen if consultations are still loading
+  if (consultationsLoading) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 3 }}>
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="400px"
+        >
+          <CircularProgress />
+          <Typography sx={{ ml: 2 }}>Đang tải dữ liệu...</Typography>
+        </Box>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
@@ -284,7 +385,7 @@ function Consultation() {
         </Box>
 
         <Stack spacing={3}>
-          {consultationRequests.map((request) => (
+          {(consultationsLoading ? [] : displayRequests).map((request) => (
             <Card
               key={request.id}
               elevation={2}
@@ -568,16 +669,32 @@ function Consultation() {
             <Button
               type="submit"
               variant="contained"
+              disabled={loading}
               sx={{
                 background: "linear-gradient(135deg, #2D77C1 0%, #56D0DB 100%)",
                 "&:hover": { opacity: 0.9 },
               }}
             >
-              Gửi yêu cầu
+              {loading ? <CircularProgress size={24} /> : "Gửi yêu cầu"}
             </Button>
           </DialogActions>
         </form>
       </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

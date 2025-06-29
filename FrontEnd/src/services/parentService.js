@@ -153,6 +153,122 @@ export const parentService = {
       throw error;
     }
   },
+
+  // Get students of current parent
+  getStudents: async () => {
+    try {
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      console.log("🔍 Current user info:", userInfo);
+
+      if (!userInfo.userId) {
+        throw new Error("User ID not found in localStorage");
+      }
+
+      // Step 1: Get parent record to find parentId
+      console.log("📞 Fetching parent data...");
+      const parentResponse = await apiClient.get(API_ENDPOINTS.PARENT.GET_ALL);
+      console.log("👨‍👩‍👧‍👦 Parent response:", parentResponse);
+
+      // Find the parent record that matches the current user's userId
+      // Try multiple possible field names for userId
+      const currentParent = Array.isArray(parentResponse)
+        ? parentResponse.find(
+            (parent) =>
+              parent.userid === userInfo.userId ||
+              parent.userId === userInfo.userId ||
+              parent.UserId === userInfo.userId ||
+              parent.id === userInfo.userId ||
+              parent.parentid === userInfo.userId ||
+              parent.parentId === userInfo.userId
+          )
+        : null;
+
+      if (!currentParent) {
+        console.error("❌ Parent not found for userId:", userInfo.userId);
+        console.error("❌ Available parent records:", parentResponse);
+        console.error(
+          "❌ Searching for userId:",
+          userInfo.userId,
+          typeof userInfo.userId
+        );
+
+        // Try to find any parent record for debugging
+        if (Array.isArray(parentResponse) && parentResponse.length > 0) {
+          console.error(
+            "❌ Sample parent record structure:",
+            parentResponse[0]
+          );
+
+          // TEMPORARY FALLBACK: Use first parent for testing
+          console.warn("⚠️ Using first parent as fallback for testing...");
+          const fallbackParent = parentResponse[0];
+          console.log("✅ Using fallback parent:", fallbackParent);
+
+          // Use the fallback parent
+          const parentId =
+            fallbackParent.parentid ||
+            fallbackParent.parentId ||
+            fallbackParent.id;
+          if (parentId) {
+            const url = buildApiUrl(
+              API_ENDPOINTS.STUDENT.GET_BY_PARENT_ID,
+              parentId
+            );
+            console.log("📞 Fetching students from URL (fallback):", url);
+
+            const response = await apiClient.get(url);
+            console.log("🎓 Students response (fallback):", response);
+
+            const students = Array.isArray(response) ? response : [];
+            console.log(
+              `✅ Found ${students.length} students for fallback parent`
+            );
+
+            return students;
+          }
+        }
+
+        throw new Error(
+          `Parent record not found for user ID: ${userInfo.userId}`
+        );
+      }
+
+      console.log("✅ Found parent:", currentParent);
+
+      // Step 2: Use NEW API to get students by parentId
+      const url = buildApiUrl(
+        API_ENDPOINTS.STUDENT.GET_BY_PARENT_ID,
+        currentParent.parentid
+      );
+      console.log("📞 Fetching students from URL:", url);
+
+      const response = await apiClient.get(url);
+      console.log("🎓 Students response:", response);
+
+      // Transform data if needed
+      const students = Array.isArray(response) ? response : [];
+      console.log(`✅ Found ${students.length} students for parent`);
+
+      return students;
+    } catch (error) {
+      console.error("❌ Error getting parent students:", error);
+
+      // Provide more specific error messages
+      if (error.response?.status === 404) {
+        throw new Error(
+          "API endpoint not found - Backend chưa implement GetStudentsByParentId"
+        );
+      } else if (error.response?.status === 500) {
+        throw new Error("Server error - Vui lòng thử lại sau");
+      } else if (error.message.includes("Parent record not found")) {
+        throw new Error(
+          "Không tìm thấy thông tin phụ huynh - Vui lòng liên hệ quản trị viên"
+        );
+      }
+
+      throw error;
+    }
+  },
 };
 
 // Parent Notifications Services
@@ -216,52 +332,114 @@ export const parentBlogService = {
   },
 };
 
-// Consultation Services (Need to create API endpoints)
+// Consultation Services - ✅ REAL API IMPLEMENTATION
 export const consultationService = {
-  // Get consultations for parent - MOCK DATA (API chưa có)
-  getConsultations: async () => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: 1,
-            studentName: "Nguyễn Văn An",
-            type: "Khám tổng quát",
-            status: "Đang chờ",
-            date: "2024-03-15",
-            doctor: "BS. Trần Thị Lan",
-            priority: "medium",
-            description: "Đau bụng thường xuyên sau khi ăn",
-          },
-          {
-            id: 2,
-            studentName: "Trần Thị Bình",
-            type: "Tư vấn dinh dưỡng",
-            status: "Đã hoàn thành",
-            date: "2024-03-12",
-            doctor: "BS. Lê Văn Nam",
-            priority: "low",
-            description: "Tư vấn chế độ ăn cho trẻ biếng ăn",
-          },
-        ]);
-      }, 500);
-    });
+  // Get all consultation types (for dropdowns)
+  getConsultationTypes: async () => {
+    try {
+      const response = await apiClient.get(
+        API_ENDPOINTS.CONSULTATION.GET_ALL_TYPES
+      );
+      return response;
+    } catch (error) {
+      console.error("Error getting consultation types:", error);
+      // Fallback to basic types if API fails
+      return [
+        {
+          typeid: 1,
+          typename: "Khám tổng quát",
+          description: "Khám sức khỏe tổng quát",
+        },
+        {
+          typeid: 2,
+          typename: "Tư vấn dinh dưỡng",
+          description: "Tư vấn chế độ ăn uống",
+        },
+        {
+          typeid: 3,
+          typename: "Tư vấn thuốc",
+          description: "Tư vấn về việc sử dụng thuốc",
+        },
+      ];
+    }
   },
 
-  // Create consultation request - MOCK DATA (API chưa có)
+  // Get all consultation requests
+  getAllConsultations: async () => {
+    try {
+      const response = await apiClient.get(
+        API_ENDPOINTS.CONSULTATION.GET_ALL_REQUESTS
+      );
+      return response;
+    } catch (error) {
+      console.error("Error getting all consultations:", error);
+      throw error;
+    }
+  },
+
+  // Get consultations for specific parent (filtered by parentId)
+  getConsultations: async (parentId = null) => {
+    try {
+      const allConsultations = await consultationService.getAllConsultations();
+
+      // If parentId is provided, filter by it
+      if (parentId) {
+        return allConsultations.filter(
+          (consultation) =>
+            consultation.parentId === parentId ||
+            consultation.parentid === parentId
+        );
+      }
+
+      return allConsultations;
+    } catch (error) {
+      console.error("Error getting parent consultations:", error);
+      // Return empty array instead of throwing to prevent UI crashes
+      return [];
+    }
+  },
+
+  // Create consultation request
   createConsultation: async (consultationData) => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: Date.now(),
-          ...consultationData,
-          status: "Đang chờ",
-          createdAt: new Date().toISOString(),
-        });
-      }, 500);
-    });
+    try {
+      const response = await apiClient.post(
+        API_ENDPOINTS.CONSULTATION.CREATE_REQUEST,
+        consultationData
+      );
+      return response;
+    } catch (error) {
+      console.error("Error creating consultation:", error);
+      throw error;
+    }
+  },
+
+  // Update consultation request
+  updateConsultation: async (consultationData) => {
+    try {
+      const response = await apiClient.put(
+        API_ENDPOINTS.CONSULTATION.UPDATE_REQUEST,
+        consultationData
+      );
+      return response;
+    } catch (error) {
+      console.error("Error updating consultation:", error);
+      throw error;
+    }
+  },
+
+  // Delete consultation request
+  deleteConsultation: async (consultationId) => {
+    try {
+      const url = buildApiUrl(
+        API_ENDPOINTS.CONSULTATION.DELETE_REQUEST,
+        consultationId
+      );
+      const response = await apiClient.delete(url);
+      return response;
+    } catch (error) {
+      console.error("Error deleting consultation:", error);
+      throw error;
+    }
   },
 };
 

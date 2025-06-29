@@ -10,6 +10,7 @@ import AccountManagement from "./pages/Manager/AccountManagement";
 import BlogManagement from "./pages/Manager/BlogManagement";
 import VaccinationList from "./pages/Manager/VaccinationList";
 import Notifications from "./pages/Manager/Notifications";
+import ManagerConsultationManagement from "./pages/Manager/ConsultationManagement";
 
 import StudentList from "./pages/Manager/StudentList";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -33,6 +34,7 @@ import NurseBlog from "./pages/Nurse/Blog";
 import ChatWithParents from "./pages/Nurse/ChatWithParents";
 
 import NurseNotifications from "./pages/Nurse/Notifications";
+import NurseConsultationManagement from "./pages/Nurse/ConsultationManagement";
 
 // Parent imports
 import ParentLayout from "./components/layout/ParentLayout";
@@ -85,6 +87,10 @@ function App() {
           <Route path="blogs" element={<BlogManagement />} />
           <Route path="vaccinations" element={<VaccinationList />} />
           <Route path="StudentList" element={<StudentList />} />
+          <Route
+            path="consultations"
+            element={<ManagerConsultationManagement />}
+          />
           <Route path="notifications" element={<Notifications />} />
         </Route>
 
@@ -104,6 +110,10 @@ function App() {
           <Route path="blog" element={<NurseBlog />} />
           <Route path="chat" element={<ChatWithParents />} />
 
+          <Route
+            path="consultations"
+            element={<NurseConsultationManagement />}
+          />
           <Route path="notifications" element={<NurseNotifications />} />
         </Route>
 

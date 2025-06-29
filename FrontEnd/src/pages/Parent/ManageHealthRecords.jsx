@@ -1,87 +1,108 @@
 import React, { useState, useEffect } from "react";
 import "../../css/Parent/ManageHealthRecords.css";
-import apiClient from "../../services/config";
-import { parentService } from "../../services/parentService";
+import { useParentStudents } from "../../utils/hooks/useParent";
 
 function ManageHealthRecords() {
-  const [children, setChildren] = useState([]);
+  // Main states
+  const [myChildren, setMyChildren] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
 
-  // Health records modal states
+  // Modal states
   const [showHealthModal, setShowHealthModal] = useState(false);
   const [selectedChild, setSelectedChild] = useState(null);
-  const [healthRecords, setHealthRecords] = useState([]);
   const [loadingHealthRecords, setLoadingHealthRecords] = useState(false);
   const [healthRecordsError, setHealthRecordsError] = useState("");
 
-  // Edit health record states
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editingRecord, setEditingRecord] = useState(null);
-  const [editFormData, setEditFormData] = useState({
-    title: "",
-    description: "",
-    categoryId: 1,
-  });
+  // Get students of current parent
+  const {
+    data: studentsData,
+    loading: studentsLoading,
+    error: studentsError,
+  } = useParentStudents();
 
+  // Fetch health records for all students
   useEffect(() => {
-    fetchMyChildren();
-  }, []);
+    const fetchChildrenWithHealthRecords = async () => {
+      if (studentsData && studentsData.length > 0) {
+        try {
+          setLoading(true);
+          setError(null);
 
-  const fetchMyChildren = async () => {
+          // Transform raw API data to component format
+          const transformedStudents = studentsData.map((student) => ({
+            id: student.id || student.studentid || Math.random(),
+            studentId: student.id || student.studentid,
+            fullName: student.fullname || "Không có tên",
+            name: student.fullname || "Không có tên",
+            studentCode: student.studentCode || "Không có mã",
+            dateOfBirth: student.dob || "Không có thông tin",
+            gender: student.gender === false ? "Nữ" : "Nam", // API: false = Nữ, true = Nam
+            className: `Lớp ${student.classid || "?"}`,
+            address: student.listparent?.[0]?.address || "Không có địa chỉ",
+            healthStatus: "Bình thường", // Default value
+            age: student.age || 0,
+            bloodType: student.bloodType || "Không có thông tin",
+            classId: student.classid,
+            parentId: student.parentid,
+            isDeleted: student.isDeleted || false,
+            avatar: student.gender === false ? "👧" : "👦", // Nữ = 👧, Nam = 👦
+            parentInfo: student.listparent?.[0] || {},
+            healthRecords: [], // Initialize empty, will be loaded on demand
+          }));
+
+          console.log("🔄 Transformed students:", transformedStudents);
+          setMyChildren(transformedStudents);
+        } catch (error) {
+          console.error("Error processing children data:", error);
+          setError("Không thể xử lý thông tin con em");
+        } finally {
+          setLoading(false);
+        }
+      } else if (studentsData && studentsData.length === 0) {
+        // If no students found, show empty state
+        setMyChildren([]);
+        setLoading(false);
+      }
+    };
+
+    if (!studentsLoading) {
+      fetchChildrenWithHealthRecords();
+    }
+  }, [studentsData, studentsLoading]);
+
+  // Fetch health records for a specific student
+  const fetchHealthRecordsByStudent = async (studentId, studentCode) => {
+    console.log(`🔍 Fetching health records for studentId: ${studentId}`);
     try {
-      setLoading(true);
-      setError("");
-
-      // Get parent ID from localStorage
-      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-      const parentId = userInfo.userId;
-
-      console.log("👨‍👩‍👧‍👦 Parent ID from localStorage:", parentId);
-
-      if (!parentId) {
-        throw new Error("Không tìm thấy thông tin phụ huynh");
-      }
-
-      // Call API to get children by parent ID
-      const apiUrl = `https://api-schoolhealth.purintech.id.vn/api/Student/GetStudentByParentId/${parentId}`;
-      console.log("🌐 Calling API:", apiUrl);
-
-      const response = await apiClient.get(
-        `/Student/GetStudentByParentId/${parentId}`
+      const response = await fetch(
+        `https://api-schoolhealth.purintech.id.vn/api/HealthRecord/getByStudentId/${studentId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
-      console.log("📥 Raw children data:", response);
 
-      if (Array.isArray(response)) {
-        const mappedChildren = response.map((child) => ({
-          studentId: child.studentId,
-          studentCode: child.studentCode,
-          fullname: child.fullname,
-          dateOfBirth: child.dob,
-          gender: child.gender === true ? "Nam" : "Nữ",
-          age: child.age,
-          bloodType: child.bloodType,
-          classId: child.classid,
-          avatar: child.gender === true ? "👦" : "👧",
-        }));
-
-        console.log("✅ Mapped children:", mappedChildren);
-        setChildren(mappedChildren);
-      } else {
-        setChildren([]);
+      if (!response.ok) {
+        console.error(
+          `⚠️ Cannot get health records for student ${studentCode}. Status: ${response.status}`
+        );
+        return [];
       }
+
+      let data = await response.json();
+      return Array.isArray(data) ? data : [];
     } catch (err) {
-      console.error("❌ Error fetching children:", err);
-      setError(`Không thể tải danh sách con em: ${err.message}`);
-      setChildren([]);
-    } finally {
-      setLoading(false);
+      console.error("❌ Error calling health records API:", err);
+      return [];
     }
   };
 
+  // Handle view health records for a child
   const handleViewHealthRecords = async (child) => {
     console.log("🏥 Viewing health records for child:", child);
-    console.log("🆔 Student ID:", child.studentId);
 
     setSelectedChild(child);
     setShowHealthModal(true);
@@ -89,127 +110,83 @@ function ManageHealthRecords() {
     setHealthRecordsError("");
 
     try {
-      // Call API to get health records by student ID
-      const apiUrl = `https://api-schoolhealth.purintech.id.vn/api/HealthRecord/getByStudentId?studentId=${child.studentId}`;
-      console.log("🌐 Calling Health Records API:", apiUrl);
-
-      const response = await apiClient.get(
-        `/HealthRecord/getByStudentId?studentId=${child.studentId}`
+      const healthRecords = await fetchHealthRecordsByStudent(
+        child.studentId || child.id,
+        child.studentCode
       );
-      console.log("📥 Raw health records:", response);
 
-      if (Array.isArray(response)) {
-        // Filter out deleted records and map data
-        const validRecords = response.filter((record) => !record.isdeleted);
+      const mappedRecords = healthRecords.map((record) => ({
+        id: record.healthrecordid || record.id || Math.random(),
+        type: record.healthcategoryid
+          ? `Loại ${record.healthcategoryid}`
+          : "Khám định kỳ",
+        title: record.healthrecordtitle || "Kiểm tra sức khỏe",
+        description: record.healthrecorddescription || "Không có mô tả",
+        severity: record.isconfirm ? "Đã xác nhận" : "Chưa xác nhận",
+        date: record.healthrecorddate
+          ? new Date(record.healthrecorddate).toLocaleDateString("vi-VN")
+          : new Date().toLocaleDateString("vi-VN"),
+        doctor: record.staffid
+          ? `Nhân viên ID: ${record.staffid}`
+          : "Y tá trường",
+        medications: [],
+        notes: record.healthrecorddescription || "",
+        status: record.isconfirm ? "Đã xác nhận" : "Chưa xác nhận",
+        isConfirm: record.isconfirm,
+        // Additional API fields
+        healthCategoryId: record.healthcategoryid,
+        staffId: record.staffid,
+        createdBy: record.createdby,
+        createdDate: record.createddate,
+        modifiedBy: record.modifiedby,
+        modifiedDate: record.modifieddate,
+        isDeleted: record.isdeleted,
+      }));
 
-        const mappedRecords = validRecords.map((record) => ({
-          id: record.healthrecordid,
-          title: record.healthrecordtitle,
-          description: record.healthrecorddescription,
-          date: new Date(record.healthrecorddate).toLocaleDateString("vi-VN"),
-          categoryId: record.healthcategoryid,
-          isConfirmed: record.isconfirm,
-          createdBy: record.createdby || "Hệ thống",
-          modifiedBy: record.modifiedby,
-          modifiedDate: record.modifieddate
-            ? new Date(record.modifieddate).toLocaleDateString("vi-VN")
-            : null,
-          status: record.isconfirm ? "Đã xác nhận" : "Chờ xác nhận",
-        }));
-
-        console.log("✅ Mapped health records:", mappedRecords);
-        setHealthRecords(mappedRecords);
-      } else {
-        setHealthRecords([]);
-      }
+      // Update the selected child with health records
+      const updatedChild = { ...child, healthRecords: mappedRecords };
+      setSelectedChild(updatedChild);
     } catch (error) {
-      console.error("❌ Error loading health records:", error);
-      setHealthRecordsError(`Không thể tải hồ sơ sức khỏe: ${error.message}`);
-      setHealthRecords([]);
+      console.error("Error fetching health records:", error);
+      setHealthRecordsError("Không thể tải hồ sơ sức khỏe");
     } finally {
       setLoadingHealthRecords(false);
     }
   };
 
-  const getCategoryName = (categoryId) => {
-    const categories = {
-      1: "Khám tổng quát",
-      2: "Dị ứng",
-      3: "Tiêm chủng",
-      4: "Khám định kỳ",
-      5: "Tai nạn/Chấn thương",
-      6: "Khác",
-    };
-    return categories[categoryId] || `Danh mục ${categoryId}`;
-  };
-
-  // Handle edit health record
-  const handleEditRecord = (record) => {
-    console.log("✏️ Editing record:", record);
-    setEditingRecord(record);
-    setEditFormData({
-      title: record.title,
-      description: record.description,
-      categoryId: record.categoryId,
-    });
-    setShowEditModal(true);
-  };
-
-  // Handle save edited record
-  const handleSaveEditedRecord = async () => {
-    if (!editingRecord) return;
-
-    try {
-      const recordData = {
-        healthrecordtitle: editFormData.title,
-        healthrecorddescription: editFormData.description,
-        healthcategoryid: editFormData.categoryId,
-      };
-
-      console.log("💾 Saving record with data:", recordData);
-      await parentService.updateHealthRecord(editingRecord.id, recordData);
-
-      // Refresh health records
-      await handleViewHealthRecords(selectedChild);
-
-      // Close modal
-      setShowEditModal(false);
-      setEditingRecord(null);
-
-      alert("Cập nhật hồ sơ sức khỏe thành công!");
-    } catch (error) {
-      console.error("Error updating health record:", error);
-      alert("Có lỗi xảy ra khi cập nhật hồ sơ sức khỏe!");
+  // Helper function to get severity color
+  const getSeverityColor = (severity) => {
+    switch (severity) {
+      case "Đã xác nhận":
+        return "#28a745";
+      case "Chưa xác nhận":
+        return "#ffc107";
+      default:
+        return "#6c757d";
     }
   };
 
-  // Handle cancel edit
-  const handleCancelEdit = () => {
-    setShowEditModal(false);
-    setEditingRecord(null);
-    setEditFormData({
-      title: "",
-      description: "",
-      categoryId: 1,
-    });
-  };
-
-  if (loading) {
+  // Show loading state
+  if (loading || studentsLoading) {
     return (
-      <div className="health-records-container">
+      <div className="parent-health-records-container">
         <div className="loading-state">
-          <p>⏳ Đang tải danh sách con em...</p>
+          <p>⏳ Đang tải thông tin sức khỏe con em...</p>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  // Show error state
+  if (error || studentsError) {
     return (
-      <div className="health-records-container">
+      <div className="parent-health-records-container">
         <div className="error-state">
-          <p>❌ {error}</p>
-          <button onClick={fetchMyChildren} className="retry-btn">
+          <p>❌ Lỗi: {error || studentsError}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="retry-btn"
+          >
             🔄 Thử lại
           </button>
         </div>
@@ -217,15 +194,36 @@ function ManageHealthRecords() {
     );
   }
 
+  // Show empty state if no children data
+  if (!loading && !error && myChildren.length === 0) {
+    return (
+      <div className="parent-health-records-container">
+        <div className="page-header">
+          <div className="header-content">
+            <h1>👨‍👩‍👧‍👦 Hồ Sơ Sức Khỏe Con Em</h1>
+            <p>Theo dõi tình trạng sức khỏe và hồ sơ y tế của con em</p>
+          </div>
+        </div>
+        <div className="empty-state">
+          <p>📭 Chưa có thông tin con em hoặc chưa có dữ liệu sức khỏe</p>
+          <p>Vui lòng liên hệ nhà trường để cập nhật thông tin.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="health-records-container">
+    <div className="parent-health-records-container">
       {/* Header */}
       <div className="page-header">
         <div className="header-content">
           <h1>🏥 Hồ Sơ Sức Khỏe Con Em</h1>
           <p>Theo dõi tình trạng sức khỏe của các con</p>
         </div>
-        <button onClick={fetchMyChildren} className="refresh-btn">
+        <button
+          onClick={() => window.location.reload()}
+          className="refresh-btn"
+        >
           🔄 Tải lại
         </button>
       </div>
@@ -235,65 +233,69 @@ function ManageHealthRecords() {
         <div className="stat-card">
           <div className="stat-icon">👶</div>
           <div className="stat-content">
-            <h3>{children.length}</h3>
+            <h3>{myChildren.length}</h3>
             <p>Tổng số con</p>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">🏥</div>
+          <div className="stat-content">
+            <h3>
+              {myChildren.reduce(
+                (sum, child) => sum + (child.healthRecords?.length || 0),
+                0
+              )}
+            </h3>
+            <p>Tổng hồ sơ y tế</p>
           </div>
         </div>
       </div>
 
       {/* Children Cards */}
       <div className="children-grid">
-        {children.length > 0 ? (
-          children.map((child) => (
-            <div key={child.studentId} className="child-card">
-              <div className="card-header">
-                <div className="child-avatar">{child.avatar}</div>
-                <div className="child-info">
-                  <h3>{child.fullname}</h3>
-                  <p>Mã HS: {child.studentCode}</p>
-                </div>
-              </div>
-
-              <div className="card-body">
-                <div className="info-row">
-                  <span className="label">Ngày sinh:</span>
-                  <span className="value">{child.dateOfBirth}</span>
-                </div>
-                <div className="info-row">
-                  <span className="label">Giới tính:</span>
-                  <span className="value">{child.gender}</span>
-                </div>
-                <div className="info-row">
-                  <span className="label">Tuổi:</span>
-                  <span className="value">{child.age}</span>
-                </div>
-                <div className="info-row">
-                  <span className="label">Nhóm máu:</span>
-                  <span className="value">{child.bloodType}</span>
-                </div>
-                <div className="info-row">
-                  <span className="label">Lớp:</span>
-                  <span className="value">Lớp {child.classId}</span>
-                </div>
-              </div>
-
-              <div className="card-footer">
-                <button
-                  className="health-records-btn"
-                  onClick={() => handleViewHealthRecords(child)}
-                >
-                  🏥 Xem hồ sơ sức khỏe
-                </button>
+        {myChildren.map((child) => (
+          <div key={child.studentId || child.id} className="child-card">
+            <div className="card-header">
+              <div className="child-avatar">{child.avatar}</div>
+              <div className="child-info">
+                <h3>{child.fullName}</h3>
+                <p>Mã HS: {child.studentCode}</p>
               </div>
             </div>
-          ))
-        ) : (
-          <div className="no-children">
-            <div className="no-children-icon">👶</div>
-            <p>Không tìm thấy con em nào</p>
-            <small>Liên hệ nhà trường để cập nhật thông tin</small>
+
+            <div className="card-body">
+              <div className="info-row">
+                <span className="label">Ngày sinh:</span>
+                <span className="value">{child.dateOfBirth}</span>
+              </div>
+              <div className="info-row">
+                <span className="label">Giới tính:</span>
+                <span className="value">{child.gender}</span>
+              </div>
+              <div className="info-row">
+                <span className="label">Tuổi:</span>
+                <span className="value">{child.age}</span>
+              </div>
+              <div className="info-row">
+                <span className="label">Nhóm máu:</span>
+                <span className="value">{child.bloodType}</span>
+              </div>
+              <div className="info-row">
+                <span className="label">Lớp:</span>
+                <span className="value">Lớp {child.classId}</span>
+              </div>
+            </div>
+
+            <div className="card-footer">
+              <button
+                className="health-records-btn"
+                onClick={() => handleViewHealthRecords(child)}
+              >
+                🏥 Xem hồ sơ sức khỏe
+              </button>
+            </div>
           </div>
-        )}
+        ))}
       </div>
 
       {/* Health Records Modal */}
@@ -304,7 +306,7 @@ function ManageHealthRecords() {
         >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>🏥 Hồ Sơ Sức Khỏe - {selectedChild.fullname}</h3>
+              <h3>🏥 Hồ Sơ Sức Khỏe - {selectedChild.fullName}</h3>
               <button
                 className="modal-close"
                 onClick={() => setShowHealthModal(false)}
@@ -354,148 +356,117 @@ function ManageHealthRecords() {
                   </div>
                 )}
 
-                {!loadingHealthRecords && !healthRecordsError && (
-                  <div className="records-list">
-                    {healthRecords.length > 0 ? (
-                      healthRecords.map((record) => (
-                        <div key={record.id} className="record-card">
-                          <div className="record-header">
-                            <div className="record-title">
-                              <h5>{record.title}</h5>
-                              <span className="record-category">
-                                {getCategoryName(record.categoryId)}
-                              </span>
-                            </div>
-                            <div className="record-meta">
-                              <span className="record-date">{record.date}</span>
-                              <span
-                                className={`record-status ${
-                                  record.isConfirmed ? "confirmed" : "pending"
-                                }`}
-                              >
-                                {record.status}
-                              </span>
-                            </div>
-                          </div>
+                {!loadingHealthRecords &&
+                  !healthRecordsError &&
+                  selectedChild.healthRecords && (
+                    <div className="records-list">
+                      {selectedChild.healthRecords.length > 0 ? (
+                        <>
+                          <p className="records-summary">
+                            📊 <strong>Tổng cộng:</strong>{" "}
+                            {selectedChild.healthRecords.length} hồ sơ y tế
+                          </p>
+                          {selectedChild.healthRecords
+                            .sort((a, b) => new Date(b.date) - new Date(a.date))
+                            .map((record, index) => (
+                              <div key={record.id} className="record-item">
+                                <div className="record-header">
+                                  <div className="record-title">
+                                    <h5>
+                                      <span className="record-number">
+                                        #{index + 1}
+                                      </span>
+                                      {record.title}
+                                    </h5>
+                                    <span className="record-type">
+                                      {record.type}
+                                    </span>
+                                  </div>
+                                  <div className="record-meta">
+                                    <span
+                                      className="severity-badge"
+                                      style={{
+                                        backgroundColor: getSeverityColor(
+                                          record.severity
+                                        ),
+                                      }}
+                                    >
+                                      {record.severity}
+                                    </span>
+                                    <span className="record-date">
+                                      {record.date}
+                                    </span>
+                                  </div>
+                                </div>
 
-                          <div className="record-content">
-                            <p>{record.description}</p>
-
-                            <div className="record-footer">
-                              <div className="record-meta-info">
-                                <span className="created-by">
-                                  Tạo bởi: {record.createdBy}
-                                </span>
-                                {record.modifiedDate && (
-                                  <span className="modified-date">
-                                    Cập nhật: {record.modifiedDate}
-                                  </span>
-                                )}
+                                <div className="record-content">
+                                  <p>
+                                    <strong>📝 Mô tả:</strong>{" "}
+                                    {record.description}
+                                  </p>
+                                  <p>
+                                    <strong>👨‍⚕️ Nhân viên y tế:</strong>{" "}
+                                    {record.doctor}
+                                  </p>
+                                  <p>
+                                    <strong>📋 Loại khám:</strong> {record.type}
+                                  </p>
+                                  {record.medications &&
+                                    record.medications.length > 0 && (
+                                      <p>
+                                        <strong>💊 Thuốc:</strong>{" "}
+                                        {record.medications.join(", ")}
+                                      </p>
+                                    )}
+                                  <p>
+                                    <strong>📝 Ghi chú:</strong> {record.notes}
+                                  </p>
+                                  <p>
+                                    <strong>✅ Trạng thái:</strong>
+                                    <span
+                                      className={`status-badge ${
+                                        record.isConfirm
+                                          ? "confirmed"
+                                          : "pending"
+                                      }`}
+                                    >
+                                      {record.status}
+                                    </span>
+                                  </p>
+                                  <p className="record-timestamp">
+                                    <strong>📅 Ngày khám:</strong> {record.date}
+                                  </p>
+                                  {record.createdDate && (
+                                    <p className="record-created">
+                                      <strong>📅 Ngày tạo:</strong>{" "}
+                                      {new Date(
+                                        record.createdDate
+                                      ).toLocaleDateString("vi-VN")}
+                                    </p>
+                                  )}
+                                </div>
                               </div>
-                              <button
-                                className="edit-record-btn"
-                                onClick={() => handleEditRecord(record)}
-                                title="Chỉnh sửa hồ sơ"
-                              >
-                                ✏️ Chỉnh sửa
-                              </button>
-                            </div>
-                          </div>
+                            ))}
+                        </>
+                      ) : (
+                        <div className="no-records">
+                          <div className="no-records-icon">📭</div>
+                          <p>Chưa có hồ sơ y tế</p>
+                          <small>Con em chưa có bản ghi y tế nào</small>
                         </div>
-                      ))
-                    ) : (
-                      <div className="no-records">
-                        <div className="no-records-icon">📭</div>
-                        <p>Chưa có hồ sơ y tế</p>
-                        <small>Con em chưa có bản ghi y tế nào</small>
-                      </div>
-                    )}
-                  </div>
-                )}
+                      )}
+                    </div>
+                  )}
               </div>
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* Edit Health Record Modal */}
-      {showEditModal && editingRecord && (
-        <div className="modal-overlay" onClick={handleCancelEdit}>
-          <div
-            className="modal-content edit-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-header">
-              <h3>✏️ Chỉnh sửa hồ sơ sức khỏe</h3>
-              <button className="modal-close" onClick={handleCancelEdit}>
-                ×
+            <div className="modal-footer">
+              <button
+                onClick={() => setShowHealthModal(false)}
+                className="close-btn"
+              >
+                Đóng
               </button>
-            </div>
-
-            <div className="modal-body">
-              <div className="edit-form">
-                <div className="form-group">
-                  <label htmlFor="edit-title">Tiêu đề:</label>
-                  <input
-                    type="text"
-                    id="edit-title"
-                    value={editFormData.title}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        title: e.target.value,
-                      })
-                    }
-                    placeholder="Nhập tiêu đề hồ sơ"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="edit-category">Danh mục:</label>
-                  <select
-                    id="edit-category"
-                    value={editFormData.categoryId}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        categoryId: parseInt(e.target.value),
-                      })
-                    }
-                  >
-                    <option value={1}>Khám tổng quát</option>
-                    <option value={2}>Dị ứng</option>
-                    <option value={3}>Tiêm chủng</option>
-                    <option value={4}>Khám định kỳ</option>
-                    <option value={5}>Tai nạn/Chấn thương</option>
-                    <option value={6}>Khác</option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="edit-description">Mô tả:</label>
-                  <textarea
-                    id="edit-description"
-                    value={editFormData.description}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        description: e.target.value,
-                      })
-                    }
-                    placeholder="Nhập mô tả chi tiết"
-                    rows={4}
-                  />
-                </div>
-
-                <div className="form-actions">
-                  <button className="cancel-btn" onClick={handleCancelEdit}>
-                    ❌ Hủy
-                  </button>
-                  <button className="save-btn" onClick={handleSaveEditedRecord}>
-                    ✅ Lưu thay đổi
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         </div>

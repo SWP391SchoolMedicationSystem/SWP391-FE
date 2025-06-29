@@ -1,43 +1,38 @@
 import apiClient, { API_ENDPOINTS, buildApiUrl } from "./config.js";
 
-// Helper function to convert classid to className for Manager
-const getClassNameFromId = (classid) => {
-  const classMap = {
-    1: "Lớp 1",
-    2: "Lớp 2",
-    3: "Lớp 3",
-    4: "Lớp 4",
-    5: "Lớp 5",
-  };
-  return classMap[classid] || `Lớp ${classid}`;
-};
+// Import consultation service
+import {
+  consultationRequestService,
+  consultationTypeService,
+} from "./consultationService.js";
 
 // Data mapping functions
 const mapStudentData = (apiStudent) => {
-  console.log("🔄 Manager mapping API student data:", apiStudent);
-  console.log("📋 classid from API:", apiStudent.classid);
+  console.log("Raw API student data:", apiStudent);
 
-  // Extract parent information if available
+  // ID thực tế là số (1, 2, 3, 4...) từ field studentid
+  const actualId = apiStudent.studentid || apiStudent.id;
+  console.log("Actual student ID for API calls:", actualId);
+
+  // Get first parent from listparent array if available
   const firstParent =
     apiStudent.listparent && apiStudent.listparent.length > 0
       ? apiStudent.listparent[0]
       : null;
 
   return {
-    id: apiStudent.studentId, // Use studentId from API (numeric ID)
-    studentId: apiStudent.studentCode, // Display code (HS001, HS002, etc.)
-    fullName: apiStudent.fullname,
-    dateOfBirth: apiStudent.dob,
+    id: actualId, // Sử dụng studentid (số) cho API calls
+    studentId: apiStudent.studentCode || `ST${actualId}`, // Mã học sinh hiển thị
+    fullName: apiStudent.fullname || apiStudent.fullName,
+    dateOfBirth: apiStudent.dob || apiStudent.dateOfBirth,
     age: apiStudent.age,
     gender: apiStudent.gender === true ? "Nam" : "Nữ", // API returns boolean
     bloodType: apiStudent.bloodType,
-    classId: apiStudent.classid,
-    parentId: apiStudent.parentid,
-    className: getClassNameFromId(apiStudent.classid),
+    classId: apiStudent.classid || apiStudent.classId,
+    parentId: apiStudent.parentid || apiStudent.parentId,
+    className: `Lớp ${apiStudent.classid || apiStudent.classId}`, // Map classid to className for now
     parentName: firstParent ? firstParent.fullname : "Chưa có thông tin",
     parentPhone: firstParent ? firstParent.phone : "Chưa có thông tin",
-    parentEmail: firstParent ? firstParent.email : "Chưa có thông tin",
-    address: firstParent ? firstParent.address : "Chưa có thông tin",
     healthStatus: "Bình thường", // Default value
     enrollmentDate: apiStudent.createdAt
       ? apiStudent.createdAt.split("T")[0]
@@ -48,6 +43,9 @@ const mapStudentData = (apiStudent) => {
     height: "Chưa có thông tin",
     weight: "Chưa có thông tin",
     notes: "Chưa có thông tin",
+    // Keep original fields for debugging
+    studentid: apiStudent.studentid,
+    originalData: apiStudent,
   };
 };
 
@@ -566,6 +564,37 @@ export const managerAccountService = {
   },
 };
 
+// Manager Health Record Services (Re-added)
+export const managerHealthService = {
+  // Get health records by student ID
+  getHealthRecordsByStudent: async (studentId) => {
+    try {
+      console.log("🔍 Input studentId:", studentId, typeof studentId);
+      console.log(
+        "📍 Endpoint template:",
+        API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT
+      );
+
+      const url = buildApiUrl(
+        API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT,
+        studentId
+      );
+      console.log("🌐 Built URL:", url);
+      console.log(
+        "🌐 Full URL will be:",
+        `${apiClient.defaults.baseURL}${url}`
+      );
+
+      const response = await apiClient.get(url);
+      console.log("✅ API Response:", response);
+      return Array.isArray(response) ? response : [];
+    } catch (error) {
+      console.error("❌ Error getting health records by student:", error);
+      throw error;
+    }
+  },
+};
+
 // Vaccination Services (Need to create API endpoints)
 export const managerVaccinationService = {
   // Get vaccination list - MOCK DATA (API chưa có)
@@ -631,180 +660,28 @@ export const managerVaccinationService = {
   },
 };
 
-// Consultation Services for Manager (Mock implementation)
+// Consultation Services for Manager
 export const managerConsultationService = {
   // Get all consultation requests (for Manager to review)
-  getAllRequests: async () => {
-    console.log("Mock: Getting all consultation requests");
-    return [];
-  },
+  getAllRequests: consultationRequestService.getAll,
 
   // Get consultation types
-  getTypes: async () => {
-    console.log("Mock: Getting consultation types");
-    return [
-      { id: 1, name: "Khám tổng quát" },
-      { id: 2, name: "Tư vấn dinh dưỡng" },
-      { id: 3, name: "Khám chuyên khoa" },
-    ];
-  },
+  getTypes: consultationTypeService.getAll,
 
   // Approve/Reject consultation requests
-  updateRequest: async (requestId, updateData) => {
-    console.log("Mock: Updating consultation request", requestId, updateData);
-    return { success: true };
-  },
+  updateRequest: consultationRequestService.update,
 
   // Delete consultation request
-  deleteRequest: async (requestId) => {
-    console.log("Mock: Deleting consultation request", requestId);
-    return { success: true };
-  },
+  deleteRequest: consultationRequestService.delete,
 
   // Create/Update/Delete consultation types (Manager permission)
-  createType: async (typeData) => {
-    console.log("Mock: Creating consultation type", typeData);
-    return { success: true };
-  },
-
-  updateType: async (typeId, typeData) => {
-    console.log("Mock: Updating consultation type", typeId, typeData);
-    return { success: true };
-  },
-
-  deleteType: async (typeId) => {
-    console.log("Mock: Deleting consultation type", typeId);
-    return { success: true };
-  },
+  createType: consultationTypeService.create,
+  updateType: consultationTypeService.update,
+  deleteType: consultationTypeService.delete,
 
   // Get consultations by parent/student for reporting
-  getByParentId: async (parentId) => {
-    console.log("Mock: Getting consultations by parent ID", parentId);
-    return [];
-  },
-
-  getByStudentId: async (studentId) => {
-    console.log("Mock: Getting consultations by student ID", studentId);
-    return [];
-  },
-};
-
-// Manager Health Record Services
-export const managerHealthService = {
-  // Get all health records
-  getAllHealthRecords: async () => {
-    try {
-      const response = await apiClient.get(API_ENDPOINTS.HEALTH_RECORD.GET_ALL);
-      return Array.isArray(response) ? response : [];
-    } catch (error) {
-      console.error("Error getting all health records:", error);
-      throw error;
-    }
-  },
-
-  // Get health records by student ID
-  getHealthRecordsByStudent: async (studentId) => {
-    try {
-      console.log("🔍 Fetching health records for student ID:", studentId);
-
-      // Use query parameter instead of path parameter
-      const url = `${API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT}?studentId=${studentId}`;
-      console.log("🌐 Built URL:", url);
-
-      const response = await apiClient.get(url);
-      console.log("✅ Health records response:", response);
-
-      return Array.isArray(response) ? response : [];
-    } catch (error) {
-      console.error("❌ Error getting health records by student:", error);
-      console.error("❌ Error details:", error.response?.data || error.message);
-      // Return empty array instead of throwing to prevent UI crashes
-      return [];
-    }
-  },
-
-  // Create new health record
-  createHealthRecord: async (healthRecordData) => {
-    try {
-      const response = await apiClient.post(
-        API_ENDPOINTS.HEALTH_RECORD.ADD,
-        healthRecordData
-      );
-      return response;
-    } catch (error) {
-      console.error("Error creating health record:", error);
-      throw error;
-    }
-  },
-
-  // Update health record
-  updateHealthRecord: async (recordId, healthRecordData) => {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.HEALTH_RECORD.UPDATE, recordId);
-      const response = await apiClient.put(url, healthRecordData);
-      return response;
-    } catch (error) {
-      console.error("Error updating health record:", error);
-      throw error;
-    }
-  },
-
-  // Delete health record
-  deleteHealthRecord: async (recordId) => {
-    try {
-      const url = buildApiUrl(API_ENDPOINTS.HEALTH_RECORD.DELETE, recordId);
-      const response = await apiClient.delete(url);
-      return response;
-    } catch (error) {
-      console.error("Error deleting health record:", error);
-      throw error;
-    }
-  },
-
-  // Map health record data for display
-  mapHealthRecordData: (apiRecord) => {
-    // Get category name based on ID (mock data for now)
-    const getCategoryName = (categoryId) => {
-      const categories = {
-        1: "Khám tổng quát",
-        2: "Dị ứng",
-        3: "Tiêm chủng",
-        4: "Khám định kỳ",
-        5: "Tai nạn/Chấn thương",
-        6: "Khác",
-      };
-      return categories[categoryId] || `Danh mục ${categoryId}`;
-    };
-
-    return {
-      id: apiRecord.healthrecordid || apiRecord.id,
-      studentId: apiRecord.studentid,
-      categoryId: apiRecord.healthcategoryid,
-      categoryName: getCategoryName(apiRecord.healthcategoryid),
-      date: apiRecord.healthrecorddate
-        ? new Date(apiRecord.healthrecorddate).toLocaleDateString("vi-VN", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-        : "Chưa có ngày",
-      title: apiRecord.healthrecordtitle || "Chưa có tiêu đề",
-      description: apiRecord.healthrecorddescription || "Chưa có mô tả",
-      staffId: apiRecord.staffid,
-      isConfirmed: apiRecord.isconfirm || false,
-      createdBy: apiRecord.createdby || "Hệ thống",
-      createdDate: apiRecord.createddate
-        ? new Date(apiRecord.createddate).toLocaleDateString("vi-VN")
-        : null,
-      modifiedBy: apiRecord.modifiedby,
-      modifiedDate: apiRecord.modifieddate
-        ? new Date(apiRecord.modifieddate).toLocaleDateString("vi-VN")
-        : null,
-      isDeleted: apiRecord.isdeleted || false,
-    };
-  },
+  getByParentId: consultationRequestService.getByParentId,
+  getByStudentId: consultationRequestService.getByStudentId,
 };
 
 export default {
@@ -814,7 +691,7 @@ export default {
   managerNotificationService,
   managerEmailService,
   managerAccountService,
+  managerHealthService,
   managerVaccinationService,
   managerConsultationService,
-  managerHealthService,
 };

@@ -132,7 +132,7 @@ export default function ParentLayout() {
 
   const handleUpdateProfile = useCallback(() => {
     setShowProfile(false);
-    navigate('/parent/update-profile');
+    navigate("/parent/update-profile");
   }, [navigate]);
 
   return (
@@ -383,26 +383,26 @@ export default function ParentLayout() {
                     icon: "🆔",
                     label: "Mã số",
                     value: userInfo.userId || userInfo.id || "N/A",
-                    bgColor: "#FFF3E0"
+                    bgColor: "#FFF3E0",
                   },
                   {
                     icon: "📧",
                     label: "Email",
                     value: userInfo.email || "N/A",
-                    bgColor: "#E8F5E8"
+                    bgColor: "#E8F5E8",
                   },
                   {
                     icon: "📱",
                     label: "Số điện thoại",
                     value: userInfo.phone || "N/A",
-                    bgColor: "#E3F2FD"
+                    bgColor: "#E3F2FD",
                   },
                   {
                     icon: "👨‍👩‍👧‍👦",
                     label: "Vai trò",
                     value: userInfo.role || "Phụ huynh",
-                    bgColor: "#F3E5F5"
-                  }
+                    bgColor: "#F3E5F5",
+                  },
                 ].map((item, index) => (
                   <Box
                     key={index}
@@ -419,7 +419,7 @@ export default function ParentLayout() {
                       "&:hover": {
                         transform: "translateY(-2px)",
                         boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                      }
+                      },
                     }}
                   >
                     <Box
@@ -432,31 +432,31 @@ export default function ParentLayout() {
                         alignItems: "center",
                         justifyContent: "center",
                         mr: 2,
-                        fontSize: "1.2rem"
+                        fontSize: "1.2rem",
                       }}
                     >
                       {item.icon}
                     </Box>
                     <Box sx={{ flex: 1 }}>
-                      <Typography 
-                        variant="body2" 
+                      <Typography
+                        variant="body2"
                         color="text.secondary"
-                        sx={{ 
+                        sx={{
                           fontSize: "0.875rem",
-                          mb: 0.5
+                          mb: 0.5,
                         }}
                       >
                         {item.label}
                       </Typography>
-                      <Typography 
-                        variant="body1" 
+                      <Typography
+                        variant="body1"
                         fontWeight="600"
                         sx={{
                           fontSize: "1rem",
                           color: "#2D77C1",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          whiteSpace: "nowrap"
+                          whiteSpace: "nowrap",
                         }}
                       >
                         {item.value}

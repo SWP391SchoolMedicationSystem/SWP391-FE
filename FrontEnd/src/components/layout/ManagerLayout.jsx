@@ -52,6 +52,11 @@ const navItems = [
     icon: <BarChart />,
   },
   {
+    to: "/manager/consultations",
+    label: "Quản Lý Tư Vấn",
+    icon: <ChatBubbleOutline />,
+  },
+  {
     to: "/manager/notifications",
     label: "Thông Báo",
     icon: <Notifications />,

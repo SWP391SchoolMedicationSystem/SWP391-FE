@@ -1,5 +1,11 @@
 import apiClient, { API_ENDPOINTS, buildApiUrl } from "./config.js";
 
+// Import consultation service
+import {
+  consultationRequestService,
+  consultationTypeService,
+} from "./consultationService.js";
+
 // Nurse Health Records Services
 export const nurseHealthService = {
   // Get all health records
@@ -138,23 +144,26 @@ export const nurseBlogService = {
   // Update blog post
   updateBlog: async (blogId, blogData) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.UPDATE, blogId);
+      // API endpoint: PUT /api/Blog/update (không cần ID trong URL)
+      const url = API_ENDPOINTS.BLOG.UPDATE;
 
+      // Backend UpdateBlogDTO expects exact field names
       const { title, content, status, image, updatedBy, isDeleted } = blogData;
 
       const payload = {
-        title,
-        content,
-        status,
-        image,
+        blogID: blogId, // Backend expects "blogID"
+        title: title,
+        content: content,
+        status: status || "Draft",
+        image: image || null,
         isDeleted: typeof isDeleted === "boolean" ? isDeleted : false,
         updatedBy:
           updatedBy ||
           JSON.parse(localStorage.getItem("userInfo") || "{}").userId ||
           0,
-        updatedAt: new Date().toISOString(),
       };
 
+      console.log("Blog update payload:", payload);
       const response = await apiClient.put(url, payload);
       return response;
     } catch (error) {
@@ -458,6 +467,24 @@ export const nurseChatService = {
   },
 };
 
+// Consultation Services for Nurse
+export const nurseConsultationService = {
+  // Get all consultation requests (for Nurse to view)
+  getAllRequests: consultationRequestService.getAll,
+
+  // Get consultation types (for dropdowns)
+  getTypes: consultationTypeService.getAll,
+
+  // Update request status (Nurse can add notes/responses)
+  updateRequest: consultationRequestService.update,
+
+  // Get consultations by student ID (for student health records)
+  getByStudentId: consultationRequestService.getByStudentId,
+
+  // Create new consultation request on behalf of parent
+  createRequest: consultationRequestService.create,
+};
+
 export default {
   nurseHealthService,
   nurseBlogService,
@@ -466,4 +493,5 @@ export default {
   nurseMedicationService,
   nurseVaccinationService,
   nurseChatService,
+  nurseConsultationService,
 };

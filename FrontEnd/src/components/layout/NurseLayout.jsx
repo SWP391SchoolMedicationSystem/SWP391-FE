@@ -56,6 +56,11 @@ const navItems = [
   { to: "/nurse/student-list", label: "Danh Sách Học Sinh", icon: <People /> },
     
   {
+    to: "/nurse/consultations",
+    label: "Lịch Tư Vấn",
+    icon: <ChatBubbleOutline />,
+  },
+  {
     to: "/nurse/notifications",
     label: "Thông Báo",
     icon: <Notifications />,

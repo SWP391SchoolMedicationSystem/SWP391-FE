@@ -199,30 +199,10 @@ export default function LoginForm() {
                   </InputAdornment>
                 ),
               }}
+              sx={{ mb: 2.5 }}
             />
 
             <Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  htmlFor="password-field"
-                  sx={{ fontWeight: 500 }}
-                ></Typography>
-                <Link
-                  component={RouterLink}
-                  to="/reset-password"
-                  variant="body2"
-                  sx={{ textDecoration: "none" }}
-                >
-                  Forgot password?
-                </Link>
-              </Box>
               <TextField
                 id="password-field"
                 name="password"
@@ -239,8 +219,24 @@ export default function LoginForm() {
                     </InputAdornment>
                   ),
                 }}
-                sx={{ mt: 0.5 }}
+                sx={{ mb: 1 }}
               />
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                }}
+              >
+                <Link
+                  component={RouterLink}
+                  to="/reset-password"
+                  variant="body2"
+                  sx={{ textDecoration: "none" }}
+                >
+                  Forgot password?
+                </Link>
+              </Box>
             </Box>
 
             <FormControlLabel
@@ -315,8 +311,7 @@ export default function LoginForm() {
                   />
                 </>
               ) : (
-                <>
-                </>
+                <></>
               )}
             </div>
           </GoogleOAuthProvider>

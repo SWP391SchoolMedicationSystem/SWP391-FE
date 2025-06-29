@@ -97,9 +97,10 @@ export const API_ENDPOINTS = {
   // Health Record (4/6)
   HEALTH_RECORD: {
     GET_ALL: "/HealthRecord/getAll", // Nurse xem all records
-    GET_BY_STUDENT: "/HealthRecord/getByStudentId", // Parent health history
-    ADD: "/HealthRecord/add", // Nurse tạo health record
-    UPDATE: "/HealthRecord/update", // Nurse update record
+    GET_BY_STUDENT: "/HealthRecord/getByStudentId/{studentId}", // Parent health history
+    ADD: "/HealthRecord/healthrecord", // Nurse tạo health record
+    UPDATE: "/HealthRecord/update/{id}", // Nurse update record
+    DELETE: "/HealthRecord/delete/{id}", // Delete health record
   },
 
   // Notification (5/7)
@@ -131,12 +132,24 @@ export const API_ENDPOINTS = {
   // Student (7/7 - all endpoints needed)
   STUDENT: {
     GET_ALL: "/Student/GetAllStudents", // Manager/Nurse student list
-    GET_BY_ID: "/Student/GetStudentById", // Get student details
-    GET_BY_PARENT: "/Student/GetStudentByParentId/{parentId}", // Get children by parent ID
+    GET_BY_ID: "/Student/GetStudentById/{id}", // Get student details
+    GET_BY_PARENT_ID: "/Student/GetStudentByParentId/{parentId}", // Get students by parent ID - Working API
     ADD: "/Student/AddStudent", // Add single student
     BULK_ADD: "/Student/student", // Bulk import students
     UPDATE: "/Student/UpdateStudent", // Update student
-    DELETE: "/Student/DeleteStudent", // Delete student
+    DELETE: "/Student/DeleteStudent/{id}", // Delete student
+  },
+
+  // Consultation (7/7 - Full CRUD available)
+  CONSULTATION: {
+    GET_ALL_REQUESTS: "/Consultation/consultationrequests", // Get all consultation requests
+    GET_ALL_TYPES: "/Consultation/consultationtypes", // Get all consultation types
+    CREATE_REQUEST: "/Consultation/consultationrequest", // Create consultation request
+    CREATE_TYPE: "/Consultation/consultationtype", // Create consultation type
+    UPDATE_REQUEST: "/Consultation/consultationrequest", // Update consultation request
+    UPDATE_TYPE: "/Consultation/consultationtype", // Update consultation type
+    DELETE_REQUEST: "/Consultation/consultationrequest/{id}", // Delete consultation request
+    DELETE_TYPE: "/Consultation/consultationtype/{id}", // Delete consultation type
   },
 };
 
@@ -149,7 +162,7 @@ export const buildApiUrl = (endpoint, id = null) => {
     return endpoint.replace("{parentId}", id);
   }
   if (id && endpoint.includes("{studentId}")) {
-    return `${endpoint}?studentId=${id}`;
+    return endpoint.replace("{studentId}", id);
   }
   return id ? `${endpoint}/${id}` : endpoint;
 };

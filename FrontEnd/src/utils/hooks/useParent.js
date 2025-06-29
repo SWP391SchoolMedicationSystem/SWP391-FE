@@ -123,6 +123,11 @@ export const useParentHealthRecords = (studentId) => {
   );
 };
 
+// Hook for parent's students
+export const useParentStudents = () => {
+  return useApi(parentService.getStudents);
+};
+
 // Hook for published blogs (parent view)
 export const useParentBlogs = () => {
   return useApi(parentBlogService.getPublishedBlogs);
@@ -174,6 +179,7 @@ export default {
   useParentProfile,
   useParentNotifications,
   useParentHealthRecords,
+  useParentStudents,
   useParentBlogs,
   useConsultations,
   useParentChat,

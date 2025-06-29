@@ -3,37 +3,10 @@
 // ==========================================
 
 // Core imports
-@use './variables' as *;
-@use './mixins' as *;
-@use './components' as *;
+@import 'theme';
+@import 'components';
+@import '../App.css'; // Import App.css here
 
-// Reset và base styles
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  font-size: 16px;
-  line-height: 1.5;
-}
-
-body {
-  font-family: $font-family;
-  color: $text-primary;
-  background-color: $bg-secondary;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-// Link styles
-a {
-  color: $primary-color;
-  text-decoration: none;
-  transition: $transition-base;
-  
-  &:hover {
-    text-decoration: underline;
-  }
-} 
+// Reset và base styles - Các style này đã được định nghĩa trong _theme.scss
+// Vì vậy, chúng ta có thể loại bỏ phần lớn code ở đây để tránh trùng lặp.
+// Body, h1-h6, a đã có style cơ bản trong theme. 
