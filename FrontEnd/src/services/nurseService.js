@@ -248,59 +248,118 @@ export const nurseNotificationService = {
   },
 };
 
-// Medication Services (Need to create API endpoints)
+// Medicine Services - Real API Integration
 export const nurseMedicationService = {
-  // Get medication schedule - MOCK DATA (API chưa có)
-  getMedicationSchedule: async () => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: 1,
-            studentName: "Nguyễn Văn An",
-            studentId: 1,
-            medicationName: "Paracetamol",
-            dosage: "500mg",
-            frequency: "2 lần/ngày",
-            startDate: "2024-03-10",
-            endDate: "2024-03-15",
-            time: ["08:00", "20:00"],
-            status: "active",
-            notes: "Uống sau ăn",
-          },
-          {
-            id: 2,
-            studentName: "Trần Thị Bình",
-            studentId: 2,
-            medicationName: "Vitamin C",
-            dosage: "100mg",
-            frequency: "1 lần/ngày",
-            startDate: "2024-03-01",
-            endDate: "2024-03-31",
-            time: ["09:00"],
-            status: "active",
-            notes: "Tăng sức đề kháng",
-          },
-        ]);
-      }, 500);
-    });
+  // Get all medicines
+  getAllMedicines: async () => {
+    try {
+      const response = await apiClient.get(API_ENDPOINTS.MEDICINE.GET_ALL);
+      return Array.isArray(response) ? response.map(mapMedicineData) : [];
+    } catch (error) {
+      console.error("Error getting all medicines:", error);
+      throw error;
+    }
   },
 
-  // Handle medicine administration - MOCK DATA (API chưa có)
-  handleMedicine: async (medicationId, action) => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: medicationId,
-          action: action,
-          timestamp: new Date().toISOString(),
-          status: "completed",
-        });
-      }, 300);
-    });
+  // Search medicines by name
+  searchMedicinesByName: async (searchTerm) => {
+    try {
+      const url = `${
+        API_ENDPOINTS.MEDICINE.SEARCH_BY_NAME
+      }?searchTerm=${encodeURIComponent(searchTerm)}`;
+      const response = await apiClient.get(url);
+      return Array.isArray(response) ? response.map(mapMedicineData) : [];
+    } catch (error) {
+      console.error("Error searching medicines by name:", error);
+      throw error;
+    }
   },
+
+  // Add new medicine
+  addMedicine: async (medicineData) => {
+    try {
+      const payload = {
+        medicinename: medicineData.medicinename,
+        medicinecategoryid: medicineData.medicinecategoryid,
+        type: medicineData.type,
+        quantity: medicineData.quantity,
+        createdat: new Date().toISOString(),
+        createdby:
+          medicineData.createdby ||
+          JSON.parse(localStorage.getItem("userInfo") || "{}").fullName ||
+          "Nurse",
+      };
+
+      const response = await apiClient.post(
+        API_ENDPOINTS.MEDICINE.ADD,
+        payload
+      );
+      return response;
+    } catch (error) {
+      console.error("Error adding medicine:", error);
+      throw error;
+    }
+  },
+
+  // Update medicine
+  updateMedicine: async (medicineId, medicineData) => {
+    try {
+      const payload = {
+        medicineid: medicineId,
+        medicinename: medicineData.medicinename,
+        medicinecategoryid: medicineData.medicinecategoryid,
+        type: medicineData.type,
+        quantity: medicineData.quantity,
+        updatedat: new Date().toISOString(),
+        updatedby:
+          medicineData.updatedby ||
+          JSON.parse(localStorage.getItem("userInfo") || "{}").fullName ||
+          "Nurse",
+      };
+
+      const response = await apiClient.put(
+        API_ENDPOINTS.MEDICINE.UPDATE,
+        payload
+      );
+      return response;
+    } catch (error) {
+      console.error("Error updating medicine:", error);
+      throw error;
+    }
+  },
+
+  // Delete medicine
+  deleteMedicine: async (medicineId) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.MEDICINE.DELETE, medicineId);
+      const response = await apiClient.delete(url);
+      return response;
+    } catch (error) {
+      console.error("Error deleting medicine:", error);
+      throw error;
+    }
+  },
+};
+
+// Helper function to map medicine data from API
+const mapMedicineData = (apiMedicine) => {
+  return {
+    id: apiMedicine.medicineid,
+    medicineName: apiMedicine.medicinename,
+    categoryId: apiMedicine.medicinecategoryid,
+    type: apiMedicine.type,
+    quantity: apiMedicine.quantity,
+    createdAt: apiMedicine.createdat
+      ? new Date(apiMedicine.createdat).toLocaleDateString("vi-VN")
+      : "Chưa có thông tin",
+    updatedAt: apiMedicine.updatedat
+      ? new Date(apiMedicine.updatedat).toLocaleDateString("vi-VN")
+      : "Chưa cập nhật",
+    createdBy: apiMedicine.createdby || "Hệ thống",
+    updatedBy: apiMedicine.updatedby || null,
+    // Original data for editing
+    originalData: apiMedicine,
+  };
 };
 
 // Vaccination Services (Need to create API endpoints)

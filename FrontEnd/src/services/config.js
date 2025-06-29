@@ -139,6 +139,15 @@ export const API_ENDPOINTS = {
     DELETE: "/Student/DeleteStudent", // Delete student
   },
 
+  // Medicine (4/4 - Full CRUD for Nurse)
+  MEDICINE: {
+    GET_ALL: "/Medicine/GetAllMedicines", // GET all medicines
+    ADD: "/Medicine/AddMedicine", // POST add new medicine
+    UPDATE: "/Medicine/UpdateMedicine", // PUT update medicine
+    DELETE: "/Medicine/DeleteMedicine", // DELETE medicine
+    SEARCH_BY_NAME: "/Medicine/SearchMedicinesByName", // GET search medicines by name
+  },
+
   // Vaccination Event (Core feature - All endpoints)
   VACCINATION_EVENT: {
     GET_ALL: "/VaccinationEvent", // Get all vaccination events
