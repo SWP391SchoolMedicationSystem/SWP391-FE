@@ -334,6 +334,7 @@ function StudentList() {
                 <th>Ngày sinh</th>
                 <th>Giới tính</th>
                 <th>Nhóm máu</th>
+                <th>Phụ huynh</th>
                 <th>Thao tác</th>
               </tr>
             </thead>
@@ -353,6 +354,12 @@ function StudentList() {
                   <td>{student.gender}</td>
                   <td>
                     <span className="blood-type">{student.bloodType}</span>
+                  </td>
+                  <td>
+                    <div className="parent-info">
+                      <strong>{student.parentName}</strong>
+                      <small>{student.parentPhone}</small>
+                    </div>
                   </td>
                   <td>
                     <div className="action-buttons">
@@ -444,24 +451,28 @@ function StudentList() {
                     <span>{currentStudent.enrollmentDate}</span>
                   </div>
                   <div className="detail-item">
-                    <label>ID phụ huynh:</label>
-                    <span>{currentStudent.parentId}</span>
+                    <label>Tên phụ huynh:</label>
+                    <span>{currentStudent.parentName}</span>
+                  </div>
+                  <div className="detail-item">
+                    <label>SĐT phụ huynh:</label>
+                    <span>{currentStudent.parentPhone}</span>
+                  </div>
+                  <div className="detail-item">
+                    <label>Email phụ huynh:</label>
+                    <span>{currentStudent.parentEmail}</span>
+                  </div>
+                  <div className="detail-item">
+                    <label>Địa chỉ:</label>
+                    <span>{currentStudent.address}</span>
                   </div>
                   <div className="detail-item">
                     <label>Tình trạng sức khỏe:</label>
                     <span>{currentStudent.healthStatus}</span>
                   </div>
                   <div className="detail-item">
-                    <label>Dị ứng:</label>
-                    <span>{currentStudent.allergies}</span>
-                  </div>
-                  <div className="detail-item">
                     <label>Liên hệ khẩn cấp:</label>
                     <span>{currentStudent.emergencyContact}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Địa chỉ:</label>
-                    <span>{currentStudent.address}</span>
                   </div>
                   <div className="detail-item full-width">
                     <label>Ghi chú:</label>

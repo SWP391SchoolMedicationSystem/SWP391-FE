@@ -200,11 +200,10 @@ export const nurseBlogService = {
 // Helper function to convert classid to className
 const getClassNameFromId = (classid) => {
   const classMap = {
-    1: "Mầm",
-    2: "Chồi",
-    3: "Lá 1",
-    4: "Lá 2",
-    5: "Lá 3",
+    1: "Lớp Mầm",
+    2: "Lớp Chồi",
+    3: "Lớp Lá",
+    // Có thể thêm nhiều lớp hơn nếu cần
   };
   return classMap[classid] || `Lớp ${classid}`;
 };

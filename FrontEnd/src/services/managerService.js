@@ -6,12 +6,23 @@ import {
   consultationTypeService,
 } from "./consultationService.js";
 
+// Helper function to convert classid to className
+const getClassNameFromId = (classid) => {
+  const classMap = {
+    1: "Lớp Mầm",
+    2: "Lớp Chồi",
+    3: "Lớp Lá",
+    // Có thể thêm nhiều lớp hơn nếu cần
+  };
+  return classMap[classid] || `Lớp ${classid}`;
+};
+
 // Data mapping functions
 const mapStudentData = (apiStudent) => {
   console.log("Raw API student data:", apiStudent);
 
-  // ID thực tế là số (1, 2, 3, 4...) từ field studentid
-  const actualId = apiStudent.studentid || apiStudent.id;
+  // ID thực tế từ field studentId (không phải studentid)
+  const actualId = apiStudent.studentId || apiStudent.id;
   console.log("Actual student ID for API calls:", actualId);
 
   // Get first parent from listparent array if available
@@ -20,23 +31,34 @@ const mapStudentData = (apiStudent) => {
       ? apiStudent.listparent[0]
       : null;
 
+  // Format date of birth
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "Chưa có thông tin";
+    try {
+      return new Date(dateStr).toLocaleDateString("vi-VN");
+    } catch {
+      return dateStr;
+    }
+  };
+
   return {
-    id: actualId, // Sử dụng studentid (số) cho API calls
-    studentId: apiStudent.studentCode || `ST${actualId}`, // Mã học sinh hiển thị
-    fullName: apiStudent.fullname || apiStudent.fullName,
-    dateOfBirth: apiStudent.dob || apiStudent.dateOfBirth,
-    age: apiStudent.age,
+    id: actualId, // Sử dụng studentId (số) cho API calls
+    studentId:
+      apiStudent.studentCode || `HS${String(actualId).padStart(3, "0")}`, // Mã học sinh hiển thị
+    fullName: apiStudent.fullname || "Chưa có thông tin",
+    dateOfBirth: formatDate(apiStudent.dob),
+    age: apiStudent.age || 0,
     gender: apiStudent.gender === true ? "Nam" : "Nữ", // API returns boolean
-    bloodType: apiStudent.bloodType,
-    classId: apiStudent.classid || apiStudent.classId,
-    parentId: apiStudent.parentid || apiStudent.parentId,
-    className: `Lớp ${apiStudent.classid || apiStudent.classId}`, // Map classid to className for now
+    bloodType: apiStudent.bloodType || "Chưa có thông tin",
+    classId: apiStudent.classid,
+    parentId: apiStudent.parentid,
+    className: getClassNameFromId(apiStudent.classid), // Map classid to className
     parentName: firstParent ? firstParent.fullname : "Chưa có thông tin",
     parentPhone: firstParent ? firstParent.phone : "Chưa có thông tin",
+    parentEmail: firstParent ? firstParent.email : "Chưa có thông tin",
+    address: firstParent ? firstParent.address : "Chưa có thông tin",
     healthStatus: "Bình thường", // Default value
-    enrollmentDate: apiStudent.createdAt
-      ? apiStudent.createdAt.split("T")[0]
-      : "Chưa có thông tin",
+    enrollmentDate: "Chưa có thông tin", // API không có field này
     // Additional fields that might be needed
     allergies: "Chưa có thông tin",
     emergencyContact: firstParent ? firstParent.phone : "Chưa có thông tin",
@@ -44,7 +66,7 @@ const mapStudentData = (apiStudent) => {
     weight: "Chưa có thông tin",
     notes: "Chưa có thông tin",
     // Keep original fields for debugging
-    studentid: apiStudent.studentid,
+    originalStudentId: apiStudent.studentId,
     originalData: apiStudent,
   };
 };
@@ -570,15 +592,10 @@ export const managerHealthService = {
   getHealthRecordsByStudent: async (studentId) => {
     try {
       console.log("🔍 Input studentId:", studentId, typeof studentId);
-      console.log(
-        "📍 Endpoint template:",
-        API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT
-      );
+      console.log("📍 Endpoint:", API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT);
 
-      const url = buildApiUrl(
-        API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT,
-        studentId
-      );
+      // Use query parameter instead of path parameter
+      const url = `${API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT}?studentId=${studentId}`;
       console.log("🌐 Built URL:", url);
       console.log(
         "🌐 Full URL will be:",

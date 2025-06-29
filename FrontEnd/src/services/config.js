@@ -97,7 +97,7 @@ export const API_ENDPOINTS = {
   // Health Record (4/6)
   HEALTH_RECORD: {
     GET_ALL: "/HealthRecord/getAll", // Nurse xem all records
-    GET_BY_STUDENT: "/HealthRecord/getByStudentId/{studentId}", // Parent health history
+    GET_BY_STUDENT: "/HealthRecord/getByStudentId", // Parent health history - uses query parameter
     ADD: "/HealthRecord/healthrecord", // Nurse tạo health record
     UPDATE: "/HealthRecord/update/{id}", // Nurse update record
     DELETE: "/HealthRecord/delete/{id}", // Delete health record
