@@ -132,10 +132,27 @@ export const API_ENDPOINTS = {
   STUDENT: {
     GET_ALL: "/Student/GetAllStudents", // Manager/Nurse student list
     GET_BY_ID: "/Student/GetStudentById", // Get student details
+    GET_BY_PARENT: "/Student/GetStudentByParentId/{parentId}", // Get children by parent ID
     ADD: "/Student/AddStudent", // Add single student
     BULK_ADD: "/Student/student", // Bulk import students
     UPDATE: "/Student/UpdateStudent", // Update student
     DELETE: "/Student/DeleteStudent", // Delete student
+  },
+
+  // Vaccination Event (Core feature - All endpoints)
+  VACCINATION_EVENT: {
+    GET_ALL: "/VaccinationEvent", // Get all vaccination events
+    GET_BY_ID: "/VaccinationEvent/{id}", // Get event by ID
+    CREATE: "/VaccinationEvent", // POST - Create new event (Manager only)
+    UPDATE: "/VaccinationEvent", // PUT - Update event (Manager only)
+    DELETE: "/VaccinationEvent/{id}", // DELETE - Delete event (Manager only)
+    GET_UPCOMING: "/VaccinationEvent/upcoming", // Get upcoming events
+    GET_BY_DATE_RANGE: "/VaccinationEvent/date-range", // Get events by date range
+    GET_SUMMARY: "/VaccinationEvent/{id}/summary", // Get event summary with student list
+    GET_RESPONSES: "/VaccinationEvent/{id}/responses", // Get student responses (will attend)
+    GET_PARENT_RESPONSES: "/VaccinationEvent/{id}/parent-responses", // Get parent responses with consent
+    SEND_EMAIL_ALL: "/VaccinationEvent/send-email", // Send email to all parents
+    SEND_EMAIL_SPECIFIC: "/VaccinationEvent/send-email-specific", // Send email to specific parents
   },
 };
 
