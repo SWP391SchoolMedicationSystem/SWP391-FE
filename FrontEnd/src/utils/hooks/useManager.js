@@ -422,7 +422,6 @@ export default {
   useManagerStudents,
   useManagerStaff,
   useManagerNotifications,
-  useVaccinations,
   useParentAccounts,
   useManagerActions,
   useManagerAccounts,
