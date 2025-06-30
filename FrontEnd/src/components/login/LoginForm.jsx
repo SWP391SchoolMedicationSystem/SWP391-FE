@@ -23,11 +23,7 @@ import {
 } from "@mui/icons-material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import {
-  GoogleOAuthProvider,
-  GoogleLogin,
-  googleLogout,
-} from "@react-oauth/google";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import userService from "../../services/userService";
 const clientId =
@@ -202,27 +198,6 @@ export default function LoginForm() {
             />
 
             <Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  htmlFor="password-field"
-                  sx={{ fontWeight: 500 }}
-                ></Typography>
-                <Link
-                  component={RouterLink}
-                  to="/reset-password"
-                  variant="body2"
-                  sx={{ textDecoration: "none" }}
-                >
-                  Forgot password?
-                </Link>
-              </Box>
               <TextField
                 id="password-field"
                 name="password"
@@ -239,8 +214,24 @@ export default function LoginForm() {
                     </InputAdornment>
                   ),
                 }}
-                sx={{ mt: 0.5 }}
+                sx={{ mt: 2 }}
               />
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  mt: 1,
+                }}
+              >
+                <Link
+                  component={RouterLink}
+                  to="/forgot-password"
+                  variant="body2"
+                  sx={{ textDecoration: "none" }}
+                >
+                  Forgot password?
+                </Link>
+              </Box>
             </Box>
 
             <FormControlLabel
@@ -315,8 +306,7 @@ export default function LoginForm() {
                   />
                 </>
               ) : (
-                <>
-                </>
+                <></>
               )}
             </div>
           </GoogleOAuthProvider>

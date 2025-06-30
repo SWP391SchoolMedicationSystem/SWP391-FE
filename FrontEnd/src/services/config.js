@@ -71,6 +71,9 @@ export const API_ENDPOINTS = {
   USER: {
     LOGIN: "/User/user", // POST endpoint for login
     GET_ALL: "/User/user", // GET endpoint for users list
+    FORGOT_PASSWORD: "/User/ForgotPassword", // POST - Send OTP to email
+    VALIDATE_OTP: "/User/ValidateOTP", // POST - Validate OTP code
+    RESET_PASSWORD: "/User/ResetPassword", // POST - Reset password
   },
 
   // Blog (5/7 - workflow: Nurse create → Manager approve → Parent view)

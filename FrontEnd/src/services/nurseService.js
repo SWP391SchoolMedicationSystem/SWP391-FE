@@ -149,24 +149,25 @@ export const nurseBlogService = {
 // Data mapping function for student data
 const mapStudentDataForNurse = (apiStudent) => {
   return {
-    id: apiStudent.studentid,
-    studentId: apiStudent.studentCode || `ST${apiStudent.studentid}`,
+    id: apiStudent.studentId,
+    studentId: apiStudent.studentCode,
     fullName: apiStudent.fullname,
     dateOfBirth: apiStudent.dob,
     age: apiStudent.age,
     gender: apiStudent.gender === true ? "Nam" : "Nữ",
     bloodType: apiStudent.bloodType || "Chưa có thông tin",
-    classId: apiStudent.classid,
-    parentId: apiStudent.parentid,
-    className: `Lớp ${apiStudent.classid}`,
-    parentName: "Chưa có thông tin", // API doesn't return parent info
-    parentPhone: "Chưa có thông tin",
+    className: apiStudent.classname, // Now using classname directly from API
+    parentId: apiStudent.parent?.parentid,
+    parentName: apiStudent.parent?.fullname || "Chưa có thông tin",
+    parentPhone: apiStudent.parent?.phone || "Chưa có thông tin",
+    parentEmail: apiStudent.parent?.email || "Chưa có thông tin",
+    parentAddress: apiStudent.parent?.address || "Chưa có thông tin",
     healthStatus: "Bình thường", // Default value
     enrollmentDate: apiStudent.createdAt
       ? apiStudent.createdAt.split("T")[0]
       : "Chưa có thông tin",
     allergies: "Chưa có thông tin",
-    emergencyContact: "Chưa có thông tin",
+    emergencyContact: apiStudent.parent?.phone || "Chưa có thông tin",
     height: "Chưa có thông tin",
     weight: "Chưa có thông tin",
     notes: "Chưa có thông tin",
