@@ -7,6 +7,7 @@ const PersonalMedicine = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     studentId: '',
+    medicineId: '', // Reference to medicine from API
     medicineName: '',
     medicineType: '',
     quantity: '',
@@ -22,10 +23,12 @@ const PersonalMedicine = () => {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [students, setStudents] = useState([]);
+  const [medicines, setMedicines] = useState([]);
 
   useEffect(() => {
     fetchStudentsByParent();
     loadPersonalMedicines();
+    loadMedicines();
   }, []);
 
   // 🎯 FUNCTION QUAN TRỌNG: Lấy danh sách học sinh CHỈ thuộc về phụ huynh hiện tại
@@ -153,6 +156,24 @@ const PersonalMedicine = () => {
     }
   };
 
+  const loadMedicines = async () => {
+    try {
+      const res = await apiClient.get(API_ENDPOINTS.MEDICINE.GET_ALL);
+      console.log('🔍 Medicines API Response:', res);
+      
+      const medicinesArray = Array.isArray(res) ? res : (Array.isArray(res.data) ? res.data : []);
+      
+      // Filter only active medicines (not deleted)
+      const activeMedicines = medicinesArray.filter(med => !med.isDeleted);
+      console.log(`📊 Active Medicines: ${activeMedicines.length}/${medicinesArray.length}`);
+      
+      setMedicines(activeMedicines);
+    } catch (error) {
+      console.error('Error loading medicines:', error);
+      setMedicines([]);
+    }
+  };
+
   const loadPersonalMedicines = async () => {
     setLoading(true);
     try {
@@ -200,6 +221,21 @@ const PersonalMedicine = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // Special handling for medicine selection
+    if (name === 'medicineId') {
+      const selectedMedicine = medicines.find(med => String(med.medicineid) === String(value));
+      if (selectedMedicine) {
+        setFormData(prev => ({
+          ...prev,
+          medicineId: value,
+          medicineName: selectedMedicine.medicinename,
+          medicineType: selectedMedicine.type
+        }));
+        return;
+      }
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -233,6 +269,11 @@ const PersonalMedicine = () => {
         note: `${formData.medicineName} - ${formData.medicineType}. ${formData.description}. Tình trạng: ${formData.condition}. Liên hệ: ${formData.contactPhone}. Thời gian tiện: ${formData.preferredTime}`
       };
 
+      // Add medicine reference if selected from list
+      if (formData.medicineId) {
+        submitData.medicineId = parseInt(formData.medicineId);
+      }
+
       console.log('Submitting personal medicine data:', submitData);
 
       const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicines', {
@@ -252,6 +293,7 @@ const PersonalMedicine = () => {
       setMessage({ type: 'success', text: 'Thêm thuốc cá nhân thành công!' });
       setFormData({
         studentId: '',
+        medicineId: '',
         medicineName: '',
         medicineType: '',
         quantity: '',
@@ -377,17 +419,37 @@ const PersonalMedicine = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="medicineName">Tên thuốc *</label>
-                <input
-                  type="text"
-                  id="medicineName"
-                  name="medicineName"
-                  value={formData.medicineName}
+                <label htmlFor="medicineId">Chọn thuốc *</label>
+                <select
+                  id="medicineId"
+                  name="medicineId"
+                  value={formData.medicineId}
                   onChange={handleInputChange}
                   required
-                  placeholder="Ví dụ: Paracetamol, Amoxicillin..."
-                />
+                >
+                  <option value="">Chọn thuốc từ danh sách</option>
+                  {medicines.map((medicine) => (
+                    <option key={medicine.medicineid} value={medicine.medicineid}>
+                      {medicine.medicinename} - {medicine.type}
+                    </option>
+                  ))}
+                </select>
               </div>
+
+              {formData.medicineId && (
+                <div className="form-group">
+                  <label htmlFor="medicineName">Tên thuốc đã chọn</label>
+                  <input
+                    type="text"
+                    id="medicineName"
+                    name="medicineName"
+                    value={formData.medicineName}
+                    onChange={handleInputChange}
+                    disabled
+                    placeholder="Tên thuốc sẽ tự động điền"
+                  />
+                </div>
+              )}
 
               <div className="form-row">
                 <div className="form-group">
@@ -400,12 +462,16 @@ const PersonalMedicine = () => {
                     required
                   >
                     <option value="">Chọn loại thuốc</option>
-                    <option value="painkiller">Thuốc giảm đau</option>
-                    <option value="antibiotic">Thuốc kháng sinh</option>
-                    <option value="vitamin">Vitamin</option>
-                    <option value="cold">Thuốc cảm cúm</option>
-                    <option value="fever">Thuốc hạ sốt</option>
-                    <option value="other">Khác</option>
+                    <option value="Tablet">Thuốc viên</option>
+                    <option value="Capsule">Thuốc nang</option>
+                    <option value="Syrup">Siro/Thuốc nước</option>
+                    <option value="Powder">Thuốc bột</option>
+                    <option value="Injection">Thuốc tiêm</option>
+                    <option value="Cream">Thuốc bôi/Kem</option>
+                    <option value="Drops">Thuốc nhỏ mắt/tai/mũi</option>
+                    <option value="Inhaler">Thuốc xịt/Hít</option>
+                    <option value="Suppository">Thuốc đặt</option>
+                    <option value="Other">Khác</option>
                   </select>
                 </div>
 
@@ -520,13 +586,68 @@ const PersonalMedicine = () => {
                 const student = students.find(s => String(s.id) === String(medicine.studentid));
                 const studentName = student?.name || 'Học sinh không xác định';
                 
+                // Try to find medicine name from Medicine API if available, otherwise extract from note
+                const medicineInfo = medicines.find(m => String(m.medicineid) === String(medicine.medicineid));
+                
+                // Debug: Check if medicine IDs match
+                if (index === 0) { // Only log for first item to avoid spam
+                  console.log(`🔍 PersonalMedicine IDs: ${personalMedicines.map(m => m.medicineid).join(', ')}`);
+                  console.log(`🔍 Available Medicine IDs: ${medicines.map(m => m.medicineid).join(', ')}`);
+                }
+                
+                let medicineTitle = `💊 Thuốc cá nhân #${medicine.medicineid}`;
+                
+                if (medicineInfo) {
+                  // Found in Medicine API
+                  medicineTitle = `💊 ${medicineInfo.medicinename} (${medicineInfo.type})`;
+                } else {
+                  // If not found in Medicine API, try to show meaningful title from note or use generic
+                  if (medicine.note && medicine.note.length > 0) {
+                    // Try to extract meaningful info from note
+                    const note = medicine.note.toLowerCase();
+                    let medicineName = '';
+                    
+                    // Check for common medicine patterns in note
+                    if (note.includes('paracetamol')) medicineName = 'Paracetamol';
+                    else if (note.includes('ibuprofen')) medicineName = 'Ibuprofen'; 
+                    else if (note.includes('vitamin')) medicineName = 'Vitamin';
+                    else if (note.includes('syrup') || note.includes('ml')) medicineName = 'Siro';
+                    else if (note.includes('viên')) medicineName = 'Thuốc viên';
+                    else if (note.includes('thuốc')) medicineName = 'Thuốc';
+                    
+                    if (medicineName) {
+                      medicineTitle = `💊 ${medicineName}`;
+                    }
+                  }
+                }
+                
                 return (
                   <div key={medicine.medicineid || index} className="history-item">
-                    <h4>💊 Thuốc cá nhân #{medicine.medicineid}</h4>
+                    <h4>{medicineTitle}</h4>
                     <div className="history-details">
                       <div className="history-detail">
                         <label>Học sinh:</label>
                         <span>{studentName}</span>
+                      </div>
+                      <div className="history-detail">
+                        <label>Thuốc:</label>
+                        <span>
+                          {medicineInfo ? 
+                            `${medicineInfo.medicinename} (${medicineInfo.type})` : 
+                            (() => {
+                              if (medicine.note && medicine.note.length > 0) {
+                                const note = medicine.note.toLowerCase();
+                                if (note.includes('paracetamol')) return 'Paracetamol';
+                                if (note.includes('ibuprofen')) return 'Ibuprofen'; 
+                                if (note.includes('vitamin')) return 'Vitamin';
+                                if (note.includes('syrup') || note.includes('ml')) return 'Siro';
+                                if (note.includes('viên')) return 'Thuốc viên';
+                                if (note.includes('thuốc')) return 'Thuốc';
+                              }
+                              return `Thuốc ID: ${medicine.medicineid}`;
+                            })()
+                          }
+                        </span>
                       </div>
                       <div className="history-detail">
                         <label>Số lượng:</label>

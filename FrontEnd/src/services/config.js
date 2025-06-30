@@ -138,6 +138,11 @@ export const API_ENDPOINTS = {
     UPDATE: "/Student/UpdateStudent", // Update student
     DELETE: "/Student/DeleteStudent", // Delete student
   },
+
+  // Medicine
+  MEDICINE: {
+    GET_ALL: "/Medicine/GetAllMedicines", // Get all medicines
+  },
 };
 
 // Helper function to build URL with ID
