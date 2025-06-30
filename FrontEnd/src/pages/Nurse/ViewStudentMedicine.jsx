@@ -157,7 +157,7 @@ const ViewStudentMedicine = () => {
         updatedAt: new Date().toISOString()
       };
 
-      const response = await fetch(`https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicines/${medicineId}`, {
+      const response = await fetch(`https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine?id=${medicineId}`, {
         method: 'PUT',
         headers: {
           'accept': '*/*',
