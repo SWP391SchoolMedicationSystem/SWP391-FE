@@ -58,7 +58,7 @@ const navItems = [
   },
   {
     to: "/parent/donate-medicine",
-    label: "Gửi Thuốc Cho Học Sinh",
+    label: "Quản Lý Thuốc Cá Nhân",
     icon: <LocalPharmacy />,
   },
 ];

@@ -131,6 +131,7 @@ export const API_ENDPOINTS = {
   // Student (6/6 - all endpoints needed)
   STUDENT: {
     GET_ALL: "/Student/GetAllStudents", // Manager/Nurse student list
+    GET_BY_PARENT: "/Student/GetStudentsByParentId", // Get students by parent ID - more optimal
     GET_BY_ID: "/Student/GetStudentById", // Get student details
     ADD: "/Student/AddStudent", // Add single student
     BULK_ADD: "/Student/student", // Bulk import students
