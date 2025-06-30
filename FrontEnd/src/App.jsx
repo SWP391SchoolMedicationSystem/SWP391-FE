@@ -53,7 +53,7 @@ import ChatWithNurse from "./pages/Parent/ChatWithNurse";
 import ManageHealthRecords from "./pages/Parent/ManageHealthRecords";
 import UpdateProfile from "./pages/Parent/UpdateProfile";
 import PersonalMedicine from "./pages/Parent/PersonalMedicine";
-import PersonalMedicine from "./pages/Parent/PersonalMedicine";
+
 
 function App() {
   return (
