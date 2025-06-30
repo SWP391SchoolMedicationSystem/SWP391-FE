@@ -101,6 +101,18 @@ export const nurseHealthService = {
       throw error;
     }
   },
+
+  // Get full health record by student ID (includes vaccination and health checks)
+  getFullHealthRecord: async (studentId) => {
+    try {
+      const url = `${API_ENDPOINTS.HEALTH_RECORD.GET_FULL_BY_STUDENT}?studentId=${studentId}`;
+      const response = await apiClient.get(url);
+      return response;
+    } catch (error) {
+      console.error("Error getting full health record:", error);
+      throw error;
+    }
+  },
 };
 
 // Mapping function để chuẩn hoá dữ liệu blog cho Nurse UI
@@ -484,6 +496,18 @@ export const nurseConsultationService = {
   createRequest: consultationRequestService.create,
 };
 
+// Main nurse service object
+export const nurseService = {
+  ...nurseHealthService,
+  ...nurseBlogService,
+  ...nurseStudentService,
+  ...nurseNotificationService,
+  ...nurseMedicationService,
+  ...nurseVaccinationService,
+  ...nurseChatService,
+  ...nurseConsultationService,
+};
+
 export default {
   nurseHealthService,
   nurseBlogService,
@@ -493,4 +517,5 @@ export default {
   nurseVaccinationService,
   nurseChatService,
   nurseConsultationService,
+  nurseService,
 };
