@@ -32,6 +32,7 @@ import NurseVaccinationEvents from "./pages/Nurse/VaccinationEvents";
 import NurseVaccinationEventStudents from "./pages/Nurse/VaccinationEventStudents";
 import MedicationSchedule from "./pages/Nurse/MedicationSchedule";
 import HandleMedicine from "./pages/Nurse/HandleMedicine";
+import MedicineManagement from "./pages/Nurse/MedicineManagement";
 import NurseStudentList from "./pages/Nurse/StudentList";
 import NurseBlog from "./pages/Nurse/Blog";
 import ChatWithParents from "./pages/Nurse/ChatWithParents";
@@ -121,6 +122,7 @@ function App() {
           />
           <Route path="medication-schedule" element={<MedicationSchedule />} />
           <Route path="handle-medicine" element={<HandleMedicine />} />
+          <Route path="medicine-management" element={<MedicineManagement />} />
           <Route path="student-list" element={<NurseStudentList />} />
           <Route path="blog" element={<NurseBlog />} />
           <Route path="chat" element={<ChatWithParents />} />
