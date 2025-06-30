@@ -4,11 +4,14 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
 import ManagerLayout from "./components/layout/ManagerLayout";
 import Dashboard from "./pages/Manager/Dashboard";
 import AccountManagement from "./pages/Manager/AccountManagement";
 import BlogManagement from "./pages/Manager/BlogManagement";
-import VaccinationList from "./pages/Manager/VaccinationList";
+
+import ManagerVaccinationEvents from "./pages/Manager/VaccinationEvents";
+import VaccinationEventStudents from "./pages/Manager/VaccinationEventStudents";
 import Notifications from "./pages/Manager/Notifications";
 
 import StudentList from "./pages/Manager/StudentList";
@@ -25,9 +28,12 @@ import AdminSettings from "./pages/Admin/Settings";
 
 // Nurse imports
 import NurseLayout from "./components/layout/NurseLayout";
-import NurseVaccinationList from "./pages/Nurse/VaccinationList";
+
+import NurseVaccinationEvents from "./pages/Nurse/VaccinationEvents";
+import NurseVaccinationEventStudents from "./pages/Nurse/VaccinationEventStudents";
 import MedicationSchedule from "./pages/Nurse/MedicationSchedule";
 import HandleMedicine from "./pages/Nurse/HandleMedicine";
+import MedicineManagement from "./pages/Nurse/MedicineManagement";
 import NurseStudentList from "./pages/Nurse/StudentList";
 import NurseBlog from "./pages/Nurse/Blog";
 import ChatWithParents from "./pages/Nurse/ChatWithParents";
@@ -39,6 +45,7 @@ import ViewStudentMedicine from "./pages/Nurse/ViewStudentMedicine";
 import ParentLayout from "./components/layout/ParentLayout";
 import ParentDashboard from "./pages/Parent/Dashboard";
 import ViewBlog from "./pages/Parent/ViewBlog";
+import ParentVaccinationEvents from "./pages/Parent/VaccinationEvents";
 import HealthHistory from "./pages/Parent/HealthHistory";
 import ParentNotifications from "./pages/Parent/Notifications";
 import Consultation from "./pages/Parent/Consultation";
@@ -54,6 +61,7 @@ function App() {
         {/* Public routes */}
         <Route path="/home" element={<Home />} />
         <Route path="/" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Admin routes */}
@@ -85,7 +93,15 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="accounts" element={<AccountManagement />} />
           <Route path="blogs" element={<BlogManagement />} />
-          <Route path="vaccinations" element={<VaccinationList />} />
+          <Route
+            path="vaccination-events"
+            element={<ManagerVaccinationEvents />}
+          />
+          <Route
+            path="vaccination-events/:eventId/students"
+            element={<VaccinationEventStudents />}
+          />
+
           <Route path="StudentList" element={<StudentList />} />
           <Route path="notifications" element={<Notifications />} />
         </Route>
@@ -99,9 +115,18 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<NurseVaccinationList />} />
+          <Route index element={<NurseVaccinationEvents />} />
+          <Route
+            path="vaccination-events"
+            element={<NurseVaccinationEvents />}
+          />
+          <Route
+            path="vaccination-events/:eventId/students"
+            element={<NurseVaccinationEventStudents />}
+          />
           <Route path="medication-schedule" element={<MedicationSchedule />} />
           <Route path="handle-medicine" element={<HandleMedicine />} />
+          <Route path="medicine-management" element={<MedicineManagement />} />
           <Route path="view-student-medicine" element={<ViewStudentMedicine />} />
           <Route path="student-list" element={<NurseStudentList />} />
           <Route path="blog" element={<NurseBlog />} />
@@ -122,12 +147,19 @@ function App() {
           <Route index element={<ParentDashboard />} />
           <Route path="dashboard" element={<ParentDashboard />} />
           <Route path="view-blog" element={<ViewBlog />} />
+          <Route
+            path="vaccination-events"
+            element={<ParentVaccinationEvents />}
+          />
           <Route path="health-history" element={<HealthHistory />} />
           <Route path="notifications" element={<ParentNotifications />} />
           <Route path="consultation" element={<Consultation />} />
           <Route path="chat-nurse" element={<ChatWithNurse />} />
           <Route path="health-records" element={<ManageHealthRecords />} />
-          <Route path="manage-health-records" element={<ManageHealthRecords />} />
+          <Route
+            path="manage-health-records"
+            element={<ManageHealthRecords />}
+          />
           <Route path="update-profile" element={<UpdateProfile />} />
           <Route path="donate-medicine" element={<DonateMedicine />} />
         </Route>

@@ -6,7 +6,6 @@ import {
   nurseStudentService,
   nurseNotificationService,
   nurseMedicationService,
-  nurseVaccinationService,
   nurseChatService,
 } from "../../services/nurseService";
 
@@ -80,11 +79,6 @@ export const useMedications = () => {
   return useApi(nurseMedicationService.getMedicationSchedule);
 };
 
-// Hook for vaccination management
-export const useNurseVaccinations = () => {
-  return useApi(nurseVaccinationService.getVaccinationList);
-};
-
 // Hook for nurse chat
 export const useNurseChat = () => {
   return useApi(nurseChatService.getChatMessages);
@@ -152,18 +146,6 @@ export const useNurseActions = () => {
     return execute(() => medicationService.deleteMedication(medicationId));
   };
 
-  const scheduleVaccination = async (vaccinationData) => {
-    return execute(() =>
-      nurseVaccinationService.scheduleVaccination(vaccinationData)
-    );
-  };
-
-  const updateVaccination = async (vaccinationId, vaccinationData) => {
-    return execute(() =>
-      nurseVaccinationService.updateVaccination(vaccinationId, vaccinationData)
-    );
-  };
-
   const sendChatMessage = async (messageData) => {
     return execute(() => nurseChatService.sendMessage(messageData));
   };
@@ -181,8 +163,7 @@ export const useNurseActions = () => {
     createMedication,
     updateMedication,
     deleteMedication,
-    scheduleVaccination,
-    updateVaccination,
+
     sendChatMessage,
     loading,
     error,
@@ -195,7 +176,7 @@ export default {
   useNurseStudents,
   useNurseNotifications,
   useMedications,
-  useNurseVaccinations,
+
   useNurseChat,
   useNurseActions,
 };

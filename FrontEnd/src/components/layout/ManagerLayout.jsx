@@ -42,10 +42,11 @@ const navItems = [
   { to: "/manager/accounts", label: "Quản Lý Tài Khoản", icon: <People /> },
   { to: "/manager/blogs", label: "Quản Lý Blog", icon: <Article /> },
   {
-    to: "/manager/vaccinations",
-    label: "Danh Sách Tiêm Chủng",
+    to: "/manager/vaccination-events",
+    label: "Sự Kiện Tiêm Chủng",
     icon: <Vaccines />,
   },
+
   {
     to: "/manager/StudentList",
     label: "Danh Sách Học Sinh",

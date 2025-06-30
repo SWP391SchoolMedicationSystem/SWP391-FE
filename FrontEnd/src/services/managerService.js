@@ -3,26 +3,27 @@ import apiClient, { API_ENDPOINTS, buildApiUrl } from "./config.js";
 // Data mapping functions
 const mapStudentData = (apiStudent) => {
   return {
-    id: apiStudent.studentid,
+    id: apiStudent.studentId,
     studentId: apiStudent.studentCode,
     fullName: apiStudent.fullname,
     dateOfBirth: apiStudent.dob,
     age: apiStudent.age,
     gender: apiStudent.gender === true ? "Nam" : "Nữ", // API returns boolean
     bloodType: apiStudent.bloodType,
-    classId: apiStudent.classid,
-    parentId: apiStudent.parentid,
-    className: `Lớp ${apiStudent.classid}`, // Map classid to className for now
-    parentName: "Chưa có thông tin", // API doesn't return parent info in student list
-    parentPhone: "Chưa có thông tin",
+    className: apiStudent.classname, // Now using classname directly from API
+    parentId: apiStudent.parent?.parentid,
+    parentName: apiStudent.parent?.fullname || "Chưa có thông tin",
+    parentPhone: apiStudent.parent?.phone || "Chưa có thông tin",
+    parentEmail: apiStudent.parent?.email || "Chưa có thông tin",
+    parentAddress: apiStudent.parent?.address || "Chưa có thông tin",
     healthStatus: "Bình thường", // Default value
     enrollmentDate: apiStudent.createdAt
       ? apiStudent.createdAt.split("T")[0]
       : "Chưa có thông tin",
     // Additional fields that might be needed
     allergies: "Chưa có thông tin",
-    emergencyContact: "Chưa có thông tin",
-    address: "Chưa có thông tin",
+    emergencyContact: apiStudent.parent?.phone || "Chưa có thông tin",
+    address: apiStudent.parent?.address || "Chưa có thông tin",
     height: "Chưa có thông tin",
     weight: "Chưa có thông tin",
     notes: "Chưa có thông tin",
@@ -542,71 +543,6 @@ export const managerAccountService = {
   },
 };
 
-// Vaccination Services (Need to create API endpoints)
-export const managerVaccinationService = {
-  // Get vaccination list - MOCK DATA (API chưa có)
-  getVaccinationList: async () => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: 1,
-            studentName: "Nguyễn Văn An",
-            studentId: 1,
-            vaccineName: "Vắc xin COVID-19",
-            scheduledDate: "2024-03-20",
-            status: "scheduled",
-            dose: "Mũi 1",
-            notes: "Kiểm tra sức khỏe trước khi tiêm",
-            class: "Lớp 1A",
-          },
-          {
-            id: 2,
-            studentName: "Trần Thị Bình",
-            studentId: 2,
-            vaccineName: "Vắc xin Cúm mùa",
-            scheduledDate: "2024-03-18",
-            status: "completed",
-            dose: "Mũi duy nhất",
-            completedDate: "2024-03-18",
-            class: "Lớp 2B",
-          },
-        ]);
-      }, 500);
-    });
-  },
-
-  // Schedule vaccination - MOCK DATA (API chưa có)
-  scheduleVaccination: async (vaccinationData) => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: Date.now(),
-          ...vaccinationData,
-          status: "scheduled",
-          createdAt: new Date().toISOString(),
-        });
-      }, 300);
-    });
-  },
-
-  // Update vaccination status - MOCK DATA (API chưa có)
-  updateVaccinationStatus: async (vaccinationId, status) => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: vaccinationId,
-          status: status,
-          updatedAt: new Date().toISOString(),
-        });
-      }, 300);
-    });
-  },
-};
-
 export default {
   managerBlogService,
   managerStudentService,
@@ -614,5 +550,4 @@ export default {
   managerNotificationService,
   managerEmailService,
   managerAccountService,
-  managerVaccinationService,
 };
