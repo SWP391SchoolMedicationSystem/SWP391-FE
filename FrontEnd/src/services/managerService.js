@@ -543,71 +543,6 @@ export const managerAccountService = {
   },
 };
 
-// Vaccination Services (Need to create API endpoints)
-export const managerVaccinationService = {
-  // Get vaccination list - MOCK DATA (API chưa có)
-  getVaccinationList: async () => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: 1,
-            studentName: "Nguyễn Văn An",
-            studentId: 1,
-            vaccineName: "Vắc xin COVID-19",
-            scheduledDate: "2024-03-20",
-            status: "scheduled",
-            dose: "Mũi 1",
-            notes: "Kiểm tra sức khỏe trước khi tiêm",
-            class: "Lớp 1A",
-          },
-          {
-            id: 2,
-            studentName: "Trần Thị Bình",
-            studentId: 2,
-            vaccineName: "Vắc xin Cúm mùa",
-            scheduledDate: "2024-03-18",
-            status: "completed",
-            dose: "Mũi duy nhất",
-            completedDate: "2024-03-18",
-            class: "Lớp 2B",
-          },
-        ]);
-      }, 500);
-    });
-  },
-
-  // Schedule vaccination - MOCK DATA (API chưa có)
-  scheduleVaccination: async (vaccinationData) => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: Date.now(),
-          ...vaccinationData,
-          status: "scheduled",
-          createdAt: new Date().toISOString(),
-        });
-      }, 300);
-    });
-  },
-
-  // Update vaccination status - MOCK DATA (API chưa có)
-  updateVaccinationStatus: async (vaccinationId, status) => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: vaccinationId,
-          status: status,
-          updatedAt: new Date().toISOString(),
-        });
-      }, 300);
-    });
-  },
-};
-
 export default {
   managerBlogService,
   managerStudentService,
@@ -615,5 +550,4 @@ export default {
   managerNotificationService,
   managerEmailService,
   managerAccountService,
-  managerVaccinationService,
 };

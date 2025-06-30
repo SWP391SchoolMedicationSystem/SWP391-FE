@@ -9,7 +9,7 @@ import ManagerLayout from "./components/layout/ManagerLayout";
 import Dashboard from "./pages/Manager/Dashboard";
 import AccountManagement from "./pages/Manager/AccountManagement";
 import BlogManagement from "./pages/Manager/BlogManagement";
-import VaccinationList from "./pages/Manager/VaccinationList";
+
 import ManagerVaccinationEvents from "./pages/Manager/VaccinationEvents";
 import VaccinationEventStudents from "./pages/Manager/VaccinationEventStudents";
 import Notifications from "./pages/Manager/Notifications";
@@ -28,7 +28,7 @@ import AdminSettings from "./pages/Admin/Settings";
 
 // Nurse imports
 import NurseLayout from "./components/layout/NurseLayout";
-import NurseVaccinationList from "./pages/Nurse/VaccinationList";
+
 import NurseVaccinationEvents from "./pages/Nurse/VaccinationEvents";
 import NurseVaccinationEventStudents from "./pages/Nurse/VaccinationEventStudents";
 import MedicationSchedule from "./pages/Nurse/MedicationSchedule";
@@ -99,7 +99,7 @@ function App() {
             path="vaccination-events/:eventId/students"
             element={<VaccinationEventStudents />}
           />
-          <Route path="vaccinations" element={<VaccinationList />} />
+
           <Route path="StudentList" element={<StudentList />} />
           <Route path="notifications" element={<Notifications />} />
         </Route>
@@ -113,7 +113,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<NurseVaccinationList />} />
+          <Route index element={<NurseVaccinationEvents />} />
           <Route
             path="vaccination-events"
             element={<NurseVaccinationEvents />}

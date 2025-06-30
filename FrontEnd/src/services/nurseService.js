@@ -255,7 +255,14 @@ export const nurseMedicationService = {
   getAllMedicines: async () => {
     try {
       const response = await apiClient.get(API_ENDPOINTS.MEDICINE.GET_ALL);
-      return Array.isArray(response) ? response.map(mapMedicineData) : [];
+      if (Array.isArray(response)) {
+        // Filter out soft-deleted medicines (isDeleted = true)
+        const activeMedicines = response.filter(
+          (medicine) => !medicine.isDeleted
+        );
+        return activeMedicines.map(mapMedicineData);
+      }
+      return [];
     } catch (error) {
       console.error("Error getting all medicines:", error);
       throw error;
@@ -269,7 +276,14 @@ export const nurseMedicationService = {
         API_ENDPOINTS.MEDICINE.SEARCH_BY_NAME
       }?searchTerm=${encodeURIComponent(searchTerm)}`;
       const response = await apiClient.get(url);
-      return Array.isArray(response) ? response.map(mapMedicineData) : [];
+      if (Array.isArray(response)) {
+        // Filter out soft-deleted medicines (isDeleted = true)
+        const activeMedicines = response.filter(
+          (medicine) => !medicine.isDeleted
+        );
+        return activeMedicines.map(mapMedicineData);
+      }
+      return [];
     } catch (error) {
       console.error("Error searching medicines by name:", error);
       throw error;
@@ -332,7 +346,7 @@ export const nurseMedicationService = {
   // Delete medicine
   deleteMedicine: async (medicineId) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.MEDICINE.DELETE, medicineId);
+      const url = `${API_ENDPOINTS.MEDICINE.DELETE}?id=${medicineId}`;
       const response = await apiClient.delete(url);
       return response;
     } catch (error) {
@@ -350,6 +364,7 @@ const mapMedicineData = (apiMedicine) => {
     categoryId: apiMedicine.medicinecategoryid,
     type: apiMedicine.type,
     quantity: apiMedicine.quantity,
+    isDeleted: apiMedicine.isDeleted || false,
     createdAt: apiMedicine.createdat
       ? new Date(apiMedicine.createdat).toLocaleDateString("vi-VN")
       : "Chưa có thông tin",
@@ -361,52 +376,6 @@ const mapMedicineData = (apiMedicine) => {
     // Original data for editing
     originalData: apiMedicine,
   };
-};
-
-// Vaccination Services (Need to create API endpoints)
-export const nurseVaccinationService = {
-  // Get vaccination list - MOCK DATA (API chưa có)
-  getVaccinationList: async () => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: 1,
-            studentName: "Nguyễn Văn An",
-            vaccineName: "Vắc xin COVID-19",
-            scheduledDate: "2024-03-20",
-            status: "scheduled",
-            dose: "Mũi 1",
-            notes: "Kiểm tra sức khỏe trước khi tiêm",
-          },
-          {
-            id: 2,
-            studentName: "Trần Thị Bình",
-            vaccineName: "Vắc xin Cúm mùa",
-            scheduledDate: "2024-03-18",
-            status: "completed",
-            dose: "Mũi duy nhất",
-            completedDate: "2024-03-18",
-          },
-        ]);
-      }, 500);
-    });
-  },
-
-  // Update vaccination status - MOCK DATA (API chưa có)
-  updateVaccinationStatus: async (vaccinationId, status) => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: vaccinationId,
-          status: status,
-          updatedAt: new Date().toISOString(),
-        });
-      }, 300);
-    });
-  },
 };
 
 // Chat Services (Need to create API endpoints)
@@ -461,6 +430,5 @@ export default {
   nurseStudentService,
   nurseNotificationService,
   nurseMedicationService,
-  nurseVaccinationService,
   nurseChatService,
 };
