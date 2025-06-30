@@ -242,6 +242,52 @@ const PersonalMedicine = () => {
     }));
   };
 
+  const sendNotificationToNurse = async (medicineData, studentData) => {
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+      const parentName = userInfo.fullName || userInfo.name || 'Phụ huynh';
+      const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+      
+      const notificationData = {
+        message: `📋 Thuốc cá nhân mới từ ${parentName}: "${medicineData.medicineName}" cho học sinh ${studentData.name} (Lớp ${studentData.class}). Số lượng: ${medicineData.quantity}. Hạn sử dụng: ${new Date(medicineData.expiryDate).toLocaleDateString('vi-VN')}. Liên hệ: ${medicineData.contactPhone}`,
+        createdBy: userInfo.userId,
+        recipientType: 'Staff',
+        priority: 'medium',
+        category: 'personal_medicine',
+        createdAt: new Date().toISOString()
+      };
+
+      console.log('🔔 Sending notification to nurse:', notificationData);
+
+      // Use direct fetch with proper headers to ensure token is included
+      const notificationResponse = await fetch(`${apiClient.defaults.baseURL}${API_ENDPOINTS.NOTIFICATION.CREATE_FOR_STAFF}`, {
+        method: 'POST',
+        headers: {
+          'accept': '*/*',
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(notificationData)
+      });
+
+      if (!notificationResponse.ok) {
+        throw new Error(`Notification API error! status: ${notificationResponse.status}`);
+      }
+
+      const result = await notificationResponse.json();
+      console.log('✅ Notification sent successfully to nurse:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ Error sending notification to nurse:', error);
+      // Don't throw error here as medicine was already added successfully
+      // But log the detailed error for debugging
+      console.error('Notification error details:', {
+        error: error.message,
+        stack: error.stack
+      });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -290,7 +336,13 @@ const PersonalMedicine = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      setMessage({ type: 'success', text: 'Thêm thuốc cá nhân thành công!' });
+      // 🎯 GỬI THÔNG BÁO CHO Y TÁ
+      const selectedStudent = students.find(s => String(s.id) === String(formData.studentId));
+      if (selectedStudent) {
+        await sendNotificationToNurse(formData, selectedStudent);
+      }
+
+      setMessage({ type: 'success', text: 'Thêm thuốc cá nhân thành công và đã gửi thông báo cho y tá!' });
       setFormData({
         studentId: '',
         medicineId: '',
@@ -303,6 +355,8 @@ const PersonalMedicine = () => {
         contactPhone: '',
         preferredTime: ''
       });
+      
+      // Cập nhật danh sách thuốc cá nhân
       loadPersonalMedicines();
     } catch (error) {
       console.error('Error submitting personal medicine:', error);
