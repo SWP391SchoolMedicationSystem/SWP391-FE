@@ -40,12 +40,8 @@ import MedlearnLogo from "../../assets/images/Medlearn-logo.png";
 const drawerWidth = 240;
 
 const navItems = [
-  { to: "/nurse", label: "Danh Sách Tiêm Chủng", icon: <VaccinesOutlined /> },
-  {
-    to: "/nurse/vaccination-events",
-    label: "Sự Kiện Tiêm Chủng",
-    icon: <VaccinesOutlined />,
-  },
+  { to: "/nurse", label: "Sự Kiện Tiêm Chủng", icon: <VaccinesOutlined /> },
+
   {
     to: "/nurse/medication-schedule",
     label: "Lịch Uống Thuốc",

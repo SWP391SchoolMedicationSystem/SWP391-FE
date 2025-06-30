@@ -46,11 +46,7 @@ const navItems = [
     label: "Sự Kiện Tiêm Chủng",
     icon: <Vaccines />,
   },
-  {
-    to: "/manager/vaccinations",
-    label: "Danh Sách Tiêm Chủng",
-    icon: <Vaccines />,
-  },
+
   {
     to: "/manager/StudentList",
     label: "Danh Sách Học Sinh",

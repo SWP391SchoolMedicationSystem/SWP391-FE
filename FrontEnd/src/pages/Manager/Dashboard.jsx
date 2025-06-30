@@ -101,13 +101,7 @@ function Dashboard() {
       color: "green",
       path: "/manager/blogs",
     },
-    {
-      title: "Danh Sách Tiêm Chủng",
-      description: "Theo dõi lịch tiêm chủng học sinh",
-      icon: "💉",
-      color: "purple",
-      path: "/manager/vaccinations",
-    },
+
     {
       title: "Danh Sách Học Sinh",
       description: "Quản lý thông tin học sinh",
