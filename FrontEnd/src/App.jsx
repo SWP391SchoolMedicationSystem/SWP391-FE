@@ -39,6 +39,7 @@ import NurseBlog from "./pages/Nurse/Blog";
 import ChatWithParents from "./pages/Nurse/ChatWithParents";
 import StudentHealthRecord from "./pages/Nurse/StudentHealthRecord";
 import NurseNotifications from "./pages/Nurse/Notifications";
+import ViewStudentMedicine from "./pages/Nurse/ViewStudentMedicine";
 
 // Parent imports
 import ParentLayout from "./components/layout/ParentLayout";
@@ -51,6 +52,7 @@ import Consultation from "./pages/Parent/Consultation";
 import ChatWithNurse from "./pages/Parent/ChatWithNurse";
 import ManageHealthRecords from "./pages/Parent/ManageHealthRecords";
 import UpdateProfile from "./pages/Parent/UpdateProfile";
+import DonateMedicine from "./pages/Parent/DonateMedicine";
 
 function App() {
   return (
@@ -125,6 +127,7 @@ function App() {
           <Route path="medication-schedule" element={<MedicationSchedule />} />
           <Route path="handle-medicine" element={<HandleMedicine />} />
           <Route path="medicine-management" element={<MedicineManagement />} />
+          <Route path="view-student-medicine" element={<ViewStudentMedicine />} />
           <Route path="student-list" element={<NurseStudentList />} />
           <Route path="blog" element={<NurseBlog />} />
           <Route path="chat" element={<ChatWithParents />} />
@@ -158,6 +161,7 @@ function App() {
             element={<ManageHealthRecords />}
           />
           <Route path="update-profile" element={<UpdateProfile />} />
+          <Route path="donate-medicine" element={<DonateMedicine />} />
         </Route>
       </Routes>
     </div>
