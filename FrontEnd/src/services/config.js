@@ -71,6 +71,9 @@ export const API_ENDPOINTS = {
   USER: {
     LOGIN: "/User/user", // POST endpoint for login
     GET_ALL: "/User/user", // GET endpoint for users list
+    FORGOT_PASSWORD: "/User/ForgotPassword", // POST - Send OTP to email
+    VALIDATE_OTP: "/User/ValidateOTP", // POST - Validate OTP code
+    RESET_PASSWORD: "/User/ResetPassword", // POST - Reset password
   },
 
   // Blog (5/7 - workflow: Nurse create → Manager approve → Parent view)
@@ -133,15 +136,36 @@ export const API_ENDPOINTS = {
     GET_ALL: "/Student/GetAllStudents", // Manager/Nurse student list
     GET_BY_PARENT: "/Student/GetStudentsByParentId", // Get students by parent ID - more optimal
     GET_BY_ID: "/Student/GetStudentById", // Get student details
+    GET_BY_PARENT: "/Student/GetStudentByParentId/{parentId}", // Get children by parent ID
     ADD: "/Student/AddStudent", // Add single student
     BULK_ADD: "/Student/student", // Bulk import students
     UPDATE: "/Student/UpdateStudent", // Update student
     DELETE: "/Student/DeleteStudent", // Delete student
   },
 
-  // Medicine
+  // Medicine (4/4 - Full CRUD for Nurse)
   MEDICINE: {
-    GET_ALL: "/Medicine/GetAllMedicines", // Get all medicines
+    GET_ALL: "/Medicine/GetAllMedicines", // GET all medicines
+    ADD: "/Medicine/AddMedicine", // POST add new medicine
+    UPDATE: "/Medicine/UpdateMedicine", // PUT update medicine
+    DELETE: "/Medicine/DeleteMedicine", // DELETE medicine
+    SEARCH_BY_NAME: "/Medicine/SearchMedicinesByName", // GET search medicines by name
+  },
+
+  // Vaccination Event (Core feature - All endpoints)
+  VACCINATION_EVENT: {
+    GET_ALL: "/VaccinationEvent", // Get all vaccination events
+    GET_BY_ID: "/VaccinationEvent/{id}", // Get event by ID
+    CREATE: "/VaccinationEvent", // POST - Create new event (Manager only)
+    UPDATE: "/VaccinationEvent", // PUT - Update event (Manager only)
+    DELETE: "/VaccinationEvent/{id}", // DELETE - Delete event (Manager only)
+    GET_UPCOMING: "/VaccinationEvent/upcoming", // Get upcoming events
+    GET_BY_DATE_RANGE: "/VaccinationEvent/date-range", // Get events by date range
+    GET_SUMMARY: "/VaccinationEvent/{id}/summary", // Get event summary with student list
+    GET_RESPONSES: "/VaccinationEvent/{id}/responses", // Get student responses (will attend)
+    GET_PARENT_RESPONSES: "/VaccinationEvent/{id}/parent-responses", // Get parent responses with consent
+    SEND_EMAIL_ALL: "/VaccinationEvent/send-email", // Send email to all parents
+    SEND_EMAIL_SPECIFIC: "/VaccinationEvent/send-email-specific", // Send email to specific parents
   },
 };
 

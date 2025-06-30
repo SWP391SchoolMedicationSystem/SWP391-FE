@@ -40,7 +40,8 @@ import MedlearnLogo from "../../assets/images/Medlearn-logo.png";
 const drawerWidth = 240;
 
 const navItems = [
-  { to: "/nurse", label: "Danh Sách Tiêm Chủng", icon: <VaccinesOutlined /> },
+  { to: "/nurse", label: "Sự Kiện Tiêm Chủng", icon: <VaccinesOutlined /> },
+
   {
     to: "/nurse/medication-schedule",
     label: "Lịch Uống Thuốc",
@@ -50,6 +51,11 @@ const navItems = [
     to: "/nurse/handle-medicine",
     label: "Xử Lý Thuốc",
     icon: <MedicalServices />,
+  },
+  {
+    to: "/nurse/medicine-management",
+    label: "Quản Lý Thuốc",
+    icon: <Medication />,
   },
   { to: "/nurse/blog", label: "Blog", icon: <Article /> },
   { to: "/nurse/chat", label: "Chat Phụ Huynh", icon: <Chat /> },
