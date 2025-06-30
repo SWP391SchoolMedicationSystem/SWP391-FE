@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../css/Parent/DonateMedicine.css';
@@ -322,7 +323,7 @@ const PersonalMedicine = () => {
 
       console.log('Submitting personal medicine data:', submitData);
 
-      const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicines', {
+      const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine', {
         method: 'POST',
         headers: {
           'accept': '*/*',

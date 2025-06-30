@@ -67,6 +67,11 @@ const navItems = [
     label: "Quản Lý Thuốc Cá Nhân",
     icon: <LocalPharmacy />,
   },
+  {
+    to: "/parent/personal-medicine",
+    label: "Quản Lý Thuốc Cá Nhân",
+    icon: <LocalPharmacy />,
+  },
 ];
 
 export default function ParentLayout() {

@@ -53,6 +53,7 @@ import ChatWithNurse from "./pages/Parent/ChatWithNurse";
 import ManageHealthRecords from "./pages/Parent/ManageHealthRecords";
 import UpdateProfile from "./pages/Parent/UpdateProfile";
 import PersonalMedicine from "./pages/Parent/PersonalMedicine";
+import PersonalMedicine from "./pages/Parent/PersonalMedicine";
 
 function App() {
   return (
@@ -161,7 +162,7 @@ function App() {
             element={<ManageHealthRecords />}
           />
           <Route path="update-profile" element={<UpdateProfile />} />
-          <Route path="donate-medicine" element={<PersonalMedicine />} />
+          <Route path="personal-medicine" element={<PersonalMedicine />} />
         </Route>
       </Routes>
     </div>
