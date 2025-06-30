@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { submitDonation, getDonationHistory } from '../../services/parentService';
 import '../../css/Parent/DonateMedicine.css';
 import apiClient, { API_ENDPOINTS } from '../../services/config';
 
-const DonateMedicine = () => {
+const PersonalMedicine = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     studentId: '',
@@ -18,7 +17,7 @@ const DonateMedicine = () => {
     preferredTime: ''
   });
   
-  const [donationHistory, setDonationHistory] = useState([]);
+  const [personalMedicines, setPersonalMedicines] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -26,7 +25,7 @@ const DonateMedicine = () => {
 
   useEffect(() => {
     fetchStudentsByParent();
-    loadDonationHistory();
+    loadPersonalMedicines();
   }, []);
 
   const fetchStudentsByParent = async () => {
@@ -100,14 +99,33 @@ const DonateMedicine = () => {
     }
   };
 
-  const loadDonationHistory = async () => {
+  const loadPersonalMedicines = async () => {
     setLoading(true);
     try {
-      const history = await getDonationHistory();
-      setDonationHistory(history);
+      const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicines', {
+        method: 'GET',
+        headers: {
+          'accept': '*/*',
+          'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Personal Medicines data:', data);
+      
+      // Ensure data is an array
+      const medicinesArray = Array.isArray(data) ? data : (data.data ? data.data : []);
+      setPersonalMedicines(medicinesArray);
+      
     } catch (error) {
-      console.error('Error loading donation history:', error);
-      setMessage({ type: 'error', text: 'Không thể tải lịch sử gửi thuốc' });
+      console.error('Error loading personal medicines:', error);
+      setMessage({ type: 'error', text: 'Không thể tải danh sách thuốc cá nhân' });
+      setPersonalMedicines([]);
     } finally {
       setLoading(false);
     }
@@ -127,8 +145,21 @@ const DonateMedicine = () => {
     setMessage({ type: '', text: '' });
 
     try {
-      await submitDonation(formData);
-      setMessage({ type: 'success', text: 'Gửi thông tin thuốc cho học sinh thành công!' });
+      const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicines', {
+        method: 'POST',
+        headers: {
+          'accept': '*/*',
+          'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      setMessage({ type: 'success', text: 'Thêm thuốc cá nhân thành công!' });
       setFormData({
         studentId: '',
         medicineName: '',
@@ -140,10 +171,10 @@ const DonateMedicine = () => {
         contactPhone: '',
         preferredTime: ''
       });
-      loadDonationHistory();
+      loadPersonalMedicines();
     } catch (error) {
-      console.error('Error submitting donation:', error);
-      setMessage({ type: 'error', text: 'Có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại.' });
+      console.error('Error submitting personal medicine:', error);
+      setMessage({ type: 'error', text: 'Có lỗi xảy ra khi thêm thuốc. Vui lòng thử lại.' });
     } finally {
       setSubmitting(false);
     }
@@ -162,6 +193,7 @@ const DonateMedicine = () => {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'Không có';
     return new Date(dateString).toLocaleDateString('vi-VN', {
       year: 'numeric',
       month: 'long',
@@ -176,41 +208,42 @@ const DonateMedicine = () => {
       {/* Header */}
       <div className="donate-header">
         <div>
-          <h1>Gửi Thuốc Cho Học Sinh</h1>
-          <p>Phụ huynh gửi thuốc cho học sinh mang đến trường, đảm bảo an toàn và đúng quy định</p>
+          <h1>💊 Quản Lý Thuốc Cá Nhân</h1>
+          <p>Quản lý thông tin thuốc cá nhân của học sinh, theo dõi liều dùng và lịch trình dùng thuốc</p>
         </div>
       </div>
 
       {/* Information Section */}
       <div className="donate-info-section">
         <div className="info-header">
-          <h3>ℹ️ Thông Tin Gửi Thuốc Cho Học Sinh</h3>
+          <h3>ℹ️ Thông Tin Thuốc Cá Nhân</h3>
         </div>
         <div className="info-content">
           <div className="info-item">
-            <h4>📋 Quy trình gửi thuốc</h4>
-            <p>Khi bạn gửi thông tin thuốc cho học sinh, nhà trường sẽ:</p>
+            <h4>📋 Quản lý thuốc cá nhân</h4>
+            <p>Hệ thống giúp bạn:</p>
             <ul>
-              <li>Tiếp nhận thông tin thuốc và liên hệ xác nhận nếu cần</li>
-              <li>Hướng dẫn phụ huynh ghi nhãn thuốc rõ ràng (tên học sinh, lớp, liều dùng...)</li>
-              <li>Nhận thuốc từ phụ huynh và bàn giao cho y tế trường</li>
-              <li>Đảm bảo thuốc được sử dụng đúng cho học sinh</li>
+              <li>Theo dõi danh sách thuốc cá nhân của học sinh</li>
+              <li>Quản lý liều dùng và tần suất dùng thuốc</li>
+              <li>Nhắc nhở lịch trình dùng thuốc</li>
+              <li>Theo dõi hạn sử dụng và tình trạng thuốc</li>
             </ul>
           </div>
 
           <div className="info-item">
-            <h4>✅ Lưu ý khi gửi thuốc cho học sinh</h4>
+            <h4>✅ Lưu ý khi quản lý thuốc cá nhân</h4>
             <ul>
-              <li>Thuốc còn hạn sử dụng, bao bì nguyên vẹn</li>
-              <li>Ghi rõ họ tên học sinh, lớp, liều dùng, thời gian dùng trên nhãn thuốc</li>
-              <li>Không gửi thuốc kê đơn đặc biệt (thuốc gây nghiện, kiểm soát...)</li>
-              <li>Thông báo cho giáo viên chủ nhiệm/y tế trường khi gửi thuốc</li>
+              <li>Cập nhật thông tin thuốc chính xác và đầy đủ</li>
+              <li>Theo dõi hạn sử dụng để tránh sử dụng thuốc hết hạn</li>
+              <li>Ghi rõ liều dùng và tần suất để tránh nhầm lẫn</li>
+              <li>Thông báo với y tế trường về thuốc đặc biệt</li>
+              <li>Bảo quản thuốc đúng cách theo hướng dẫn</li>
             </ul>
           </div>
 
           <div className="info-item">
             <h4>📞 Liên hệ hỗ trợ</h4>
-            <p>Nếu bạn có thắc mắc về việc gửi thuốc cho học sinh, vui lòng liên hệ:</p>
+            <p>Nếu bạn có thắc mắc về quản lý thuốc cá nhân, vui lòng liên hệ:</p>
             <ul>
               <li>Hotline: 1900-xxxx</li>
               <li>Email: schoolhealth@medlearn.com</li>
@@ -222,10 +255,10 @@ const DonateMedicine = () => {
 
       {/* Main Content */}
       <div className="donate-content">
-        {/* Send Medicine Form */}
+        {/* Personal Medicine Form */}
         <div className="donate-form-section">
           <div className="form-header">
-            <h3>📋 Form Gửi Thuốc Cho Học Sinh</h3>
+            <h3>📋 Thêm Thuốc Cá Nhân</h3>
           </div>
           <div className="form-content">
             {message.text && (
@@ -371,64 +404,64 @@ const DonateMedicine = () => {
                 className="submit-btn"
                 disabled={submitting}
               >
-                {submitting ? 'Đang gửi...' : 'Gửi thông tin thuốc cho học sinh'}
+                {submitting ? 'Đang thêm...' : 'Thêm thuốc cá nhân'}
               </button>
             </form>
           </div>
         </div>
 
-        {/* Send Medicine History */}
+        {/* Personal Medicine List */}
         <div className="donate-history-section">
           <div className="history-header">
-            <h3>📊 Lịch Sử Gửi Thuốc</h3>
+            <h3>📊 Danh Sách Thuốc Cá Nhân</h3>
           </div>
           <div className="history-content">
             {loading ? (
               <div className="empty-history">
                 <h4>Đang tải...</h4>
               </div>
-            ) : donationHistory.length === 0 ? (
+            ) : personalMedicines.length === 0 ? (
               <div className="empty-history">
-                <h4>Chưa có lịch sử gửi thuốc</h4>
-                <p>Bạn chưa gửi thuốc nào cho học sinh. Hãy bắt đầu bằng cách điền form bên cạnh!</p>
+                <h4>Chưa có thuốc cá nhân nào</h4>
+                <p>Chưa có thuốc cá nhân nào được ghi nhận. Hãy bắt đầu bằng cách thêm thuốc mới!</p>
               </div>
             ) : (
-              donationHistory.map((donation, index) => (
+              personalMedicines.map((medicine, index) => (
                 <div key={index} className="history-item">
-                  <h4>{donation.medicineName}</h4>
+                  <h4>{medicine.medicineName || medicine.name || 'Không có tên thuốc'}</h4>
                   <div className="history-details">
                     <div className="history-detail">
                       <label>Loại thuốc:</label>
-                      <span>{donation.medicineType}</span>
+                      <span>{medicine.medicineType || medicine.type || 'Không xác định'}</span>
                     </div>
                     <div className="history-detail">
                       <label>Số lượng:</label>
-                      <span>{donation.quantity}</span>
+                      <span>{medicine.quantity || 'Không xác định'}</span>
                     </div>
                     <div className="history-detail">
                       <label>Hạn sử dụng:</label>
-                      <span>{new Date(donation.expiryDate).toLocaleDateString('vi-VN')}</span>
+                      <span>{medicine.expiryDate ? new Date(medicine.expiryDate).toLocaleDateString('vi-VN') : 'Không có'}</span>
                     </div>
                     <div className="history-detail">
                       <label>Tình trạng:</label>
-                      <span>{donation.condition}</span>
+                      <span>{medicine.condition || 'Không xác định'}</span>
                     </div>
-                    {donation.studentId && (
+                    {medicine.studentId && (
                       <div className="history-detail">
                         <label>Học sinh:</label>
-                        <span>{students.find(s => String(s.id) === String(donation.studentId))?.name || '---'}</span>
+                        <span>{students.find(s => String(s.id) === String(medicine.studentId))?.name || '---'}</span>
                       </div>
                     )}
                   </div>
-                  {donation.description && (
+                  {medicine.description && (
                     <div className="history-detail">
-                      <label>Mô tả:</label>
-                      <span>{donation.description}</span>
+                      <label>Ghi chú:</label>
+                      <span>{medicine.description}</span>
                     </div>
                   )}
                   <div className="history-status">
-                    {getStatusBadge(donation.status)}
-                    <span className="history-date">{formatDate(donation.createdAt)}</span>
+                    {getStatusBadge(medicine.status || 'active')}
+                    <span className="history-date">{formatDate(medicine.createdAt || medicine.created)}</span>
                   </div>
                 </div>
               ))
@@ -441,7 +474,7 @@ const DonateMedicine = () => {
       {submitting && (
         <div className="loading-overlay">
           <div className="loading-spinner">
-            <h4>Đang gửi thông tin...</h4>
+            <h4>Đang thêm thuốc...</h4>
             <p>Vui lòng chờ trong giây lát</p>
           </div>
         </div>
@@ -450,4 +483,4 @@ const DonateMedicine = () => {
   );
 };
 
-export default DonateMedicine; 
+export default PersonalMedicine; 
