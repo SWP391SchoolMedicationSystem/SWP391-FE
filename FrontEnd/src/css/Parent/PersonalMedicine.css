@@ -474,4 +474,161 @@
 
 .loading-overlay {
   animation: fadeIn 0.3s ease-out;
+}
+
+/* Edit/Delete Functionality Styles */
+.edit-notice {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  padding: 16px 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 4px solid #ff6b6b;
+}
+
+.edit-notice span {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.cancel-edit-btn {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancel-edit-btn:hover {
+  background: #e55656;
+  transform: translateY(-1px);
+}
+
+.medicine-card-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e9ecef;
+}
+
+.edit-btn, .delete-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.edit-btn {
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+  color: white;
+}
+
+.edit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(116, 185, 255, 0.4);
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+  color: white;
+}
+
+.delete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 118, 117, 0.4);
+}
+
+.edit-btn:disabled, .delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal {
+  background: white;
+  padding: 32px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  animation: slideIn 0.3s ease;
+}
+
+.modal h3 {
+  color: #2c3e50;
+  margin-bottom: 16px;
+  font-size: 1.4rem;
+}
+
+.modal p {
+  color: #5a6c7d;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.cancel-btn, .confirm-delete-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.cancel-btn {
+  background: #95a5a6;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: #7f8c8d;
+}
+
+.confirm-delete-btn {
+  background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+  color: white;
+}
+
+.confirm-delete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 118, 117, 0.4);
+}
+
+.confirm-delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 } 
