@@ -54,7 +54,7 @@ const navItems = [
   },
   {
     to: "/nurse/medicine-management",
-    label: "Quản Lý Thuốc",
+    label: "Đưa thuốc cho học sinh",
     icon: <Medication />,
   },
   { to: "/nurse/view-student-medicine", label: "Đơn thuốc từ phụ huynh", icon: <Medication /> },
