@@ -47,6 +47,7 @@ import ParentNotifications from "./pages/Parent/Notifications";
 import Consultation from "./pages/Parent/Consultation";
 import ChatWithNurse from "./pages/Parent/ChatWithNurse";
 import ManageHealthRecords from "./pages/Parent/ManageHealthRecords";
+import ParentStudentHealthRecordDetail from "./pages/Parent/StudentHealthRecordDetail";
 import UpdateProfile from "./pages/Parent/UpdateProfile";
 
 function App() {
@@ -144,6 +145,10 @@ function App() {
           <Route path="consultation" element={<Consultation />} />
           <Route path="chat-nurse" element={<ChatWithNurse />} />
           <Route path="health-records" element={<ManageHealthRecords />} />
+          <Route
+            path="health-records/:studentId"
+            element={<ParentStudentHealthRecordDetail />}
+          />
           <Route
             path="manage-health-records"
             element={<ManageHealthRecords />}
