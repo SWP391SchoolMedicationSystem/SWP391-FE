@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Table from '../../components/common/Table';
-import '../../css/Parent/DonateMedicine.css';
+import '../../css/Nurse/ViewStudentMedicine.css';
 import apiClient, { API_ENDPOINTS } from '../../services/config';
 
 const statusMap = {
@@ -84,6 +84,7 @@ const ViewStudentMedicine = () => {
         
         return {
           id: medicine.medicineid,
+          studentId: medicine.studentid, // Add student ID for filtering
           studentName: student?.name || student?.fullName || 'Học sinh không xác định',
           class: student?.class || student?.className || 'Không xác định',
           parentName: parentName,
@@ -274,43 +275,42 @@ const ViewStudentMedicine = () => {
   ];
 
   return (
-    <div className="donate-medicine-container">
-      <div className="donate-header">
+        <div className="view-student-medicine-container">
+      <div className="medicine-header">
         <div>
           <h1>💊 Đơn Thuốc Từ Phụ Huynh</h1>
           <p>Xem, kiểm tra và duyệt các đơn thuốc phụ huynh gửi cho học sinh</p>
         </div>
         <button 
           onClick={loadPersonalMedicines}
-          className="submit-btn"
-          style={{ width: 'auto', padding: '10px 20px' }}
+          className="refresh-btn"
         >
           🔄 Làm mới
         </button>
       </div>
 
       {/* Statistics */}
-      <div className="donate-info-section">
-        <div className="info-content" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-          <div className="info-item" style={{ textAlign: 'center' }}>
+      <div className="medicine-info-section">
+        <div className="info-content">
+          <div className="info-item">
             <h4>📊 Tổng số đơn</h4>
-            <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#3b82f6' }}>{requests.length}</p>
+            <p style={{ color: '#3b82f6' }}>{requests.length}</p>
           </div>
-          <div className="info-item" style={{ textAlign: 'center' }}>
+          <div className="info-item">
             <h4>⏳ Chờ duyệt</h4>
-            <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#f59e0b' }}>
+            <p style={{ color: '#f59e0b' }}>
               {requests.filter(r => r.status === 'pending').length}
             </p>
           </div>
-          <div className="info-item" style={{ textAlign: 'center' }}>
+          <div className="info-item">
             <h4>✅ Đã duyệt</h4>
-            <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#10b981' }}>
+            <p style={{ color: '#10b981' }}>
               {requests.filter(r => r.status === 'approved').length}
             </p>
           </div>
-          <div className="info-item" style={{ textAlign: 'center' }}>
+          <div className="info-item">
             <h4>❌ Từ chối</h4>
-            <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#ef4444' }}>
+            <p style={{ color: '#ef4444' }}>
               {requests.filter(r => r.status === 'rejected').length}
             </p>
           </div>
@@ -324,7 +324,7 @@ const ViewStudentMedicine = () => {
         </div>
       )}
 
-      <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.08)', padding: 24, marginTop: 24 }}>
+      <div className="table-container">
         <Table
           data={requests}
           columns={columns}

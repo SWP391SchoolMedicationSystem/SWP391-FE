@@ -182,7 +182,7 @@ function MedicineManagement() {
   return (
     <div className="medicine-management-container">
       <div className="medicine-management-header">
-        <h1>💊 Quản Lý Thuốc</h1>
+        <h1>💊 Đưa thuốc cho học sinh</h1>
         <p>Quản lý kho thuốc của trường</p>
       </div>
 

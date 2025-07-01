@@ -62,11 +62,7 @@ const navItems = [
     label: "Hồ Sơ Sức Khỏe",
     icon: <FolderShared />,
   },
-  {
-    to: "/parent/donate-medicine",
-    label: "Gửi Thuốc Cho Học Sinh",
-    icon: <LocalPharmacy />,
-  },
+
   {
     to: "/parent/personal-medicine",
     label: "Quản Lý Thuốc Cá Nhân",
