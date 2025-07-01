@@ -134,7 +134,9 @@ function ParentDashboard() {
     navigate("/parent/chat");
   };
 
-
+  const handlePersonalMedicine = () => {
+    navigate("/parent/personal-medicine");
+  };
 
   return (
     <div className="parent-dashboard-container">
@@ -298,9 +300,9 @@ function ParentDashboard() {
             <span className="action-icon">📰</span>
             <span>Đọc Blog Sức Khỏe</span>
           </button>
-          <button className="action-btn donate-btn" onClick={handleDonateMedicine}>
+          <button className="action-btn donate-btn" onClick={handlePersonalMedicine}>
             <span className="action-icon">💊</span>
-            <span>Quyên Góp Thuốc</span>
+            <span>Thuốc Cá Nhân</span>
           </button>
         </div>
       </div>
