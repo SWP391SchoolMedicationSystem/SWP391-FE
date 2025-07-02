@@ -1,8 +1,31 @@
 import { useState, useEffect } from "react";
-import "../../css/Parent/VaccinationEvents.css";
+import { useOutletContext } from "react-router-dom";
 import { vaccinationEventService } from "../../services/vaccinationService";
 
+// Material-UI Icons
+import VaccinesIcon from "@mui/icons-material/Vaccines";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+import ScheduleIcon from "@mui/icons-material/Schedule";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import CloseIcon from "@mui/icons-material/Close";
+import InfoIcon from "@mui/icons-material/Info";
+import DescriptionIcon from "@mui/icons-material/Description";
+import NotesIcon from "@mui/icons-material/Notes";
+import WarningIcon from "@mui/icons-material/Warning";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import ErrorIcon from "@mui/icons-material/Error";
+import InboxIcon from "@mui/icons-material/Inbox";
+
 function VaccinationEvents() {
+  // Get theme from parent layout
+  const context = useOutletContext();
+  const { theme, isDarkMode } = context || { theme: null, isDarkMode: false };
+
   // States for events management
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -36,15 +59,6 @@ function VaccinationEvents() {
     setShowDetailModal(true);
   };
 
-  // Get status badge class
-  const getStatusBadgeClass = (event) => {
-    const eventDate = new Date(event.eventDate);
-    const today = new Date();
-
-    if (eventDate < today) return "status-completed";
-    return "status-upcoming";
-  };
-
   // Get status text
   const getStatusText = (event) => {
     const eventDate = new Date(event.eventDate);
@@ -54,23 +68,40 @@ function VaccinationEvents() {
     return "Sắp diễn ra";
   };
 
-  // Get response badge class
-  const getResponseBadgeClass = (responseStatus) => {
-    switch (responseStatus) {
-      case "Đã đồng ý":
-        return "response-confirmed";
-      case "Đã từ chối":
-        return "response-declined";
-      default:
-        return "response-pending";
-    }
-  };
-
   if (loading) {
     return (
-      <div className="vaccination-events-container">
-        <div className="loading-state">
-          <p>⏳ Đang tải danh sách sự kiện tiêm chủng...</p>
+      <div
+        style={{
+          padding: "20px",
+          background: theme ? theme.background : "#f2f6f3",
+          minHeight: "100vh",
+          fontFamily:
+            "Satoshi, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+        }}
+      >
+        <div
+          style={{
+            background: theme ? theme.cardBg : "white",
+            borderRadius: "20px",
+            padding: "40px",
+            textAlign: "center",
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+            border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
+          }}
+        >
+          <HourglassEmptyIcon
+            sx={{ color: "#97a19b", fontSize: "3rem", marginBottom: "15px" }}
+          />
+          <p
+            style={{
+              margin: 0,
+              color: theme ? theme.textSecondary : "#97a19b",
+              fontFamily: "Satoshi, sans-serif",
+              fontSize: "1.1rem",
+            }}
+          >
+            Đang tải danh sách sự kiện tiêm chủng...
+          </p>
         </div>
       </div>
     );
@@ -78,11 +109,63 @@ function VaccinationEvents() {
 
   if (error) {
     return (
-      <div className="vaccination-events-container">
-        <div className="error-state">
-          <p>❌ {error}</p>
-          <button onClick={fetchVaccinationEvents} className="retry-btn">
-            🔄 Thử lại
+      <div
+        style={{
+          padding: "20px",
+          background: theme ? theme.background : "#f2f6f3",
+          minHeight: "100vh",
+          fontFamily:
+            "Satoshi, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+        }}
+      >
+        <div
+          style={{
+            background: theme ? theme.cardBg : "white",
+            borderRadius: "20px",
+            padding: "40px",
+            textAlign: "center",
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+            border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
+          }}
+        >
+          <ErrorIcon
+            sx={{ color: "#c3555c", fontSize: "3rem", marginBottom: "15px" }}
+          />
+          <p
+            style={{
+              margin: "0 0 20px 0",
+              color: theme ? theme.textPrimary : "#2f5148",
+              fontFamily: "Satoshi, sans-serif",
+              fontSize: "1.1rem",
+            }}
+          >
+            {error}
+          </p>
+          <button
+            onClick={fetchVaccinationEvents}
+            style={{
+              background: theme
+                ? isDarkMode
+                  ? "#2d4739"
+                  : "#2f5148"
+                : "#2f5148",
+              color: "white",
+              border: "none",
+              padding: "12px 24px",
+              borderRadius: "10px",
+              cursor: "pointer",
+              fontSize: "1rem",
+              fontWeight: 500,
+              fontFamily: "Satoshi, sans-serif",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              margin: "0 auto",
+              transition: "all 0.3s ease",
+            }}
+          >
+            <RefreshIcon sx={{ fontSize: "1.2rem" }} />
+            Thử lại
           </button>
         </div>
       </div>
@@ -90,134 +173,669 @@ function VaccinationEvents() {
   }
 
   return (
-    <div className="vaccination-events-container">
+    <div
+      style={{
+        padding: "20px",
+        background: theme ? theme.background : "#f2f6f3",
+        minHeight: "100vh",
+        fontFamily:
+          "Satoshi, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+        transition: "all 0.3s ease",
+      }}
+    >
       {/* Header */}
-      <div className="page-header">
-        <div className="header-content">
-          <h1>💉 Thông Tin Tiêm Chủng</h1>
-          <p>Xem thông tin các đợt tiêm vaccine cho con em</p>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "30px",
+          padding: "30px",
+          borderRadius: "20px",
+          background: theme
+            ? isDarkMode
+              ? "linear-gradient(135deg, #2a2a2a 0%, #333333 100%)"
+              : "linear-gradient(135deg, #2f5148 0%, #73ad67 100%)"
+            : "linear-gradient(135deg, #2f5148 0%, #73ad67 100%)",
+          color: "white",
+          boxShadow: "0 4px 20px rgba(47, 81, 72, 0.3)",
+        }}
+      >
+        <div>
+          <h1
+            style={{
+              fontSize: "2.5rem",
+              margin: 0,
+              fontWeight: 700,
+              fontFamily: "Satoshi, sans-serif",
+              color: "white",
+              display: "flex",
+              alignItems: "center",
+              gap: "15px",
+            }}
+          >
+            <VaccinesIcon sx={{ color: "white", fontSize: "2.5rem" }} />
+            Thông Tin Tiêm Chủng
+          </h1>
+          <p
+            style={{
+              fontSize: "1.1rem",
+              margin: "10px 0 0 0",
+              opacity: 0.9,
+              fontFamily: "Satoshi, sans-serif",
+              color: "white",
+            }}
+          >
+            Xem thông tin các đợt tiêm vaccine cho con em
+          </p>
         </div>
-        <div className="header-actions">
-          <button onClick={fetchVaccinationEvents} className="refresh-btn">
-            🔄 Tải lại
-          </button>
-        </div>
+        <button
+          onClick={fetchVaccinationEvents}
+          style={{
+            background: "rgba(255, 255, 255, 0.2)",
+            color: "white",
+            border: "none",
+            padding: "12px 20px",
+            borderRadius: "10px",
+            cursor: "pointer",
+            fontSize: "1rem",
+            fontWeight: 500,
+            fontFamily: "Satoshi, sans-serif",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            transition: "all 0.3s ease",
+            backdropFilter: "blur(10px)",
+          }}
+        >
+          <RefreshIcon sx={{ fontSize: "1.2rem" }} />
+          Tải lại
+        </button>
       </div>
 
       {/* Statistics */}
-      <div className="stats-row">
-        <div className="stat-card">
-          <div className="stat-icon">📅</div>
-          <div className="stat-content">
-            <h3>{events.length}</h3>
-            <p>Tổng sự kiện</p>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+          gap: "20px",
+          marginBottom: "30px",
+        }}
+      >
+        <div
+          style={{
+            background: theme ? theme.cardBg : "white",
+            padding: "25px",
+            borderRadius: "18px",
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+            boxShadow: "0 2px 10px rgba(193, 203, 194, 0.3)",
+            border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
+            transition: "transform 0.2s ease, box-shadow 0.2s ease",
+          }}
+        >
+          <div
+            style={{
+              padding: "15px",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "rgba(191, 239, 161, 0.3)",
+            }}
+          >
+            <CalendarTodayIcon sx={{ color: "#97a19b", fontSize: "2.5rem" }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: "2rem",
+                margin: 0,
+                color: theme ? theme.textPrimary : "#2f5148",
+                fontWeight: 700,
+                fontFamily: "Satoshi, sans-serif",
+              }}
+            >
+              {events.length}
+            </h3>
+            <p
+              style={{
+                margin: "5px 0 0 0",
+                color: theme ? theme.textSecondary : "#97a19b",
+                fontFamily: "Satoshi, sans-serif",
+              }}
+            >
+              Tổng sự kiện
+            </p>
           </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-icon">✅</div>
-          <div className="stat-content">
-            <h3>
+
+        <div
+          style={{
+            background: theme ? theme.cardBg : "white",
+            padding: "25px",
+            borderRadius: "18px",
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+            boxShadow: "0 2px 10px rgba(193, 203, 194, 0.3)",
+            border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
+            transition: "transform 0.2s ease, box-shadow 0.2s ease",
+          }}
+        >
+          <div
+            style={{
+              padding: "15px",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "rgba(191, 239, 161, 0.3)",
+            }}
+          >
+            <CheckCircleIcon sx={{ color: "#97a19b", fontSize: "2.5rem" }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: "2rem",
+                margin: 0,
+                color: theme ? theme.textPrimary : "#2f5148",
+                fontWeight: 700,
+                fontFamily: "Satoshi, sans-serif",
+              }}
+            >
               {events.filter((e) => e.responseStatus === "Đã đồng ý").length}
             </h3>
-            <p>Đã đồng ý</p>
+            <p
+              style={{
+                margin: "5px 0 0 0",
+                color: theme ? theme.textSecondary : "#97a19b",
+                fontFamily: "Satoshi, sans-serif",
+              }}
+            >
+              Đã đồng ý
+            </p>
           </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-icon">❌</div>
-          <div className="stat-content">
-            <h3>
+
+        <div
+          style={{
+            background: theme ? theme.cardBg : "white",
+            padding: "25px",
+            borderRadius: "18px",
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+            boxShadow: "0 2px 10px rgba(193, 203, 194, 0.3)",
+            border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
+            transition: "transform 0.2s ease, box-shadow 0.2s ease",
+          }}
+        >
+          <div
+            style={{
+              padding: "15px",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "rgba(191, 239, 161, 0.3)",
+            }}
+          >
+            <CancelIcon sx={{ color: "#97a19b", fontSize: "2.5rem" }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: "2rem",
+                margin: 0,
+                color: theme ? theme.textPrimary : "#2f5148",
+                fontWeight: 700,
+                fontFamily: "Satoshi, sans-serif",
+              }}
+            >
               {events.filter((e) => e.responseStatus === "Đã từ chối").length}
             </h3>
-            <p>Đã từ chối</p>
+            <p
+              style={{
+                margin: "5px 0 0 0",
+                color: theme ? theme.textSecondary : "#97a19b",
+                fontFamily: "Satoshi, sans-serif",
+              }}
+            >
+              Đã từ chối
+            </p>
           </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-icon">⏳</div>
-          <div className="stat-content">
-            <h3>
+
+        <div
+          style={{
+            background: theme ? theme.cardBg : "white",
+            padding: "25px",
+            borderRadius: "18px",
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+            boxShadow: "0 2px 10px rgba(193, 203, 194, 0.3)",
+            border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
+            transition: "transform 0.2s ease, box-shadow 0.2s ease",
+          }}
+        >
+          <div
+            style={{
+              padding: "15px",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "rgba(191, 239, 161, 0.3)",
+            }}
+          >
+            <ScheduleIcon sx={{ color: "#97a19b", fontSize: "2.5rem" }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: "2rem",
+                margin: 0,
+                color: theme ? theme.textPrimary : "#2f5148",
+                fontWeight: 700,
+                fontFamily: "Satoshi, sans-serif",
+              }}
+            >
               {
                 events.filter((e) => e.responseStatus === "Chưa phản hồi")
                   .length
               }
             </h3>
-            <p>Chưa phản hồi</p>
+            <p
+              style={{
+                margin: "5px 0 0 0",
+                color: theme ? theme.textSecondary : "#97a19b",
+                fontFamily: "Satoshi, sans-serif",
+              }}
+            >
+              Chưa phản hồi
+            </p>
           </div>
         </div>
       </div>
 
       {/* Events List */}
-      <div className="events-section">
-        <h2>📋 Lịch tiêm chủng</h2>
+      <div
+        style={{
+          background: theme ? theme.cardBg : "white",
+          borderRadius: "20px",
+          padding: "25px",
+          marginBottom: "30px",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+          border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
+          transition: "all 0.3s ease",
+        }}
+      >
+        <h2
+          style={{
+            margin: "0 0 30px 0",
+            color: theme ? theme.textPrimary : "#2f5148",
+            fontFamily: "Satoshi, sans-serif",
+            fontSize: "1.5rem",
+            fontWeight: 600,
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
+          <VaccinesIcon sx={{ color: "#97a19b", fontSize: "1.5rem" }} />
+          Lịch tiêm chủng
+        </h2>
 
         {events.length > 0 ? (
-          <div className="events-grid">
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))",
+              gap: "25px",
+            }}
+          >
             {events.map((event) => (
-              <div key={event.id} className="event-card">
-                <div className="card-header">
-                  <div className="event-title">
-                    <h3>{event.title}</h3>
-                    <div className="status-badges">
-                      <span
-                        className={`status-badge ${getStatusBadgeClass(event)}`}
-                      >
-                        {getStatusText(event)}
-                      </span>
-                      <span
-                        className={`response-badge ${getResponseBadgeClass(
-                          event.responseStatus
-                        )}`}
-                      >
-                        {event.responseStatus}
-                      </span>
-                    </div>
+              <div
+                key={event.id}
+                style={{
+                  background: theme
+                    ? isDarkMode
+                      ? "#2a2a2a"
+                      : "white"
+                    : "white",
+                  borderRadius: "18px",
+                  overflow: "hidden",
+                  boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+                  border: theme
+                    ? `1px solid ${theme.border}`
+                    : "1px solid #e9ecef",
+                  transition: "all 0.3s ease",
+                  cursor: "pointer",
+                }}
+              >
+                {/* Card Header */}
+                <div
+                  style={{
+                    padding: "20px 25px",
+                    borderBottom: theme
+                      ? `1px solid ${theme.border}`
+                      : "1px solid #e9ecef",
+                  }}
+                >
+                  <h3
+                    style={{
+                      margin: "0 0 15px 0",
+                      color: theme ? theme.textPrimary : "#2f5148",
+                      fontFamily: "Satoshi, sans-serif",
+                      fontSize: "1.3rem",
+                      fontWeight: 600,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {event.title}
+                  </h3>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <span
+                      style={{
+                        background:
+                          getStatusText(event) === "Đã hoàn thành"
+                            ? "#85b06d"
+                            : theme
+                            ? isDarkMode
+                              ? "#4a5568"
+                              : "#bfefa1"
+                            : "#bfefa1",
+                        color:
+                          getStatusText(event) === "Đã hoàn thành"
+                            ? "white"
+                            : theme
+                            ? isDarkMode
+                              ? "#ffffff"
+                              : "#1a3a2e"
+                            : "#1a3a2e",
+                        padding: "4px 12px",
+                        borderRadius: "15px",
+                        fontSize: "0.8rem",
+                        fontWeight: 500,
+                        fontFamily: "Satoshi, sans-serif",
+                      }}
+                    >
+                      {getStatusText(event)}
+                    </span>
+
+                    <span
+                      style={{
+                        background:
+                          event.responseStatus === "Đã đồng ý"
+                            ? "#85b06d"
+                            : event.responseStatus === "Đã từ chối"
+                            ? "#c3555c"
+                            : theme
+                            ? isDarkMode
+                              ? "#4a5568"
+                              : "#c1cbc2"
+                            : "#c1cbc2",
+                        color: "white",
+                        padding: "4px 12px",
+                        borderRadius: "15px",
+                        fontSize: "0.8rem",
+                        fontWeight: 500,
+                        fontFamily: "Satoshi, sans-serif",
+                      }}
+                    >
+                      {event.responseStatus}
+                    </span>
                   </div>
                 </div>
 
-                <div className="card-body">
-                  <div className="event-info">
-                    <div className="info-row">
-                      <span className="label">💉 Vaccine:</span>
-                      <span className="value">{event.vaccineName}</span>
+                {/* Card Body */}
+                <div style={{ padding: "20px 25px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "12px",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                      }}
+                    >
+                      <VaccinesIcon
+                        sx={{ color: "#97a19b", fontSize: "1.2rem" }}
+                      />
+                      <span
+                        style={{
+                          color: theme ? theme.textSecondary : "#97a19b",
+                          fontSize: "0.9rem",
+                          fontFamily: "Satoshi, sans-serif",
+                          fontWeight: 500,
+                        }}
+                      >
+                        Vaccine:
+                      </span>
+                      <span
+                        style={{
+                          color: theme ? theme.textPrimary : "#2f5148",
+                          fontSize: "0.9rem",
+                          fontFamily: "Satoshi, sans-serif",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {event.vaccineName}
+                      </span>
                     </div>
-                    <div className="info-row">
-                      <span className="label">📅 Ngày tiêm:</span>
-                      <span className="value">{event.eventDate}</span>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                      }}
+                    >
+                      <CalendarTodayIcon
+                        sx={{ color: "#97a19b", fontSize: "1.2rem" }}
+                      />
+                      <span
+                        style={{
+                          color: theme ? theme.textSecondary : "#97a19b",
+                          fontSize: "0.9rem",
+                          fontFamily: "Satoshi, sans-serif",
+                          fontWeight: 500,
+                        }}
+                      >
+                        Ngày tiêm:
+                      </span>
+                      <span
+                        style={{
+                          color: theme ? theme.textPrimary : "#2f5148",
+                          fontSize: "0.9rem",
+                          fontFamily: "Satoshi, sans-serif",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {event.eventDate}
+                      </span>
                     </div>
-                    <div className="info-row">
-                      <span className="label">⏰ Giờ tiêm:</span>
-                      <span className="value">
+
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                      }}
+                    >
+                      <AccessTimeIcon
+                        sx={{ color: "#97a19b", fontSize: "1.2rem" }}
+                      />
+                      <span
+                        style={{
+                          color: theme ? theme.textSecondary : "#97a19b",
+                          fontSize: "0.9rem",
+                          fontFamily: "Satoshi, sans-serif",
+                          fontWeight: 500,
+                        }}
+                      >
+                        Giờ tiêm:
+                      </span>
+                      <span
+                        style={{
+                          color: theme ? theme.textPrimary : "#2f5148",
+                          fontSize: "0.9rem",
+                          fontFamily: "Satoshi, sans-serif",
+                          fontWeight: 600,
+                        }}
+                      >
                         {event.eventTime || "Chưa có"}
                       </span>
                     </div>
-                    <div className="info-row">
-                      <span className="label">📍 Địa điểm:</span>
-                      <span className="value">{event.location}</span>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                      }}
+                    >
+                      <LocationOnIcon
+                        sx={{ color: "#97a19b", fontSize: "1.2rem" }}
+                      />
+                      <span
+                        style={{
+                          color: theme ? theme.textSecondary : "#97a19b",
+                          fontSize: "0.9rem",
+                          fontFamily: "Satoshi, sans-serif",
+                          fontWeight: 500,
+                        }}
+                      >
+                        Địa điểm:
+                      </span>
+                      <span
+                        style={{
+                          color: theme ? theme.textPrimary : "#2f5148",
+                          fontSize: "0.9rem",
+                          fontFamily: "Satoshi, sans-serif",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {event.location}
+                      </span>
                     </div>
                   </div>
 
                   {event.description && (
-                    <div className="event-description">
-                      <p>{event.description}</p>
+                    <div
+                      style={{
+                        background: theme
+                          ? isDarkMode
+                            ? "#333333"
+                            : "#f8f9fa"
+                          : "#f8f9fa",
+                        padding: "15px",
+                        borderRadius: "12px",
+                        marginBottom: "20px",
+                        border: theme
+                          ? `1px solid ${theme.border}`
+                          : "1px solid #e9ecef",
+                      }}
+                    >
+                      <p
+                        style={{
+                          margin: 0,
+                          color: theme ? theme.textSecondary : "#97a19b",
+                          fontSize: "0.9rem",
+                          fontFamily: "Satoshi, sans-serif",
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {event.description}
+                      </p>
                     </div>
                   )}
-                </div>
 
-                <div className="card-footer">
+                  {/* Card Footer */}
                   <button
-                    className="view-btn"
                     onClick={() => handleViewDetails(event)}
+                    style={{
+                      width: "100%",
+                      background: theme
+                        ? isDarkMode
+                          ? "#2d4739"
+                          : "#2f5148"
+                        : "#2f5148",
+                      color: "white",
+                      border: "none",
+                      padding: "12px 20px",
+                      borderRadius: "10px",
+                      cursor: "pointer",
+                      fontSize: "1rem",
+                      fontWeight: 500,
+                      fontFamily: "Satoshi, sans-serif",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                      transition: "all 0.3s ease",
+                    }}
                   >
-                    👁️ Xem chi tiết
+                    <VisibilityIcon sx={{ fontSize: "1.2rem" }} />
+                    Xem chi tiết
                   </button>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="no-events">
-            <div className="no-events-icon">💉</div>
-            <p>Chưa có sự kiện tiêm chủng nào</p>
-            <small>Liên hệ nhà trường để biết thêm thông tin</small>
+          <div
+            style={{
+              textAlign: "center",
+              padding: "40px",
+              background: theme
+                ? isDarkMode
+                  ? "#333333"
+                  : "#f8f9fa"
+                : "#f8f9fa",
+              borderRadius: "15px",
+              border: theme ? `1px solid ${theme.border}` : "1px solid #e9ecef",
+            }}
+          >
+            <VaccinesIcon
+              sx={{ color: "#97a19b", fontSize: "4rem", marginBottom: "15px" }}
+            />
+            <p
+              style={{
+                margin: "0 0 10px 0",
+                color: theme ? theme.textSecondary : "#97a19b",
+                fontFamily: "Satoshi, sans-serif",
+                fontSize: "1.1rem",
+              }}
+            >
+              Chưa có sự kiện tiêm chủng nào
+            </p>
+            <small
+              style={{
+                color: theme ? theme.textSecondary : "#97a19b",
+                fontFamily: "Satoshi, sans-serif",
+                fontSize: "0.9rem",
+              }}
+            >
+              Liên hệ nhà trường để biết thêm thông tin
+            </small>
           </div>
         )}
       </div>
@@ -225,68 +843,398 @@ function VaccinationEvents() {
       {/* Detail Modal */}
       {showDetailModal && selectedEvent && (
         <div
-          className="modal-overlay"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: "20px",
+          }}
           onClick={() => setShowDetailModal(false)}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>🔍 Chi Tiết Sự Kiện Tiêm Chủng</h3>
-              <button
-                className="modal-close"
-                onClick={() => setShowDetailModal(false)}
+          <div
+            style={{
+              background: theme ? theme.cardBg : "white",
+              borderRadius: "20px",
+              width: "100%",
+              maxWidth: "700px",
+              maxHeight: "90vh",
+              overflow: "auto",
+              border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
+              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
+              backdropFilter: "blur(20px)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "25px",
+                borderBottom: theme
+                  ? `1px solid ${theme.border}`
+                  : "1px solid #e9ecef",
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  color: theme ? theme.textPrimary : "#2f5148",
+                  fontFamily: "Satoshi, sans-serif",
+                  fontSize: "1.5rem",
+                  fontWeight: 600,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
               >
-                ×
+                <InfoIcon sx={{ color: "#97a19b", fontSize: "1.5rem" }} />
+                Chi Tiết Sự Kiện Tiêm Chủng
+              </h3>
+              <button
+                onClick={() => setShowDetailModal(false)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: theme ? theme.textSecondary : "#97a19b",
+                  cursor: "pointer",
+                  fontSize: "1.5rem",
+                  padding: "5px",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                <CloseIcon sx={{ fontSize: "1.5rem" }} />
               </button>
             </div>
 
-            <div className="modal-body">
-              <div className="detail-section">
-                <h4>📋 Thông tin cơ bản</h4>
-                <div className="detail-grid">
-                  <div className="detail-item">
-                    <span className="detail-label">Tiêu đề:</span>
-                    <span className="detail-value">{selectedEvent.title}</span>
+            {/* Modal Body */}
+            <div style={{ padding: "25px" }}>
+              {/* Basic Information */}
+              <div style={{ marginBottom: "30px" }}>
+                <h4
+                  style={{
+                    margin: "0 0 20px 0",
+                    color: theme ? theme.textPrimary : "#2f5148",
+                    fontFamily: "Satoshi, sans-serif",
+                    fontSize: "1.2rem",
+                    fontWeight: 600,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <InfoIcon sx={{ color: "#97a19b", fontSize: "1.2rem" }} />
+                  Thông tin cơ bản
+                </h4>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                    gap: "15px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "12px 15px",
+                      background: theme
+                        ? isDarkMode
+                          ? "#333333"
+                          : "#f8f9fa"
+                        : "#f8f9fa",
+                      borderRadius: "10px",
+                      border: theme
+                        ? `1px solid ${theme.border}`
+                        : "1px solid #e9ecef",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: theme ? theme.textSecondary : "#97a19b",
+                        fontFamily: "Satoshi, sans-serif",
+                        fontSize: "0.9rem",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Tiêu đề:
+                    </span>
+                    <span
+                      style={{
+                        color: theme ? theme.textPrimary : "#2f5148",
+                        fontFamily: "Satoshi, sans-serif",
+                        fontSize: "0.9rem",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {selectedEvent.title}
+                    </span>
                   </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Vaccine:</span>
-                    <span className="detail-value">
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "12px 15px",
+                      background: theme
+                        ? isDarkMode
+                          ? "#333333"
+                          : "#f8f9fa"
+                        : "#f8f9fa",
+                      borderRadius: "10px",
+                      border: theme
+                        ? `1px solid ${theme.border}`
+                        : "1px solid #e9ecef",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: theme ? theme.textSecondary : "#97a19b",
+                        fontFamily: "Satoshi, sans-serif",
+                        fontSize: "0.9rem",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Vaccine:
+                    </span>
+                    <span
+                      style={{
+                        color: theme ? theme.textPrimary : "#2f5148",
+                        fontFamily: "Satoshi, sans-serif",
+                        fontSize: "0.9rem",
+                        fontWeight: 600,
+                      }}
+                    >
                       {selectedEvent.vaccineName}
                     </span>
                   </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Ngày tiêm:</span>
-                    <span className="detail-value">
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "12px 15px",
+                      background: theme
+                        ? isDarkMode
+                          ? "#333333"
+                          : "#f8f9fa"
+                        : "#f8f9fa",
+                      borderRadius: "10px",
+                      border: theme
+                        ? `1px solid ${theme.border}`
+                        : "1px solid #e9ecef",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: theme ? theme.textSecondary : "#97a19b",
+                        fontFamily: "Satoshi, sans-serif",
+                        fontSize: "0.9rem",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Ngày tiêm:
+                    </span>
+                    <span
+                      style={{
+                        color: theme ? theme.textPrimary : "#2f5148",
+                        fontFamily: "Satoshi, sans-serif",
+                        fontSize: "0.9rem",
+                        fontWeight: 600,
+                      }}
+                    >
                       {selectedEvent.eventDate}
                     </span>
                   </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Giờ tiêm:</span>
-                    <span className="detail-value">
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "12px 15px",
+                      background: theme
+                        ? isDarkMode
+                          ? "#333333"
+                          : "#f8f9fa"
+                        : "#f8f9fa",
+                      borderRadius: "10px",
+                      border: theme
+                        ? `1px solid ${theme.border}`
+                        : "1px solid #e9ecef",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: theme ? theme.textSecondary : "#97a19b",
+                        fontFamily: "Satoshi, sans-serif",
+                        fontSize: "0.9rem",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Giờ tiêm:
+                    </span>
+                    <span
+                      style={{
+                        color: theme ? theme.textPrimary : "#2f5148",
+                        fontFamily: "Satoshi, sans-serif",
+                        fontSize: "0.9rem",
+                        fontWeight: 600,
+                      }}
+                    >
                       {selectedEvent.eventTime || "Chưa có"}
                     </span>
                   </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Địa điểm:</span>
-                    <span className="detail-value">
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "12px 15px",
+                      background: theme
+                        ? isDarkMode
+                          ? "#333333"
+                          : "#f8f9fa"
+                        : "#f8f9fa",
+                      borderRadius: "10px",
+                      border: theme
+                        ? `1px solid ${theme.border}`
+                        : "1px solid #e9ecef",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: theme ? theme.textSecondary : "#97a19b",
+                        fontFamily: "Satoshi, sans-serif",
+                        fontSize: "0.9rem",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Địa điểm:
+                    </span>
+                    <span
+                      style={{
+                        color: theme ? theme.textPrimary : "#2f5148",
+                        fontFamily: "Satoshi, sans-serif",
+                        fontSize: "0.9rem",
+                        fontWeight: 600,
+                      }}
+                    >
                       {selectedEvent.location}
                     </span>
                   </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Trạng thái sự kiện:</span>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "12px 15px",
+                      background: theme
+                        ? isDarkMode
+                          ? "#333333"
+                          : "#f8f9fa"
+                        : "#f8f9fa",
+                      borderRadius: "10px",
+                      border: theme
+                        ? `1px solid ${theme.border}`
+                        : "1px solid #e9ecef",
+                    }}
+                  >
                     <span
-                      className={`status-badge ${getStatusBadgeClass(
-                        selectedEvent
-                      )}`}
+                      style={{
+                        color: theme ? theme.textSecondary : "#97a19b",
+                        fontFamily: "Satoshi, sans-serif",
+                        fontSize: "0.9rem",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Trạng thái:
+                    </span>
+                    <span
+                      style={{
+                        background:
+                          getStatusText(selectedEvent) === "Đã hoàn thành"
+                            ? "#85b06d"
+                            : theme
+                            ? isDarkMode
+                              ? "#4a5568"
+                              : "#bfefa1"
+                            : "#bfefa1",
+                        color:
+                          getStatusText(selectedEvent) === "Đã hoàn thành"
+                            ? "white"
+                            : theme
+                            ? isDarkMode
+                              ? "#ffffff"
+                              : "#1a3a2e"
+                            : "#1a3a2e",
+                        padding: "4px 12px",
+                        borderRadius: "15px",
+                        fontSize: "0.8rem",
+                        fontWeight: 500,
+                        fontFamily: "Satoshi, sans-serif",
+                      }}
                     >
                       {getStatusText(selectedEvent)}
                     </span>
                   </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Phản hồi của bạn:</span>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "12px 15px",
+                      background: theme
+                        ? isDarkMode
+                          ? "#333333"
+                          : "#f8f9fa"
+                        : "#f8f9fa",
+                      borderRadius: "10px",
+                      border: theme
+                        ? `1px solid ${theme.border}`
+                        : "1px solid #e9ecef",
+                    }}
+                  >
                     <span
-                      className={`response-badge ${getResponseBadgeClass(
-                        selectedEvent.responseStatus
-                      )}`}
+                      style={{
+                        color: theme ? theme.textSecondary : "#97a19b",
+                        fontFamily: "Satoshi, sans-serif",
+                        fontSize: "0.9rem",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Phản hồi:
+                    </span>
+                    <span
+                      style={{
+                        background:
+                          selectedEvent.responseStatus === "Đã đồng ý"
+                            ? "#85b06d"
+                            : selectedEvent.responseStatus === "Đã từ chối"
+                            ? "#c3555c"
+                            : theme
+                            ? isDarkMode
+                              ? "#4a5568"
+                              : "#c1cbc2"
+                            : "#c1cbc2",
+                        color: "white",
+                        padding: "4px 12px",
+                        borderRadius: "15px",
+                        fontSize: "0.8rem",
+                        fontWeight: 500,
+                        fontFamily: "Satoshi, sans-serif",
+                      }}
                     >
                       {selectedEvent.responseStatus}
                     </span>
@@ -294,30 +1242,140 @@ function VaccinationEvents() {
                 </div>
               </div>
 
+              {/* Description */}
               {selectedEvent.description && (
-                <div className="detail-section">
-                  <h4>📝 Mô tả</h4>
-                  <div className="description-content">
-                    <p>{selectedEvent.description}</p>
+                <div style={{ marginBottom: "30px" }}>
+                  <h4
+                    style={{
+                      margin: "0 0 15px 0",
+                      color: theme ? theme.textPrimary : "#2f5148",
+                      fontFamily: "Satoshi, sans-serif",
+                      fontSize: "1.2rem",
+                      fontWeight: 600,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <DescriptionIcon
+                      sx={{ color: "#97a19b", fontSize: "1.2rem" }}
+                    />
+                    Mô tả
+                  </h4>
+                  <div
+                    style={{
+                      background: theme
+                        ? isDarkMode
+                          ? "#333333"
+                          : "#f8f9fa"
+                        : "#f8f9fa",
+                      padding: "15px",
+                      borderRadius: "12px",
+                      border: theme
+                        ? `1px solid ${theme.border}`
+                        : "1px solid #e9ecef",
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: 0,
+                        color: theme ? theme.textSecondary : "#97a19b",
+                        fontSize: "0.9rem",
+                        fontFamily: "Satoshi, sans-serif",
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {selectedEvent.description}
+                    </p>
                   </div>
                 </div>
               )}
 
+              {/* Notes */}
               {selectedEvent.notes && (
-                <div className="detail-section">
-                  <h4>📌 Ghi chú</h4>
-                  <div className="notes-content">
-                    <p>{selectedEvent.notes}</p>
+                <div style={{ marginBottom: "30px" }}>
+                  <h4
+                    style={{
+                      margin: "0 0 15px 0",
+                      color: theme ? theme.textPrimary : "#2f5148",
+                      fontFamily: "Satoshi, sans-serif",
+                      fontSize: "1.2rem",
+                      fontWeight: 600,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <NotesIcon sx={{ color: "#97a19b", fontSize: "1.2rem" }} />
+                    Ghi chú
+                  </h4>
+                  <div
+                    style={{
+                      background: theme
+                        ? isDarkMode
+                          ? "#333333"
+                          : "#f8f9fa"
+                        : "#f8f9fa",
+                      padding: "15px",
+                      borderRadius: "12px",
+                      border: theme
+                        ? `1px solid ${theme.border}`
+                        : "1px solid #e9ecef",
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: 0,
+                        color: theme ? theme.textSecondary : "#97a19b",
+                        fontSize: "0.9rem",
+                        fontFamily: "Satoshi, sans-serif",
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {selectedEvent.notes}
+                    </p>
                   </div>
                 </div>
               )}
 
+              {/* Decline Reason */}
               {selectedEvent.myResponse &&
                 selectedEvent.responseStatus === "Đã từ chối" && (
-                  <div className="detail-section">
-                    <h4>❌ Lý do từ chối</h4>
-                    <div className="decline-reason-content">
-                      <p>
+                  <div style={{ marginBottom: "30px" }}>
+                    <h4
+                      style={{
+                        margin: "0 0 15px 0",
+                        color: "#c3555c",
+                        fontFamily: "Satoshi, sans-serif",
+                        fontSize: "1.2rem",
+                        fontWeight: 600,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      <CancelIcon
+                        sx={{ color: "#c3555c", fontSize: "1.2rem" }}
+                      />
+                      Lý do từ chối
+                    </h4>
+                    <div
+                      style={{
+                        background: "rgba(195, 85, 92, 0.1)",
+                        padding: "15px",
+                        borderRadius: "12px",
+                        border: "1px solid rgba(195, 85, 92, 0.3)",
+                      }}
+                    >
+                      <p
+                        style={{
+                          margin: 0,
+                          color: "#c3555c",
+                          fontSize: "0.9rem",
+                          fontFamily: "Satoshi, sans-serif",
+                          lineHeight: 1.6,
+                        }}
+                      >
                         {selectedEvent.myResponse.reasonForDecline ||
                           "Không có lý do cụ thể"}
                       </p>
@@ -325,10 +1383,47 @@ function VaccinationEvents() {
                   </div>
                 )}
 
-              <div className="detail-section">
-                <h4>⚠️ Lưu ý quan trọng</h4>
-                <div className="important-notes">
-                  <ul>
+              {/* Important Notes */}
+              <div style={{ marginBottom: "20px" }}>
+                <h4
+                  style={{
+                    margin: "0 0 15px 0",
+                    color: theme ? theme.textPrimary : "#2f5148",
+                    fontFamily: "Satoshi, sans-serif",
+                    fontSize: "1.2rem",
+                    fontWeight: 600,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <WarningIcon sx={{ color: "#97a19b", fontSize: "1.2rem" }} />
+                  Lưu ý quan trọng
+                </h4>
+                <div
+                  style={{
+                    background: theme
+                      ? isDarkMode
+                        ? "#333333"
+                        : "#f8f9fa"
+                      : "#f8f9fa",
+                    padding: "15px",
+                    borderRadius: "12px",
+                    border: theme
+                      ? `1px solid ${theme.border}`
+                      : "1px solid #e9ecef",
+                  }}
+                >
+                  <ul
+                    style={{
+                      margin: 0,
+                      paddingLeft: "20px",
+                      color: theme ? theme.textSecondary : "#97a19b",
+                      fontFamily: "Satoshi, sans-serif",
+                      fontSize: "0.9rem",
+                      lineHeight: 1.6,
+                    }}
+                  >
                     <li>Vui lòng đảm bảo con em đã ăn sáng trước khi tiêm</li>
                     <li>Mang theo sổ tiêm chủng và giấy tờ tùy thân</li>
                     <li>Thông báo cho y tá nếu con em có tiền sử dị ứng</li>
@@ -338,10 +1433,39 @@ function VaccinationEvents() {
               </div>
             </div>
 
-            <div className="modal-footer">
+            {/* Modal Footer */}
+            <div
+              style={{
+                padding: "20px 25px",
+                borderTop: theme
+                  ? `1px solid ${theme.border}`
+                  : "1px solid #e9ecef",
+                display: "flex",
+                justifyContent: "flex-end",
+              }}
+            >
               <button
                 onClick={() => setShowDetailModal(false)}
-                className="close-btn"
+                style={{
+                  background: theme
+                    ? isDarkMode
+                      ? "#3a3a3a"
+                      : "#bfefa1"
+                    : "#bfefa1",
+                  color: theme
+                    ? isDarkMode
+                      ? "#ffffff"
+                      : "#1a3a2e"
+                    : "#1a3a2e",
+                  border: "none",
+                  padding: "12px 24px",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  fontSize: "1rem",
+                  fontWeight: 500,
+                  fontFamily: "Satoshi, sans-serif",
+                  transition: "all 0.3s ease",
+                }}
               >
                 Đóng
               </button>

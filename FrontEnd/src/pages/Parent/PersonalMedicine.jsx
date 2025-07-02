@@ -160,6 +160,8 @@ const PersonalMedicine = () => {
       const allMedicines = Array.isArray(data) ? data : (data.data ? data.data : []);
       
       console.log('🔍 All Personal Medicines from API:', allMedicines.length);
+      console.log('🔍 Sample medicine structure:', allMedicines[0]);
+      console.log('🔍 Available keys in first medicine:', allMedicines[0] ? Object.keys(allMedicines[0]) : 'No medicines');
       
       // 🔒 SECURITY: Only show medicines for students belonging to current parent
       const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
@@ -297,15 +299,33 @@ const PersonalMedicine = () => {
 
   // Edit Medicine Functions
   const startEditMedicine = (medicine) => {
+<<<<<<< HEAD
     console.log("Starting edit for medicine:", medicine);
     console.log("medicine.personalmedicineid:", medicine.personalmedicineid);
+=======
+    console.log('🔍 Medicine object for editing:', medicine);
+    console.log('🔍 Available keys:', Object.keys(medicine));
+    
+    // Try different possible ID fields
+    const possibleId = medicine.personalMedicineId || 
+                      medicine.id || 
+                      medicine.personalMedicineID ||
+                      medicine.personalmedicineid ||
+                      medicine.PersonalMedicineId;
+    
+    console.log('🔍 Found ID:', possibleId);
+>>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
     
     const medicineInfo = medicines.find(m => String(m.medicineid) === String(medicine.medicineid));
     const student = students.find(s => String(s.id) === String(medicine.studentid));
     
     setEditingMedicine({
       ...medicine,
+<<<<<<< HEAD
       originalId: medicine.personalmedicineid
+=======
+      originalId: possibleId
+>>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
     });
     
     setFormData({
@@ -345,10 +365,26 @@ const PersonalMedicine = () => {
     try {
       const updateId = editingMedicine.originalId;
       
+<<<<<<< HEAD
       console.log('Editing medicine with personalmedicineid:', updateId);
+=======
+      console.log('🔍 Editing medicine object:', editingMedicine);
+      console.log('🔍 Update ID:', updateId);
+>>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
       
       if (!updateId) {
-        throw new Error('Không tìm thấy ID để cập nhật');
+        console.error('❌ No ID found in editing medicine:', editingMedicine);
+        throw new Error(`Không tìm thấy ID để cập nhật. Available keys: ${Object.keys(editingMedicine).join(', ')}`);
+      }
+
+      // Get parent ID from user info
+      const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+      const parentId = userInfo.userId;
+      
+      if (!parentId) {
+        setMessage({ type: 'error', text: 'Không tìm thấy thông tin phụ huynh. Vui lòng đăng nhập lại.' });
+        setSubmitting(false);
+        return;
       }
 
       // Get parent ID from user info
@@ -362,7 +398,11 @@ const PersonalMedicine = () => {
       }
 
       const updateData = {
+<<<<<<< HEAD
         personalmedicineid: parseInt(updateId),
+=======
+        personalMedicineId: updateId,
+>>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
         medicineid: parseInt(formData.medicineId),
         parentid: parseInt(parentId),
         studentid: parseInt(formData.studentId),
@@ -375,18 +415,61 @@ const PersonalMedicine = () => {
 
       console.log('Updating PersonalMedicine with data:', updateData);
 
+<<<<<<< HEAD
       // Use PUT API to update
       const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine', {
         method: 'PUT',
+=======
+      // Use DELETE + POST approach as primary method for editing
+      console.log('🔄 Using DELETE + POST approach to update medicine...');
+      
+      // Step 1: Delete old record
+      const deleteResponse = await fetch(`https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine/${updateId}`, {
+        method: 'DELETE',
+        headers: {
+          'accept': '*/*',
+          'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`
+        }
+      });
+
+      console.log('🗑️ DELETE response status:', deleteResponse.status);
+
+      if (!deleteResponse.ok) {
+        const deleteErrorText = await deleteResponse.text();
+        console.error('❌ DELETE API Error:', deleteErrorText);
+        throw new Error(`Lỗi khi xóa thuốc cũ: ${deleteResponse.status} - ${deleteErrorText}`);
+      }
+
+      // Step 2: Create new record with updated data using new POST API structure
+      const newMedicineData = {
+        medicineid: parseInt(formData.medicineId),
+        parentid: parseInt(parentId),
+        studentid: parseInt(formData.studentId),
+        quantity: parseInt(formData.quantity),
+        receiveddate: new Date().toISOString(),
+        expiryDate: formData.expiryDate,
+        status: false,
+        note: updateData.note
+      };
+
+      console.log('📤 Creating new medicine with data:', newMedicineData);
+
+      const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine', {
+        method: 'POST',
+>>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
         headers: {
           'accept': '*/*',
           'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(newMedicineData)
       });
 
+<<<<<<< HEAD
       console.log('PUT response status:', response.status);
+=======
+      console.log('📡 POST response status:', response.status);
+>>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -410,7 +493,22 @@ const PersonalMedicine = () => {
 
   // Delete Medicine Functions
   const startDeleteMedicine = (medicine) => {
-    setDeletingMedicine(medicine);
+    console.log('🔍 Medicine object for deleting:', medicine);
+    console.log('🔍 Available keys:', Object.keys(medicine));
+    
+    // Try different possible ID fields
+    const possibleId = medicine.personalMedicineId || 
+                      medicine.id || 
+                      medicine.personalMedicineID ||
+                      medicine.personalmedicineid ||
+                      medicine.PersonalMedicineId;
+    
+    console.log('🔍 Found delete ID:', possibleId);
+    
+    setDeletingMedicine({
+      ...medicine,
+      deleteId: possibleId
+    });
   };
 
   const confirmDelete = async () => {
@@ -418,12 +516,20 @@ const PersonalMedicine = () => {
     
     setSubmitting(true);
     try {
+<<<<<<< HEAD
       const deleteId = deletingMedicine.personalmedicineid;
       
       console.log('Deleting medicine with ID:', deleteId);
+=======
+      const deleteId = deletingMedicine.deleteId;
+      
+      console.log('🔍 Deleting medicine object:', deletingMedicine);
+      console.log('🔍 Delete ID:', deleteId);
+>>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
       
       if (!deleteId) {
-        throw new Error('Không tìm thấy ID để xóa');
+        console.error('❌ No delete ID found in deleting medicine:', deletingMedicine);
+        throw new Error(`Không tìm thấy ID để xóa. Available keys: ${Object.keys(deletingMedicine).join(', ')}`);
       }
 
       // Call DELETE API
@@ -445,7 +551,11 @@ const PersonalMedicine = () => {
       // Reload data to get fresh data from server
       await loadPersonalMedicines();
       
+<<<<<<< HEAD
 
+=======
+      console.log('✅ Delete successful for ID:', deleteId);
+>>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
       
     } catch (error) {
       console.error('Error deleting personal medicine:', error);
@@ -671,7 +781,16 @@ const PersonalMedicine = () => {
                 const medicineInfo = medicines.find(m => String(m.medicineid) === String(medicine.medicineid));
                 
                 // Create truly unique key using multiple identifiers
+<<<<<<< HEAD
                 const medicineId = medicine.personalmedicineid || medicine.id || 'unknown';
+=======
+                const medicineId = medicine.personalMedicineId || 
+                                 medicine.id || 
+                                 medicine.personalMedicineID ||
+                                 medicine.personalmedicineid ||
+                                 medicine.PersonalMedicineId ||
+                                 'unknown';
+>>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
                 const uniqueKey = `medicine_${medicineId}_${medicine.studentid || 'nostudent'}_${medicine.medicineid || 'nomedicine'}_${medicine.receiveddate || 'nodate'}_${index}`;
                 
                 // Debug log for duplicate key detection

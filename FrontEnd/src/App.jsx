@@ -54,6 +54,7 @@ import ManageHealthRecords from "./pages/Parent/ManageHealthRecords";
 import UpdateProfile from "./pages/Parent/UpdateProfile";
 import PersonalMedicine from "./pages/Parent/PersonalMedicine";
 
+
 function App() {
   return (
     <div className="App">
