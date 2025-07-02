@@ -39,17 +39,6 @@ const PersonalMedicine = () => {
     }
   }, [students]);
 
-  // Helper function to refresh all data
-  const refreshAllData = async () => {
-    try {
-      await fetchStudentsByParent();
-      await loadMedicines();
-      // loadPersonalMedicines will be called automatically when students are loaded
-    } catch (error) {
-      console.error('Error refreshing data:', error);
-    }
-  };
-
   const fetchStudentsByParent = async () => {
     try {
       const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
@@ -63,37 +52,37 @@ const PersonalMedicine = () => {
         return;
       }
       
-      // Use direct API call to get students by parent ID
-      console.log('📡 Calling GetStudentByParentId API...');
-      
-      const response = await fetch(`https://api-schoolhealth.purintech.id.vn/api/Student/GetStudentByParentId/${parentId}`, {
-        method: 'GET',
-        headers: {
-          'accept': '*/*',
-          'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      console.log('📡 GetStudentByParentId response status:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ GetStudentByParentId API Error:', errorText);
-        throw new Error(`Lỗi API: ${response.status} - ${errorText}`);
+      // Try to get students by parent ID first
+      let studentData = [];
+      try {
+        const res = await apiClient.get(`${API_ENDPOINTS.STUDENT.GET_BY_PARENT}/${parentId}`);
+        console.log('GetStudentsByParentId Response:', res);
+        studentData = Array.isArray(res) ? res : (Array.isArray(res.data) ? res.data : []);
+      } catch (getByParentError) {
+        console.error('GetStudentsByParentId failed, trying GET_ALL:', getByParentError);
+        
+        // Fallback: Get all students and filter by parent ID
+        const res = await apiClient.get(API_ENDPOINTS.STUDENT.GET_ALL);
+        const allStudents = Array.isArray(res) ? res : (Array.isArray(res.data) ? res.data : []);
+        
+        console.log('📚 All students from API:', allStudents.length);
+        
+        // 🔒 SECURITY: Only show students belonging to current parent
+        studentData = allStudents.filter(stu => {
+          const studentParentId = stu.parent?.parentid || stu.parent?.parentId || 
+                                 stu.parentid || stu.parentId || stu.parent_id || stu.ParentId;
+          const isMyChild = String(studentParentId) === String(parentId);
+          
+          console.log(`👶 Student: ${stu.fullname} - Parent ID: ${studentParentId} - Is mine: ${isMyChild ? '✅' : '❌'}`);
+          
+          return isMyChild;
+        });
       }
-
-      const data = await response.json();
-      const studentData = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
-      
-      console.log('📚 Students from GetStudentByParentId API:', studentData.length);
-      console.log('📚 Sample student structure:', studentData[0]);
-      console.log('📚 Available keys in first student:', studentData[0] ? Object.keys(studentData[0]) : 'No students');
       
       if (studentData.length === 0) {
         setMessage({ 
           type: 'info', 
-          text: `Không tìm thấy học sinh nào cho phụ huynh ID: ${parentId}. Vui lòng liên hệ nhà trường để cập nhật thông tin.` 
+          text: `Không tìm thấy học sinh nào thuộc về tài khoản phụ huynh này. Vui lòng liên hệ nhà trường để cập nhật thông tin.` 
         });
         setStudents([]);
         return;
@@ -114,11 +103,8 @@ const PersonalMedicine = () => {
       setStudents(uniqueStudents);
       
     } catch (error) {
-      console.error('Error fetching students by parent ID:', error);
-      setMessage({ 
-        type: 'error', 
-        text: `Không thể tải danh sách học sinh: ${error.message}` 
-      });
+      console.error('Error fetching students:', error);
+      setMessage({ type: 'error', text: 'Không thể tải danh sách học sinh của bạn' });
       setStudents([]);
     }
   };
@@ -299,10 +285,6 @@ const PersonalMedicine = () => {
 
   // Edit Medicine Functions
   const startEditMedicine = (medicine) => {
-<<<<<<< HEAD
-    console.log("Starting edit for medicine:", medicine);
-    console.log("medicine.personalmedicineid:", medicine.personalmedicineid);
-=======
     console.log('🔍 Medicine object for editing:', medicine);
     console.log('🔍 Available keys:', Object.keys(medicine));
     
@@ -314,18 +296,13 @@ const PersonalMedicine = () => {
                       medicine.PersonalMedicineId;
     
     console.log('🔍 Found ID:', possibleId);
->>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
     
     const medicineInfo = medicines.find(m => String(m.medicineid) === String(medicine.medicineid));
     const student = students.find(s => String(s.id) === String(medicine.studentid));
     
     setEditingMedicine({
       ...medicine,
-<<<<<<< HEAD
-      originalId: medicine.personalmedicineid
-=======
       originalId: possibleId
->>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
     });
     
     setFormData({
@@ -365,12 +342,8 @@ const PersonalMedicine = () => {
     try {
       const updateId = editingMedicine.originalId;
       
-<<<<<<< HEAD
-      console.log('Editing medicine with personalmedicineid:', updateId);
-=======
       console.log('🔍 Editing medicine object:', editingMedicine);
       console.log('🔍 Update ID:', updateId);
->>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
       
       if (!updateId) {
         console.error('❌ No ID found in editing medicine:', editingMedicine);
@@ -387,22 +360,8 @@ const PersonalMedicine = () => {
         return;
       }
 
-      // Get parent ID from user info
-      const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-      const parentId = userInfo.userId;
-      
-      if (!parentId) {
-        setMessage({ type: 'error', text: 'Không tìm thấy thông tin phụ huynh. Vui lòng đăng nhập lại.' });
-        setSubmitting(false);
-        return;
-      }
-
       const updateData = {
-<<<<<<< HEAD
-        personalmedicineid: parseInt(updateId),
-=======
         personalMedicineId: updateId,
->>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
         medicineid: parseInt(formData.medicineId),
         parentid: parseInt(parentId),
         studentid: parseInt(formData.studentId),
@@ -413,13 +372,9 @@ const PersonalMedicine = () => {
         note: `${formData.description} | Loại: ${formData.medicineType} | SĐT: ${formData.contactPhone} | Thời gian liên hệ: ${formData.preferredTime}`
       };
 
-      console.log('Updating PersonalMedicine with data:', updateData);
+      console.log('✏️ Updating PersonalMedicine ID:', updateId);
+      console.log('📋 Update data:', updateData);
 
-<<<<<<< HEAD
-      // Use PUT API to update
-      const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine', {
-        method: 'PUT',
-=======
       // Use DELETE + POST approach as primary method for editing
       console.log('🔄 Using DELETE + POST approach to update medicine...');
       
@@ -456,7 +411,6 @@ const PersonalMedicine = () => {
 
       const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine', {
         method: 'POST',
->>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
         headers: {
           'accept': '*/*',
           'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`,
@@ -465,14 +419,12 @@ const PersonalMedicine = () => {
         body: JSON.stringify(newMedicineData)
       });
 
-<<<<<<< HEAD
-      console.log('PUT response status:', response.status);
-=======
       console.log('📡 POST response status:', response.status);
->>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ UPDATE API Error:', errorText);
+        throw new Error(`Lỗi API: ${response.status} - ${errorText}`);
       }
 
       setMessage({ type: 'success', text: '✅ Đã cập nhật thuốc cá nhân thành công!' });
@@ -485,7 +437,10 @@ const PersonalMedicine = () => {
       
     } catch (error) {
       console.error('Error updating personal medicine:', error);
-      setMessage({ type: 'error', text: 'Có lỗi xảy ra khi cập nhật thuốc cá nhân' });
+      setMessage({ 
+        type: 'error', 
+        text: `❌ Có lỗi xảy ra khi cập nhật thuốc cá nhân: ${error.message}`
+      });
     } finally {
       setSubmitting(false);
     }
@@ -516,21 +471,17 @@ const PersonalMedicine = () => {
     
     setSubmitting(true);
     try {
-<<<<<<< HEAD
-      const deleteId = deletingMedicine.personalmedicineid;
-      
-      console.log('Deleting medicine with ID:', deleteId);
-=======
       const deleteId = deletingMedicine.deleteId;
       
       console.log('🔍 Deleting medicine object:', deletingMedicine);
       console.log('🔍 Delete ID:', deleteId);
->>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
       
       if (!deleteId) {
         console.error('❌ No delete ID found in deleting medicine:', deletingMedicine);
         throw new Error(`Không tìm thấy ID để xóa. Available keys: ${Object.keys(deletingMedicine).join(', ')}`);
       }
+
+      console.log('🗑️ Deleting PersonalMedicine ID:', deleteId);
 
       // Call DELETE API
       const response = await fetch(`https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine/${deleteId}`, {
@@ -541,8 +492,12 @@ const PersonalMedicine = () => {
         }
       });
 
+      console.log('📡 DELETE response status:', response.status);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ DELETE API Error:', errorText);
+        throw new Error(`Lỗi API: ${response.status} - ${errorText}`);
       }
 
       setMessage({ type: 'success', text: '✅ Đã xóa thuốc cá nhân thành công!' });
@@ -551,15 +506,14 @@ const PersonalMedicine = () => {
       // Reload data to get fresh data from server
       await loadPersonalMedicines();
       
-<<<<<<< HEAD
-
-=======
       console.log('✅ Delete successful for ID:', deleteId);
->>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
       
     } catch (error) {
       console.error('Error deleting personal medicine:', error);
-      setMessage({ type: 'error', text: 'Có lỗi xảy ra khi xóa thuốc cá nhân' });
+      setMessage({ 
+        type: 'error', 
+        text: `❌ Có lỗi xảy ra khi xóa thuốc cá nhân: ${error.message}`
+      });
     } finally {
       setSubmitting(false);
     }
@@ -578,7 +532,10 @@ const PersonalMedicine = () => {
           <p>Quản lý thông tin thuốc cá nhân của học sinh, theo dõi liều dùng và lịch trình dùng thuốc</p>
         </div>
         <button 
-          onClick={refreshAllData}
+          onClick={() => {
+            fetchStudentsByParent();
+            loadMedicines();
+          }}
           className="refresh-btn"
         >
           🔄 Làm mới
@@ -776,21 +733,16 @@ const PersonalMedicine = () => {
           ) : (
             <div className="medicine-grid" key="medicine-grid-container">
               {personalMedicines.map((medicine, index) => {
-                console.log("medicine", medicine);
                 const student = students.find(s => String(s.id) === String(medicine.studentid));
                 const medicineInfo = medicines.find(m => String(m.medicineid) === String(medicine.medicineid));
                 
                 // Create truly unique key using multiple identifiers
-<<<<<<< HEAD
-                const medicineId = medicine.personalmedicineid || medicine.id || 'unknown';
-=======
                 const medicineId = medicine.personalMedicineId || 
                                  medicine.id || 
                                  medicine.personalMedicineID ||
                                  medicine.personalmedicineid ||
                                  medicine.PersonalMedicineId ||
                                  'unknown';
->>>>>>> 1ed08b318d9428a810e250356bf8db753d9aeb0c
                 const uniqueKey = `medicine_${medicineId}_${medicine.studentid || 'nostudent'}_${medicine.medicineid || 'nomedicine'}_${medicine.receiveddate || 'nodate'}_${index}`;
                 
                 // Debug log for duplicate key detection
