@@ -56,14 +56,41 @@ function VaccinationEvents() {
 
   // Get response badge class
   const getResponseBadgeClass = (responseStatus) => {
-    switch (responseStatus) {
-      case "Đã đồng ý":
-        return "response-confirmed";
-      case "Đã từ chối":
-        return "response-declined";
-      default:
-        return "response-pending";
-    }
+    if (responseStatus.includes("đồng ý (tất cả)")) return "response-confirmed";
+    if (responseStatus.includes("từ chối (tất cả)")) return "response-declined";
+    if (responseStatus.includes("Đã phản hồi")) return "response-mixed";
+    if (responseStatus === "Đã đồng ý") return "response-confirmed";
+    if (responseStatus === "Đã từ chối") return "response-declined";
+    return "response-pending";
+  };
+
+  // Get overall statistics for all children
+  const getOverallStats = () => {
+    const totalEvents = events.length;
+    const totalChildren = events.reduce(
+      (sum, event) => sum + (event.totalChildren || 0),
+      0
+    );
+    const confirmedChildren = events.reduce(
+      (sum, event) => sum + (event.confirmedChildren || 0),
+      0
+    );
+    const declinedChildren = events.reduce(
+      (sum, event) => sum + (event.declinedChildren || 0),
+      0
+    );
+    const pendingChildren = events.reduce(
+      (sum, event) => sum + (event.pendingChildren || 0),
+      0
+    );
+
+    return {
+      totalEvents,
+      totalChildren,
+      confirmedChildren,
+      declinedChildren,
+      pendingChildren,
+    };
   };
 
   if (loading) {
@@ -109,37 +136,35 @@ function VaccinationEvents() {
         <div className="stat-card">
           <div className="stat-icon">📅</div>
           <div className="stat-content">
-            <h3>{events.length}</h3>
+            <h3>{getOverallStats().totalEvents}</h3>
             <p>Tổng sự kiện</p>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">👶</div>
+          <div className="stat-content">
+            <h3>{getOverallStats().totalChildren}</h3>
+            <p>Tổng lượt tiêm</p>
           </div>
         </div>
         <div className="stat-card">
           <div className="stat-icon">✅</div>
           <div className="stat-content">
-            <h3>
-              {events.filter((e) => e.responseStatus === "Đã đồng ý").length}
-            </h3>
+            <h3>{getOverallStats().confirmedChildren}</h3>
             <p>Đã đồng ý</p>
           </div>
         </div>
         <div className="stat-card">
           <div className="stat-icon">❌</div>
           <div className="stat-content">
-            <h3>
-              {events.filter((e) => e.responseStatus === "Đã từ chối").length}
-            </h3>
+            <h3>{getOverallStats().declinedChildren}</h3>
             <p>Đã từ chối</p>
           </div>
         </div>
         <div className="stat-card">
           <div className="stat-icon">⏳</div>
           <div className="stat-content">
-            <h3>
-              {
-                events.filter((e) => e.responseStatus === "Chưa phản hồi")
-                  .length
-              }
-            </h3>
+            <h3>{getOverallStats().pendingChildren}</h3>
             <p>Chưa phản hồi</p>
           </div>
         </div>
@@ -176,28 +201,58 @@ function VaccinationEvents() {
                 <div className="card-body">
                   <div className="event-info">
                     <div className="info-row">
-                      <span className="label">💉 Vaccine:</span>
-                      <span className="value">{event.vaccineName}</span>
-                    </div>
-                    <div className="info-row">
                       <span className="label">📅 Ngày tiêm:</span>
                       <span className="value">{event.eventDate}</span>
-                    </div>
-                    <div className="info-row">
-                      <span className="label">⏰ Giờ tiêm:</span>
-                      <span className="value">
-                        {event.eventTime || "Chưa có"}
-                      </span>
                     </div>
                     <div className="info-row">
                       <span className="label">📍 Địa điểm:</span>
                       <span className="value">{event.location}</span>
                     </div>
+                    <div className="info-row">
+                      <span className="label">👶 Số con tham gia:</span>
+                      <span className="value">{event.totalChildren || 0}</span>
+                    </div>
+                    {event.totalChildren > 0 && (
+                      <div className="info-row">
+                        <span className="label">📊 Trạng thái chi tiết:</span>
+                        <span className="value">
+                          ✅ {event.confirmedChildren} • ❌{" "}
+                          {event.declinedChildren} • ⏳ {event.pendingChildren}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {event.description && (
                     <div className="event-description">
                       <p>{event.description}</p>
+                    </div>
+                  )}
+
+                  {/* Display individual child responses if any */}
+                  {event.myResponses && event.myResponses.length > 0 && (
+                    <div className="children-responses">
+                      <h5>👨‍👩‍👧‍👦 Phản hồi từng con:</h5>
+                      <div className="children-list">
+                        {Object.entries(event.responsesByStudent || {}).map(
+                          ([studentId, responses]) => (
+                            <div key={studentId} className="child-response">
+                              {responses.map((response, index) => (
+                                <div key={index} className="response-item">
+                                  <span className="student-info">
+                                    Con #{studentId}
+                                  </span>
+                                  <span
+                                    className={`status-badge ${response.statusClass}`}
+                                  >
+                                    {response.status}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -248,21 +303,9 @@ function VaccinationEvents() {
                     <span className="detail-value">{selectedEvent.title}</span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Vaccine:</span>
-                    <span className="detail-value">
-                      {selectedEvent.vaccineName}
-                    </span>
-                  </div>
-                  <div className="detail-item">
                     <span className="detail-label">Ngày tiêm:</span>
                     <span className="detail-value">
                       {selectedEvent.eventDate}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Giờ tiêm:</span>
-                    <span className="detail-value">
-                      {selectedEvent.eventTime || "Chưa có"}
                     </span>
                   </div>
                   <div className="detail-item">
@@ -282,7 +325,13 @@ function VaccinationEvents() {
                     </span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Phản hồi của bạn:</span>
+                    <span className="detail-label">Tổng số con tham gia:</span>
+                    <span className="detail-value">
+                      {selectedEvent.totalChildren || 0}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Phản hồi tổng quan:</span>
                     <span
                       className={`response-badge ${getResponseBadgeClass(
                         selectedEvent.responseStatus
@@ -293,6 +342,62 @@ function VaccinationEvents() {
                   </div>
                 </div>
               </div>
+
+              {/* Children Responses Detail */}
+              {selectedEvent.myResponses &&
+                selectedEvent.myResponses.length > 0 && (
+                  <div className="detail-section">
+                    <h4>👨‍👩‍👧‍👦 Chi tiết phản hồi từng con</h4>
+                    <div className="children-responses-detail">
+                      {Object.entries(
+                        selectedEvent.responsesByStudent || {}
+                      ).map(([studentId, responses]) => (
+                        <div key={studentId} className="child-detail-card">
+                          <h5>Con #{studentId}</h5>
+                          {responses.map((response, index) => (
+                            <div key={index} className="response-detail">
+                              <div className="response-status">
+                                <span className="label">Trạng thái:</span>
+                                <span
+                                  className={`status-badge ${response.statusClass}`}
+                                >
+                                  {response.status}
+                                </span>
+                              </div>
+                              <div className="response-consent">
+                                <span className="label">
+                                  Đồng ý của phụ huynh:
+                                </span>
+                                <span
+                                  className={`status-badge ${
+                                    response.parentConsent
+                                      ? "status-confirmed"
+                                      : "status-declined"
+                                  }`}
+                                >
+                                  {response.parentConsent
+                                    ? "Đã đồng ý"
+                                    : "Chưa đồng ý"}
+                                </span>
+                              </div>
+                              {response.willAttend === false &&
+                                response.reasonForDecline && (
+                                  <div className="response-reason">
+                                    <span className="label">
+                                      Lý do từ chối:
+                                    </span>
+                                    <div className="decline-reason-content">
+                                      <p>{response.reasonForDecline}</p>
+                                    </div>
+                                  </div>
+                                )}
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
               {selectedEvent.description && (
                 <div className="detail-section">
@@ -311,19 +416,6 @@ function VaccinationEvents() {
                   </div>
                 </div>
               )}
-
-              {selectedEvent.myResponse &&
-                selectedEvent.responseStatus === "Đã từ chối" && (
-                  <div className="detail-section">
-                    <h4>❌ Lý do từ chối</h4>
-                    <div className="decline-reason-content">
-                      <p>
-                        {selectedEvent.myResponse.reasonForDecline ||
-                          "Không có lý do cụ thể"}
-                      </p>
-                    </div>
-                  </div>
-                )}
 
               <div className="detail-section">
                 <h4>⚠️ Lưu ý quan trọng</h4>
