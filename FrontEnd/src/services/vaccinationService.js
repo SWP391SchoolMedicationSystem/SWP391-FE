@@ -163,19 +163,33 @@ export const vaccinationEventService = {
     }
   },
 
-  // Get parent responses for vaccination event (with consent info)
+  // Get parent responses for vaccination event (with updated mapping)
   getParentResponses: async (eventId) => {
     try {
+      console.log("🌐 Getting vaccination event parent responses:", eventId);
       const url = buildApiUrl(
         API_ENDPOINTS.VACCINATION_EVENT.GET_PARENT_RESPONSES,
         eventId
       );
       const response = await apiClient.get(url);
+      console.log("📥 Vaccination event parent responses:", response);
 
       const responses = Array.isArray(response) ? response : [];
-      return responses.map(vaccinationEventService.mapParentResponseData);
+
+      // Flatten the responses since each parent can have multiple students
+      const flattenedResponses = [];
+      responses.forEach((parentResponse) => {
+        const mappedResponses =
+          vaccinationEventService.mapParentResponseData(parentResponse);
+        flattenedResponses.push(...mappedResponses);
+      });
+
+      return flattenedResponses;
     } catch (error) {
-      console.error("Error getting vaccination event parent responses:", error);
+      console.error(
+        "❌ Error getting vaccination event parent responses:",
+        error
+      );
       throw error;
     }
   },
@@ -198,18 +212,35 @@ export const vaccinationEventService = {
   },
 
   // Send email to specific parents (Manager only)
-  sendEmailToSpecific: async (parentId, emailData) => {
+  sendEmailToSpecific: async (parentIds, emailData) => {
     try {
-      const url = `${API_ENDPOINTS.VACCINATION_EVENT.SEND_EMAIL_SPECIFIC}?parentIds=${parentId}`;
-      const response = await apiClient.post(url, emailData);
+      console.log("🌐 Sending email to specific parents:", {
+        parentIds,
+        emailData,
+      });
+
+      // Ensure parentIds is an array
+      const parentIdsArray = Array.isArray(parentIds) ? parentIds : [parentIds];
+
+      const requestBody = {
+        parentIds: parentIdsArray,
+        sendVaccinationEmailDTO: emailData,
+      };
+
+      const response = await apiClient.post(
+        API_ENDPOINTS.VACCINATION_EVENT.SEND_EMAIL_SPECIFIC,
+        requestBody
+      );
+      console.log("✅ Email sent to specific parents:", response);
+
       return response;
     } catch (error) {
-      console.error("Error sending email to specific parent:", error);
+      console.error("❌ Error sending email to specific parents:", error);
       throw error;
     }
   },
 
-  // Get parent's own responses for all vaccination events
+  // Get parent's own responses for all vaccination events (updated for multiple children)
   getMyResponses: async () => {
     try {
       console.log("🌐 Getting parent's vaccination responses");
@@ -236,20 +267,59 @@ export const vaccinationEventService = {
           try {
             const parentResponses =
               await vaccinationEventService.getParentResponses(event.id);
-            const myResponse = parentResponses.find(
+
+            // Find all responses for this parent (can have multiple children)
+            const myResponses = parentResponses.filter(
               (response) => response.parentId === parentId
             );
 
+            // Group responses by student for better display
+            const responsesByStudent = myResponses.reduce((acc, response) => {
+              if (!acc[response.studentId]) {
+                acc[response.studentId] = [];
+              }
+              acc[response.studentId].push(response);
+              return acc;
+            }, {});
+
+            // Determine overall response status for the event
+            let overallStatus = "Chưa phản hồi";
+            if (myResponses.length > 0) {
+              const confirmedCount = myResponses.filter(
+                (r) => r.willAttend === true
+              ).length;
+              const declinedCount = myResponses.filter(
+                (r) => r.willAttend === false
+              ).length;
+              const pendingCount = myResponses.filter(
+                (r) => r.willAttend === null
+              ).length;
+
+              if (pendingCount === myResponses.length) {
+                overallStatus = "Chưa phản hồi";
+              } else if (confirmedCount === myResponses.length) {
+                overallStatus = "Đã đồng ý (tất cả)";
+              } else if (declinedCount === myResponses.length) {
+                overallStatus = "Đã từ chối (tất cả)";
+              } else {
+                overallStatus = `Đã phản hồi (${confirmedCount} đồng ý, ${declinedCount} từ chối, ${pendingCount} chưa phản hồi)`;
+              }
+            }
+
             return {
               ...event,
-              myResponse: myResponse || null,
-              responseStatus: myResponse
-                ? myResponse.willAttend === true
-                  ? "Đã đồng ý"
-                  : myResponse.willAttend === false
-                  ? "Đã từ chối"
-                  : "Chưa phản hồi"
-                : "Chưa phản hồi",
+              myResponses: myResponses || [],
+              responsesByStudent,
+              responseStatus: overallStatus,
+              totalChildren: myResponses.length,
+              confirmedChildren: myResponses.filter(
+                (r) => r.willAttend === true
+              ).length,
+              declinedChildren: myResponses.filter(
+                (r) => r.willAttend === false
+              ).length,
+              pendingChildren: myResponses.filter((r) => r.willAttend === null)
+                .length,
             };
           } catch (error) {
             console.error(
@@ -258,8 +328,13 @@ export const vaccinationEventService = {
             );
             return {
               ...event,
-              myResponse: null,
+              myResponses: [],
+              responsesByStudent: {},
               responseStatus: "Chưa phản hồi",
+              totalChildren: 0,
+              confirmedChildren: 0,
+              declinedChildren: 0,
+              pendingChildren: 0,
             };
           }
         })
@@ -322,29 +397,57 @@ export const vaccinationEventService = {
     };
   },
 
-  // Map parent vaccination response data (from parent-responses API)
+  // Map parent vaccination response data (updated for multiple students per parent)
   mapParentResponseData: (apiResponse) => {
-    return {
-      parentId: apiResponse.parentId,
-      studentId: apiResponse.studentId,
-      vaccinationEventId: apiResponse.vaccinationEventId,
-      willAttend: apiResponse.willAttend,
-      reasonForDecline: apiResponse.reasonForDecline || "",
-      parentConsent: apiResponse.parentConsent,
-      // Add status based on willAttend value
-      status:
-        apiResponse.willAttend === true
-          ? "Đồng ý"
-          : apiResponse.willAttend === false
-          ? "Từ chối"
-          : "Chưa phản hồi",
-      statusClass:
-        apiResponse.willAttend === true
-          ? "confirmed"
-          : apiResponse.willAttend === false
-          ? "declined"
-          : "pending",
-    };
+    // Handle both old single-student format and new multiple-students format
+    if (apiResponse.responses && Array.isArray(apiResponse.responses)) {
+      // New format: multiple students per parent
+      return apiResponse.responses.map((studentResponse) => ({
+        parentId: apiResponse.parentId,
+        studentId: studentResponse.studentId,
+        vaccinationEventId: apiResponse.vaccinationEventId,
+        willAttend: studentResponse.willAttend,
+        reasonForDecline: studentResponse.reasonForDecline || "",
+        parentConsent: apiResponse.parentConsent,
+        // Add status based on willAttend value
+        status:
+          studentResponse.willAttend === true
+            ? "Đồng ý"
+            : studentResponse.willAttend === false
+            ? "Từ chối"
+            : "Chưa phản hồi",
+        statusClass:
+          studentResponse.willAttend === true
+            ? "confirmed"
+            : studentResponse.willAttend === false
+            ? "declined"
+            : "pending",
+      }));
+    } else {
+      // Old format: single student
+      return [
+        {
+          parentId: apiResponse.parentId,
+          studentId: apiResponse.studentId,
+          vaccinationEventId: apiResponse.vaccinationEventId,
+          willAttend: apiResponse.willAttend,
+          reasonForDecline: apiResponse.reasonForDecline || "",
+          parentConsent: apiResponse.parentConsent,
+          status:
+            apiResponse.willAttend === true
+              ? "Đồng ý"
+              : apiResponse.willAttend === false
+              ? "Từ chối"
+              : "Chưa phản hồi",
+          statusClass:
+            apiResponse.willAttend === true
+              ? "confirmed"
+              : apiResponse.willAttend === false
+              ? "declined"
+              : "pending",
+        },
+      ];
+    }
   },
 };
 
