@@ -116,7 +116,7 @@
 .events-section h2 {
   margin: 0 0 25px 0;
   color: #2c3e50;
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 600;
 }
 
@@ -142,7 +142,7 @@
 }
 
 .card-header {
-  background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+ 
   color: white;
   padding: 20px;
 }
