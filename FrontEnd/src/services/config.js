@@ -97,12 +97,14 @@ export const API_ENDPOINTS = {
     UPDATE_TEMPLATE: "/Email/UpdateEmailTemplate", // Admin update template
   },
 
-  // Health Record (4/6)
+  // Health Record (6/6 - Full implementation)
   HEALTH_RECORD: {
     GET_ALL: "/HealthRecord/getAll", // Nurse xem all records
-    GET_BY_STUDENT: "/HealthRecord/getByStudentId", // Parent health history
-    ADD: "/HealthRecord/add", // Nurse tạo health record
-    UPDATE: "/HealthRecord/update", // Nurse update record
+    GET_BY_STUDENT: "/HealthRecord/getByStudentId", // Parent health history - uses query parameter
+    GET_FULL_BY_STUDENT: "/HealthRecord/fullhealthrecordByStudentId", // Full health record with vaccination & health checks
+    ADD: "/HealthRecord/healthrecord", // Nurse tạo health record
+    UPDATE: "/HealthRecord/update/{id}", // Nurse update record
+    DELETE: "/HealthRecord/delete/{id}", // Delete health record
   },
 
   // Notification (5/7)
@@ -134,9 +136,9 @@ export const API_ENDPOINTS = {
   // Student (6/6 - all endpoints needed)
   STUDENT: {
     GET_ALL: "/Student/GetAllStudents", // Manager/Nurse student list
-    GET_BY_PARENT: "/Student/GetStudentsByParentId", // Get students by parent ID - more optimal
+    GET_BY_PARENT_ID: "/Student/GetStudentByParentId", // Get students by parent ID - query parameter
     GET_BY_ID: "/Student/GetStudentById", // Get student details
-    GET_BY_PARENT: "/Student/GetStudentByParentId/{parentId}", // Get children by parent ID
+    GET_BY_PARENT: "/Student/GetStudentByParentId/{parentId}", // Get children by parent ID - path parameter
     ADD: "/Student/AddStudent", // Add single student
     BULK_ADD: "/Student/student", // Bulk import students
     UPDATE: "/Student/UpdateStudent", // Update student
@@ -169,10 +171,16 @@ export const API_ENDPOINTS = {
   },
 };
 
-// Helper function to build URL with ID
+// Helper function to build URL with ID or parameters
 export const buildApiUrl = (endpoint, id = null) => {
   if (id && endpoint.includes("{id}")) {
     return endpoint.replace("{id}", id);
+  }
+  if (id && endpoint.includes("{parentId}")) {
+    return endpoint.replace("{parentId}", id);
+  }
+  if (id && endpoint.includes("{studentId}")) {
+    return endpoint.replace("{studentId}", id);
   }
   return id ? `${endpoint}/${id}` : endpoint;
 };
