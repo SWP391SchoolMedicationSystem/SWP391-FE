@@ -146,6 +146,8 @@ const PersonalMedicine = () => {
       const allMedicines = Array.isArray(data) ? data : (data.data ? data.data : []);
       
       console.log('🔍 All Personal Medicines from API:', allMedicines.length);
+      console.log('🔍 Sample medicine structure:', allMedicines[0]);
+      console.log('🔍 Available keys in first medicine:', allMedicines[0] ? Object.keys(allMedicines[0]) : 'No medicines');
       
       // 🔒 SECURITY: Only show medicines for students belonging to current parent
       const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
@@ -218,15 +220,28 @@ const PersonalMedicine = () => {
     setSubmitting(true);
     
     try {
+      // Get parent ID from user info
+      const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+      const parentId = userInfo.userId;
+      
+      if (!parentId) {
+        setMessage({ type: 'error', text: 'Không tìm thấy thông tin phụ huynh. Vui lòng đăng nhập lại.' });
+        setSubmitting(false);
+        return;
+      }
+
       const requestData = {
-        studentid: parseInt(formData.studentId),
         medicineid: parseInt(formData.medicineId),
+        parentid: parseInt(parentId),
+        studentid: parseInt(formData.studentId),
         quantity: parseInt(formData.quantity),
-        expiryDate: formData.expiryDate,
-        note: `${formData.description} | Loại: ${formData.medicineType} | SĐT: ${formData.contactPhone} | Thời gian liên hệ: ${formData.preferredTime}`,
         receiveddate: new Date().toISOString(),
-        status: false
+        expiryDate: formData.expiryDate,
+        status: false,
+        note: `${formData.description} | Loại: ${formData.medicineType} | SĐT: ${formData.contactPhone} | Thời gian liên hệ: ${formData.preferredTime}`
       };
+
+      console.log('📤 Sending PersonalMedicine data:', requestData);
 
       const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine', {
         method: 'POST',
@@ -258,8 +273,8 @@ const PersonalMedicine = () => {
         preferredTime: ''
       });
       
-      // Reload data (personal medicines will auto reload when students change)
-      fetchStudentsByParent();
+      // Reload data to get fresh data from server
+      await loadPersonalMedicines();
     } catch (error) {
       console.error('Error adding personal medicine:', error);
       setMessage({ type: 'error', text: '❌ Có lỗi xảy ra khi thêm thuốc cá nhân' });
@@ -270,12 +285,24 @@ const PersonalMedicine = () => {
 
   // Edit Medicine Functions
   const startEditMedicine = (medicine) => {
+    console.log('🔍 Medicine object for editing:', medicine);
+    console.log('🔍 Available keys:', Object.keys(medicine));
+    
+    // Try different possible ID fields
+    const possibleId = medicine.personalMedicineId || 
+                      medicine.id || 
+                      medicine.personalMedicineID ||
+                      medicine.personalmedicineid ||
+                      medicine.PersonalMedicineId;
+    
+    console.log('🔍 Found ID:', possibleId);
+    
     const medicineInfo = medicines.find(m => String(m.medicineid) === String(medicine.medicineid));
     const student = students.find(s => String(s.id) === String(medicine.studentid));
     
     setEditingMedicine({
       ...medicine,
-      originalId: medicine.personalMedicineId || medicine.id
+      originalId: possibleId
     });
     
     setFormData({
@@ -315,96 +342,84 @@ const PersonalMedicine = () => {
     try {
       const updateId = editingMedicine.originalId;
       
+      console.log('🔍 Editing medicine object:', editingMedicine);
+      console.log('🔍 Update ID:', updateId);
+      
       if (!updateId) {
-        throw new Error('Không tìm thấy ID để cập nhật');
+        console.error('❌ No ID found in editing medicine:', editingMedicine);
+        throw new Error(`Không tìm thấy ID để cập nhật. Available keys: ${Object.keys(editingMedicine).join(', ')}`);
+      }
+
+      // Get parent ID from user info
+      const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+      const parentId = userInfo.userId;
+      
+      if (!parentId) {
+        setMessage({ type: 'error', text: 'Không tìm thấy thông tin phụ huynh. Vui lòng đăng nhập lại.' });
+        setSubmitting(false);
+        return;
       }
 
       const updateData = {
         personalMedicineId: updateId,
-        studentid: parseInt(formData.studentId),
         medicineid: parseInt(formData.medicineId),
+        parentid: parseInt(parentId),
+        studentid: parseInt(formData.studentId),
         quantity: parseInt(formData.quantity),
-        expiryDate: formData.expiryDate,
-        note: `${formData.description} | Loại: ${formData.medicineType} | SĐT: ${formData.contactPhone} | Thời gian liên hệ: ${formData.preferredTime}`,
         receiveddate: editingMedicine.receiveddate || new Date().toISOString(),
-        status: false // Keep as pending
+        expiryDate: formData.expiryDate,
+        status: false, // Keep as pending
+        note: `${formData.description} | Loại: ${formData.medicineType} | SĐT: ${formData.contactPhone} | Thời gian liên hệ: ${formData.preferredTime}`
       };
 
       console.log('✏️ Updating PersonalMedicine ID:', updateId);
       console.log('📋 Update data:', updateData);
 
-      // Try PUT method first
-      let response = await fetch(`https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine/${updateId}`, {
-        method: 'PUT',
+      // Use DELETE + POST approach as primary method for editing
+      console.log('🔄 Using DELETE + POST approach to update medicine...');
+      
+      // Step 1: Delete old record
+      const deleteResponse = await fetch(`https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine/${updateId}`, {
+        method: 'DELETE',
+        headers: {
+          'accept': '*/*',
+          'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`
+        }
+      });
+
+      console.log('🗑️ DELETE response status:', deleteResponse.status);
+
+      if (!deleteResponse.ok) {
+        const deleteErrorText = await deleteResponse.text();
+        console.error('❌ DELETE API Error:', deleteErrorText);
+        throw new Error(`Lỗi khi xóa thuốc cũ: ${deleteResponse.status} - ${deleteErrorText}`);
+      }
+
+      // Step 2: Create new record with updated data using new POST API structure
+      const newMedicineData = {
+        medicineid: parseInt(formData.medicineId),
+        parentid: parseInt(parentId),
+        studentid: parseInt(formData.studentId),
+        quantity: parseInt(formData.quantity),
+        receiveddate: new Date().toISOString(),
+        expiryDate: formData.expiryDate,
+        status: false,
+        note: updateData.note
+      };
+
+      console.log('📤 Creating new medicine with data:', newMedicineData);
+
+      const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine', {
+        method: 'POST',
         headers: {
           'accept': '*/*',
           'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(newMedicineData)
       });
 
-      console.log('📡 PUT response status:', response.status);
-
-      // If PUT doesn't work, try PATCH with partial data
-      if (response.status === 405 || response.status === 404) {
-        console.log('⚠️ PUT failed, trying PATCH...');
-        
-        const patchData = {
-          quantity: parseInt(formData.quantity),
-          expiryDate: formData.expiryDate,
-          note: updateData.note
-        };
-
-        response = await fetch(`https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine/${updateId}`, {
-          method: 'PATCH',
-          headers: {
-            'accept': '*/*',
-            'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(patchData)
-        });
-
-        console.log('📡 PATCH response status:', response.status);
-      }
-
-      // If both PUT and PATCH fail, use DELETE + POST approach
-      if (response.status === 405 || response.status === 404) {
-        console.log('⚠️ Both PUT and PATCH failed, trying DELETE + POST...');
-        
-        // Step 1: Delete old record
-        const deleteResponse = await fetch(`https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine/${updateId}`, {
-          method: 'DELETE',
-          headers: {
-            'accept': '*/*',
-            'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`
-          }
-        });
-
-        console.log('🗑️ DELETE response status:', deleteResponse.status);
-
-        // Step 2: Create new record
-        response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine', {
-          method: 'POST',
-          headers: {
-            'accept': '*/*',
-            'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            studentid: parseInt(formData.studentId),
-            medicineid: parseInt(formData.medicineId),
-            quantity: parseInt(formData.quantity),
-            expiryDate: formData.expiryDate,
-            note: updateData.note,
-            receiveddate: new Date().toISOString(),
-            status: false
-          })
-        });
-
-        console.log('📡 POST response status:', response.status);
-      }
+      console.log('📡 POST response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -412,17 +427,11 @@ const PersonalMedicine = () => {
         throw new Error(`Lỗi API: ${response.status} - ${errorText}`);
       }
 
-      // Update local state after successful API call
-      setPersonalMedicines(prev => 
-        prev.map(med => 
-          (med.personalMedicineId || med.id) === updateId 
-            ? { ...med, ...updateData }
-            : med
-        )
-      );
-
       setMessage({ type: 'success', text: '✅ Đã cập nhật thuốc cá nhân thành công!' });
       cancelEdit();
+      
+      // Reload data to get fresh data from server
+      await loadPersonalMedicines();
       
       console.log('✅ Update successful for ID:', updateId);
       
@@ -439,7 +448,22 @@ const PersonalMedicine = () => {
 
   // Delete Medicine Functions
   const startDeleteMedicine = (medicine) => {
-    setDeletingMedicine(medicine);
+    console.log('🔍 Medicine object for deleting:', medicine);
+    console.log('🔍 Available keys:', Object.keys(medicine));
+    
+    // Try different possible ID fields
+    const possibleId = medicine.personalMedicineId || 
+                      medicine.id || 
+                      medicine.personalMedicineID ||
+                      medicine.personalmedicineid ||
+                      medicine.PersonalMedicineId;
+    
+    console.log('🔍 Found delete ID:', possibleId);
+    
+    setDeletingMedicine({
+      ...medicine,
+      deleteId: possibleId
+    });
   };
 
   const confirmDelete = async () => {
@@ -447,10 +471,14 @@ const PersonalMedicine = () => {
     
     setSubmitting(true);
     try {
-      const deleteId = deletingMedicine.personalMedicineId || deletingMedicine.id;
+      const deleteId = deletingMedicine.deleteId;
+      
+      console.log('🔍 Deleting medicine object:', deletingMedicine);
+      console.log('🔍 Delete ID:', deleteId);
       
       if (!deleteId) {
-        throw new Error('Không tìm thấy ID để xóa');
+        console.error('❌ No delete ID found in deleting medicine:', deletingMedicine);
+        throw new Error(`Không tìm thấy ID để xóa. Available keys: ${Object.keys(deletingMedicine).join(', ')}`);
       }
 
       console.log('🗑️ Deleting PersonalMedicine ID:', deleteId);
@@ -472,15 +500,11 @@ const PersonalMedicine = () => {
         throw new Error(`Lỗi API: ${response.status} - ${errorText}`);
       }
 
-      // Remove from local state after successful API call
-      setPersonalMedicines(prev => 
-        prev.filter(med => 
-          (med.personalMedicineId || med.id) !== deleteId
-        )
-      );
-      
       setMessage({ type: 'success', text: '✅ Đã xóa thuốc cá nhân thành công!' });
       setDeletingMedicine(null);
+      
+      // Reload data to get fresh data from server
+      await loadPersonalMedicines();
       
       console.log('✅ Delete successful for ID:', deleteId);
       
@@ -713,7 +737,13 @@ const PersonalMedicine = () => {
                 const medicineInfo = medicines.find(m => String(m.medicineid) === String(medicine.medicineid));
                 
                 // Create truly unique key using multiple identifiers
-                const uniqueKey = `medicine_${medicine.personalMedicineId || medicine.id || 'unknown'}_${medicine.studentid || 'nostudent'}_${medicine.medicineid || 'nomedicine'}_${medicine.receiveddate || 'nodate'}_${index}`;
+                const medicineId = medicine.personalMedicineId || 
+                                 medicine.id || 
+                                 medicine.personalMedicineID ||
+                                 medicine.personalmedicineid ||
+                                 medicine.PersonalMedicineId ||
+                                 'unknown';
+                const uniqueKey = `medicine_${medicineId}_${medicine.studentid || 'nostudent'}_${medicine.medicineid || 'nomedicine'}_${medicine.receiveddate || 'nodate'}_${index}`;
                 
                 // Debug log for duplicate key detection
                 if (process.env.NODE_ENV === 'development') {
@@ -789,7 +819,7 @@ const PersonalMedicine = () => {
         <div className="modal-overlay" key="delete-modal-overlay">
           <div className="modal" key="delete-modal">
             <h3>🗑️ Xác nhận xóa</h3>
-            <p>Bạn có chắc chắn muốn xóa thuốc <strong>{medicines.find(m => String(m.medicineid) === String(deletingMedicine.medicineid))?.medicinename}</strong> không?</p>
+            <p>Bạn có chắc chắn muốn xóa thuốc <strong>{medicines.find(m => String(m.medicineid) === String(deletingMedicine.medicineid))?.medicinename || 'Thuốc không xác định'}</strong> không?</p>
             <p>Hành động này không thể hoàn tác.</p>
             
             <div className="modal-actions">
