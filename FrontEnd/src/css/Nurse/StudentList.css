@@ -355,6 +355,12 @@
 }
 
 /* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
 .btn-view {
   padding: 10px 15px;
   border: none;
@@ -378,6 +384,32 @@
 }
 
 .btn-view:active {
+  transform: translateY(-1px) scale(1.05);
+}
+
+.btn-health {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 45px;
+  height: 45px;
+}
+
+.btn-health:hover {
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+}
+
+.btn-health:active {
   transform: translateY(-1px) scale(1.05);
 }
 

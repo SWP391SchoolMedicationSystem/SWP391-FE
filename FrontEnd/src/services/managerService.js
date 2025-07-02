@@ -543,6 +543,58 @@ export const managerAccountService = {
   },
 };
 
+// Manager Health Record Services
+export const managerHealthService = {
+  // Get health records by student ID
+  getHealthRecordsByStudent: async (studentId) => {
+    try {
+      console.log("🔍 Getting health records for student:", studentId);
+      console.log("📍 Endpoint:", API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT);
+
+      // Use query parameter instead of path parameter
+      const url = `${API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT}?studentId=${studentId}`;
+      console.log("🌐 Built URL:", url);
+      console.log(
+        "🌐 Full URL will be:",
+        `${apiClient.defaults.baseURL}${url}`
+      );
+
+      const response = await apiClient.get(url);
+      console.log("✅ API Response:", response);
+      return Array.isArray(response) ? response : [];
+    } catch (error) {
+      console.error("❌ Error getting health records by student:", error);
+      throw error;
+    }
+  },
+
+  // Get full health record by student ID
+  getFullHealthRecord: async (studentId) => {
+    try {
+      console.log("🔍 Getting full health record for studentId:", studentId);
+      console.log(
+        "📍 Endpoint:",
+        API_ENDPOINTS.HEALTH_RECORD.GET_FULL_BY_STUDENT
+      );
+
+      // Use query parameter
+      const url = `${API_ENDPOINTS.HEALTH_RECORD.GET_FULL_BY_STUDENT}?studentId=${studentId}`;
+      console.log("🌐 Built URL:", url);
+      console.log(
+        "🌐 Full URL will be:",
+        `${apiClient.defaults.baseURL}${url}`
+      );
+
+      const response = await apiClient.get(url);
+      console.log("✅ Full health record response:", response);
+      return response;
+    } catch (error) {
+      console.error("❌ Error getting full health record:", error);
+      throw error;
+    }
+  },
+};
+
 export default {
   managerBlogService,
   managerStudentService,
@@ -550,4 +602,5 @@ export default {
   managerNotificationService,
   managerEmailService,
   managerAccountService,
+  managerHealthService,
 };
