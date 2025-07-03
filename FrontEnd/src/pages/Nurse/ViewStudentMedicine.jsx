@@ -5,7 +5,7 @@ import apiClient, { API_ENDPOINTS } from '../../services/config';
 
 const statusMap = {
   pending: { class: 'status-pending', text: 'Chờ duyệt' },
-  approved: { class: 'status-approved', text: 'Đã chấp thuận' },
+  approved: { class: 'status-approved', text: 'Đã phê duyệt' },
   rejected: { class: 'status-rejected', text: 'Từ chối' },
   completed: { class: 'status-approved', text: 'Hoàn thành' },
 };
@@ -90,7 +90,21 @@ const ViewStudentMedicine = () => {
       const data = await response.json();
       
       // Ensure data is an array
-      const medicinesArray = Array.isArray(data) ? data : (data.data ? data.data : []);
+      const rawMedicines = Array.isArray(data) ? data : (data.data ? data.data : []);
+      
+      // 🗑️ Filter out soft-deleted medicines
+      const medicinesArray = rawMedicines.filter(medicine => {
+        // Check various possible soft delete fields
+        const isDeleted = medicine.isDeleted || 
+                         medicine.deleted || 
+                         medicine.isRemoved || 
+                         medicine.status === 'deleted' ||
+                         medicine.status === 'removed';
+        
+        return !isDeleted; // Only show non-deleted medicines
+      });
+      
+      console.log(`🏥 Nurse view - Active medicines: ${medicinesArray.length}/${rawMedicines.length}`);
       
       // Use passed data or fallback to state
       const studentsToUse = studentsData || students;
@@ -150,7 +164,7 @@ const ViewStudentMedicine = () => {
           condition: 'Chưa xác định',
           note: medicine.note || 'Không có ghi chú',
           contactPhone: contactPhone,
-          status: medicine.status ? 'approved' : 'pending',
+          status: medicine.isapproved ? 'approved' : 'pending',
           createdAt: medicine.receiveddate || new Date().toISOString(),
           originalData: medicine
         };
@@ -165,6 +179,7 @@ const ViewStudentMedicine = () => {
         )
       );
 
+      console.log("uniqueRequests", uniqueRequests);
       setRequests(uniqueRequests);
       
     } catch (error) {
@@ -178,14 +193,37 @@ const ViewStudentMedicine = () => {
 
 
 
-  const updateMedicineStatus = async (personalMedicineId, newStatus) => {
-    // Simple local update only - no API calls
-    return { 
-      success: true, 
-      method: 'local-only', 
-      id: personalMedicineId, 
-      status: newStatus
-    };
+  const updateMedicineStatus = async (requestId, newStatus) => {
+    const request = requests.find(r => r.id === requestId);
+    console.log(request);
+    const personalMedicineId = request?.originalData?.personalmedicineid || request?.originalData?.id;
+    
+    if (!personalMedicineId) {
+      throw new Error('Không tìm thấy ID đơn thuốc');
+    }
+
+    const authToken = localStorage.getItem('authToken') || localStorage.getItem('token');
+    const endpoint = newStatus === 'approved' ? 'approve' : 'reject';
+    
+    const response = await fetch(`https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/${endpoint}`, {
+      method: 'PUT',
+      headers: {
+        'accept': '*/*',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify({
+        personalmedicineid: personalMedicineId,
+        approvedby: "Phạm Thị Dung"
+      })
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Lỗi ${response.status}: ${errorText}`);
+    }
+
+    return { success: true };
   };
 
   const handleApprove = async (id) => {
@@ -202,7 +240,8 @@ const ViewStudentMedicine = () => {
       setStatusFilter('all');
       setMessage({ type: 'success', text: '✅ Đã chấp thuận đơn thuốc thành công!' });
     } catch (error) {
-      setMessage({ type: 'error', text: '❌ Có lỗi xảy ra khi chấp thuận đơn thuốc' });
+      console.error('❌ Error in handleApprove:', error);
+      setMessage({ type: 'error', text: '❌ Lỗi: ' + error.message });
     } finally {
       setActionLoading(null);
     }
@@ -222,7 +261,8 @@ const ViewStudentMedicine = () => {
       setStatusFilter('all');
       setMessage({ type: 'success', text: '✅ Đã từ chối đơn thuốc!' });
     } catch (error) {
-      setMessage({ type: 'error', text: '❌ Có lỗi xảy ra khi từ chối đơn thuốc' });
+      console.error('❌ Error in handleReject:', error);
+      setMessage({ type: 'error', text: '❌ Lỗi: ' + error.message });
     } finally {
       setActionLoading(null);
     }
@@ -251,7 +291,7 @@ const ViewStudentMedicine = () => {
     {
       header: 'Trạng thái',
       key: 'status',
-      render: (v) => <span className={`status-badge ${statusMap[v]?.class}`}>{statusMap[v]?.text}</span>,
+      render: (v) => <span onClick={() => console.log(v)} className={`status-badge ${statusMap[v]?.class}`}>{statusMap[v]?.text}</span>,
     },
     {
       header: 'Ngày gửi',
@@ -261,27 +301,58 @@ const ViewStudentMedicine = () => {
     {
       header: 'Thao tác',
       key: 'actions',
-      render: (v, row) =>
-        row.status === 'pending' ? (
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button
-              className="submit-btn"
-              style={{ width: 90, background: '#e6f9f0', color: '#1e7e34', fontSize: 13, padding: '7px 0' }}
-              onClick={() => handleApprove(row.id)}
-              disabled={actionLoading === row.id}
+      render: (v, row) => (
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+          {row.status === 'pending' ? (
+            <>
+              <button
+                className="submit-btn"
+                style={{ 
+                  width: 90, 
+                  background: '#e6f9f0', 
+                  color: '#1e7e34', 
+                  fontSize: 13, 
+                  padding: '7px 0',
+                  border: '1px solid #28a745'
+                }}
+                onClick={() => handleApprove(row.id)}
+                disabled={actionLoading === row.id}
+              >
+                {actionLoading === row.id ? 'Đang duyệt...' : 'Chấp thuận'}
+              </button>
+              <button
+                className="submit-btn"
+                style={{ 
+                  width: 90, 
+                  background: '#fbeaea', 
+                  color: '#c82333', 
+                  fontSize: 13, 
+                  padding: '7px 0',
+                  border: '1px solid #dc3545'
+                }}
+                onClick={() => handleReject(row.id)}
+                disabled={actionLoading === row.id}
+              >
+                {actionLoading === row.id ? 'Đang xử lý...' : 'Từ chối'}
+              </button>
+            </>
+          ) : (
+            <span 
+              style={{ 
+                fontSize: 14, 
+                fontWeight: 'bold',
+                color: row.originalData.isapproved ? '#28a745' : '#dc3545',
+                background: row.originalData.isapproved ? '#d4edda' : '#f8d7da',
+                padding: '8px 16px',
+                borderRadius: '6px',
+                border: `2px solid ${row.originalData.isapproved ? '#28a745' : '#dc3545'}`
+              }}
             >
-              {actionLoading === row.id ? 'Đang duyệt...' : 'Chấp thuận'}
-            </button>
-            <button
-              className="submit-btn"
-              style={{ width: 90, background: '#fbeaea', color: '#c82333', fontSize: 13, padding: '7px 0' }}
-              onClick={() => handleReject(row.id)}
-              disabled={actionLoading === row.id}
-            >
-              {actionLoading === row.id ? 'Đang xử lý...' : 'Từ chối'}
-            </button>
-          </div>
-        ) : null,
+              {row.originalData.isapproved ? '✅ Đã chấp thuận' : '❌ Đã từ chối'}
+            </span>
+          )}
+        </div>
+      ),
     },
   ];
 
@@ -292,40 +363,44 @@ const ViewStudentMedicine = () => {
           <h1>💊 Đơn Thuốc Từ Phụ Huynh</h1>
           <p>Xem, kiểm tra và duyệt các đơn thuốc phụ huynh gửi cho học sinh</p>
         </div>
-                <button 
-          onClick={() => {
-            const loadData = async () => {
-              try {
-                const [studentsRes, medicinesRes] = await Promise.all([
-                  apiClient.get(API_ENDPOINTS.STUDENT.GET_ALL),
-                  apiClient.get(API_ENDPOINTS.MEDICINE.GET_ALL)
-                ]);
-                
-                const studentsArray = Array.isArray(studentsRes) ? studentsRes : (Array.isArray(studentsRes.data) ? studentsRes.data : []);
-                const mappedStudents = studentsArray.map(stu => ({
-                  id: stu.studentId || stu.studentid || stu.id,
-                  name: stu.fullname || stu.fullName || stu.name || 'Không có tên',
-                  class: stu.classname || stu.classId || stu.className || '---',
-                  parentName: stu.parent?.fullname || 'Chưa có thông tin'
-                }));
-                setStudents(mappedStudents);
-                
-                const medicinesArray = Array.isArray(medicinesRes) ? medicinesRes : (Array.isArray(medicinesRes.data) ? medicinesRes.data : []);
-                const activeMedicines = medicinesArray.filter(med => !med.isDeleted);
-                setMedicines(activeMedicines);
-                
-                await loadPersonalMedicines(mappedStudents, activeMedicines);
-              } catch (error) {
-                console.error('Error refreshing data:', error);
-                setMessage({ type: 'error', text: 'Không thể làm mới dữ liệu' });
-              }
-            };
-            loadData();
-          }}
-          className="refresh-btn"
-        >
-          🔄 Làm mới
-        </button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+          <button 
+            onClick={() => {
+              const loadData = async () => {
+                try {
+                  const [studentsRes, medicinesRes] = await Promise.all([
+                    apiClient.get(API_ENDPOINTS.STUDENT.GET_ALL),
+                    apiClient.get(API_ENDPOINTS.MEDICINE.GET_ALL)
+                  ]);
+                  
+                  const studentsArray = Array.isArray(studentsRes) ? studentsRes : (Array.isArray(studentsRes.data) ? studentsRes.data : []);
+                  const mappedStudents = studentsArray.map(stu => ({
+                    id: stu.studentId || stu.studentid || stu.id,
+                    name: stu.fullname || stu.fullName || stu.name || 'Không có tên',
+                    class: stu.classname || stu.classId || stu.className || '---',
+                    parentName: stu.parent?.fullname || 'Chưa có thông tin'
+                  }));
+                  setStudents(mappedStudents);
+                  
+                  const medicinesArray = Array.isArray(medicinesRes) ? medicinesRes : (Array.isArray(medicinesRes.data) ? medicinesRes.data : []);
+                  const activeMedicines = medicinesArray.filter(med => !med.isDeleted);
+                  setMedicines(activeMedicines);
+                  
+                  await loadPersonalMedicines(mappedStudents, activeMedicines);
+                } catch (error) {
+                  console.error('Error refreshing data:', error);
+                  setMessage({ type: 'error', text: 'Không thể làm mới dữ liệu' });
+                }
+              };
+              loadData();
+            }}
+            className="refresh-btn"
+          >
+            🔄 Làm mới
+          </button>
+
+
+        </div>
       </div>
 
       {/* Filter and Statistics */}

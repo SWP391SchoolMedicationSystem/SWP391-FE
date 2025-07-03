@@ -14,7 +14,6 @@ const PersonalMedicine = () => {
     expiryDate: '',
     condition: 'good',
     description: '',
-    contactPhone: '',
     preferredTime: ''
   });
   
@@ -143,11 +142,41 @@ const PersonalMedicine = () => {
       }
 
       const data = await response.json();
-      const allMedicines = Array.isArray(data) ? data : (data.data ? data.data : []);
+      const rawMedicines = Array.isArray(data) ? data : (data.data ? data.data : []);
       
-      console.log('🔍 All Personal Medicines from API:', allMedicines.length);
+      // Filter out deleted medicines
+      const allMedicines = rawMedicines.filter(medicine => {
+        // Check various possible delete flag fields
+        const isDeleted = medicine.isDeleted || 
+                         medicine.deleted || 
+                         medicine.isRemoved || 
+                         medicine.status === 'deleted';
+        
+        return !isDeleted; // Only show non-deleted medicines
+      });
+      
+      console.log('🔍 Raw medicines from API:', rawMedicines.length);
+      console.log('🔍 Active medicines after filtering deleted:', allMedicines.length);
       console.log('🔍 Sample medicine structure:', allMedicines[0]);
       console.log('🔍 Available keys in first medicine:', allMedicines[0] ? Object.keys(allMedicines[0]) : 'No medicines');
+      
+              // Debug ID fields and status specifically
+        if (allMedicines[0]) {
+          const sample = allMedicines[0];
+          console.log('🆔 ID Debugging:');
+          console.log('  - personalMedicineId:', sample.personalMedicineId);
+          console.log('  - personalmedicineid:', sample.personalmedicineid);
+          console.log('  - id:', sample.id);
+          console.log('  - ID:', sample.ID);
+          console.log('  - _id:', sample._id);
+          
+          console.log('📊 Status Debugging:');
+          console.log('  - status:', sample.status);
+          console.log('  - isapproved:', sample.isapproved);
+          console.log('  - isApproved:', sample.isApproved);
+          console.log('  - approvedby:', sample.approvedby);
+          console.log('  - approvedBy:', sample.approvedBy);
+        }
       
       // 🔒 SECURITY: Only show medicines for students belonging to current parent
       const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
@@ -238,7 +267,7 @@ const PersonalMedicine = () => {
         receiveddate: new Date().toISOString(),
         expiryDate: formData.expiryDate,
         status: false,
-        note: `${formData.description} | Loại: ${formData.medicineType} | SĐT: ${formData.contactPhone} | Thời gian liên hệ: ${formData.preferredTime}`
+        note: `${formData.description} | Loại: ${formData.medicineType} | Thời gian liên hệ: ${formData.preferredTime}`
       };
 
       console.log('📤 Sending PersonalMedicine data:', requestData);
@@ -269,7 +298,6 @@ const PersonalMedicine = () => {
         expiryDate: '',
         condition: 'good',
         description: '',
-        contactPhone: '',
         preferredTime: ''
       });
       
@@ -288,14 +316,20 @@ const PersonalMedicine = () => {
     console.log('🔍 Medicine object for editing:', medicine);
     console.log('🔍 Available keys:', Object.keys(medicine));
     
-    // Try different possible ID fields
-    const possibleId = medicine.personalMedicineId || 
+    // Try different possible ID fields (prioritize lowercase for API)
+    const possibleId = medicine.personalmedicineid ||
+                      medicine.personalMedicineId || 
                       medicine.id || 
                       medicine.personalMedicineID ||
-                      medicine.personalmedicineid ||
-                      medicine.PersonalMedicineId;
+                      medicine.PersonalMedicineId ||
+                      medicine.ID ||
+                      medicine._id;
     
-    console.log('🔍 Found ID:', possibleId);
+    console.log('🔍 Found ID for editing:', possibleId);
+    console.log('🔍 ID fields check:');
+    console.log('  - personalmedicineid (lowercase):', medicine.personalmedicineid);
+    console.log('  - personalMedicineId (camelCase):', medicine.personalMedicineId);
+    console.log('  - id:', medicine.id);
     
     const medicineInfo = medicines.find(m => String(m.medicineid) === String(medicine.medicineid));
     const student = students.find(s => String(s.id) === String(medicine.studentid));
@@ -314,7 +348,6 @@ const PersonalMedicine = () => {
       expiryDate: medicine.expiryDate ? medicine.expiryDate.split('T')[0] : '',
       condition: 'good',
       description: medicine.note ? medicine.note.split(' | ')[0] : '',
-      contactPhone: medicine.note ? (medicine.note.match(/SĐT: ([^\|]+)/) || ['', ''])[1].trim() : '',
       preferredTime: medicine.note ? (medicine.note.match(/Thời gian liên hệ: (.+)/) || ['', ''])[1] : ''
     });
   };
@@ -330,7 +363,6 @@ const PersonalMedicine = () => {
       expiryDate: '',
       condition: 'good',
       description: '',
-      contactPhone: '',
       preferredTime: ''
     });
   };
@@ -360,71 +392,52 @@ const PersonalMedicine = () => {
         return;
       }
 
+      // Use lowercase field names to match API expectation
       const updateData = {
-        personalMedicineId: updateId,
+        personalmedicineid: updateId, // Use lowercase as expected by API
         medicineid: parseInt(formData.medicineId),
         parentid: parseInt(parentId),
         studentid: parseInt(formData.studentId),
         quantity: parseInt(formData.quantity),
         receiveddate: editingMedicine.receiveddate || new Date().toISOString(),
         expiryDate: formData.expiryDate,
-        status: false, // Keep as pending
-        note: `${formData.description} | Loại: ${formData.medicineType} | SĐT: ${formData.contactPhone} | Thời gian liên hệ: ${formData.preferredTime}`
+        status: false,
+        note: `${formData.description} | Loại: ${formData.medicineType} | Thời gian liên hệ: ${formData.preferredTime}`
       };
 
       console.log('✏️ Updating PersonalMedicine ID:', updateId);
       console.log('📋 Update data:', updateData);
 
-      // Use DELETE + POST approach as primary method for editing
-      console.log('🔄 Using DELETE + POST approach to update medicine...');
-      
-      // Step 1: Delete old record
-      const deleteResponse = await fetch(`https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine/${updateId}`, {
-        method: 'DELETE',
-        headers: {
-          'accept': '*/*',
-          'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`
-        }
-      });
-
-      console.log('🗑️ DELETE response status:', deleteResponse.status);
-
-      if (!deleteResponse.ok) {
-        const deleteErrorText = await deleteResponse.text();
-        console.error('❌ DELETE API Error:', deleteErrorText);
-        throw new Error(`Lỗi khi xóa thuốc cũ: ${deleteResponse.status} - ${deleteErrorText}`);
-      }
-
-      // Step 2: Create new record with updated data using new POST API structure
-      const newMedicineData = {
-        medicineid: parseInt(formData.medicineId),
-        parentid: parseInt(parentId),
-        studentid: parseInt(formData.studentId),
-        quantity: parseInt(formData.quantity),
-        receiveddate: new Date().toISOString(),
-        expiryDate: formData.expiryDate,
-        status: false,
-        note: updateData.note
-      };
-
-      console.log('📤 Creating new medicine with data:', newMedicineData);
+      // Try PUT API first
+      console.log('🔄 Using PUT API to update medicine...');
 
       const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine', {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'accept': '*/*',
           'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(newMedicineData)
+        body: JSON.stringify(updateData)
       });
 
-      console.log('📡 POST response status:', response.status);
+      console.log('📡 PUT response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ UPDATE API Error:', errorText);
-        throw new Error(`Lỗi API: ${response.status} - ${errorText}`);
+        console.error('❌ PUT API Error:', errorText);
+        console.error('❌ PUT Request Body:', JSON.stringify(updateData, null, 2));
+        console.error('❌ Original medicine data:', editingMedicine);
+        
+        // Parse error to understand what's wrong
+        try {
+          const errorObj = JSON.parse(errorText);
+          console.error('❌ Parsed error:', errorObj);
+        } catch (e) {
+          console.error('❌ Raw error text:', errorText);
+        }
+        
+        throw new Error(`Lỗi API PUT: ${response.status} - ${errorText}`);
       }
 
       setMessage({ type: 'success', text: '✅ Đã cập nhật thuốc cá nhân thành công!' });
@@ -451,14 +464,20 @@ const PersonalMedicine = () => {
     console.log('🔍 Medicine object for deleting:', medicine);
     console.log('🔍 Available keys:', Object.keys(medicine));
     
-    // Try different possible ID fields
-    const possibleId = medicine.personalMedicineId || 
+    // Try different possible ID fields (prioritize lowercase for API)
+    const possibleId = medicine.personalmedicineid ||
+                      medicine.personalMedicineId || 
                       medicine.id || 
                       medicine.personalMedicineID ||
-                      medicine.personalmedicineid ||
-                      medicine.PersonalMedicineId;
+                      medicine.PersonalMedicineId ||
+                      medicine.ID ||
+                      medicine._id;
     
     console.log('🔍 Found delete ID:', possibleId);
+    console.log('🔍 ID fields check:');
+    console.log('  - personalmedicineid (lowercase):', medicine.personalmedicineid);
+    console.log('  - personalMedicineId (camelCase):', medicine.personalMedicineId);
+    console.log('  - id:', medicine.id);
     
     setDeletingMedicine({
       ...medicine,
@@ -523,6 +542,39 @@ const PersonalMedicine = () => {
     setDeletingMedicine(null);
   };
 
+  // Helper functions for status handling
+  const getStatusClass = (medicine) => {
+    if (medicine.status === false) {
+      return 'status-pending';
+    } else if (medicine.status === true && medicine.isapproved === true) {
+      return 'status-approved';
+    } else if (medicine.status === true && medicine.isapproved === false) {
+      return 'status-rejected';
+    } else {
+      // Fallback logic based on status only
+      return medicine.status ? 'status-approved' : 'status-pending';
+    }
+  };
+
+  const getStatusText = (medicine) => {
+    if (medicine.status === false) {
+      return 'CHỜ XỬ LÝ';
+    } else if (medicine.status === true && medicine.isapproved === true) {
+      return 'ĐÃ CHẤP THUẬN';
+    } else if (medicine.status === true && medicine.isapproved === false) {
+      return 'ĐÃ BỊ TỪ CHỐI';
+    } else {
+      // Fallback logic
+      return medicine.status ? 'ĐÃ XỬ LÝ' : 'CHỜ XỬ LÝ';
+    }
+  };
+
+  const canEditOrDelete = (medicine) => {
+    // Can edit/delete if: pending OR rejected
+    return medicine.status === false || 
+           (medicine.status === true && medicine.isapproved === false);
+  };
+
   return (
     <div className="personal-medicine-container">
       {/* Header */}
@@ -582,22 +634,10 @@ const PersonalMedicine = () => {
         </div>
       </div>
 
-      {/* Add/Edit Medicine Form */}
+      {/* Add Medicine Form */}
       <div className="add-medicine-section">
-        <h3>📋 {editingMedicine ? 'Chỉnh Sửa Thuốc Cá Nhân' : 'Thêm Thuốc Cá Nhân'}</h3>
-        <p>
-          {editingMedicine 
-            ? 'Cập nhật thông tin thuốc cá nhân của học sinh' 
-            : 'Để tải thông tin thuốc cá nhân của học sinh, theo dõi liều dùng và lịch trình dùng thuốc'
-          }
-        </p>
-        
-        {editingMedicine && (
-          <div className="edit-notice">
-            <span>🔄 Đang chỉnh sửa thuốc cho {students.find(s => String(s.id) === String(editingMedicine.studentid))?.name}</span>
-            <button type="button" onClick={cancelEdit} className="cancel-edit-btn">✖ Hủy</button>
-          </div>
-        )}
+        <h3>📋 Thêm Thuốc Cá Nhân</h3>
+        <p>Để tải thông tin thuốc cá nhân của học sinh, theo dõi liều dùng và lịch trình dùng thuốc</p>
         
         {message.text && (
           <div className={`${message.type}-message`}>
@@ -605,7 +645,7 @@ const PersonalMedicine = () => {
           </div>
         )}
         
-        <form onSubmit={editingMedicine ? updateMedicine : handleSubmit} className="add-medicine-form" key="medicine-form">
+        <form onSubmit={handleSubmit} className="add-medicine-form" key="medicine-form">
           <div className="form-group">
             <label htmlFor="studentId">Chọn học sinh *</label>
             <select
@@ -680,19 +720,6 @@ const PersonalMedicine = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="contactPhone">Số điện thoại liên hệ *</label>
-            <input
-              type="tel"
-              id="contactPhone"
-              name="contactPhone"
-              value={formData.contactPhone}
-              onChange={handleInputChange}
-              required
-              placeholder="0123456789"
-            />
-          </div>
-
-          <div className="form-group">
             <label htmlFor="preferredTime">Thời gian thuận tiện liên hệ</label>
             <input
               type="text"
@@ -709,10 +736,7 @@ const PersonalMedicine = () => {
             className="submit-btn"
             disabled={submitting}
           >
-            {submitting 
-              ? (editingMedicine ? 'Đang cập nhật...' : 'Đang thêm...') 
-              : (editingMedicine ? 'Cập nhật thuốc cá nhân' : 'Thêm thuốc cá nhân')
-            }
+            {submitting ? 'Đang thêm...' : 'Thêm thuốc cá nhân'}
           </button>
         </form>
       </div>
@@ -754,8 +778,8 @@ const PersonalMedicine = () => {
                   <div key={uniqueKey} className="medicine-card">
                     <div className="medicine-card-header">
                       <h4>💊 {medicineInfo?.medicinename || 'Thuốc không xác định'}</h4>
-                      <span className={`status-badge ${medicine.status ? 'status-approved' : 'status-pending'}`}>
-                        {medicine.status ? 'ĐÃ XỬ LÝ' : 'CHỜ XỬ LÝ'}
+                      <span className={`status-badge ${getStatusClass(medicine)}`}>
+                        {getStatusText(medicine)}
                       </span>
                     </div>
                     <div className="medicine-card-body">
@@ -787,8 +811,8 @@ const PersonalMedicine = () => {
                       )}
                     </div>
                     
-                    {/* Action Buttons - only for pending medicines */}
-                    {!medicine.status && (
+                    {/* Action Buttons - for pending and rejected medicines */}
+                    {canEditOrDelete(medicine) && (
                       <div className="medicine-card-actions">
                         <button 
                           onClick={() => startEditMedicine(medicine)}
@@ -806,6 +830,13 @@ const PersonalMedicine = () => {
                         </button>
                       </div>
                     )}
+                    
+                    {/* Info message for approved medicines */}
+                    {medicine.status === true && medicine.isapproved === true && (
+                      <div className="approved-medicine-info">
+                        ✅ Đơn thuốc đã được duyệt - không thể chỉnh sửa
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -813,6 +844,112 @@ const PersonalMedicine = () => {
           )}
         </div>
       </div>
+
+      {/* Edit Medicine Modal */}
+      {editingMedicine && (
+        <div className="modal-overlay" key="edit-modal-overlay">
+          <div className="edit-modal" key="edit-modal">
+            <div className="edit-modal-header">
+              <h3>✏️ Chỉnh Sửa Thuốc Cá Nhân</h3>
+              <button type="button" onClick={cancelEdit} className="close-modal-btn">✖</button>
+            </div>
+            
+            <form onSubmit={updateMedicine} className="edit-medicine-form">
+              <div className="form-group">
+                <label htmlFor="edit-studentId">Chọn học sinh *</label>
+                <select
+                  id="edit-studentId"
+                  name="studentId"
+                  value={formData.studentId}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">Chọn học sinh</option>
+                  {students.map((student, idx) => (
+                    <option key={`edit_student_${student.id}_${idx}`} value={student.id}>
+                      {student.name} - Lớp {student.class}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="edit-medicineId">Chọn thuốc *</label>
+                <select
+                  id="edit-medicineId"
+                  name="medicineId"
+                  value={formData.medicineId}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">Chọn thuốc từ danh sách</option>
+                  {medicines.map((medicine, idx) => (
+                    <option key={`edit_medicine_${medicine.medicineid}_${idx}`} value={medicine.medicineid}>
+                      {medicine.medicinename} - {medicine.type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="edit-quantity">Số lượng *</label>
+                <input
+                  type="number"
+                  id="edit-quantity"
+                  name="quantity"
+                  value={formData.quantity}
+                  onChange={handleInputChange}
+                  required
+                  min="1"
+                  placeholder="Số viên/hộp"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="edit-expiryDate">Hạn sử dụng *</label>
+                <input
+                  type="date"
+                  id="edit-expiryDate"
+                  name="expiryDate"
+                  value={formData.expiryDate}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="edit-description">Mô tả chi tiết (liều dùng, thời gian dùng...)</label>
+                <textarea
+                  id="edit-description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  placeholder="Mô tả về thuốc, liều dùng, thời gian dùng, lưu ý cho y tế trường..."
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="edit-preferredTime">Thời gian thuận tiện liên hệ</label>
+                <input
+                  type="text"
+                  id="edit-preferredTime"
+                  name="preferredTime"
+                  value={formData.preferredTime}
+                  onChange={handleInputChange}
+                  placeholder="Ví dụ: Sáng 8-12h, Chiều 14-18h"
+                />
+              </div>
+
+              <div className="modal-actions">
+                <button type="button" onClick={cancelEdit} className="cancel-btn">Hủy</button>
+                <button type="submit" className="submit-btn" disabled={submitting}>
+                  {submitting ? 'Đang cập nhật...' : 'Cập nhật thuốc'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {deletingMedicine && (
@@ -836,7 +973,7 @@ const PersonalMedicine = () => {
       {submitting && (
         <div className="loading-overlay" key="loading-overlay">
           <div className="loading-spinner" key="loading-spinner">
-            <h4>{editingMedicine ? 'Đang cập nhật...' : 'Đang thêm thuốc...'}</h4>
+            <h4>Đang xử lý...</h4>
             <p>Vui lòng chờ trong giây lát</p>
           </div>
         </div>
