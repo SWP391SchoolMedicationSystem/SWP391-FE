@@ -24,6 +24,15 @@ function VaccinationEventStudents() {
     customMessage: "",
   });
 
+  // Email template options (same as in VaccinationEvents.jsx)
+  const emailTemplateOptions = [
+    { id: 1, name: "Template Thông Báo Cơ Bản" },
+    { id: 2, name: "Template Nhắc Nhở" },
+    { id: 3, name: "Template Khẩn Cấp" },
+    { id: 4, name: "Template Thông Tin Chi Tiết" },
+    { id: 5, name: "Template Mặc Định" },
+  ];
+
   // Filter states
   const [statusFilter, setStatusFilter] = useState("all");
   const [classFilter, setClassFilter] = useState("all");
@@ -141,14 +150,16 @@ function VaccinationEventStudents() {
     }
 
     try {
+      // Updated structure for the new API
       const emailData = {
         vaccinationEventId: parseInt(eventId),
         emailTemplateId: parseInt(emailFormData.emailTemplateId),
         customMessage: emailFormData.customMessage.trim() || "string",
       };
 
+      // Send parentId as array to the new API structure
       await vaccinationEventService.sendEmailToSpecific(
-        selectedStudent.parentId,
+        [selectedStudent.parentId], // Pass as array
         emailData
       );
 
@@ -528,16 +539,21 @@ function VaccinationEventStudents() {
               </div>
 
               <div className="form-group">
-                <label>Email Template ID *</label>
-                <input
-                  type="number"
+                <label>Chọn Template Email *</label>
+                <select
                   name="emailTemplateId"
                   value={emailFormData.emailTemplateId}
                   onChange={handleEmailInputChange}
-                  min="1"
                   required
-                />
-                <small>ID của template email (mặc định: 5)</small>
+                  className="template-select"
+                >
+                  {emailTemplateOptions.map((template) => (
+                    <option key={template.id} value={template.id}>
+                      {template.name} (ID: {template.id})
+                    </option>
+                  ))}
+                </select>
+                <small>Chọn template phù hợp cho thông báo</small>
               </div>
 
               <div className="form-group">

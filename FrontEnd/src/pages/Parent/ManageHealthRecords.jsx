@@ -1,362 +1,224 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../css/Parent/ManageHealthRecords.css";
+import { useParentStudents } from "../../utils/hooks/useParent";
 
 function ManageHealthRecords() {
-  const [selectedChild, setSelectedChild] = useState(null);
-  const [showDetailModal, setShowDetailModal] = useState(false);
+  const navigate = useNavigate();
 
-  // Mock data - Danh sách con em của phụ huynh đăng nhập
-  const myChildren = [
-    {
-      id: 1,
-      name: "Nguyễn Minh An",
-      studentCode: "MN001",
-      dateOfBirth: "2020-05-15",
-      gender: "Nam",
-      className: "Lớp Mầm",
-      address: "123 Đường ABC, Quận 1, TP.HCM",
-      healthStatus: "Bình thường",
-      avatar: "👶",
-      healthRecords: [
-        {
-          id: 1,
-          type: "Dị ứng",
-          title: "Dị ứng sữa bò",
-          description: "Dị ứng với protein sữa bò, gây nôn và tiêu chảy",
-          severity: "Trung bình",
-          date: "2024-01-15",
-          doctor: "BS. Nguyễn Thị Lan",
-          medications: ["Sữa không lactose"],
-          notes: "Cho uống sữa đặc biệt, không cho sữa bò thường",
-          status: "Đang theo dõi",
-        },
-        {
-          id: 2,
-          type: "Khám định kỳ",
-          title: "Tiêm chủng định kỳ",
-          description: "Tiêm vaccine phòng bệnh theo lịch",
-          severity: "Bình thường",
-          date: "2024-03-10",
-          doctor: "BS. Phạm Văn Minh",
-          medications: [],
-          notes: "Đã tiêm đủ vaccine theo độ tuổi",
-          status: "Hoàn thành",
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "Nguyễn Thị Bé",
-      studentCode: "MN008",
-      dateOfBirth: "2019-08-22",
-      gender: "Nữ",
-      className: "Lớp Chồi",
-      address: "123 Đường ABC, Quận 1, TP.HCM",
-      healthStatus: "Tốt",
-      avatar: "👧",
-      healthRecords: [
-        {
-          id: 3,
-          type: "Khám định kỳ",
-          title: "Kiểm tra sức khỏe tổng quát",
-          description: "Khám sức khỏe định kỳ cho trẻ mầm non",
-          severity: "Bình thường",
-          date: "2024-02-20",
-          doctor: "BS. Lê Thị Mai",
-          medications: [],
-          notes: "Sức khỏe tốt, phát triển bình thường",
-          status: "Hoàn thành",
-        },
-      ],
-    },
-  ];
+  // Main states
+  const [myChildren, setMyChildren] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const getHealthStatusColor = (status) => {
-    const colors = {
-      Tốt: "#28a745",
-      "Bình thường": "#17a2b8",
-      "Cần chú ý": "#ffc107",
-      "Nghiêm trọng": "#dc3545",
+  // Get students of current parent
+  const {
+    data: studentsData,
+    loading: studentsLoading,
+    error: studentsError,
+  } = useParentStudents();
+
+  // Fetch health records for all students
+  useEffect(() => {
+    const fetchChildrenWithHealthRecords = async () => {
+      if (studentsData && studentsData.length > 0) {
+        try {
+          setLoading(true);
+          setError(null);
+
+          // Transform raw API data to component format
+          const transformedStudents = studentsData.map((student) => {
+            console.log("🔍 Raw student data từ API:", student);
+            console.log("🆔 StudentId từ API:", student.studentId);
+
+            return {
+              id: student.studentId, // Sử dụng studentId từ API
+              studentId: student.studentId, // Field chính để identify
+              fullName: student.fullname || "Không có tên",
+              name: student.fullname || "Không có tên",
+              studentCode: student.studentCode || "Không có mã",
+              dateOfBirth: student.dob || "Không có thông tin",
+              gender: student.gender === false ? "Nữ" : "Nam", // API: false = Nữ, true = Nam
+              className: student.classname || "Không có lớp", // Sử dụng classname từ API
+              address: student.parent?.address || "Không có địa chỉ", // Sử dụng parent.address
+              healthStatus: "Bình thường", // Default value
+              age: student.age || 0,
+              bloodType: student.bloodType || "Không có thông tin",
+              classId: student.classname || "Không có lớp",
+              parentId: student.parent?.parentid, // Sử dụng parent.parentid
+              isDeleted: false, // Default value
+              avatar: student.gender === false ? "👧" : "👦", // Nữ = 👧, Nam = 👦
+              parentInfo: student.parent || {}, // Sử dụng parent object
+              healthRecords: [], // Initialize empty, will be loaded on demand
+            };
+          });
+
+          console.log("🔄 Transformed students:", transformedStudents);
+          setMyChildren(transformedStudents);
+        } catch (error) {
+          console.error("Error processing children data:", error);
+          setError("Không thể xử lý thông tin con em");
+        } finally {
+          setLoading(false);
+        }
+      } else if (studentsData && studentsData.length === 0) {
+        // If no students found, show empty state
+        setMyChildren([]);
+        setLoading(false);
+      }
     };
-    return colors[status] || "#6c757d";
+
+    if (!studentsLoading) {
+      fetchChildrenWithHealthRecords();
+    }
+  }, [studentsData, studentsLoading]);
+
+  // Handle view health records for a child
+  const handleViewHealthRecords = (child) => {
+    console.log("🏥 Viewing health records for child:", child);
+    console.log("🔍 StudentId from card:", child.studentId);
+    console.log("📋 StudentCode from card:", child.studentCode);
+    console.log("👤 Student name:", child.fullName);
+    console.log(
+      "📋 Chuyển sang trang chi tiết hồ sơ sức khỏe với studentId:",
+      child.studentId
+    );
+
+    // Chuyển trang đến trang chi tiết hồ sơ sức khỏe
+    navigate(`/parent/health-records/${child.studentId}`);
   };
 
-  const getSeverityColor = (severity) => {
-    const colors = {
-      Nhẹ: "#28a745",
-      "Trung bình": "#ffc107",
-      Nặng: "#dc3545",
-      "Bình thường": "#17a2b8",
-    };
-    return colors[severity] || "#6c757d";
-  };
+  // Show loading state
+  if (loading || studentsLoading) {
+    return (
+      <div className="parent-health-records-container">
+        <div className="loading-state">
+          <p>⏳ Đang tải thông tin sức khỏe con em...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const handleViewChild = (child) => {
-    setSelectedChild(child);
-    setShowDetailModal(true);
-  };
+  // Show error state
+  if (error || studentsError) {
+    return (
+      <div className="parent-health-records-container">
+        <div className="error-state">
+          <p>❌ Lỗi: {error || studentsError}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="retry-btn"
+          >
+            🔄 Thử lại
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  const totalRecords = myChildren.reduce(
-    (sum, child) => sum + child.healthRecords.length,
-    0
-  );
+  // Show empty state if no children data
+  if (!loading && !error && myChildren.length === 0) {
+    return (
+      <div className="parent-health-records-container">
+        <div className="page-header">
+          <div className="header-content">
+            <h1>👨‍👩‍👧‍👦 Hồ Sơ Sức Khỏe Con Em</h1>
+            <p>Theo dõi tình trạng sức khỏe và hồ sơ y tế của con em</p>
+          </div>
+        </div>
+        <div className="empty-state">
+          <p>📭 Chưa có thông tin con em hoặc chưa có dữ liệu sức khỏe</p>
+          <p>Vui lòng liên hệ nhà trường để cập nhật thông tin.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="parent-health-records-container">
       {/* Header */}
       <div className="page-header">
         <div className="header-content">
-          <h1>👨‍👩‍👧‍👦 Hồ Sơ Sức Khỏe Con Em</h1>
-          <p>Theo dõi tình trạng sức khỏe và hồ sơ y tế của con em</p>
+          <h1>🏥 Hồ Sơ Sức Khỏe Con Em</h1>
+          <p>Theo dõi tình trạng sức khỏe của các con</p>
         </div>
+        <button
+          onClick={() => window.location.reload()}
+          className="refresh-btn"
+        >
+          🔄 Tải lại
+        </button>
       </div>
 
-      {/* Quick Stats */}
-      <div className="stats-cards">
-        <div className="stat-card total">
+      {/* Statistics */}
+      <div className="stats-row">
+        <div className="stat-card">
           <div className="stat-icon">👶</div>
           <div className="stat-content">
             <h3>{myChildren.length}</h3>
-            <p>Số con em</p>
+            <p>Tổng số con</p>
           </div>
         </div>
-        <div className="stat-card active">
-          <div className="stat-icon">📋</div>
+        <div className="stat-card">
+          <div className="stat-icon">🏥</div>
           <div className="stat-content">
-            <h3>{totalRecords}</h3>
+            <h3>
+              {myChildren.reduce(
+                (sum, child) => sum + (child.healthRecords?.length || 0),
+                0
+              )}
+            </h3>
             <p>Tổng hồ sơ y tế</p>
           </div>
         </div>
-        <div className="stat-card monitoring">
-          <div className="stat-icon">💚</div>
-          <div className="stat-content">
-            <h3>
-              {
-                myChildren.filter((child) => child.healthStatus === "Tốt")
-                  .length
-              }
-            </h3>
-            <p>Sức khỏe tốt</p>
-          </div>
-        </div>
-        <div className="stat-card high-priority">
-          <div className="stat-icon">⚠️</div>
-          <div className="stat-content">
-            <h3>
-              {
-                myChildren.filter((child) => child.healthStatus === "Cần chú ý")
-                  .length
-              }
-            </h3>
-            <p>Cần chú ý</p>
-          </div>
-        </div>
       </div>
 
-      {/* Children List */}
-      <div className="children-section">
-        <div className="section-header">
-          <h3>👨‍👩‍👧‍👦 Danh sách con em</h3>
-        </div>
-
-        <div className="children-grid">
-          {myChildren.map((child) => (
-            <div key={child.id} className="child-card">
-              <div className="child-header">
-                <div className="child-avatar">{child.avatar}</div>
-                <div className="child-info">
-                  <h4>{child.name}</h4>
-                  <p className="child-code">{child.studentCode}</p>
-                  <p className="child-birth">Sinh: {child.dateOfBirth}</p>
-                  <p className="child-class">🏫 {child.className}</p>
-                </div>
-                <div className="child-status">
-                  <span
-                    className="health-badge"
-                    style={{
-                      backgroundColor: getHealthStatusColor(child.healthStatus),
-                    }}
-                  >
-                    {child.healthStatus}
-                  </span>
-                </div>
-              </div>
-
-              <div className="child-details">
-                <div className="detail-row">
-                  <span className="detail-label">⚧️ Giới tính:</span>
-                  <span>{child.gender}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">📋 Hồ sơ y tế:</span>
-                  <span>{child.healthRecords.length} bản ghi</span>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">📅 Cập nhật gần nhất:</span>
-                  <span>
-                    {child.healthRecords.length > 0
-                      ? child.healthRecords[child.healthRecords.length - 1].date
-                      : "Chưa có"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="child-actions">
-                <button
-                  className="view-btn"
-                  onClick={() => handleViewChild(child)}
-                >
-                  👁️ Xem hồ sơ chi tiết
-                </button>
+      {/* Children Cards */}
+      <div className="children-grid">
+        {myChildren.map((child) => (
+          <div key={child.studentId || child.id} className="child-card">
+            <div className="card-header">
+              <div className="child-avatar">{child.avatar}</div>
+              <div className="child-info">
+                <h3>{child.fullName}</h3>
+                <p>Mã HS: {child.studentCode}</p>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Child Detail Modal */}
-      {showDetailModal && selectedChild && (
-        <div className="modal-overlay">
-          <div className="modal-content large-modal">
-            <div className="modal-header">
-              <h3>📋 Hồ sơ sức khỏe - {selectedChild.name}</h3>
+            <div className="card-body">
+              <div className="info-row">
+                <span className="label">Ngày sinh:</span>
+                <span className="value">{child.dateOfBirth}</span>
+              </div>
+              <div className="info-row">
+                <span className="label">Giới tính:</span>
+                <span className="value">{child.gender}</span>
+              </div>
+              <div className="info-row">
+                <span className="label">Tuổi:</span>
+                <span className="value">{child.age}</span>
+              </div>
+              <div className="info-row">
+                <span className="label">Nhóm máu:</span>
+                <span className="value">{child.bloodType}</span>
+              </div>
+              <div className="info-row">
+                <span className="label">Lớp:</span>
+                <span className="value">{child.className}</span>
+              </div>
+            </div>
+
+            <div className="card-footer">
               <button
-                className="modal-close"
-                onClick={() => setShowDetailModal(false)}
+                className="health-records-btn"
+                onClick={() => handleViewHealthRecords(child)}
               >
-                ✕
+                🏥 Xem hồ sơ sức khỏe
               </button>
             </div>
-
-            <div className="modal-body">
-              {/* Child Info */}
-              <div className="child-info-section">
-                <div className="info-grid">
-                  <div className="info-item">
-                    <label>👤 Họ và tên:</label>
-                    <span>{selectedChild.name}</span>
-                  </div>
-                  <div className="info-item">
-                    <label>🏷️ Mã học sinh:</label>
-                    <span>{selectedChild.studentCode}</span>
-                  </div>
-                  <div className="info-item">
-                    <label>🎂 Ngày sinh:</label>
-                    <span>{selectedChild.dateOfBirth}</span>
-                  </div>
-                  <div className="info-item">
-                    <label>⚧️ Giới tính:</label>
-                    <span>{selectedChild.gender}</span>
-                  </div>
-                  <div className="info-item">
-                    <label>🏫 Lớp học:</label>
-                    <span>{selectedChild.className}</span>
-                  </div>
-                  <div className="info-item">
-                    <label>🏠 Địa chỉ:</label>
-                    <span>{selectedChild.address}</span>
-                  </div>
-                  <div className="info-item">
-                    <label>💚 Tình trạng sức khỏe:</label>
-                    <span
-                      className="health-badge"
-                      style={{
-                        backgroundColor: getHealthStatusColor(
-                          selectedChild.healthStatus
-                        ),
-                      }}
-                    >
-                      {selectedChild.healthStatus}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Health Records */}
-              <div className="health-records-section">
-                <h4>📋 Hồ sơ y tế</h4>
-
-                {selectedChild.healthRecords.length > 0 ? (
-                  <div className="records-list">
-                    {selectedChild.healthRecords.map((record) => (
-                      <div key={record.id} className="record-item">
-                        <div className="record-header">
-                          <div className="record-title">
-                            <h5>{record.title}</h5>
-                            <span className="record-type">{record.type}</span>
-                          </div>
-                          <div className="record-meta">
-                            <span
-                              className="severity-badge"
-                              style={{
-                                backgroundColor: getSeverityColor(
-                                  record.severity
-                                ),
-                              }}
-                            >
-                              {record.severity}
-                            </span>
-                            <span className="record-date">{record.date}</span>
-                          </div>
-                        </div>
-
-                        <div className="record-content">
-                          <p>
-                            <strong>Mô tả:</strong> {record.description}
-                          </p>
-                          <p>
-                            <strong>Bác sĩ:</strong> {record.doctor}
-                          </p>
-                          {record.medications.length > 0 && (
-                            <p>
-                              <strong>Thuốc:</strong>{" "}
-                              {record.medications.join(", ")}
-                            </p>
-                          )}
-                          <p>
-                            <strong>Ghi chú:</strong> {record.notes}
-                          </p>
-                          <p>
-                            <strong>Trạng thái:</strong> {record.status}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="no-records">
-                    <p>Chưa có hồ sơ y tế nào</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Contact Info */}
-              <div className="contact-section">
-                <h4>📞 Liên hệ y tá trường</h4>
-                <div className="contact-info">
-                  <p>
-                    <strong>📱 Hotline:</strong> 1900 1234
-                  </p>
-                  <p>
-                    <strong>📧 Email:</strong> nurse@school.edu.vn
-                  </p>
-                  <p>
-                    <strong>🕐 Giờ làm việc:</strong> 7:00 - 17:00 (Thứ 2 - Thứ
-                    6)
-                  </p>
-                  <p className="note">
-                    💡{" "}
-                    <em>
-                      Vui lòng liên hệ y tá trường nếu có thắc mắc về sức khỏe
-                      của con em
-                    </em>
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
+import React, { useState, useCallback } from "react";
 import { useApi, useApiCall } from "./useApi";
-import { useState, useCallback } from "react";
 import {
   parentService,
   parentNotificationService,
@@ -115,6 +115,57 @@ export const useParentNotifications = () => {
   };
 };
 
+// Hook for parent students (get children)
+export const useParentStudents = () => {
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchStudents = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Get current parent ID from localStorage
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      const parentId = userInfo.userId;
+
+      if (!parentId) {
+        throw new Error("Không tìm thấy thông tin phụ huynh");
+      }
+
+      console.log("🔍 Fetching students for parent ID:", parentId);
+      const data = await parentService.getMyChildren(parentId);
+      console.log("📥 Raw students data:", data);
+
+      setStudents(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("❌ Failed to fetch parent students:", err);
+      setError(err.message || "Không thể tải danh sách con em");
+      setStudents([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const refetch = useCallback(() => {
+    fetchStudents();
+  }, [fetchStudents]);
+
+  // Auto-fetch on mount
+  React.useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
+
+  return {
+    data: students,
+    loading,
+    error,
+    refetch,
+    fetchStudents,
+  };
+};
+
 // Hook for parent health records
 export const useParentHealthRecords = (studentId) => {
   return useApi(
@@ -173,6 +224,7 @@ export const useParentActions = () => {
 export default {
   useParentProfile,
   useParentNotifications,
+  useParentStudents,
   useParentHealthRecords,
   useParentBlogs,
   useConsultations,

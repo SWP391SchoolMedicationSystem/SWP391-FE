@@ -15,6 +15,7 @@ import VaccinationEventStudents from "./pages/Manager/VaccinationEventStudents";
 import Notifications from "./pages/Manager/Notifications";
 
 import StudentList from "./pages/Manager/StudentList";
+import ManagerStudentHealthRecordDetail from "./pages/Manager/StudentHealthRecordDetail";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Admin imports
@@ -38,6 +39,7 @@ import NurseStudentList from "./pages/Nurse/StudentList";
 import NurseBlog from "./pages/Nurse/Blog";
 import ChatWithParents from "./pages/Nurse/ChatWithParents";
 import StudentHealthRecord from "./pages/Nurse/StudentHealthRecord";
+import NurseStudentHealthRecordDetail from "./pages/Nurse/StudentHealthRecordDetail";
 import NurseNotifications from "./pages/Nurse/Notifications";
 import ViewStudentMedicine from "./pages/Nurse/ViewStudentMedicine";
 
@@ -51,9 +53,9 @@ import ParentNotifications from "./pages/Parent/Notifications";
 import Consultation from "./pages/Parent/Consultation";
 import ChatWithNurse from "./pages/Parent/ChatWithNurse";
 import ManageHealthRecords from "./pages/Parent/ManageHealthRecords";
+import ParentStudentHealthRecordDetail from "./pages/Parent/StudentHealthRecordDetail";
 import UpdateProfile from "./pages/Parent/UpdateProfile";
 import PersonalMedicine from "./pages/Parent/PersonalMedicine";
-
 
 function App() {
   return (
@@ -104,6 +106,10 @@ function App() {
           />
 
           <Route path="StudentList" element={<StudentList />} />
+          <Route
+            path="student-health-record/:studentId"
+            element={<ManagerStudentHealthRecordDetail />}
+          />
           <Route path="notifications" element={<Notifications />} />
         </Route>
 
@@ -128,11 +134,18 @@ function App() {
           <Route path="medication-schedule" element={<MedicationSchedule />} />
           <Route path="handle-medicine" element={<HandleMedicine />} />
           <Route path="medicine-management" element={<MedicineManagement />} />
-          <Route path="view-student-medicine" element={<ViewStudentMedicine />} />
+          <Route
+            path="view-student-medicine"
+            element={<ViewStudentMedicine />}
+          />
           <Route path="student-list" element={<NurseStudentList />} />
           <Route path="blog" element={<NurseBlog />} />
           <Route path="chat" element={<ChatWithParents />} />
           <Route path="health-records" element={<StudentHealthRecord />} />
+          <Route
+            path="student-health-record/:studentId"
+            element={<NurseStudentHealthRecordDetail />}
+          />
           <Route path="notifications" element={<NurseNotifications />} />
         </Route>
 
@@ -157,6 +170,10 @@ function App() {
           <Route path="consultation" element={<Consultation />} />
           <Route path="chat-nurse" element={<ChatWithNurse />} />
           <Route path="health-records" element={<ManageHealthRecords />} />
+          <Route
+            path="health-records/:studentId"
+            element={<ParentStudentHealthRecordDetail />}
+          />
           <Route
             path="manage-health-records"
             element={<ManageHealthRecords />}
