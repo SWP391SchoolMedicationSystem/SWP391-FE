@@ -65,10 +65,10 @@ export const API_ENDPOINTS = {
     GET_BY_ID: "/Blog/getById", // Get blog by ID
     GET_PUBLISHED: "/Blog/GetPublishedBlogs", // Parent xem approved blogs
     ADD: "/Blog/add", // Nurse tạo blog
-    UPDATE: "/Blog/update", // Manager/Nurse edit blog
-    DELETE: "/Blog/delete", // Manager delete blog
-    APPROVE: "/Blog/ApproveBlog", // Manager approve blog
-    REJECT: "/Blog/RejectBlog", // Manager reject blog
+    UPDATE: "/Blog/update", // Manager/Nurse edit blog - blogID trong body
+    DELETE: "/Blog/delete", // Manager delete blog - query parameter ?id={blogID}
+    APPROVE: "/Blog/ApproveBlog", // Manager approve blog - body với blogId, approvedBy, approvedOn, status
+    REJECT: "/Blog/RejectBlog", // Manager reject blog - body với blogId, approvedBy, approvedOn, status
   },
 
   // Email (5/7 - including admin features)

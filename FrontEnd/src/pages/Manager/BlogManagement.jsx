@@ -161,40 +161,21 @@ function BlogManagement() {
   const handleApprovalSubmit = async (e) => {
     e.preventDefault();
     try {
+      const blogId = currentPost?.blogId || currentPost?.id;
+
       if (approvalData.approvalStatus === "Approved") {
-        await approveBlog(currentPost.id);
-        setLocalBlogPosts(
-          localBlogPosts.map((post) =>
-            post.id === currentPost.id
-              ? {
-                  ...post,
-                  approvalStatus: "Approved",
-                  status: "Published",
-                  publishedDate: new Date().toISOString().split("T")[0],
-                  approvedBy: "Manager", // Get from user context
-                }
-              : post
-          )
-        );
+        await approveBlog(blogId);
+        alert("Blog đã được phê duyệt thành công!");
       } else if (approvalData.approvalStatus === "Rejected") {
-        await rejectBlog(currentPost.id, approvalData.rejectionReason);
-        setLocalBlogPosts(
-          localBlogPosts.map((post) =>
-            post.id === currentPost.id
-              ? {
-                  ...post,
-                  approvalStatus: "Rejected",
-                  rejectionReason: approvalData.rejectionReason,
-                }
-              : post
-          )
-        );
+        await rejectBlog(blogId, approvalData.rejectionReason);
+        alert("Blog đã bị từ chối!");
       }
+
       setShowModal(false);
       refetch(); // Refresh data from API
     } catch (error) {
       console.error("Error processing approval:", error);
-      // Handle error - show toast or alert
+      alert("Có lỗi xảy ra khi xử lý phê duyệt. Vui lòng thử lại!");
     }
   };
 
@@ -379,15 +360,34 @@ function BlogManagement() {
                         >
                           ✏️
                         </button>
-                        {post.approvalStatus === "Pending" && (
-                          <button
-                            onClick={() => handleApprovePost(post)}
-                            className="btn btn-approve"
-                            title="Phê duyệt"
-                            disabled={actionLoading}
-                          >
-                            {actionLoading ? "⏳" : "✅"}
-                          </button>
+                        {(post.status === "Draft" ||
+                          post.status === "Pending") && (
+                          <>
+                            <button
+                              onClick={() => handleApprovePost(post)}
+                              className="btn btn-approve"
+                              title="Phê duyệt"
+                              disabled={actionLoading}
+                            >
+                              {actionLoading ? "⏳" : "✅"}
+                            </button>
+                            <button
+                              onClick={() => {
+                                setModalMode("approve");
+                                setCurrentPost(post);
+                                setApprovalData({
+                                  approvalStatus: "Rejected",
+                                  rejectionReason: "",
+                                });
+                                setShowModal(true);
+                              }}
+                              className="btn btn-reject"
+                              title="Từ chối"
+                              disabled={actionLoading}
+                            >
+                              {actionLoading ? "⏳" : "❌"}
+                            </button>
+                          </>
                         )}
                         <button
                           onClick={() => handleDeletePost(post.id)}

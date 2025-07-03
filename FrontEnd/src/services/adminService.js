@@ -130,7 +130,27 @@ export const adminBlogService = {
   getAllBlogs: async () => {
     try {
       const response = await apiClient.get(API_ENDPOINTS.BLOG.GET_ALL);
-      return response;
+      if (!Array.isArray(response)) return [];
+
+      return response.map((blog) => ({
+        id: blog.blogId || blog.id || blog.blogid,
+        blogId: blog.blogId || blog.id || blog.blogid,
+        title: blog.title,
+        content: blog.content,
+        author: blog.createdByName || "",
+        status: blog.status,
+        createdDate: blog.createdAt?.split("T")[0] || "N/A",
+        isDeleted: blog.isDeleted ?? blog.isdeleted ?? false,
+        createdById: blog.createdBy || blog.createdby || blog.authorId,
+        createdByName: blog.createdByName || "",
+        approvedBy: blog.approvedBy,
+        approvedByName: blog.approvedByName,
+        approvedOn: blog.approvedOn,
+        updatedBy: blog.updatedBy,
+        updatedByName: blog.updatedByName,
+        updatedAt: blog.updatedAt,
+        image: blog.image,
+      }));
     } catch (error) {
       console.error("Error getting all blogs:", error);
       throw error;
@@ -138,13 +158,46 @@ export const adminBlogService = {
   },
 
   // Approve blog
-  approveBlog: async (blogId, approvalData) => {
+  approveBlog: async (blogId) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.APPROVE, blogId);
-      const response = await apiClient.post(url, approvalData);
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      const approvalData = {
+        blogId: blogId,
+        approvedBy: userInfo.userId || userInfo.id || 0,
+        approvedOn: new Date().toISOString(),
+        status: "Published",
+      };
+
+      const response = await apiClient.post(
+        API_ENDPOINTS.BLOG.APPROVE,
+        approvalData
+      );
       return response;
     } catch (error) {
       console.error("Error approving blog:", error);
+      throw error;
+    }
+  },
+
+  // Reject blog
+  rejectBlog: async (blogId, reason = "Rejected by admin") => {
+    try {
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      const rejectData = {
+        blogId: blogId,
+        approvedBy: userInfo.userId || userInfo.id || 0,
+        approvedOn: new Date().toISOString(),
+        status: "Rejected",
+        message: reason,
+      };
+
+      const response = await apiClient.post(
+        API_ENDPOINTS.BLOG.REJECT,
+        rejectData
+      );
+      return response;
+    } catch (error) {
+      console.error("Error rejecting blog:", error);
       throw error;
     }
   },

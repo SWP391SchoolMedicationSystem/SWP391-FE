@@ -57,16 +57,26 @@ export const nurseHealthService = {
 
 // Mapping function để chuẩn hoá dữ liệu blog cho Nurse UI
 const mapBlogData = (apiBlog) => ({
-  id: apiBlog.id || apiBlog.blogid || apiBlog.blogId,
+  id: apiBlog.blogId || apiBlog.id || apiBlog.blogid,
+  blogId: apiBlog.blogId || apiBlog.id || apiBlog.blogid,
   title: apiBlog.title,
   content: apiBlog.content,
-  author: apiBlog.author || apiBlog.createdByName || "Unknown",
+  author: apiBlog.createdByName || apiBlog.author || "Unknown",
   category: apiBlog.category || "N/A",
   status: apiBlog.status,
   createdDate: apiBlog.createdAt?.split("T")[0] || apiBlog.createdDate || "N/A",
   views: apiBlog.views || apiBlog.readCount || 0,
   featured: apiBlog.featured || false,
   isDeleted: apiBlog.isDeleted ?? apiBlog.isdeleted ?? false,
+  createdById: apiBlog.createdBy || apiBlog.createdby || apiBlog.authorId,
+  createdByName: apiBlog.createdByName || "",
+  approvedBy: apiBlog.approvedBy,
+  approvedByName: apiBlog.approvedByName,
+  approvedOn: apiBlog.approvedOn,
+  updatedBy: apiBlog.updatedBy,
+  updatedByName: apiBlog.updatedByName,
+  updatedAt: apiBlog.updatedAt,
+  image: apiBlog.image,
 });
 
 // Nurse Blog Services
@@ -96,24 +106,21 @@ export const nurseBlogService = {
   // Update blog post
   updateBlog: async (blogId, blogData) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.UPDATE, blogId);
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
 
-      const { title, content, status, image, updatedBy, isDeleted } = blogData;
+      // API mới sử dụng blogID trong body thay vì URL parameter
+      const { title, content, status, image, isDeleted } = blogData;
 
       const payload = {
+        blogID: blogId, // Sử dụng blogID trong body
         title,
         content,
         status,
-        image,
+        updatedBy: userInfo.userId || userInfo.id || 0,
         isDeleted: typeof isDeleted === "boolean" ? isDeleted : false,
-        updatedBy:
-          updatedBy ||
-          JSON.parse(localStorage.getItem("userInfo") || "{}").userId ||
-          0,
-        updatedAt: new Date().toISOString(),
       };
 
-      const response = await apiClient.put(url, payload);
+      const response = await apiClient.put(API_ENDPOINTS.BLOG.UPDATE, payload);
       return response;
     } catch (error) {
       console.error("Error updating blog:", error);
@@ -124,8 +131,10 @@ export const nurseBlogService = {
   // Delete blog post
   deleteBlog: async (blogId) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.DELETE, blogId);
-      const response = await apiClient.delete(url);
+      // API mới sử dụng query parameter ?id={blogID}
+      const response = await apiClient.delete(
+        `${API_ENDPOINTS.BLOG.DELETE}?id=${blogId}`
+      );
       return response;
     } catch (error) {
       console.error("Error deleting blog:", error);

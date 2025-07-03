@@ -32,10 +32,11 @@ const mapStudentData = (apiStudent) => {
 // Mapping function for blog data (ensures unified fields)
 const mapBlogData = (apiBlog) => {
   return {
-    id: apiBlog.id || apiBlog.blogid || apiBlog.blogId,
+    id: apiBlog.blogId || apiBlog.id || apiBlog.blogid,
+    blogId: apiBlog.blogId || apiBlog.id || apiBlog.blogid,
     title: apiBlog.title,
     content: apiBlog.content,
-    author: "", // to be filled later
+    author: apiBlog.createdByName || "", // to be filled later
     category: apiBlog.category || "N/A",
     status: apiBlog.status,
     createdDate:
@@ -43,6 +44,14 @@ const mapBlogData = (apiBlog) => {
     featured: apiBlog.featured || false,
     isDeleted: apiBlog.isDeleted ?? apiBlog.isdeleted ?? false,
     createdById: apiBlog.createdBy || apiBlog.createdby || apiBlog.authorId,
+    createdByName: apiBlog.createdByName || "",
+    approvedBy: apiBlog.approvedBy,
+    approvedByName: apiBlog.approvedByName,
+    approvedOn: apiBlog.approvedOn,
+    updatedBy: apiBlog.updatedBy,
+    updatedByName: apiBlog.updatedByName,
+    updatedAt: apiBlog.updatedAt,
+    image: apiBlog.image,
   };
 };
 
@@ -81,10 +90,20 @@ export const managerBlogService = {
   },
 
   // Approve blog
-  approveBlog: async (blogId, approvalData) => {
+  approveBlog: async (blogId) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.APPROVE, blogId);
-      const response = await apiClient.post(url, approvalData);
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      const approvalData = {
+        blogId: blogId,
+        approvedBy: userInfo.userId || userInfo.id || 0,
+        approvedOn: new Date().toISOString(),
+        status: "Published",
+      };
+
+      const response = await apiClient.post(
+        API_ENDPOINTS.BLOG.APPROVE,
+        approvalData
+      );
       return response;
     } catch (error) {
       console.error("Error approving blog:", error);
@@ -93,10 +112,21 @@ export const managerBlogService = {
   },
 
   // Reject blog
-  rejectBlog: async (blogId, reason) => {
+  rejectBlog: async (blogId, reason = "Rejected by manager") => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.REJECT, blogId);
-      const response = await apiClient.post(url, { reason });
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      const rejectData = {
+        blogId: blogId,
+        approvedBy: userInfo.userId || userInfo.id || 0,
+        approvedOn: new Date().toISOString(),
+        status: "Rejected",
+        message: reason,
+      };
+
+      const response = await apiClient.post(
+        API_ENDPOINTS.BLOG.REJECT,
+        rejectData
+      );
       return response;
     } catch (error) {
       console.error("Error rejecting blog:", error);
@@ -118,25 +148,21 @@ export const managerBlogService = {
   // Update blog post
   updateBlog: async (blogId, blogData) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.UPDATE, blogId);
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
 
-      // API hiện tại chỉ chấp nhận các field cụ thể, loại bỏ các field dư
-      const { title, content, status, image, updatedBy, isDeleted } = blogData;
+      // API mới sử dụng blogID trong body thay vì URL parameter
+      const { title, content, status, image, isDeleted } = blogData;
 
       const payload = {
+        blogID: blogId, // Sử dụng blogID trong body
         title,
         content,
         status,
-        image,
+        updatedBy: userInfo.userId || userInfo.id || 0,
         isDeleted: typeof isDeleted === "boolean" ? isDeleted : false,
-        updatedBy:
-          updatedBy ||
-          JSON.parse(localStorage.getItem("userInfo") || "{}").userId ||
-          0,
-        updatedAt: new Date().toISOString(),
       };
 
-      const response = await apiClient.put(url, payload);
+      const response = await apiClient.put(API_ENDPOINTS.BLOG.UPDATE, payload);
       return response;
     } catch (error) {
       console.error("Error updating blog:", error);
@@ -147,8 +173,10 @@ export const managerBlogService = {
   // Delete blog post
   deleteBlog: async (blogId) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.DELETE, blogId);
-      const response = await apiClient.delete(url);
+      // API mới sử dụng query parameter ?id={blogID}
+      const response = await apiClient.delete(
+        `${API_ENDPOINTS.BLOG.DELETE}?id=${blogId}`
+      );
       return response;
     } catch (error) {
       console.error("Error deleting blog:", error);
