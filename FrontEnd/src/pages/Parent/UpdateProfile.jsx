@@ -151,7 +151,7 @@ export default function UpdateProfile() {
         <Typography 
           variant="h4" 
           fontWeight="bold" 
-          color="#2D77C1"
+          color="#2f5148"
           sx={{
             position: 'relative',
             '&:after': {
@@ -161,7 +161,7 @@ export default function UpdateProfile() {
               left: 0,
               width: '60px',
               height: '4px',
-              background: 'linear-gradient(90deg, #56D0DB 0%, #2D77C1 100%)',
+              background: 'linear-gradient(90deg, #73ad67 0%, #2f5148 100%)',
               borderRadius: '2px',
             }
           }}
@@ -178,7 +178,7 @@ export default function UpdateProfile() {
             sx={{ 
               p: 4, 
               borderRadius: 4,
-              background: 'linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)',
+              background: 'linear-gradient(135deg, #73ad67 0%, #2f5148 100%)',
               color: 'white',
               textAlign: 'center',
               position: 'relative',
@@ -201,7 +201,7 @@ export default function UpdateProfile() {
                   height: 130,
                   margin: '0 auto',
                   bgcolor: 'white',
-                  color: '#2D77C1',
+                  color: '#2f5148',
                   fontSize: '3.5rem',
                   fontWeight: 'bold',
                   boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
@@ -321,7 +321,7 @@ export default function UpdateProfile() {
                 <Grid item xs={12}>
                   <Box sx={{ position: 'relative' }}>
                     <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
-                      <AccountCircle sx={{ color: '#2D77C1', mr: 2, mb: 0.5 }} />
+                      <AccountCircle sx={{ color: '#2f5148', mr: 2, mb: 0.5 }} />
                       <TextField
                         fullWidth
                         label="Họ và tên"
@@ -332,7 +332,7 @@ export default function UpdateProfile() {
                         variant="standard"
                         sx={{
                           '& .MuiInput-underline:before': { borderColor: 'rgba(0, 0, 0, 0.1)' },
-                          '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderColor: '#2D77C1' },
+                          '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderColor: '#2f5148' },
                         }}
                       />
                       <Tooltip title="Chỉnh sửa" TransitionComponent={Zoom}>
@@ -340,7 +340,7 @@ export default function UpdateProfile() {
                           onClick={() => toggleEdit('fullname')}
                           sx={{ 
                             ml: 1,
-                            color: isEditing.fullname ? '#2D77C1' : 'text.secondary',
+                            color: isEditing.fullname ? '#2f5148' : 'text.secondary',
                           }}
                         >
                           <Edit fontSize="small" />
@@ -353,7 +353,7 @@ export default function UpdateProfile() {
                 <Grid item xs={12}>
                   <Box sx={{ position: 'relative' }}>
                     <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
-                      <Phone sx={{ color: '#2D77C1', mr: 2, mb: 0.5 }} />
+                      <Phone sx={{ color: '#2f5148', mr: 2, mb: 0.5 }} />
                       <TextField
                         fullWidth
                         label="Số điện thoại"
@@ -363,7 +363,7 @@ export default function UpdateProfile() {
                         variant="standard"
                         sx={{
                           '& .MuiInput-underline:before': { borderColor: 'rgba(0, 0, 0, 0.1)' },
-                          '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderColor: '#2D77C1' },
+                          '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderColor: '#2f5148' },
                         }}
                       />
                       <Tooltip title="Chỉnh sửa" TransitionComponent={Zoom}>
@@ -371,7 +371,7 @@ export default function UpdateProfile() {
                           onClick={() => toggleEdit('phone')}
                           sx={{ 
                             ml: 1,
-                            color: isEditing.phone ? '#2D77C1' : 'text.secondary',
+                            color: isEditing.phone ? '#2f5148' : 'text.secondary',
                           }}
                         >
                           <Edit fontSize="small" />
@@ -384,7 +384,7 @@ export default function UpdateProfile() {
                 <Grid item xs={12}>
                   <Box sx={{ position: 'relative' }}>
                     <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
-                      <Email sx={{ color: '#2D77C1', mr: 2, mb: 0.5 }} />
+                      <Email sx={{ color: '#2f5148', mr: 2, mb: 0.5 }} />
                       <TextField
                         fullWidth
                         label="Email"
@@ -396,7 +396,7 @@ export default function UpdateProfile() {
                         variant="standard"
                         sx={{
                           '& .MuiInput-underline:before': { borderColor: 'rgba(0, 0, 0, 0.1)' },
-                          '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderColor: '#2D77C1' },
+                          '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderColor: '#2f5148' },
                         }}
                       />
                       <Tooltip title="Chỉnh sửa" TransitionComponent={Zoom}>
@@ -404,7 +404,7 @@ export default function UpdateProfile() {
                           onClick={() => toggleEdit('email')}
                           sx={{ 
                             ml: 1,
-                            color: isEditing.email ? '#2D77C1' : 'text.secondary',
+                            color: isEditing.email ? '#2f5148' : 'text.secondary',
                           }}
                         >
                           <Edit fontSize="small" />
@@ -417,7 +417,7 @@ export default function UpdateProfile() {
                 <Grid item xs={12}>
                   <Box sx={{ position: 'relative' }}>
                     <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
-                      <Home sx={{ color: '#2D77C1', mr: 2, mb: 0.5 }} />
+                      <Home sx={{ color: '#2f5148', mr: 2, mb: 0.5 }} />
                       <TextField
                         fullWidth
                         label="Địa chỉ"
@@ -429,7 +429,7 @@ export default function UpdateProfile() {
                         variant="standard"
                         sx={{
                           '& .MuiInput-underline:before': { borderColor: 'rgba(0, 0, 0, 0.1)' },
-                          '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderColor: '#2D77C1' },
+                          '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderColor: '#2f5148' },
                         }}
                       />
                       <Tooltip title="Chỉnh sửa" TransitionComponent={Zoom}>
@@ -437,7 +437,7 @@ export default function UpdateProfile() {
                           onClick={() => toggleEdit('address')}
                           sx={{ 
                             ml: 1,
-                            color: isEditing.address ? '#2D77C1' : 'text.secondary',
+                            color: isEditing.address ? '#2f5148' : 'text.secondary',
                           }}
                         >
                           <Edit fontSize="small" />
@@ -463,14 +463,14 @@ export default function UpdateProfile() {
                   onClick={() => navigate('/parent')}
                   disabled={loading}
                   sx={{
-                    borderColor: '#56D0DB',
-                    color: '#2D77C1',
+                    borderColor: '#73ad67',
+                    color: '#2f5148',
                     px: 4,
                     py: 1.5,
                     borderRadius: 2,
                     fontWeight: 'bold',
                     '&:hover': {
-                      borderColor: '#2D77C1',
+                      borderColor: '#2f5148',
                       background: 'rgba(86, 208, 219, 0.1)',
                       transform: 'translateY(-2px)',
                     },
@@ -484,7 +484,7 @@ export default function UpdateProfile() {
                   variant="contained"
                   disabled={loading}
                   sx={{
-                    background: 'linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)',
+                    background: 'linear-gradient(135deg, #73ad67 0%, #2f5148 100%)',
                     color: 'white',
                     px: 4,
                     py: 1.5,

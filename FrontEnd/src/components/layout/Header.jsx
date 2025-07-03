@@ -1,5 +1,5 @@
 import { Link as RouterLink } from "react-router-dom";
-import { Box, Button, Container, Link, Typography } from "@mui/material";
+import { Box, Container, Link, Typography } from "@mui/material";
 import MedlearnLogo from "../../assets/images/medlearn-logo.png";
 
 export default function Header() {
@@ -18,40 +18,42 @@ export default function Header() {
             to="#"
             sx={{ textDecoration: "none", color: "inherit" }}
           >
-            <Box sx={{ 
-              position: "relative", 
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 0.5
-            }}>
+            <Box
+              sx={{
+                position: "relative",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 0.5,
+              }}
+            >
               <Box sx={{ width: "50px", height: "50px" }}>
                 <img
                   src={MedlearnLogo}
                   alt="Medlearn Logo"
-                  style={{ 
+                  style={{
                     width: "100%",
                     height: "100%",
-                    objectFit: "contain"
+                    objectFit: "contain",
                   }}
                 />
               </Box>
               <Box sx={{ textAlign: "center" }}>
-                <Typography 
-                  sx={{ 
-                    fontSize: "1rem", 
+                <Typography
+                  sx={{
+                    fontSize: "1rem",
                     fontWeight: "bold",
-                    color: "#2D77C1",
-                    lineHeight: 1
+                    color: "#73ad67",
+                    lineHeight: 1,
                   }}
                 >
                   MEDLEARN
                 </Typography>
-                <Typography 
-                  sx={{ 
+                <Typography
+                  sx={{
                     fontSize: "0.7rem",
                     color: "#666",
-                    lineHeight: 1
+                    lineHeight: 1,
                   }}
                 >
                   Medical Education
@@ -96,23 +98,8 @@ export default function Header() {
               About Us
             </Link>
           </Box>
-          <Button
-            variant="contained"
-            sx={{
-              borderRadius: "50px",
-              px: 3,
-              color: "white",
-              background: "linear-gradient(to right, #56D0DB, #2D77C1)",
-              "&:hover": {
-                opacity: 0.9,
-              },
-            }}
-          >
-            Login
-          </Button>
         </Box>
       </Container>
     </Box>
   );
 }
-  

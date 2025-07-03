@@ -1,31 +1,42 @@
-/* StudentHealthRecord.css */
+/* StudentHealthRecord.css - Green Theme Applied */
 .manage-health-records-container {
   padding: 20px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background-color: #f2f6f3; /* $bg-main */
   min-height: 100vh;
+  font-family: "Satoshi", "Inter", "Segoe UI", Tahoma, Geneva, Verdana,
+    sans-serif;
 }
 
 .page-header {
-  color: white;
+  background: linear-gradient(
+    135deg,
+    #2f5148 0%,
+    #73ad67 100%
+  ); /* $primary-gradient */
+  color: #ffffff; /* $text-white */
   padding: 30px;
-  border-radius: 15px;
+  border-radius: 20px;
   margin-bottom: 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(47, 81, 72, 0.3);
 }
 
 .header-content h1 {
   margin: 0 0 10px 0;
   font-size: 2.5rem;
   font-weight: 700;
+  color: #ffffff; /* $text-white */
+  font-family: "Satoshi", sans-serif;
 }
 
 .header-content p {
   margin: 0;
   font-size: 1.2rem;
   opacity: 0.9;
+  color: #ffffff; /* $text-white */
+  font-family: "Satoshi", sans-serif;
 }
 
 .header-actions {
@@ -36,21 +47,23 @@
 .add-record-btn,
 .export-btn {
   background: rgba(255, 255, 255, 0.2);
-  color: white;
+  color: #ffffff; /* $text-white */
   border: none;
   padding: 12px 20px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
+  font-family: "Satoshi", sans-serif;
 }
 
 .add-record-btn:hover,
 .export-btn:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
 }
 
 /* Stats Cards */
@@ -62,18 +75,19 @@
 }
 
 .stat-card {
-  background: white;
-  border-radius: 15px;
+  background: #ffffff; /* $bg-card */
+  border-radius: 18px;
   padding: 25px;
   display: flex;
   align-items: center;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(193, 203, 194, 0.3);
+  border: 1px solid #c1cbc2; /* $border-light */
   transition: all 0.3s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 5px 25px rgba(47, 81, 72, 0.15);
 }
 
 .stat-icon {
@@ -85,50 +99,40 @@
   align-items: center;
   justify-content: center;
   border-radius: 15px;
-}
-
-.stat-card.total .stat-icon {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.stat-card.active .stat-icon {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
-
-.stat-card.monitoring .stat-icon {
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-}
-
-.stat-card.high-priority .stat-icon {
-  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  background: rgba(191, 239, 161, 0.3); /* Light green background for icons */
+  color: #97a19b; /* $text-secondary - Gray color for icons */
 }
 
 .stat-content h3 {
   margin: 0 0 8px 0;
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2d77c1;
+  color: #2f5148; /* $text-primary */
+  font-family: "Satoshi", sans-serif;
 }
 
 .stat-content p {
   margin: 0;
-  color: #666;
+  color: #97a19b; /* $text-secondary */
   font-size: 1rem;
+  font-family: "Satoshi", sans-serif;
 }
 
 /* Filter Section */
 .filter-section {
-  background: white;
-  border-radius: 15px;
+  background: #ffffff; /* $bg-card */
+  border-radius: 18px;
   padding: 25px;
   margin-bottom: 30px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(193, 203, 194, 0.3);
+  border: 1px solid #c1cbc2; /* $border-light */
 }
 
 .filter-section h3 {
   margin: 0 0 20px 0;
-  color: #2d77c1;
+  color: #2f5148; /* $text-primary */
   font-size: 1.5rem;
+  font-family: "Satoshi", sans-serif;
 }
 
 .class-buttons {
@@ -152,8 +156,6 @@
 
 .class-btn:hover,
 .class-btn.active {
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
-  color: white;
   transform: translateY(-2px);
   border-color: transparent;
 }
@@ -185,7 +187,7 @@
 
 .section-header h3 {
   margin: 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.5rem;
 }
 
@@ -206,8 +208,7 @@
 
 .student-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  border-color: #56d0db;
+  border-color: transparent;
 }
 
 .student-header {
@@ -224,13 +225,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
   border-radius: 50%;
 }
 
 .student-info h4 {
   margin: 0 0 5px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.3rem;
 }
 
@@ -243,7 +243,7 @@
 
 .student-class {
   margin: 2px 0;
-  color: #007bff;
+  color: #73ad67;
   font-size: 0.9rem;
   font-weight: 500;
 }
@@ -283,8 +283,6 @@
 
 .view-btn {
   flex: 1;
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
-  color: white;
   border: none;
   padding: 10px 15px;
   border-radius: 8px;
@@ -331,9 +329,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 25px;
-  border-bottom: 1px solid #eee;
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
-  color: white;
+  border-bottom: 1px solid transparent;
   border-radius: 15px 15px 0 0;
 }
 
@@ -394,7 +390,7 @@
 /* Health Records Section */
 .health-records-section h4 {
   margin: 0 0 20px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.3rem;
 }
 
@@ -420,7 +416,7 @@
 
 .record-title h5 {
   margin: 0 0 5px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.1rem;
 }
 
@@ -512,8 +508,7 @@
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #56d0db;
-  box-shadow: 0 0 0 3px rgba(86, 208, 219, 0.1);
+  border-color: transparent;
 }
 
 .modal-actions {
@@ -545,8 +540,6 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
-  color: white;
 }
 
 .btn-primary:hover {

@@ -45,7 +45,7 @@
 
 .nurses-sidebar h3 {
   margin: 0 0 20px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.3rem;
   text-align: center;
   padding-bottom: 15px;
@@ -73,9 +73,9 @@
 }
 
 .nurse-item.active {
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  background: linear-gradient(135deg, #73ad67, #2f5148);
   color: white;
-  border-color: #2d77c1;
+  border-color: #2f5148;
 }
 
 .nurse-avatar {
@@ -115,7 +115,7 @@
 /* Quick Actions */
 .quick-actions h4 {
   margin: 0 0 15px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1rem;
   text-align: center;
 }
@@ -175,7 +175,7 @@
 
 /* Chat Header */
 .chat-header {
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  background: linear-gradient(135deg, #73ad67, #2f5148);
   color: white;
   padding: 20px;
   display: flex;
@@ -265,7 +265,7 @@
 }
 
 .message.sent .message-content {
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  background: linear-gradient(135deg, #73ad67, #2f5148);
   color: white;
   border-radius: 20px 20px 5px 20px;
 }
@@ -310,7 +310,7 @@
 }
 
 .input-group:focus-within {
-  border-color: #56d0db;
+  border-color: #73ad67;
   box-shadow: 0 0 0 3px rgba(86, 208, 219, 0.1);
 }
 
@@ -340,7 +340,7 @@
 }
 
 .send-btn {
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  background: linear-gradient(135deg, #73ad67, #2f5148);
   color: white;
   border: none;
   padding: 10px 20px;
@@ -366,7 +366,7 @@
 
 .chat-guidelines h3 {
   margin: 0 0 25px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.5rem;
   text-align: center;
 }
@@ -383,7 +383,7 @@
   padding: 20px;
   background: #f8fafc;
   border-radius: 12px;
-  border-left: 4px solid #56d0db;
+  border-left: 4px solid #73ad67;
 }
 
 .guideline-icon {
@@ -393,7 +393,7 @@
 }
 
 .guideline-item strong {
-  color: #2d77c1;
+  color: #2f5148;
   display: block;
   margin-bottom: 5px;
 }

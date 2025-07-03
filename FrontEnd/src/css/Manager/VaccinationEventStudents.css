@@ -1,9 +1,8 @@
-/* Vaccination Event Students Page Styles */
+/* Vaccination Event Students Page Styles - Color Cleaned */
 .vaccination-students-container {
   padding: 20px;
   max-width: 1400px;
   margin: 0 auto;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
 }
 
@@ -14,9 +13,7 @@
   align-items: flex-start;
   margin-bottom: 30px;
   padding: 25px;
-  background: white;
   border-radius: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .header-content {
@@ -27,8 +24,6 @@
 
 .back-btn {
   padding: 10px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -42,24 +37,20 @@
 
 .back-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
 .event-info h1 {
   margin: 0 0 10px 0;
-  color: #2d3748;
   font-size: 2rem;
 }
 
 .event-details h2 {
   margin: 0 0 5px 0;
-  color: #4a5568;
   font-size: 1.3rem;
 }
 
 .event-details p {
   margin: 0;
-  color: #718096;
   font-size: 1rem;
 }
 
@@ -70,8 +61,6 @@
 
 .refresh-btn {
   padding: 12px 24px;
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  color: white;
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -81,7 +70,6 @@
 
 .refresh-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
 }
 
 /* Statistics Styles */
@@ -93,10 +81,8 @@
 }
 
 .stat-card {
-  background: white;
   padding: 25px;
   border-radius: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   gap: 15px;
@@ -105,23 +91,22 @@
 
 .stat-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
 }
 
 .stat-card.total {
-  border-left: 5px solid #667eea;
+  border-left: 5px solid transparent;
 }
 
 .stat-card.confirmed {
-  border-left: 5px solid #48bb78;
+  border-left: 5px solid transparent;
 }
 
 .stat-card.declined {
-  border-left: 5px solid #f56565;
+  border-left: 5px solid transparent;
 }
 
 .stat-card.pending {
-  border-left: 5px solid #ed8936;
+  border-left: 5px solid transparent;
 }
 
 .stat-icon {
@@ -133,21 +118,17 @@
   margin: 0;
   font-size: 2rem;
   font-weight: 700;
-  color: #2d3748;
 }
 
 .stat-content p {
   margin: 5px 0 0 0;
-  color: #718096;
   font-weight: 500;
 }
 
 /* Filters Styles */
 .filters-section {
-  background: white;
   padding: 20px;
   border-radius: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   margin-bottom: 30px;
   display: flex;
   gap: 30px;
@@ -162,16 +143,13 @@
 
 .filter-group label {
   font-weight: 600;
-  color: #4a5568;
   min-width: 80px;
 }
 
 .filter-select {
   padding: 10px 15px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid transparent;
   border-radius: 8px;
-  background: white;
-  color: #4a5568;
   font-weight: 500;
   min-width: 150px;
   transition: all 0.3s ease;
@@ -179,21 +157,16 @@
 
 .filter-select:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 /* Students Section */
 .students-section {
-  background: white;
   padding: 25px;
   border-radius: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .students-section h3 {
   margin: 0 0 20px 0;
-  color: #2d3748;
   font-size: 1.4rem;
 }
 
@@ -201,18 +174,14 @@
 .students-table {
   overflow-x: auto;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .students-table table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
 }
 
 .students-table th {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
   padding: 15px 12px;
   text-align: left;
   font-weight: 600;
@@ -230,13 +199,11 @@
 
 .students-table td {
   padding: 15px 12px;
-  border-bottom: 1px solid #e2e8f0;
-  color: #4a5568;
+  border-bottom: 1px solid transparent;
   font-size: 0.9rem;
 }
 
 .students-table tr:hover {
-  background: #f7fafc;
 }
 
 .students-table tr:last-child td {
@@ -245,7 +212,6 @@
 
 .student-name {
   font-weight: 600;
-  color: #2d3748;
 }
 
 /* Status Badge Styles */
@@ -256,21 +222,6 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-}
-
-.status-badge.status-confirmed {
-  background: #c6f6d5;
-  color: #22543d;
-}
-
-.status-badge.status-declined {
-  background: #fed7d7;
-  color: #742a2a;
-}
-
-.status-badge.status-pending {
-  background: #feebc8;
-  color: #7b341e;
 }
 
 /* Action Buttons */
@@ -293,31 +244,18 @@
   min-width: 80px;
 }
 
-.detail-btn {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  color: white;
-}
-
 .detail-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
-}
-
-.email-btn {
-  background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
-  color: white;
 }
 
 .email-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4);
 }
 
 /* No Students State */
 .no-students {
   text-align: center;
   padding: 60px 20px;
-  color: #718096;
 }
 
 .no-students-icon {
@@ -338,7 +276,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -347,9 +284,7 @@
 }
 
 .modal-content {
-  background: white;
   border-radius: 20px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
   max-width: 600px;
   width: 90%;
   max-height: 80vh;
@@ -373,13 +308,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid transparent;
   margin-bottom: 25px;
 }
 
 .modal-header h3 {
   margin: 0 0 20px 0;
-  color: #2d3748;
   font-size: 1.5rem;
 }
 
@@ -388,14 +322,9 @@
   border: none;
   font-size: 2rem;
   cursor: pointer;
-  color: #a0aec0;
   transition: color 0.3s ease;
   padding: 0;
   margin-bottom: 20px;
-}
-
-.modal-close:hover {
-  color: #4a5568;
 }
 
 .modal-body {
@@ -413,36 +342,30 @@
   align-items: flex-start;
   gap: 15px;
   padding: 15px;
-  background: #f7fafc;
   border-radius: 10px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid transparent;
 }
 
 .detail-row .label {
   font-weight: 600;
-  color: #4a5568;
   min-width: 140px;
   flex-shrink: 0;
 }
 
 .detail-row .value {
-  color: #2d3748;
   font-weight: 500;
   flex: 1;
 }
 
 .detail-row.decline-reason {
-  border-left-color: #f56565;
-  background: #fed7d7;
+  border-left-color: transparent;
 }
 
 .reason-content {
-  background: white;
   padding: 15px;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid transparent;
   font-style: italic;
-  color: #4a5568;
   line-height: 1.6;
 }
 
@@ -450,14 +373,12 @@
   padding: 20px 30px 30px 30px;
   display: flex;
   justify-content: flex-end;
-  border-top: 2px solid #e2e8f0;
+  border-top: 2px solid transparent;
   margin-top: 25px;
 }
 
 .close-btn {
   padding: 12px 30px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -467,27 +388,23 @@
 
 .close-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
 /* Email Modal Styles */
 .email-info {
-  background: #f7fafc;
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 25px;
-  border-left: 5px solid #00b894;
+  border-left: 5px solid transparent;
 }
 
 .email-info h4 {
   margin: 0 0 15px 0;
-  color: #2d3748;
   font-size: 1.2rem;
 }
 
 .email-info p {
   margin: 8px 0;
-  color: #4a5568;
   font-size: 0.95rem;
   line-height: 1.4;
 }
@@ -495,84 +412,73 @@
 .form-group small {
   display: block;
   margin-top: 8px;
-  color: #718096;
   font-size: 0.8rem;
   font-style: italic;
 }
 
 .email-preview {
-  background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
   padding: 20px;
   border-radius: 12px;
-  margin-top: 25px;
-  border: 2px solid #00b894;
+  border: 2px solid transparent;
+  margin-bottom: 25px;
 }
 
 .email-preview h5 {
   margin: 0 0 15px 0;
-  color: #2d3748;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
 }
 
 .email-preview p {
-  margin: 8px 0;
-  color: #2d3748;
-  font-size: 0.9rem;
-  line-height: 1.5;
+  margin: 0;
+  line-height: 1.6;
+  font-size: 0.95rem;
 }
 
 .send-email-btn {
-  background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
-  color: white;
   padding: 12px 30px;
   border: none;
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
+  width: 100%;
 }
 
 .send-email-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4);
 }
 
-/* Loading and Error States */
 .loading-state,
 .error-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 400px;
-  text-align: center;
-  color: #718096;
+  padding: 60px 20px;
+  border-radius: 15px;
 }
 
 .loading-state p,
 .error-state p {
-  font-size: 1.2rem;
-  margin-bottom: 20px;
+  font-size: 1.1rem;
+  margin: 20px 0 0 0;
 }
 
 .retry-btn {
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  color: white;
+  padding: 12px 30px;
   border: none;
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
+  margin-top: 20px;
 }
 
 .retry-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .vaccination-students-container {
     padding: 15px;
@@ -580,8 +486,8 @@
 
   .page-header {
     flex-direction: column;
-    gap: 20px;
     align-items: stretch;
+    gap: 20px;
   }
 
   .header-content {
@@ -590,7 +496,7 @@
   }
 
   .stats-row {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
   }
 
   .filters-section {
@@ -600,34 +506,32 @@
   }
 
   .filter-group {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
+    justify-content: space-between;
   }
 
   .filter-select {
-    min-width: auto;
+    flex: 1;
   }
 
   .students-table {
-    font-size: 0.8rem;
+    overflow-x: auto;
   }
 
   .students-table th,
   .students-table td {
     padding: 10px 8px;
+    font-size: 0.8rem;
   }
 
   .modal-content {
+    width: 95%;
     margin: 20px;
-    width: calc(100% - 40px);
   }
 
   .modal-header,
   .modal-body,
   .modal-footer {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding: 20px;
   }
 }
 
@@ -655,13 +559,10 @@
 
   .action-buttons {
     flex-direction: column;
-    gap: 5px;
   }
 
   .detail-btn,
   .email-btn {
     min-width: auto;
-    font-size: 0.7rem;
-    padding: 6px 10px;
   }
 }

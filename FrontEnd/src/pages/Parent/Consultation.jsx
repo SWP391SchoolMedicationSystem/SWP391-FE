@@ -164,7 +164,7 @@ function Consultation() {
         sx={{
           p: 3,
           mb: 3,
-          backgroundColor: "linear-gradient(135deg, #2D77C1 0%, #56D0DB 100%)",
+          backgroundColor: "linear-gradient(135deg, #2f5148 0%, #73ad67 100%)",
           borderRadius: 3,
         }}
       >
@@ -186,7 +186,7 @@ function Consultation() {
             <CardContent sx={{ textAlign: "center", p: 3 }}>
               <Avatar
                 sx={{
-                  bgcolor: "#2D77C1",
+                  bgcolor: "#2f5148",
                   width: 56,
                   height: 56,
                   mx: "auto",
@@ -418,7 +418,7 @@ function Consultation() {
           position: "fixed",
           bottom: 24,
           right: 24,
-          background: "linear-gradient(135deg, #2D77C1 0%, #56D0DB 100%)",
+          background: "linear-gradient(135deg, #2f5148 0%, #73ad67 100%)",
         }}
         onClick={() => setShowForm(true)}
       >
@@ -569,7 +569,7 @@ function Consultation() {
               type="submit"
               variant="contained"
               sx={{
-                background: "linear-gradient(135deg, #2D77C1 0%, #56D0DB 100%)",
+                background: "linear-gradient(135deg, #2f5148 0%, #73ad67 100%)",
                 "&:hover": { opacity: 0.9 },
               }}
             >

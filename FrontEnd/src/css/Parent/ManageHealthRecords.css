@@ -106,7 +106,7 @@
   margin: 0 0 8px 0;
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2d77c1;
+  color: #2f5148;
 }
 
 .stat-content p {
@@ -126,7 +126,7 @@
 
 .filter-section h3 {
   margin: 0 0 20px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.5rem;
 }
 
@@ -151,7 +151,7 @@
 
 .class-btn:hover,
 .class-btn.active {
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  background: linear-gradient(135deg, #73ad67, #2f5148);
   color: white;
   transform: translateY(-2px);
   border-color: transparent;
@@ -184,7 +184,7 @@
 
 .section-header h3 {
   margin: 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.5rem;
 }
 
@@ -204,7 +204,7 @@
 }
 
 .student-card:hover {
-  border-color: #56d0db;
+  border-color: #73ad67;
   transform: translateY(-3px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
@@ -223,13 +223,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  background: linear-gradient(135deg, #73ad67, #2f5148);
   border-radius: 50%;
 }
 
 .student-info h4 {
   margin: 0 0 5px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.3rem;
 }
 
@@ -304,7 +304,7 @@
 }
 
 .child-card:hover {
-  border-color: #56d0db;
+  border-color: #73ad67;
   transform: translateY(-3px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
@@ -323,13 +323,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  background: linear-gradient(135deg, #73ad67, #2f5148);
   border-radius: 50%;
 }
 
 .child-info h4 {
   margin: 0 0 5px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.3rem;
 }
 
@@ -371,12 +371,12 @@
   padding: 20px;
   background: #f0f9ff;
   border-radius: 10px;
-  border-left: 4px solid #56d0db;
+  border-left: 4px solid #73ad67;
 }
 
 .contact-section h4 {
   margin: 0 0 15px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.2rem;
 }
 
@@ -395,7 +395,7 @@
 
 .view-btn {
   flex: 1;
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  background: linear-gradient(135deg, #73ad67, #2f5148);
   color: white;
   border: none;
   padding: 10px 15px;
@@ -444,7 +444,7 @@
   align-items: center;
   padding: 25px;
   border-bottom: 1px solid #eee;
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  background: linear-gradient(135deg, #73ad67, #2f5148);
   color: white;
   border-radius: 15px 15px 0 0;
 }
@@ -506,7 +506,7 @@
 /* Health Records Section */
 .health-records-section h4 {
   margin: 0 0 20px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.3rem;
 }
 
@@ -532,7 +532,7 @@
 
 .record-title h5 {
   margin: 0 0 5px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.1rem;
 }
 
@@ -628,7 +628,7 @@
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #56d0db;
+  border-color: #73ad67;
   box-shadow: 0 0 0 3px rgba(86, 208, 219, 0.1);
 }
 
@@ -664,7 +664,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  background: linear-gradient(135deg, #73ad67, #2f5148);
   color: white;
 }
 

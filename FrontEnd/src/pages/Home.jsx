@@ -270,7 +270,7 @@ export default function Home() {
                 <Box
                   sx={{
                     background:
-                      "linear-gradient(135deg, #56D0DB 0%, #2D77C1 100%)",
+                      "linear-gradient(135deg, #73ad67 0%, #2f5148 100%)",
                     p: 2,
                     display: "flex",
                     alignItems: "center",
@@ -352,7 +352,7 @@ export default function Home() {
                   flexDirection: "column",
                 }}
               >
-                <Assessment sx={{ fontSize: 60, color: "#56D0DB", mb: 2 }} />
+                <Assessment sx={{ fontSize: 60, color: "#73ad67", mb: 2 }} />
                 <Typography variant="body2" color="text.secondary">
                   Thống kê Sức khỏe Học Sinh
                 </Typography>
