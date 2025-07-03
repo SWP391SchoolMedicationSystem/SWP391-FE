@@ -150,24 +150,27 @@ export const nurseBlogService = {
   // Update blog post
   updateBlog: async (blogId, blogData) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.UPDATE, blogId);
-
       const { title, content, status, image, updatedBy, isDeleted } = blogData;
 
+      // Get current user ID from localStorage
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      const currentUserId = userInfo.userId || userInfo.id || 0;
+
       const payload = {
+        blogID: parseInt(blogId), // blogID trong body theo API mới
         title,
         content,
         status,
-        image,
+        updatedBy: updatedBy || currentUserId,
         isDeleted: typeof isDeleted === "boolean" ? isDeleted : false,
-        updatedBy:
-          updatedBy ||
-          JSON.parse(localStorage.getItem("userInfo") || "{}").userId ||
-          0,
-        updatedAt: new Date().toISOString(),
       };
 
-      const response = await apiClient.put(url, payload);
+      // Chỉ thêm image nếu có
+      if (image !== undefined) {
+        payload.image = image;
+      }
+
+      const response = await apiClient.put(API_ENDPOINTS.BLOG.UPDATE, payload);
       return response;
     } catch (error) {
       console.error("Error updating blog:", error);
@@ -175,10 +178,10 @@ export const nurseBlogService = {
     }
   },
 
-  // Delete blog post
+  // Delete blog post (soft delete)
   deleteBlog: async (blogId) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.DELETE, blogId);
+      const url = `${API_ENDPOINTS.BLOG.DELETE}?id=${blogId}`;
       const response = await apiClient.delete(url);
       return response;
     } catch (error) {

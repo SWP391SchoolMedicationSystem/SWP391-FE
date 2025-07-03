@@ -1,4 +1,10 @@
 import React, { useState } from "react";
+import { IconButton, Tooltip } from "@mui/material";
+import {
+  Visibility as VisibilityIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
 import "../../css/Manager/BlogManagement.css";
 import {
   useManagerBlogs,
@@ -28,12 +34,12 @@ function BlogManagement() {
     }
   }, [blogs]);
 
-  // Available statuses
-  const statuses = ["Draft", "Published", "Scheduled", "Archived"];
+  // Available statuses for Manager
+  const statuses = ["Draft", "Published", "Rejected"];
 
   // Modal and form states
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState("add"); // 'add', 'edit', 'view', 'approve'
+  const [modalMode, setModalMode] = useState("add"); // 'add', 'edit', 'view'
   const [currentPost, setCurrentPost] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -45,12 +51,7 @@ function BlogManagement() {
     content: "",
     status: "Draft",
     featured: false,
-  });
-
-  // Approval form data
-  const [approvalData, setApprovalData] = useState({
-    approvalStatus: "Approved",
-    rejectionReason: "",
+    approvalMessage: "", // Thêm field cho message approve/reject
   });
 
   // Filter blogs based on search and filters
@@ -76,15 +77,6 @@ function BlogManagement() {
     }));
   };
 
-  // Handle approval form changes
-  const handleApprovalChange = (e) => {
-    const { name, value } = e.target;
-    setApprovalData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
   // Open modal for adding new post
   const handleAddPost = () => {
     setModalMode("add");
@@ -93,6 +85,7 @@ function BlogManagement() {
       content: "",
       status: "Draft",
       featured: false,
+      approvalMessage: "",
     });
     setCurrentPost(null);
     setShowModal(true);
@@ -106,6 +99,7 @@ function BlogManagement() {
       content: post.content,
       status: post.status,
       featured: post.featured,
+      approvalMessage: "", // Reset message khi edit
     });
     setCurrentPost(post);
     setShowModal(true);
@@ -125,105 +119,79 @@ function BlogManagement() {
     setShowModal(true);
   };
 
-  // Open modal for approving post
-  const handleApprovePost = (post) => {
-    setModalMode("approve");
-    setCurrentPost(post);
-    setApprovalData({
-      approvalStatus: "Approved",
-      rejectionReason: "",
-    });
-    setShowModal(true);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (modalMode === "add") {
         // Create new post via API
         await createBlog(formData);
-        alert("Tạo bài viết thành công!");
+        alert("✅ Tạo bài viết thành công!");
       } else if (modalMode === "edit") {
-        // Update existing post via API (fallback các field id khác)
+        // Get blogId from current post (support multiple field names)
         const blogId =
-          currentPost?.id ?? currentPost?.blogid ?? currentPost?.blogId;
-        await updateBlog(blogId, formData);
-        alert("Cập nhật bài viết thành công!");
+          currentPost?.blogId || currentPost?.id || currentPost?.blogid;
+
+        // Check if status changed to Published or Rejected (approval actions)
+        const oldStatus = currentPost?.status?.toLowerCase();
+        const newStatus = formData.status?.toLowerCase();
+
+        if (
+          oldStatus !== newStatus &&
+          (newStatus === "published" || newStatus === "rejected")
+        ) {
+          // Handle approval/rejection
+          if (newStatus === "published") {
+            await approveBlog(blogId, formData.approvalMessage);
+            alert("✅ Blog đã được duyệt và xuất bản thành công!");
+          } else if (newStatus === "rejected") {
+            await rejectBlog(blogId, formData.approvalMessage);
+            alert("❌ Blog đã bị từ chối!");
+          }
+        } else {
+          // Regular update
+          await updateBlog(blogId, formData);
+          alert("✅ Cập nhật bài viết thành công!");
+        }
       }
       setShowModal(false);
       refetch(); // Refresh data from API
     } catch (error) {
       console.error("Error saving blog:", error);
-      alert("Có lỗi xảy ra khi lưu bài viết. Vui lòng thử lại!");
+      alert("❌ Có lỗi xảy ra khi lưu bài viết. Vui lòng thử lại!");
     }
   };
 
-  const handleApprovalSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (approvalData.approvalStatus === "Approved") {
-        await approveBlog(currentPost.id);
-        setLocalBlogPosts(
-          localBlogPosts.map((post) =>
-            post.id === currentPost.id
-              ? {
-                  ...post,
-                  approvalStatus: "Approved",
-                  status: "Published",
-                  publishedDate: new Date().toISOString().split("T")[0],
-                  approvedBy: "Manager", // Get from user context
-                }
-              : post
-          )
-        );
-      } else if (approvalData.approvalStatus === "Rejected") {
-        await rejectBlog(currentPost.id, approvalData.rejectionReason);
-        setLocalBlogPosts(
-          localBlogPosts.map((post) =>
-            post.id === currentPost.id
-              ? {
-                  ...post,
-                  approvalStatus: "Rejected",
-                  rejectionReason: approvalData.rejectionReason,
-                }
-              : post
-          )
-        );
-      }
-      setShowModal(false);
-      refetch(); // Refresh data from API
-    } catch (error) {
-      console.error("Error processing approval:", error);
-      // Handle error - show toast or alert
-    }
-  };
-
-  const handleDeletePost = async (postId) => {
+  const handleDeletePost = async (post) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
       try {
-        const idValue = postId ?? postId?.blogid ?? postId?.blogId;
-        await deleteBlog(idValue);
-        alert("Xóa bài viết thành công!");
+        // Get blogId from post object (support multiple field names)
+        const blogId = post?.blogId || post?.id || post?.blogid || post;
+        await deleteBlog(blogId);
+        alert("✅ Xóa bài viết thành công!");
         refetch(); // Refresh data from API
       } catch (error) {
         console.error("Error deleting blog:", error);
-        alert("Có lỗi xảy ra khi xóa bài viết. Vui lòng thử lại!");
+        alert("❌ Có lỗi xảy ra khi xóa bài viết. Vui lòng thử lại!");
       }
     }
   };
 
   const getStatusBadgeClass = (status) => {
-    switch (status) {
-      case "Published":
-        return "status-published";
-      case "Draft":
-        return "status-draft";
-      case "Scheduled":
-        return "status-scheduled";
-      case "Archived":
-        return "status-archived";
+    switch (status?.toLowerCase()) {
+      case "published":
+        return "published";
+      case "draft":
+        return "draft";
+      case "rejected":
+        return "rejected";
+      case "pending":
+        return "pending";
+      case "scheduled":
+        return "pending";
+      case "archived":
+        return "draft";
       default:
-        return "status-draft";
+        return "draft";
     }
   };
 
@@ -365,37 +333,36 @@ function BlogManagement() {
                     </td>
                     <td>
                       <div className="action-buttons">
-                        <button
-                          onClick={() => handleViewPost(post)}
-                          className="btn btn-view"
-                          title="Xem chi tiết"
-                        >
-                          👁️
-                        </button>
-                        <button
-                          onClick={() => handleEditPost(post)}
-                          className="btn btn-edit"
-                          title="Chỉnh sửa"
-                        >
-                          ✏️
-                        </button>
-                        {post.approvalStatus === "Pending" && (
-                          <button
-                            onClick={() => handleApprovePost(post)}
-                            className="btn btn-approve"
-                            title="Phê duyệt"
-                            disabled={actionLoading}
+                        <Tooltip title="Xem chi tiết">
+                          <IconButton
+                            size="small"
+                            onClick={() => handleViewPost(post)}
+                            className="btn-view"
+                            sx={{ color: "#6c757d" }}
                           >
-                            {actionLoading ? "⏳" : "✅"}
-                          </button>
-                        )}
-                        <button
-                          onClick={() => handleDeletePost(post.id)}
-                          className="btn btn-delete"
-                          title="Xóa"
-                        >
-                          🗑️
-                        </button>
+                            <VisibilityIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Chỉnh sửa">
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEditPost(post)}
+                            className="btn-edit"
+                            sx={{ color: "#6c757d" }}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Xóa Blog">
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeletePost(post)}
+                            className="btn-delete"
+                            sx={{ color: "#6c757d" }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
                       </div>
                     </td>
                   </tr>
@@ -427,10 +394,9 @@ function BlogManagement() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>
-                {modalMode === "add" && "➕ Add New Blog Post"}
-                {modalMode === "edit" && "✏️ Edit Blog Post"}
-                {modalMode === "view" && "👁 View Blog Post"}
-                {modalMode === "approve" && "✅ Blog Approval"}
+                {modalMode === "add" && "➕ Tạo Bài Viết Mới"}
+                {modalMode === "edit" && "✏️ Chỉnh Sửa Blog"}
+                {modalMode === "view" && "👁 Xem Chi Tiết Blog"}
               </h2>
               <button
                 className="modal-close"
@@ -491,71 +457,10 @@ function BlogManagement() {
                   </button>
                 </div>
               </div>
-            ) : modalMode === "approve" ? (
-              <form className="approval-form" onSubmit={handleApprovalSubmit}>
-                <div className="approval-info">
-                  <h4>Post Information</h4>
-                  <p>
-                    <strong>Title:</strong> {currentPost.title}
-                  </p>
-                  <p>
-                    <strong>ID:</strong> {currentPost.id}
-                  </p>
-                  <p>
-                    <strong>Author:</strong> {currentPost.author}
-                  </p>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="approvalStatus">Approval Decision:</label>
-                  <select
-                    id="approvalStatus"
-                    name="approvalStatus"
-                    value={approvalData.approvalStatus}
-                    onChange={handleApprovalChange}
-                    className="form-select"
-                    required
-                  >
-                    <option value="Approved">✅ Approve</option>
-                    <option value="Rejected">❌ Reject</option>
-                  </select>
-                </div>
-
-                {approvalData.approvalStatus === "Rejected" && (
-                  <div className="form-group">
-                    <label htmlFor="rejectionReason">Rejection Reason:</label>
-                    <textarea
-                      id="rejectionReason"
-                      name="rejectionReason"
-                      value={approvalData.rejectionReason}
-                      onChange={handleApprovalChange}
-                      className="form-textarea"
-                      rows="4"
-                      placeholder="Please provide a reason for rejection..."
-                      required
-                    />
-                  </div>
-                )}
-
-                <div className="form-actions">
-                  <button
-                    type="button"
-                    className="btn btn-cancel"
-                    onClick={() => setShowModal(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    {approvalData.approvalStatus === "Approved"
-                      ? "✅ Approve Post"
-                      : "❌ Reject Post"}
-                  </button>
-                </div>
-              </form>
             ) : (
               <form className="post-form" onSubmit={handleSubmit}>
                 <div className="form-group">
-                  <label htmlFor="title">Post Title:</label>
+                  <label htmlFor="title">📝 Tiêu đề bài viết:</label>
                   <input
                     type="text"
                     id="title"
@@ -564,13 +469,13 @@ function BlogManagement() {
                     onChange={handleInputChange}
                     className="form-input"
                     required
-                    placeholder="Enter post title..."
+                    placeholder="Nhập tiêu đề bài viết..."
                   />
                 </div>
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="status">Status:</label>
+                    <label htmlFor="status">🔄 Trạng thái:</label>
                     <select
                       id="status"
                       name="status"
@@ -581,15 +486,44 @@ function BlogManagement() {
                     >
                       {statuses.map((status) => (
                         <option key={status} value={status}>
-                          {status}
+                          {status === "Draft" && "📝 Draft (Bản nháp)"}
+                          {status === "Published" && "✅ Published (Đã duyệt)"}
+                          {status === "Rejected" && "❌ Rejected (Từ chối)"}
                         </option>
                       ))}
                     </select>
                   </div>
                 </div>
 
+                {/* Approval Message Field - chỉ hiển thị khi status là Published hoặc Rejected */}
+                {(formData.status === "Published" ||
+                  formData.status === "Rejected") && (
+                  <div className="form-group">
+                    <label htmlFor="approvalMessage">
+                      💬{" "}
+                      {formData.status === "Published"
+                        ? "Ghi chú duyệt (tùy chọn):"
+                        : "Lý do từ chối:"}
+                    </label>
+                    <textarea
+                      id="approvalMessage"
+                      name="approvalMessage"
+                      value={formData.approvalMessage}
+                      onChange={handleInputChange}
+                      className="form-textarea"
+                      rows="3"
+                      placeholder={
+                        formData.status === "Published"
+                          ? "Nhập ghi chú cho việc duyệt blog..."
+                          : "Vui lòng cung cấp lý do từ chối..."
+                      }
+                      required={formData.status === "Rejected"}
+                    />
+                  </div>
+                )}
+
                 <div className="form-group">
-                  <label htmlFor="content">Content:</label>
+                  <label htmlFor="content">📄 Nội dung bài viết:</label>
                   <textarea
                     id="content"
                     name="content"
@@ -598,7 +532,7 @@ function BlogManagement() {
                     className="form-textarea"
                     rows="8"
                     required
-                    placeholder="Write your blog post content here..."
+                    placeholder="Viết nội dung bài viết tại đây..."
                   />
                 </div>
 
@@ -611,7 +545,9 @@ function BlogManagement() {
                     onChange={handleInputChange}
                     className="form-checkbox"
                   />
-                  <label htmlFor="featured">⭐ Mark as Featured Post</label>
+                  <label htmlFor="featured">
+                    ⭐ Đánh dấu là bài viết nổi bật
+                  </label>
                 </div>
 
                 <div className="form-actions">
@@ -620,10 +556,25 @@ function BlogManagement() {
                     className="btn btn-cancel"
                     onClick={() => setShowModal(false)}
                   >
-                    Cancel
+                    ❌ Hủy
                   </button>
-                  <button type="submit" className="btn btn-primary">
-                    {modalMode === "add" ? "➕ Create Post" : "💾 Update Post"}
+                  <button
+                    type="submit"
+                    className={`btn ${
+                      formData.status === "Published"
+                        ? "btn-approve"
+                        : formData.status === "Rejected"
+                        ? "btn-reject"
+                        : "btn-primary"
+                    }`}
+                  >
+                    {modalMode === "add"
+                      ? "➕ Tạo Bài Viết"
+                      : formData.status === "Published"
+                      ? "✅ Duyệt & Lưu"
+                      : formData.status === "Rejected"
+                      ? "❌ Từ Chối & Lưu"
+                      : "💾 Cập Nhật"}
                   </button>
                 </div>
               </form>

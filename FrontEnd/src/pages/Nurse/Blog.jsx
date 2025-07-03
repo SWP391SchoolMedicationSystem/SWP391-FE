@@ -1,4 +1,10 @@
 import React, { useState } from "react";
+import { IconButton, Tooltip } from "@mui/material";
+import {
+  Visibility as VisibilityIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
 import "../../css/Nurse/NurseBlog.css";
 import { useNurseBlogs, useNurseActions } from "../../utils/hooks/useNurse";
 
@@ -35,7 +41,7 @@ function Blog() {
       author: "Y tá Nguyễn Thị Mai",
       createdDate: "2024-03-18",
       updatedDate: "2024-03-19",
-      status: "Đã đăng",
+      status: "Chờ duyệt",
       category: "Dinh dưỡng",
       tags: ["dị ứng", "thức ăn", "phòng ngừa"],
       readCount: 32,
@@ -51,6 +57,19 @@ function Blog() {
       status: "Bản nháp",
       category: "Vệ sinh",
       tags: ["vệ sinh", "rửa tay", "phòng bệnh"],
+      readCount: 0,
+    },
+    {
+      id: 4,
+      title: "Xử lý khi trẻ bị ngã tại trường",
+      content:
+        "Khi trẻ bị ngã hoặc va đập tại trường, y tá cần đánh giá tình trạng và xử lý phù hợp...",
+      author: "Y tá Nguyễn Thị Mai",
+      createdDate: "2024-03-10",
+      updatedDate: "2024-03-10",
+      status: "Từ chối",
+      category: "An toàn",
+      tags: ["an toàn", "xử lý", "chấn thương"],
       readCount: 0,
     },
   ]);
@@ -78,7 +97,7 @@ function Blog() {
     "An toàn",
     "Phát triển",
   ];
-  const statuses = ["Bản nháp", "Đã đăng"];
+  const statuses = ["Bản nháp", "Chờ duyệt", "Đã đăng", "Từ chối"];
 
   // Use real blogs or fallback to mock data
   const blogData = blogs || mockBlogs;
@@ -189,13 +208,21 @@ function Blog() {
   };
 
   const getStatusClass = (status) => {
-    switch (status) {
-      case "Đã đăng":
-        return "status-published";
-      case "Bản nháp":
-        return "status-draft";
+    switch (status?.toLowerCase()) {
+      case "đã đăng":
+      case "published":
+        return "published";
+      case "bản nháp":
+      case "draft":
+        return "draft";
+      case "từ chối":
+      case "rejected":
+        return "rejected";
+      case "chờ duyệt":
+      case "pending":
+        return "pending";
       default:
-        return "status-draft";
+        return "draft";
     }
   };
 
@@ -337,88 +364,108 @@ function Blog() {
         </div>
       </div>
 
-      {/* Blog List */}
-      <div className="blog-list">
-        {filteredBlogs.map((blog) => (
-          <div
-            key={blog.id}
-            className={`blog-card ${blog.isDeleted ? "deleted" : ""}`}
-          >
-            <div className="blog-header-section">
-              <div className="blog-meta">
-                <span
-                  className={`category-badge ${getCategoryColor(
-                    blog.category
-                  )}`}
-                >
-                  {blog.category}
-                </span>
-                <span className={`status-badge ${getStatusClass(blog.status)}`}>
-                  {blog.status}
-                </span>
-              </div>
-              <div className="blog-stats">
-                <span className="read-count">👁️ {blog.readCount}</span>
-              </div>
-            </div>
-
-            <div className="blog-content-section">
-              <h3 className="blog-title">{blog.title}</h3>
-              <p className="blog-excerpt">
-                {blog.content.length > 100
-                  ? blog.content.substring(0, 100) + "..."
-                  : blog.content}
-              </p>
-
-              <div className="blog-tags">
-                {blog.tags &&
-                  Array.isArray(blog.tags) &&
-                  blog.tags.map((tag, index) => (
-                    <span key={index} className="tag">
-                      #{tag}
-                    </span>
-                  ))}
-              </div>
-            </div>
-
-            <div className="blog-footer-section">
-              <div className="blog-info">
-                {blog.isDeleted && (
-                  <span className="deleted-badge">Đã xóa</span>
-                )}
-                <span className="author">{blog.author}</span>
-                <span className="date">{blog.createdDate}</span>
-                {blog.updatedDate !== blog.createdDate && (
-                  <span className="updated">Cập nhật: {blog.updatedDate}</span>
-                )}
-              </div>
-
-              <div className="blog-actions">
-                <button
-                  className="btn-view"
-                  onClick={() => handleViewBlog(blog)}
-                  title="Xem chi tiết"
-                >
-                  👁️
-                </button>
-                <button
-                  className="btn-edit"
-                  onClick={() => handleEditBlog(blog)}
-                  title="Chỉnh sửa"
-                >
-                  ✏️
-                </button>
-                <button
-                  className="btn-delete"
-                  onClick={() => handleDeleteBlog(blog)}
-                  title="Xóa"
-                >
-                  🗑️
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+      {/* Blog Posts Table */}
+      <div className="table-container">
+        <table className="blog-table">
+          <thead>
+            <tr>
+              <th>Tiêu đề</th>
+              <th>Danh mục</th>
+              <th>Trạng thái</th>
+              <th>Lượt xem</th>
+              <th>Ngày tạo</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredBlogs.map((blog) => (
+              <tr key={blog.id} className={blog.isDeleted ? "deleted-row" : ""}>
+                <td className="blog-title-cell">
+                  <div className="blog-title-wrapper">
+                    <h4>{blog.title}</h4>
+                    <p className="blog-excerpt">
+                      {blog.content.length > 120
+                        ? blog.content.substring(0, 120) + "..."
+                        : blog.content}
+                    </p>
+                    {blog.tags && Array.isArray(blog.tags) && (
+                      <div className="blog-tags">
+                        {blog.tags.slice(0, 3).map((tag, index) => (
+                          <span key={index} className="tag">
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </td>
+                <td>
+                  <span
+                    className={`category-badge ${getCategoryColor(
+                      blog.category
+                    )}`}
+                  >
+                    {blog.category}
+                  </span>
+                </td>
+                <td>
+                  <span
+                    className={`status-badge ${getStatusClass(blog.status)}`}
+                  >
+                    {blog.status}
+                  </span>
+                </td>
+                <td>
+                  <span className="read-count">👁️ {blog.readCount}</span>
+                </td>
+                <td>
+                  <div className="date-info">
+                    <span className="created-date">{blog.createdDate}</span>
+                    {blog.updatedDate !== blog.createdDate && (
+                      <span className="updated-date">
+                        Sửa: {blog.updatedDate}
+                      </span>
+                    )}
+                  </div>
+                </td>
+                <td>
+                  <div className="action-buttons">
+                    <Tooltip title="Xem chi tiết">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleViewBlog(blog)}
+                        className="btn-view"
+                        sx={{ color: "#6c757d" }}
+                      >
+                        <VisibilityIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Chỉnh sửa">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleEditBlog(blog)}
+                        className="btn-edit"
+                        sx={{ color: "#6c757d" }}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Xóa">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleDeleteBlog(blog)}
+                        className="btn-delete"
+                        sx={{ color: "#6c757d" }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
         {filteredBlogs.length === 0 && (
           <div className="no-data">
