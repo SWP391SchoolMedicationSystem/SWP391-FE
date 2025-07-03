@@ -14,7 +14,7 @@
   margin-bottom: 30px;
   padding: 30px;
   border-radius: 15px;
-  background: linear-gradient(135deg, #56d0db 0%, #2d77c1 100%);
+  background: linear-gradient(135deg, #73ad67 0%, #2f5148 100%);
   color: white;
   box-shadow: 0 4px 20px rgba(86, 208, 219, 0.3);
 }
@@ -48,7 +48,7 @@
 }
 
 .form-header {
-  background: linear-gradient(135deg, #56d0db 0%, #2d77c1 100%);
+  background: linear-gradient(135deg, #73ad67 0%, #2f5148 100%);
   color: white;
   padding: 20px;
 }
@@ -91,7 +91,7 @@
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #56d0db;
+  border-color: #73ad67;
   box-shadow: 0 0 0 3px rgba(86, 208, 219, 0.1);
 }
 
@@ -107,7 +107,7 @@
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #56d0db 0%, #2d77c1 100%);
+  background: linear-gradient(135deg, #73ad67 0%, #2f5148 100%);
   color: white;
   border: none;
   padding: 15px 30px;
@@ -426,7 +426,7 @@
 }
 .data-table thead th {
   background: #fff;
-  color: #2d77c1;
+  color: #2f5148;
   font-weight: 700;
   text-align: center;
   padding: 14px 8px;
@@ -491,7 +491,7 @@
   align-items: center;
   gap: 5px;
   background: #f2f6fa;
-  color: #2d77c1;
+  color: #2f5148;
 }
 .data-table .submit-btn:active {
   transform: scale(0.97);

@@ -165,7 +165,7 @@ export default function ResetPassword() {
               disabled={loading}
               sx={{
                 color: "white",
-                background: "linear-gradient(to right, #56D0DB, #2D77C1)",
+                background: "linear-gradient(to right, #73ad67, #2f5148)",
                 "&:hover": { opacity: 0.9 },
                 py: 1.5,
                 mb: 2,
@@ -216,7 +216,7 @@ export default function ResetPassword() {
               disabled={loading || verificationCode.length !== 6}
               sx={{
                 color: "white",
-                background: "linear-gradient(to right, #56D0DB, #2D77C1)",
+                background: "linear-gradient(to right, #73ad67, #2f5148)",
                 "&:hover": { opacity: 0.9 },
                 py: 1.5,
                 mb: 2,
@@ -229,7 +229,7 @@ export default function ResetPassword() {
               variant="text"
               fullWidth
               onClick={() => setActiveStep(0)}
-              sx={{ color: "#56D0DB" }}
+              sx={{ color: "#73ad67" }}
             >
               Thay đổi địa chỉ email
             </Button>
@@ -288,7 +288,7 @@ export default function ResetPassword() {
               disabled={loading}
               sx={{
                 color: "white",
-                background: "linear-gradient(to right, #56D0DB, #2D77C1)",
+                background: "linear-gradient(to right, #73ad67, #2f5148)",
                 "&:hover": { opacity: 0.9 },
                 py: 1.5,
                 mb: 2,
@@ -336,7 +336,7 @@ export default function ResetPassword() {
                 display: "flex",
                 alignItems: "center",
                 textDecoration: "none",
-                color: "#56D0DB",
+                color: "#73ad67",
                 fontWeight: 500,
                 "&:hover": { opacity: 0.8 },
               }}
@@ -402,7 +402,7 @@ export default function ResetPassword() {
             Cần hỗ trợ? Liên hệ{" "}
             <Link
               href="mailto:support@medlearn.com"
-              sx={{ color: "#56D0DB", textDecoration: "none" }}
+              sx={{ color: "#73ad67", textDecoration: "none" }}
             >
               support@medlearn.com
             </Link>

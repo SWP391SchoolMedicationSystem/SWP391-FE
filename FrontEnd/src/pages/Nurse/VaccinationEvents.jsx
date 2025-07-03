@@ -90,7 +90,7 @@ function VaccinationEvents() {
       {/* Header */}
       <div className="page-header">
         <div className="header-content">
-          <h1>💉 Sự Kiện Tiêm Chủng</h1>
+          <h1> Sự Kiện Tiêm Chủng</h1>
           <p>Xem thông tin các đợt tiêm vaccine cho học sinh</p>
         </div>
         <div className="header-actions">
@@ -134,7 +134,7 @@ function VaccinationEvents() {
 
       {/* Events List */}
       <div className="events-section">
-        <h2>📋 Danh sách sự kiện</h2>
+        <h2> Danh sách sự kiện</h2>
 
         {events.length > 0 ? (
           <div className="events-grid">
@@ -185,7 +185,7 @@ function VaccinationEvents() {
                     className="view-btn"
                     onClick={() => handleViewDetails(event)}
                   >
-                    👁️ Xem chi tiết
+                     Xem chi tiết
                   </button>
                   <button
                     className="students-btn"

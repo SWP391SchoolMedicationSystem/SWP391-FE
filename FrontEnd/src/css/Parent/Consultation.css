@@ -79,7 +79,7 @@
   margin: 0 0 8px 0;
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2d77c1;
+  color: #2f5148;
 }
 
 .stat-content p {
@@ -106,7 +106,7 @@
 
 .new-consultation h3 {
   margin: 0 0 25px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.5rem;
   display: flex;
   align-items: center;
@@ -144,7 +144,7 @@
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #56d0db;
+  border-color: #73ad67;
   box-shadow: 0 0 0 3px rgba(86, 208, 219, 0.1);
 }
 
@@ -160,7 +160,7 @@
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  background: linear-gradient(135deg, #73ad67, #2f5148);
   color: white;
   border: none;
   padding: 15px 30px;
@@ -187,7 +187,7 @@
 
 .doctor-info h3 {
   margin: 0 0 25px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.5rem;
   display: flex;
   align-items: center;
@@ -199,7 +199,7 @@
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 20px;
-  border-left: 4px solid #56d0db;
+  border-left: 4px solid #73ad67;
 }
 
 .doctor-header {
@@ -211,7 +211,7 @@
 .doctor-avatar {
   font-size: 3rem;
   margin-right: 15px;
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  background: linear-gradient(135deg, #73ad67, #2f5148);
   color: white;
   width: 60px;
   height: 60px;
@@ -223,7 +223,7 @@
 
 .doctor-details h4 {
   margin: 0 0 5px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.2rem;
 }
 
@@ -249,7 +249,7 @@
 
 .info-label {
   font-weight: 500;
-  color: #2d77c1;
+  color: #2f5148;
 }
 
 .working-hours {
@@ -261,7 +261,7 @@
 
 .working-hours h5 {
   margin: 0 0 10px 0;
-  color: #2d77c1;
+  color: #2f5148;
 }
 
 .hours-grid {
@@ -276,7 +276,7 @@
   border-radius: 6px;
   text-align: center;
   font-size: 0.8rem;
-  color: #2d77c1;
+  color: #2f5148;
   font-weight: 500;
 }
 
@@ -291,7 +291,7 @@
 
 .consultation-history h3 {
   margin: 0 0 25px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.5rem;
   display: flex;
   align-items: center;
@@ -317,9 +317,9 @@
 
 .filter-btn.active,
 .filter-btn:hover {
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  background: linear-gradient(135deg, #73ad67, #2f5148);
   color: white;
-  border-color: #2d77c1;
+  border-color: #2f5148;
 }
 
 .history-list {
@@ -337,7 +337,7 @@
 }
 
 .history-item:hover {
-  border-color: #56d0db;
+  border-color: #73ad67;
   transform: translateY(-2px);
 }
 
@@ -354,7 +354,7 @@
 
 .history-title h4 {
   margin: 0 0 5px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.1rem;
 }
 
@@ -404,14 +404,14 @@
 
 .detail-label {
   font-weight: 500;
-  color: #2d77c1;
+  color: #2f5148;
 }
 
 .history-description {
   background: white;
   padding: 15px;
   border-radius: 8px;
-  border-left: 4px solid #56d0db;
+  border-left: 4px solid #73ad67;
   margin-bottom: 15px;
 }
 
@@ -478,7 +478,7 @@
 
 .contact-methods h3 {
   margin: 0 0 20px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.3rem;
   text-align: center;
 }
@@ -500,7 +500,7 @@
 }
 
 .contact-item:hover {
-  border-color: #56d0db;
+  border-color: #73ad67;
   transform: translateY(-3px);
 }
 
@@ -512,7 +512,7 @@
 
 .contact-item h4 {
   margin: 0 0 5px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1rem;
 }
 

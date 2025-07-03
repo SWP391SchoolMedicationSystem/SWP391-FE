@@ -1,28 +1,39 @@
-/* ChatWithParents.css */
+/* ChatWithParents.css - Green Theme Applied */
 .chat-container {
   padding: 20px;
-  background: linear-gradient(to right, #56d0db, #2d77c1);
   min-height: 100vh;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f2f6f3; /* $bg-main */
+  font-family: "Satoshi", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .chat-header {
   text-align: center;
   margin-bottom: 30px;
-  color: white;
+  padding: 30px;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    #2f5148 0%,
+    #73ad67 100%
+  ); /* $primary-gradient */
+  color: #ffffff; /* $text-white */
+  box-shadow: 0 4px 20px rgba(47, 81, 72, 0.3);
 }
 
 .chat-header h1 {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 10px;
-  color: #56d0db;
+  color: #ffffff; /* $text-white */
+  font-family: "Satoshi", sans-serif;
 }
 
 .chat-header p {
   font-size: 1.1rem;
   opacity: 0.9;
   margin: 0;
+  color: #ffffff; /* $text-white */
+  font-family: "Satoshi", sans-serif;
 }
 
 /* Statistics Cards */
