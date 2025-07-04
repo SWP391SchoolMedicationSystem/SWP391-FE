@@ -22,7 +22,7 @@ function NurseNotifications() {
   }, [fetchNotifications]);
 
   const filterTypes = [
-    { id: "all", name: "Tất cả", icon: "📋", color: "#56D0DB" },
+    { id: "all", name: "Tất cả", icon: "📋", color: "#73ad67" },
     { id: "general", name: "Thông báo chung", icon: "📢", color: "#6f42c1" },
     { id: "health", name: "Sức khỏe", icon: "🏥", color: "#28a745" },
     { id: "emergency", name: "Khẩn cấp", icon: "🚨", color: "#dc3545" },

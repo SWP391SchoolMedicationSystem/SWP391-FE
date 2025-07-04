@@ -2,18 +2,10 @@ import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
   Box,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  AppBar,
-  Toolbar,
+  Typography,
+  Avatar,
   IconButton,
   InputBase,
-  Avatar,
-  Typography,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -31,30 +23,51 @@ import {
   Logout,
   ChatBubbleOutline,
   BarChart,
+  Search,
+  DarkMode,
+  LightMode,
 } from "@mui/icons-material";
 import userService from "../../services/userService";
 import MedlearnLogo from "../../assets/images/Medlearn-logo.png";
 
-const drawerWidth = 240;
+const drawerWidth = 280;
 
 const navItems = [
-  { to: "/manager", label: "Bảng Điều Khiển", icon: <Dashboard /> },
-  { to: "/manager/accounts", label: "Quản Lý Tài Khoản", icon: <People /> },
-  { to: "/manager/blogs", label: "Quản Lý Blog", icon: <Article /> },
   {
-    to: "/manager/vaccinations",
-    label: "Danh Sách Tiêm Chủng",
+    to: "/manager",
+    label: "Bảng Điều Khiển",
+    icon: <Dashboard />,
+    key: "dashboard",
+  },
+  {
+    to: "/manager/accounts",
+    label: "Quản Lý Tài Khoản",
+    icon: <People />,
+    key: "accounts",
+  },
+  {
+    to: "/manager/blogs",
+    label: "Quản Lý Blog",
+    icon: <Article />,
+    key: "blogs",
+  },
+  {
+    to: "/manager/vaccination-events",
+    label: "Sự Kiện Tiêm Chủng",
     icon: <Vaccines />,
+    key: "vaccination",
   },
   {
     to: "/manager/StudentList",
     label: "Danh Sách Học Sinh",
     icon: <BarChart />,
+    key: "students",
   },
   {
     to: "/manager/notifications",
     label: "Thông Báo",
     icon: <Notifications />,
+    key: "notifications",
   },
 ];
 
@@ -62,6 +75,7 @@ export default function ManagerLayout() {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     // Lấy thông tin user từ localStorage
@@ -74,6 +88,12 @@ export default function ManagerLayout() {
         console.error("Error parsing user info:", error);
       }
     }
+
+    // Lấy theme preference từ localStorage
+    const storedTheme = localStorage.getItem("managerTheme");
+    if (storedTheme) {
+      setIsDarkMode(storedTheme === "dark");
+    }
   }, []);
 
   const handleLogout = () => {
@@ -81,9 +101,15 @@ export default function ManagerLayout() {
     navigate("/");
   };
 
+  const toggleDarkMode = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem("managerTheme", newMode ? "dark" : "light");
+  };
+
   // Get user display info
   const getUserDisplayName = () => {
-    if (!userInfo) return "Manager";
+    if (!userInfo) return "Manager Pro";
     return (
       userInfo.userName ||
       userInfo.fullname ||
@@ -93,8 +119,8 @@ export default function ManagerLayout() {
   };
 
   const getUserEmail = () => {
-    if (!userInfo) return "manager@example.com";
-    return userInfo.email || "manager@example.com";
+    if (!userInfo) return "manager@medlearn.com";
+    return userInfo.email || "manager@medlearn.com";
   };
 
   const getUserAvatar = () => {
@@ -102,207 +128,513 @@ export default function ManagerLayout() {
     return displayName.charAt(0).toUpperCase();
   };
 
+  // Theme colors
+  const theme = {
+    light: {
+      background:
+        "linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(240, 253, 244, 0.1) 100%), linear-gradient(45deg, #f0fdf4 0%, #ecfdf5 25%, #f8fafc 50%, #f0fdf4 75%, #f8fafc 100%)",
+      sidebarBg:
+        "linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(240, 253, 244, 0.15) 100%)",
+      headerBg:
+        "linear-gradient(135deg, rgba(240, 253, 244, 0.3) 0%, rgba(240, 253, 244, 0.2) 100%)",
+      cardBg:
+        "linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(240, 253, 244, 0.3) 100%)",
+      cardBgHover:
+        "linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(240, 253, 244, 0.2) 100%)",
+      cardBgInactive:
+        "linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(240, 253, 244, 0.1) 100%)",
+      logoGradient:
+        "linear-gradient(135deg, #16a34a 0%, #22c55e 50%, #10b981 100%)",
+      textPrimary: "#1e293b",
+      textSecondary: "#64748b",
+      textGradient:
+        "linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%)",
+      activeText: "#22c55e",
+      border: "rgba(255, 255, 255, 0.3)",
+      iconButton:
+        "linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(240, 253, 244, 0.1) 100%)",
+      iconButtonHover:
+        "linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(240, 253, 244, 0.2) 100%)",
+    },
+    dark: {
+      background:
+        "linear-gradient(135deg, rgba(29, 29, 29, 0.95) 0%, rgba(29, 29, 29, 0.9) 50%, rgba(29, 29, 29, 0.85) 100%), linear-gradient(45deg, #1d1d1d 0%, #242424 25%, #2a2a2a 50%, #313131 75%, #2a2a2a 100%)",
+      sidebarBg:
+        "linear-gradient(135deg, rgba(29, 29, 29, 0.9) 0%, rgba(29, 29, 29, 0.7) 100%)",
+      headerBg:
+        "linear-gradient(135deg, rgba(29, 29, 29, 0.9) 0%, rgba(29, 29, 29, 0.7) 100%)",
+      cardBg:
+        "linear-gradient(135deg, rgba(29, 29, 29, 0.8) 0%, rgba(36, 36, 36, 0.6) 100%)",
+      cardBgHover:
+        "linear-gradient(135deg, rgba(29, 29, 29, 0.9) 0%, rgba(36, 36, 36, 0.7) 100%)",
+      cardBgInactive:
+        "linear-gradient(135deg, rgba(29, 29, 29, 0.5) 0%, rgba(36, 36, 36, 0.3) 100%)",
+      logoGradient:
+        "linear-gradient(135deg, #22c55e 0%, #10b981 50%, #059669 100%)",
+      textPrimary: "#eaebed",
+      textSecondary: "#eaebed",
+      textGradient:
+        "linear-gradient(135deg, #eaebed 0%, #eaebed 50%, #eaebed 100%)",
+      activeText: "#22c55e",
+      border: "rgba(234, 235, 237, 0.2)",
+      iconButton:
+        "linear-gradient(135deg, rgba(29, 29, 29, 0.7) 0%, rgba(36, 36, 36, 0.5) 100%)",
+      iconButtonHover:
+        "linear-gradient(135deg, rgba(29, 29, 29, 0.9) 0%, rgba(36, 36, 36, 0.7) 100%)",
+    },
+  };
+
+  const currentTheme = isDarkMode ? theme.dark : theme.light;
+
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
+    <Box
+      sx={{
+        display: "flex",
+        height: "100vh",
+        background: currentTheme.background,
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        transition: "all 0.3s ease",
+      }}
+    >
       {/* Sidebar */}
-      <Drawer
-        variant="permanent"
+      <Box
         sx={{
           width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
-            width: drawerWidth,
-            boxSizing: "border-box",
-            backgroundColor: "#fff",
-            borderRight: "1px solid #e0e0e0",
-          },
+          height: "100vh",
+          position: "fixed",
+          left: 0,
+          top: 0,
+          zIndex: 1200,
+          background: currentTheme.sidebarBg,
+          backdropFilter: "blur(30px)",
+          borderRight: `1px solid ${currentTheme.border}`,
+          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+          display: "flex",
+          flexDirection: "column",
+          transition: "all 0.3s ease",
         }}
       >
-        <Toolbar
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            py: 1,
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 0.5,
-            }}
-          >
-            <Box sx={{ width: "40px", height: "40px" }}>
-              <img
-                src={MedlearnLogo}
-                alt="Medlearn Logo"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "contain",
-                }}
-              />
-            </Box>
-            <Box sx={{ textAlign: "center" }}>
-              <Typography
-                sx={{
-                  fontSize: "0.75rem",
-                  fontWeight: "bold",
-                  color: "#2D77C1",
-                  lineHeight: 1,
-                }}
-              >
-                MEDLEARN
-              </Typography>
-              <Typography
-                sx={{
-                  fontSize: "0.6rem",
-                  color: "#2D77C1",
-                  lineHeight: 1,
-                  fontWeight: "600",
-                }}
-              >
-                Manager
-              </Typography>
-            </Box>
-          </Box>
-        </Toolbar>
-        <List>
-          {navItems.map(({ to, label, icon }) => (
-            <NavLink
-              to={to}
-              key={to}
-              end={to === "/manager"} // chỉ dùng end cho dashboard
-              style={{ textDecoration: "none" }}
-            >
-              {({ isActive }) => (
-                <ListItem disablePadding>
-                  <ListItemButton
-                    sx={{
-                      borderRadius: 1,
-                      mx: 1,
-                      my: 0.5,
-                      color: isActive ? "white" : "#333",
-                      background: isActive
-                        ? "linear-gradient(to right, #56D0DB, #2D77C1)"
-                        : "transparent",
-                      "&:hover": {
-                        background: isActive
-                          ? "linear-gradient(to right, #56D0DB, #2D77C1)"
-                          : "#f0f0f0",
-                      },
-                    }}
-                  >
-                    <ListItemIcon sx={{ color: "inherit" }}>
-                      {icon}
-                    </ListItemIcon>
-                    <ListItemText primary={label} />
-                  </ListItemButton>
-                </ListItem>
-              )}
-            </NavLink>
-          ))}
-        </List>
-
-        {/* Bottom user info */}
+        {/* Logo */}
         <Box
           sx={{
-            mt: "auto",
-            p: 2,
-            borderTop: "1px solid #e0e0e0",
+            p: 3,
             display: "flex",
             alignItems: "center",
             gap: 2,
           }}
         >
-          <IconButton onClick={() => setShowProfile(true)}>
-            <Avatar sx={{ bgcolor: "#56D0DB" }}>{getUserAvatar()}</Avatar>
-          </IconButton>
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                fontSize: 14,
-                fontWeight: 600,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {getUserDisplayName()}
-            </div>
-            <div
-              style={{
-                fontSize: 12,
-                color: "#888",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {getUserEmail()}
-            </div>
-          </Box>
-          <IconButton
-            sx={{ marginLeft: "auto", color: "#aaa" }}
-            onClick={handleLogout}
-            title="Đăng xuất"
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: "12px",
+              background: currentTheme.cardBgInactive,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backdropFilter: "blur(15px)",
+              border: `1px solid ${currentTheme.border}`,
+              boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+            }}
           >
-            <Logout />
-          </IconButton>
+              <img
+                src={MedlearnLogo}
+              alt="Logo"
+                style={{
+                width: "24px",
+                height: "24px",
+                  objectFit: "contain",
+                }}
+              />
+            </Box>
+              <Typography
+                sx={{
+              background: currentTheme.logoGradient,
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              fontSize: "20px",
+              fontWeight: 700,
+              letterSpacing: "-0.5px",
+            }}
+          >
+            MedLearn
+              </Typography>
+            </Box>
+
+        {/* Navigation */}
+        <Box sx={{ flex: 1, px: 2 }}>
+          {navItems.map(({ to, label, icon, key }) => (
+            <NavLink
+              to={to}
+              key={key}
+              end={to === "/manager"}
+              style={{ textDecoration: "none" }}
+            >
+              {({ isActive }) => (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    p: "12px 16px",
+                    mb: 1,
+                    borderRadius: "15px",
+                    color: isActive
+                      ? currentTheme.activeText
+                      : currentTheme.textSecondary,
+                    background: isActive ? currentTheme.cardBg : "transparent",
+                    backdropFilter: isActive ? "blur(15px)" : "none",
+                    border: isActive
+                      ? `1px solid ${currentTheme.border}`
+                      : "1px solid transparent",
+                    boxShadow: isActive
+                      ? "0 4px 15px rgba(0, 0, 0, 0.1)"
+                      : "none",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      background: currentTheme.cardBgHover,
+                      backdropFilter: "blur(15px)",
+                      border: `1px solid ${currentTheme.border}`,
+                      color: currentTheme.activeText,
+                      transform: "translateY(-1px)",
+                    },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 24,
+                      height: 24,
+                      "& svg": {
+                        fontSize: "20px",
+                        color: "inherit",
+                      },
+                    }}
+                  >
+                      {icon}
+                  </Box>
+                  <Typography
+                    sx={{
+                      fontSize: "14px",
+                      fontWeight: isActive ? 600 : 400,
+                      color: "inherit",
+                    }}
+                  >
+                    {label}
+                  </Typography>
+                </Box>
+              )}
+            </NavLink>
+          ))}
         </Box>
-      </Drawer>
+
+        {/* Bottom section */}
+        <Box sx={{ p: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+              p: "12px 16px",
+              borderRadius: "15px",
+              background: currentTheme.cardBgInactive,
+              backdropFilter: "blur(15px)",
+              border: `1px solid ${currentTheme.border}`,
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                background: currentTheme.cardBgHover,
+                transform: "translateY(-1px)",
+                boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+              },
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 24,
+                height: 24,
+                "& svg": {
+                  fontSize: "20px",
+                  color: currentTheme.textSecondary,
+                },
+              }}
+            >
+              <ChatBubbleOutline />
+            </Box>
+            <Typography
+              sx={{
+                fontSize: "14px",
+                fontWeight: 400,
+                color: currentTheme.textSecondary,
+              }}
+            >
+              Transfers
+            </Typography>
+          </Box>
+
+          <Box
+            onClick={() => setShowProfile(true)}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              p: "12px 16px",
+              mt: 1,
+              borderRadius: "15px",
+              background: currentTheme.cardBgInactive,
+              backdropFilter: "blur(15px)",
+              border: `1px solid ${currentTheme.border}`,
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                background: currentTheme.cardBgHover,
+                transform: "translateY(-1px)",
+                boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+              },
+            }}
+          >
+            <Avatar
+              sx={{
+                width: 24,
+                height: 24,
+                fontSize: "12px",
+                background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+              }}
+            >
+              {getUserAvatar()}
+            </Avatar>
+            <Typography
+              sx={{
+                fontSize: "14px",
+                fontWeight: 400,
+                color: currentTheme.textSecondary,
+              }}
+            >
+              Profile
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
 
       {/* Main content area */}
-      <Box component="main" sx={{ flexGrow: 1, bgcolor: "#f7f7f7" }}>
-        {/* Topbar */}
-        <AppBar
-          position="static"
-          elevation={0}
+      <Box
+        sx={{
+          flexGrow: 1,
+          marginLeft: `${drawerWidth}px`,
+          display: "flex",
+          flexDirection: "column",
+          height: "100vh",
+        }}
+      >
+        {/* Top Header */}
+        <Box
           sx={{
-            bgcolor: "#fff",
-            borderBottom: "1px solid #e0e0e0",
-            height: 64,
             display: "flex",
-            justifyContent: "center",
+            alignItems: "center",
+            justifyContent: "space-between",
+            p: 3,
+            background: currentTheme.headerBg,
+            backdropFilter: "blur(30px)",
+            borderBottom: `1px solid ${currentTheme.border}`,
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+            transition: "all 0.3s ease",
           }}
         >
-          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box>
+            <Typography
+              sx={{
+                background: currentTheme.textGradient,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontSize: "24px",
+                fontWeight: 700,
+                mb: 0.5,
+              }}
+            >
+              Welcome back, {getUserDisplayName()}! 👋
+            </Typography>
+            <Typography
+              sx={{
+                color: currentTheme.textSecondary,
+                fontSize: "14px",
+                fontWeight: 500,
+              }}
+            >
+              Manager Dashboard
+            </Typography>
+          </Box>
+
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <IconButton>
-                <Menu />
-              </IconButton>
+            {/* Search Bar */}
               <Box
                 sx={{
                   position: "relative",
                   width: 300,
-                  bgcolor: "#f0f0f0",
-                  borderRadius: 1,
+                background: currentTheme.iconButton,
+                backdropFilter: "blur(15px)",
+                border: `1px solid ${currentTheme.border}`,
+                borderRadius: "12px",
+                "&:hover": {
+                  background: currentTheme.iconButtonHover,
+                },
                 }}
               >
                 <InputBase
                   placeholder="Tìm kiếm thông tin, học sinh, etc."
-                  sx={{ pl: 2, pr: 2, py: 0.5, width: "100%" }}
-                />
-              </Box>
+                sx={{
+                  pl: 2,
+                  pr: 2,
+                  py: 0.5,
+                  width: "100%",
+                  color: currentTheme.textSecondary,
+                  "& ::placeholder": {
+                    color: currentTheme.textSecondary,
+                    opacity: 0.7,
+                  },
+                }}
+              />
             </Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <IconButton>
+
+            <IconButton
+              sx={{
+                width: 40,
+                height: 40,
+                background: currentTheme.iconButton,
+                backdropFilter: "blur(15px)",
+                border: `1px solid ${currentTheme.border}`,
+                color: currentTheme.textSecondary,
+                borderRadius: "12px",
+                "&:hover": {
+                  background: currentTheme.iconButtonHover,
+                  color: currentTheme.textPrimary,
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+                },
+              }}
+            >
                 <Notifications />
               </IconButton>
-              <IconButton>
+
+            <IconButton
+              sx={{
+                width: 40,
+                height: 40,
+                background: currentTheme.iconButton,
+                backdropFilter: "blur(15px)",
+                border: `1px solid ${currentTheme.border}`,
+                color: currentTheme.textSecondary,
+                borderRadius: "12px",
+                "&:hover": {
+                  background: currentTheme.iconButtonHover,
+                  color: currentTheme.textPrimary,
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+                },
+              }}
+            >
                 <ChatBubbleOutline />
               </IconButton>
-              <IconButton onClick={() => setShowProfile(true)}>
-                <Avatar sx={{ bgcolor: "#2D77C1" }}>{getUserAvatar()}</Avatar>
+
+            {/* Dark Mode Toggle */}
+            <IconButton
+              onClick={toggleDarkMode}
+              sx={{
+                width: 40,
+                height: 40,
+                background: currentTheme.iconButton,
+                backdropFilter: "blur(15px)",
+                border: `1px solid ${currentTheme.border}`,
+                color: currentTheme.textSecondary,
+                borderRadius: "12px",
+                "&:hover": {
+                  background: currentTheme.iconButtonHover,
+                  color: isDarkMode ? "#fbbf24" : "#22c55e",
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+                },
+              }}
+            >
+              {isDarkMode ? <LightMode /> : <DarkMode />}
+            </IconButton>
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Avatar
+                sx={{
+                  width: 40,
+                  height: 40,
+                  background:
+                    "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+                  border: `2px solid ${currentTheme.border}`,
+                  fontSize: "16px",
+                  fontWeight: 600,
+                  color: "white",
+                  boxShadow: "0 4px 15px rgba(34, 197, 94, 0.3)",
+                  cursor: "pointer",
+                }}
+                onClick={() => setShowProfile(true)}
+              >
+                {getUserAvatar()}
+              </Avatar>
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <Typography
+                  sx={{
+                    color: currentTheme.textPrimary,
+                    fontSize: "14px",
+                    fontWeight: 600,
+                  }}
+                >
+                  {getUserDisplayName()}
+                </Typography>
+                <Typography
+                  sx={{
+                    color: currentTheme.textSecondary,
+                    fontSize: "12px",
+                    fontWeight: 500,
+                  }}
+                >
+                  Manager
+                </Typography>
+              </Box>
+              <IconButton
+                onClick={handleLogout}
+                sx={{
+                  width: 36,
+                  height: 36,
+                  background: currentTheme.iconButton,
+                  backdropFilter: "blur(10px)",
+                  border: `1px solid ${currentTheme.border}`,
+                  borderRadius: "10px",
+                  color: currentTheme.textSecondary,
+                  "&:hover": {
+                    color: "#ef4444",
+                    background: currentTheme.iconButtonHover,
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+                  },
+                }}
+              >
+                <Logout />
               </IconButton>
             </Box>
-          </Toolbar>
-        </AppBar>
+          </Box>
+        </Box>
 
-        {/* Content render từ router */}
-        <Box sx={{ p: 3 }}>
+        {/* Content */}
+        <Box
+          sx={{
+            flexGrow: 1,
+            overflow: "auto",
+            p: 3,
+          }}
+        >
           <Outlet />
         </Box>
       </Box>
@@ -316,7 +648,9 @@ export default function ManagerLayout() {
             borderRadius: 3,
             width: "100%",
             maxWidth: 450,
-            background: "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)",
+            background: currentTheme.cardBg,
+            backdropFilter: "blur(20px)",
+            border: `1px solid ${currentTheme.border}`,
           },
         }}
       >
@@ -324,7 +658,7 @@ export default function ManagerLayout() {
           sx={{
             textAlign: "center",
             pb: 1,
-            background: "linear-gradient(135deg, #2196f3 0%, #1976d2 100%)",
+            background: currentTheme.logoGradient,
             color: "white",
             fontWeight: "bold",
             fontSize: "1.3rem",
@@ -342,10 +676,11 @@ export default function ManagerLayout() {
                     width: 80,
                     height: 80,
                     margin: "0 auto",
-                    bgcolor: "#2196f3",
+                    background: currentTheme.logoGradient,
                     fontSize: "2rem",
                     fontWeight: "bold",
-                    boxShadow: "0 4px 20px rgba(33, 150, 243, 0.3)",
+                    boxShadow: "0 4px 20px rgba(34, 197, 94, 0.3)",
+                    color: "white",
                   }}
                 >
                   {getUserAvatar()}
@@ -355,7 +690,7 @@ export default function ManagerLayout() {
                   sx={{
                     mt: 2,
                     fontWeight: "bold",
-                    color: "#1976d2",
+                    color: currentTheme.textPrimary,
                   }}
                 >
                   {getUserDisplayName()}
@@ -363,7 +698,7 @@ export default function ManagerLayout() {
                 <Typography
                   variant="body2"
                   sx={{
-                    color: "#666",
+                    color: currentTheme.textSecondary,
                     fontStyle: "italic",
                   }}
                 >
@@ -378,10 +713,10 @@ export default function ManagerLayout() {
                     display: "flex",
                     alignItems: "center",
                     p: 2,
-                    bgcolor: "white",
+                    background: currentTheme.iconButton,
                     borderRadius: 2,
                     boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                    border: "1px solid #e0e0e0",
+                    border: `1px solid ${currentTheme.border}`,
                   }}
                 >
                   <Box
@@ -389,7 +724,7 @@ export default function ManagerLayout() {
                       width: 40,
                       height: 40,
                       borderRadius: "50%",
-                      bgcolor: "#E3F2FD",
+                      background: currentTheme.cardBgInactive,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -399,11 +734,24 @@ export default function ManagerLayout() {
                     🆔
                   </Box>
                   <Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Mã số
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: currentTheme.textSecondary,
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                      }}
+                    >
+                      User ID
                     </Typography>
-                    <Typography variant="body1" fontWeight="600">
-                      {userInfo.userId || userInfo.id || "N/A"}
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        color: currentTheme.textPrimary,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {userInfo.userId || "N/A"}
                     </Typography>
                   </Box>
                 </Box>
@@ -413,10 +761,10 @@ export default function ManagerLayout() {
                     display: "flex",
                     alignItems: "center",
                     p: 2,
-                    bgcolor: "white",
+                    background: currentTheme.iconButton,
                     borderRadius: 2,
                     boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                    border: "1px solid #e0e0e0",
+                    border: `1px solid ${currentTheme.border}`,
                   }}
                 >
                   <Box
@@ -424,7 +772,7 @@ export default function ManagerLayout() {
                       width: 40,
                       height: 40,
                       borderRadius: "50%",
-                      bgcolor: "#E8F5E8",
+                      background: currentTheme.cardBgInactive,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -434,25 +782,37 @@ export default function ManagerLayout() {
                     📧
                   </Box>
                   <Box>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: currentTheme.textSecondary,
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                      }}
+                    >
                       Email
                     </Typography>
-                    <Typography variant="body1" fontWeight="600">
-                      {userInfo.email || "N/A"}
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        color: currentTheme.textPrimary,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {getUserEmail()}
                     </Typography>
                   </Box>
                 </Box>
 
-                {userInfo.phone && (
                   <Box
                     sx={{
                       display: "flex",
                       alignItems: "center",
                       p: 2,
-                      bgcolor: "white",
+                    background: currentTheme.iconButton,
                       borderRadius: 2,
                       boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      border: "1px solid #e0e0e0",
+                    border: `1px solid ${currentTheme.border}`,
                     }}
                   >
                     <Box
@@ -460,68 +820,43 @@ export default function ManagerLayout() {
                         width: 40,
                         height: 40,
                         borderRadius: "50%",
-                        bgcolor: "#FFF3E0",
+                      background: currentTheme.cardBgInactive,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         mr: 2,
                       }}
                     >
-                      📱
-                    </Box>
-                    <Box>
-                      <Typography variant="body2" color="text.secondary">
-                        Số điện thoại
-                      </Typography>
-                      <Typography variant="body1" fontWeight="600">
-                        {userInfo.phone}
-                      </Typography>
-                    </Box>
+                    👤
                   </Box>
-                )}
-
-                {userInfo.role && (
-                  <Box
+                  <Box>
+                    <Typography
+                      variant="body2"
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      p: 2,
-                      bgcolor: "white",
-                      borderRadius: 2,
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      border: "1px solid #e0e0e0",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: "50%",
-                        bgcolor: "#E8EAF6",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mr: 2,
+                        color: currentTheme.textSecondary,
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
                       }}
                     >
-                      👨‍💼
-                    </Box>
-                    <Box>
-                      <Typography variant="body2" color="text.secondary">
-                        Vai trò
-                      </Typography>
-                      <Typography variant="body1" fontWeight="600">
-                        {userInfo.role}
+                      Username
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        color: currentTheme.textPrimary,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {userInfo.userName || "N/A"}
                       </Typography>
                     </Box>
                   </Box>
-                )}
               </Box>
             </Box>
           ) : (
-            <Box sx={{ p: 4, textAlign: "center" }}>
-              <Typography color="text.secondary">
-                Không có thông tin người dùng.
+            <Box sx={{ p: 3, textAlign: "center" }}>
+              <Typography sx={{ color: currentTheme.textSecondary }}>
+                Không có thông tin người dùng
               </Typography>
             </Box>
           )}
@@ -529,20 +864,17 @@ export default function ManagerLayout() {
         <DialogActions sx={{ p: 2, justifyContent: "center" }}>
           <Button
             onClick={() => setShowProfile(false)}
-            variant="contained"
             sx={{
-              background: "linear-gradient(135deg, #2196f3 0%, #1976d2 100%)",
+              background: currentTheme.logoGradient,
               color: "white",
-              px: 4,
-              py: 1,
               borderRadius: 2,
-              fontWeight: "bold",
+              px: 3,
+              fontWeight: 600,
               "&:hover": {
-                background: "linear-gradient(135deg, #1e88e5 0%, #1565c0 100%)",
+                background: currentTheme.logoGradient,
                 transform: "translateY(-1px)",
-                boxShadow: "0 4px 12px rgba(33, 150, 243, 0.3)",
+                boxShadow: "0 4px 15px rgba(34, 197, 94, 0.3)",
               },
-              transition: "all 0.3s ease",
             }}
           >
             Đóng

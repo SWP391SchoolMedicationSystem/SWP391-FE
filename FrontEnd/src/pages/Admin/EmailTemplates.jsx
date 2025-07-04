@@ -239,7 +239,7 @@ function EmailTemplates() {
               startIcon={<AddIcon />}
               onClick={() => handleOpenDialog()}
               sx={{
-                background: "linear-gradient(135deg, #2D77C1 0%, #56D0DB 100%)",
+                background: "linear-gradient(135deg, #2f5148 0%, #73ad67 100%)",
               }}
             >
               Tạo Template Mới
@@ -356,7 +356,7 @@ function EmailTemplates() {
       >
         <DialogTitle
           sx={{
-            background: "linear-gradient(135deg, #2D77C1 0%, #56D0DB 100%)",
+            background: "linear-gradient(135deg, #2f5148 0%, #73ad67 100%)",
             color: "white",
             fontWeight: "bold",
           }}
@@ -417,7 +417,7 @@ function EmailTemplates() {
             startIcon={<SaveIcon />}
             variant="contained"
             sx={{
-              background: "linear-gradient(135deg, #2D77C1 0%, #56D0DB 100%)",
+              background: "linear-gradient(135deg, #2f5148 0%, #73ad67 100%)",
             }}
           >
             {editingTemplate ? "Cập nhật" : "Tạo mới"}
@@ -486,7 +486,7 @@ function EmailTemplates() {
           position: "fixed",
           bottom: 24,
           right: 24,
-          background: "linear-gradient(135deg, #2D77C1 0%, #56D0DB 100%)",
+          background: "linear-gradient(135deg, #2f5148 0%, #73ad67 100%)",
         }}
         onClick={() => handleOpenDialog()}
       >

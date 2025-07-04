@@ -16,16 +16,58 @@ export const nurseHealthService = {
   // Get health records by student ID
   getHealthRecordsByStudent: async (studentId) => {
     try {
-      const url = buildApiUrl(
-        API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT,
-        studentId
-      );
+      const url = `${API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT}?studentId=${studentId}`;
       const response = await apiClient.get(url);
-      return response;
+      const records = Array.isArray(response) ? response : [];
+      return records.map(nurseHealthService.mapHealthRecordData);
     } catch (error) {
       console.error("Error getting health records by student:", error);
-      throw error;
+      return [];
     }
+  },
+
+  // Map health record data for display
+  mapHealthRecordData: (apiRecord) => {
+    const getCategoryName = (categoryId) => {
+      const categories = {
+        1: "Khám tổng quát",
+        2: "Dị ứng",
+        3: "Tiêm chủng",
+        4: "Khám định kỳ",
+        5: "Tai nạn/Chấn thương",
+        6: "Khác",
+      };
+      return categories[categoryId] || `Danh mục ${categoryId}`;
+    };
+
+    return {
+      id: apiRecord.healthrecordid || apiRecord.id,
+      studentId: apiRecord.studentid,
+      categoryId: apiRecord.healthcategoryid,
+      categoryName: getCategoryName(apiRecord.healthcategoryid),
+      date: apiRecord.healthrecorddate
+        ? new Date(apiRecord.healthrecorddate).toLocaleDateString("vi-VN", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : "Chưa có ngày",
+      title: apiRecord.healthrecordtitle || "Chưa có tiêu đề",
+      description: apiRecord.healthrecorddescription || "Chưa có mô tả",
+      staffId: apiRecord.staffid,
+      isConfirmed: apiRecord.isconfirm || false,
+      createdBy: apiRecord.createdby || "Hệ thống",
+      createdDate: apiRecord.createddate
+        ? new Date(apiRecord.createddate).toLocaleDateString("vi-VN")
+        : null,
+      modifiedBy: apiRecord.modifiedby,
+      modifiedDate: apiRecord.modifieddate
+        ? new Date(apiRecord.modifieddate).toLocaleDateString("vi-VN")
+        : null,
+      isDeleted: apiRecord.isdeleted || false,
+    };
   },
 
   // Create new health record
@@ -53,20 +95,40 @@ export const nurseHealthService = {
       throw error;
     }
   },
+
+  // Get full health record by student ID (includes vaccination and health checks)
+  getFullHealthRecord: async (studentId) => {
+    try {
+      const url = `${API_ENDPOINTS.HEALTH_RECORD.GET_FULL_BY_STUDENT}?studentId=${studentId}`;
+      const response = await apiClient.get(url);
+      return response;
+    } catch (error) {
+      console.error("Error getting full health record:", error);
+      throw error;
+    }
+  },
 };
 
 // Mapping function để chuẩn hoá dữ liệu blog cho Nurse UI
 const mapBlogData = (apiBlog) => ({
-  id: apiBlog.id || apiBlog.blogid || apiBlog.blogId,
+  id: apiBlog.blogId || apiBlog.id || apiBlog.blogid,
+  blogId: apiBlog.blogId || apiBlog.id || apiBlog.blogid,
   title: apiBlog.title,
   content: apiBlog.content,
-  author: apiBlog.author || apiBlog.createdByName || "Unknown",
+  author: apiBlog.createdByName || apiBlog.author || "Unknown",
+  createdByName: apiBlog.createdByName || "",
+  updatedByName: apiBlog.updatedByName || "",
   category: apiBlog.category || "N/A",
   status: apiBlog.status,
   createdDate: apiBlog.createdAt?.split("T")[0] || apiBlog.createdDate || "N/A",
-  views: apiBlog.views || apiBlog.readCount || 0,
+  readCount: apiBlog.readCount || apiBlog.views || 0,
   featured: apiBlog.featured || false,
   isDeleted: apiBlog.isDeleted ?? apiBlog.isdeleted ?? false,
+  approvedBy: apiBlog.approvedBy,
+  approvedByName: apiBlog.approvedByName || "",
+  approvedOn: apiBlog.approvedOn,
+  updatedAt: apiBlog.updatedAt,
+  image: apiBlog.image,
 });
 
 // Nurse Blog Services
@@ -96,24 +158,20 @@ export const nurseBlogService = {
   // Update blog post
   updateBlog: async (blogId, blogData) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.UPDATE, blogId);
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
 
-      const { title, content, status, image, updatedBy, isDeleted } = blogData;
-
+      // API mới yêu cầu blogID trong body
       const payload = {
-        title,
-        content,
-        status,
-        image,
-        isDeleted: typeof isDeleted === "boolean" ? isDeleted : false,
-        updatedBy:
-          updatedBy ||
-          JSON.parse(localStorage.getItem("userInfo") || "{}").userId ||
-          0,
-        updatedAt: new Date().toISOString(),
+        blogID: blogData.blogID || blogId,
+        title: blogData.title,
+        content: blogData.content,
+        updatedBy: blogData.updatedBy || userInfo.userId || 0,
+        status: blogData.status || "Draft",
+        isDeleted:
+          typeof blogData.isDeleted === "boolean" ? blogData.isDeleted : false,
       };
 
-      const response = await apiClient.put(url, payload);
+      const response = await apiClient.put(API_ENDPOINTS.BLOG.UPDATE, payload);
       return response;
     } catch (error) {
       console.error("Error updating blog:", error);
@@ -121,11 +179,12 @@ export const nurseBlogService = {
     }
   },
 
-  // Delete blog post
+  // Delete blog post (soft delete)
   deleteBlog: async (blogId) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.DELETE, blogId);
-      const response = await apiClient.delete(url);
+      const response = await apiClient.delete(
+        `${API_ENDPOINTS.BLOG.DELETE}?id=${blogId}`
+      );
       return response;
     } catch (error) {
       console.error("Error deleting blog:", error);
@@ -149,24 +208,25 @@ export const nurseBlogService = {
 // Data mapping function for student data
 const mapStudentDataForNurse = (apiStudent) => {
   return {
-    id: apiStudent.studentid,
-    studentId: apiStudent.studentCode || `ST${apiStudent.studentid}`,
+    id: apiStudent.studentId,
+    studentId: apiStudent.studentCode,
     fullName: apiStudent.fullname,
     dateOfBirth: apiStudent.dob,
     age: apiStudent.age,
     gender: apiStudent.gender === true ? "Nam" : "Nữ",
     bloodType: apiStudent.bloodType || "Chưa có thông tin",
-    classId: apiStudent.classid,
-    parentId: apiStudent.parentid,
-    className: `Lớp ${apiStudent.classid}`,
-    parentName: "Chưa có thông tin", // API doesn't return parent info
-    parentPhone: "Chưa có thông tin",
+    className: apiStudent.classname, // Now using classname directly from API
+    parentId: apiStudent.parent?.parentid,
+    parentName: apiStudent.parent?.fullname || "Chưa có thông tin",
+    parentPhone: apiStudent.parent?.phone || "Chưa có thông tin",
+    parentEmail: apiStudent.parent?.email || "Chưa có thông tin",
+    parentAddress: apiStudent.parent?.address || "Chưa có thông tin",
     healthStatus: "Bình thường", // Default value
     enrollmentDate: apiStudent.createdAt
       ? apiStudent.createdAt.split("T")[0]
       : "Chưa có thông tin",
     allergies: "Chưa có thông tin",
-    emergencyContact: "Chưa có thông tin",
+    emergencyContact: apiStudent.parent?.phone || "Chưa có thông tin",
     height: "Chưa có thông tin",
     weight: "Chưa có thông tin",
     notes: "Chưa có thông tin",
@@ -248,105 +308,133 @@ export const nurseNotificationService = {
   },
 };
 
-// Medication Services (Need to create API endpoints)
+// Medicine Services - Real API Integration
 export const nurseMedicationService = {
-  // Get medication schedule - MOCK DATA (API chưa có)
-  getMedicationSchedule: async () => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: 1,
-            studentName: "Nguyễn Văn An",
-            studentId: 1,
-            medicationName: "Paracetamol",
-            dosage: "500mg",
-            frequency: "2 lần/ngày",
-            startDate: "2024-03-10",
-            endDate: "2024-03-15",
-            time: ["08:00", "20:00"],
-            status: "active",
-            notes: "Uống sau ăn",
-          },
-          {
-            id: 2,
-            studentName: "Trần Thị Bình",
-            studentId: 2,
-            medicationName: "Vitamin C",
-            dosage: "100mg",
-            frequency: "1 lần/ngày",
-            startDate: "2024-03-01",
-            endDate: "2024-03-31",
-            time: ["09:00"],
-            status: "active",
-            notes: "Tăng sức đề kháng",
-          },
-        ]);
-      }, 500);
-    });
+  // Get all medicines
+  getAllMedicines: async () => {
+    try {
+      const response = await apiClient.get(API_ENDPOINTS.MEDICINE.GET_ALL);
+      if (Array.isArray(response)) {
+        // Filter out soft-deleted medicines (isDeleted = true)
+        const activeMedicines = response.filter(
+          (medicine) => !medicine.isDeleted
+        );
+        return activeMedicines.map(mapMedicineData);
+      }
+      return [];
+    } catch (error) {
+      console.error("Error getting all medicines:", error);
+      throw error;
+    }
   },
 
-  // Handle medicine administration - MOCK DATA (API chưa có)
-  handleMedicine: async (medicationId, action) => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: medicationId,
-          action: action,
-          timestamp: new Date().toISOString(),
-          status: "completed",
-        });
-      }, 300);
-    });
+  // Search medicines by name
+  searchMedicinesByName: async (searchTerm) => {
+    try {
+      const url = `${
+        API_ENDPOINTS.MEDICINE.SEARCH_BY_NAME
+      }?searchTerm=${encodeURIComponent(searchTerm)}`;
+      const response = await apiClient.get(url);
+      if (Array.isArray(response)) {
+        // Filter out soft-deleted medicines (isDeleted = true)
+        const activeMedicines = response.filter(
+          (medicine) => !medicine.isDeleted
+        );
+        return activeMedicines.map(mapMedicineData);
+      }
+      return [];
+    } catch (error) {
+      console.error("Error searching medicines by name:", error);
+      throw error;
+    }
+  },
+
+  // Add new medicine
+  addMedicine: async (medicineData) => {
+    try {
+      const payload = {
+        medicinename: medicineData.medicinename,
+        medicinecategoryid: medicineData.medicinecategoryid,
+        type: medicineData.type,
+        quantity: medicineData.quantity,
+        createdat: new Date().toISOString(),
+        createdby:
+          medicineData.createdby ||
+          JSON.parse(localStorage.getItem("userInfo") || "{}").fullName ||
+          "Nurse",
+      };
+
+      const response = await apiClient.post(
+        API_ENDPOINTS.MEDICINE.ADD,
+        payload
+      );
+      return response;
+    } catch (error) {
+      console.error("Error adding medicine:", error);
+      throw error;
+    }
+  },
+
+  // Update medicine
+  updateMedicine: async (medicineId, medicineData) => {
+    try {
+      const payload = {
+        medicineid: medicineId,
+        medicinename: medicineData.medicinename,
+        medicinecategoryid: medicineData.medicinecategoryid,
+        type: medicineData.type,
+        quantity: medicineData.quantity,
+        updatedat: new Date().toISOString(),
+        updatedby:
+          medicineData.updatedby ||
+          JSON.parse(localStorage.getItem("userInfo") || "{}").fullName ||
+          "Nurse",
+      };
+
+      const response = await apiClient.put(
+        API_ENDPOINTS.MEDICINE.UPDATE,
+        payload
+      );
+      return response;
+    } catch (error) {
+      console.error("Error updating medicine:", error);
+      throw error;
+    }
+  },
+
+  // Delete medicine
+  deleteMedicine: async (medicineId) => {
+    try {
+      const url = `${API_ENDPOINTS.MEDICINE.DELETE}?id=${medicineId}`;
+      const response = await apiClient.delete(url);
+      return response;
+    } catch (error) {
+      console.error("Error deleting medicine:", error);
+      throw error;
+    }
   },
 };
 
-// Vaccination Services (Need to create API endpoints)
-export const nurseVaccinationService = {
-  // Get vaccination list - MOCK DATA (API chưa có)
-  getVaccinationList: async () => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: 1,
-            studentName: "Nguyễn Văn An",
-            vaccineName: "Vắc xin COVID-19",
-            scheduledDate: "2024-03-20",
-            status: "scheduled",
-            dose: "Mũi 1",
-            notes: "Kiểm tra sức khỏe trước khi tiêm",
-          },
-          {
-            id: 2,
-            studentName: "Trần Thị Bình",
-            vaccineName: "Vắc xin Cúm mùa",
-            scheduledDate: "2024-03-18",
-            status: "completed",
-            dose: "Mũi duy nhất",
-            completedDate: "2024-03-18",
-          },
-        ]);
-      }, 500);
-    });
-  },
-
-  // Update vaccination status - MOCK DATA (API chưa có)
-  updateVaccinationStatus: async (vaccinationId, status) => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: vaccinationId,
-          status: status,
-          updatedAt: new Date().toISOString(),
-        });
-      }, 300);
-    });
-  },
+// Helper function to map medicine data from API
+const mapMedicineData = (apiMedicine) => {
+  return {
+    id: apiMedicine.medicineid,
+    medicineName: apiMedicine.medicinename,
+    categoryId: apiMedicine.medicinecategoryid,
+    type: apiMedicine.type,
+    quantity: apiMedicine.quantity,
+    isDeleted: apiMedicine.isDeleted || false,
+    createdAt: apiMedicine.createdat
+      ? new Date(apiMedicine.createdat).toLocaleDateString("vi-VN")
+      : "Chưa có thông tin",
+    updatedAt: apiMedicine.updatedat
+      ? new Date(apiMedicine.updatedat).toLocaleDateString("vi-VN")
+      : "Chưa cập nhật",
+    createdBy: apiMedicine.createdby || "Hệ thống",
+    updatedBy: apiMedicine.updatedby || null,
+    // Original data for editing
+    originalData: apiMedicine,
+  };
 };
 
 // Chat Services (Need to create API endpoints)
@@ -401,6 +489,5 @@ export default {
   nurseStudentService,
   nurseNotificationService,
   nurseMedicationService,
-  nurseVaccinationService,
   nurseChatService,
 };

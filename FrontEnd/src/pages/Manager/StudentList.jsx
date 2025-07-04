@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../css/Manager/StudentList.css";
 import {
   useManagerStudents,
@@ -6,7 +7,8 @@ import {
 } from "../../utils/hooks/useManager";
 
 function StudentList() {
-  // Use API hooks
+  // Use hooks
+  const navigate = useNavigate();
   const { data: students, loading, error, refetch } = useManagerStudents();
   // Uncomment when implementing CRUD operations
   // const { createStudent, updateStudent, deleteStudent, loading: actionLoading } = useManagerActions();
@@ -51,6 +53,12 @@ function StudentList() {
   const handleViewStudent = (student) => {
     setCurrentStudent(student);
     setShowModal(true);
+  };
+
+  // Handle viewing student health records
+  const handleViewHealthRecords = (student) => {
+    // Navigate to health record detail page
+    navigate(`/manager/student-health-record/${student.id}`);
   };
 
   // Handle file import
@@ -319,6 +327,13 @@ function StudentList() {
                         title="Xem chi tiết"
                       >
                         👁️
+                      </button>
+                      <button
+                        className="btn-health"
+                        onClick={() => handleViewHealthRecords(student)}
+                        title="Xem hồ sơ sức khỏe"
+                      >
+                        🏥
                       </button>
                     </div>
                   </td>

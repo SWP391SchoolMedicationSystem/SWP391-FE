@@ -1,27 +1,38 @@
-/* MedicationSchedule.css */
+/* MedicationSchedule.css - Green Theme Applied */
 .medication-container {
   padding: 20px;
-  background: #f8fafc;
+  background-color: #f2f6f3; /* $bg-main */
   min-height: 100vh;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Satoshi", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .medication-header {
   text-align: center;
   margin-bottom: 30px;
-  color: #1e293b;
+  padding: 30px;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    #2f5148 0%,
+    #73ad67 100%
+  ); /* $primary-gradient */
+  color: #ffffff; /* $text-white */
+  box-shadow: 0 4px 20px rgba(47, 81, 72, 0.3);
 }
 
 .medication-header h1 {
   font-size: 2.5rem;
   margin-bottom: 10px;
-  color: #56d0db;
   font-weight: bold;
+  color: #ffffff; /* $text-white */
+  font-family: "Satoshi", sans-serif;
 }
 
 .medication-header p {
   font-size: 1.2rem;
-  color: #64748b;
+  color: #ffffff; /* $text-white */
+  opacity: 0.9;
+  font-family: "Satoshi", sans-serif;
 }
 
 /* Statistics Cards */
@@ -33,11 +44,11 @@
 }
 
 .stat-card {
-  background: white;
+  background: #ffffff; /* $bg-card */
   padding: 25px;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  box-shadow: 0 2px 10px rgba(193, 203, 194, 0.3);
+  border: 1px solid #c1cbc2; /* $border-light */
   display: flex;
   align-items: center;
   gap: 20px;
@@ -46,22 +57,7 @@
 
 .stat-card:hover {
   transform: translateY(-5px);
-}
-
-.stat-card.total {
-  border-left: 4px solid #3b82f6;
-}
-
-.stat-card.active {
-  border-left: 4px solid #10b981;
-}
-
-.stat-card.reminder {
-  border-left: 4px solid #f59e0b;
-}
-
-.stat-card.conditions {
-  border-left: 4px solid #8b5cf6;
+  box-shadow: 0 5px 25px rgba(47, 81, 72, 0.15);
 }
 
 .stat-icon {
@@ -72,20 +68,23 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #f1f5f9;
+  background: rgba(191, 239, 161, 0.3); /* Light green background for icons */
+  color: #97a19b; /* $text-secondary - Gray color for icons */
 }
 
 .stat-content h3 {
   font-size: 2rem;
   margin: 0 0 5px 0;
-  color: #1e293b;
+  color: #2f5148; /* $text-primary */
   font-weight: bold;
+  font-family: "Satoshi", sans-serif;
 }
 
 .stat-content p {
   margin: 0;
-  color: #64748b;
+  color: #97a19b; /* $text-secondary */
   font-size: 1rem;
+  font-family: "Satoshi", sans-serif;
 }
 
 /* Controls */

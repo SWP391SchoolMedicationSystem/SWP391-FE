@@ -3,26 +3,27 @@ import apiClient, { API_ENDPOINTS, buildApiUrl } from "./config.js";
 // Data mapping functions
 const mapStudentData = (apiStudent) => {
   return {
-    id: apiStudent.studentid,
+    id: apiStudent.studentId,
     studentId: apiStudent.studentCode,
     fullName: apiStudent.fullname,
     dateOfBirth: apiStudent.dob,
     age: apiStudent.age,
     gender: apiStudent.gender === true ? "Nam" : "Nữ", // API returns boolean
     bloodType: apiStudent.bloodType,
-    classId: apiStudent.classid,
-    parentId: apiStudent.parentid,
-    className: `Lớp ${apiStudent.classid}`, // Map classid to className for now
-    parentName: "Chưa có thông tin", // API doesn't return parent info in student list
-    parentPhone: "Chưa có thông tin",
+    className: apiStudent.classname, // Now using classname directly from API
+    parentId: apiStudent.parent?.parentid,
+    parentName: apiStudent.parent?.fullname || "Chưa có thông tin",
+    parentPhone: apiStudent.parent?.phone || "Chưa có thông tin",
+    parentEmail: apiStudent.parent?.email || "Chưa có thông tin",
+    parentAddress: apiStudent.parent?.address || "Chưa có thông tin",
     healthStatus: "Bình thường", // Default value
     enrollmentDate: apiStudent.createdAt
       ? apiStudent.createdAt.split("T")[0]
       : "Chưa có thông tin",
     // Additional fields that might be needed
     allergies: "Chưa có thông tin",
-    emergencyContact: "Chưa có thông tin",
-    address: "Chưa có thông tin",
+    emergencyContact: apiStudent.parent?.phone || "Chưa có thông tin",
+    address: apiStudent.parent?.address || "Chưa có thông tin",
     height: "Chưa có thông tin",
     weight: "Chưa có thông tin",
     notes: "Chưa có thông tin",
@@ -32,7 +33,8 @@ const mapStudentData = (apiStudent) => {
 // Mapping function for blog data (ensures unified fields)
 const mapBlogData = (apiBlog) => {
   return {
-    id: apiBlog.id || apiBlog.blogid || apiBlog.blogId,
+    id: apiBlog.blogId || apiBlog.id || apiBlog.blogid,
+    blogId: apiBlog.blogId || apiBlog.id || apiBlog.blogid,
     title: apiBlog.title,
     content: apiBlog.content,
     author: "", // to be filled later
@@ -43,6 +45,14 @@ const mapBlogData = (apiBlog) => {
     featured: apiBlog.featured || false,
     isDeleted: apiBlog.isDeleted ?? apiBlog.isdeleted ?? false,
     createdById: apiBlog.createdBy || apiBlog.createdby || apiBlog.authorId,
+    createdByName: apiBlog.createdByName || "",
+    updatedBy: apiBlog.updatedBy,
+    updatedByName: apiBlog.updatedByName || "",
+    updatedAt: apiBlog.updatedAt,
+    approvedBy: apiBlog.approvedBy,
+    approvedByName: apiBlog.approvedByName || "",
+    approvedOn: apiBlog.approvedOn,
+    image: apiBlog.image,
   };
 };
 
@@ -83,8 +93,18 @@ export const managerBlogService = {
   // Approve blog
   approveBlog: async (blogId, approvalData) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.APPROVE, blogId);
-      const response = await apiClient.post(url, approvalData);
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      const payload = {
+        blogId: blogId,
+        approvedBy: userInfo.userId || 0,
+        approvedOn: new Date().toISOString(),
+        status: "Published",
+        ...approvalData,
+      };
+      const response = await apiClient.post(
+        API_ENDPOINTS.BLOG.APPROVE,
+        payload
+      );
       return response;
     } catch (error) {
       console.error("Error approving blog:", error);
@@ -95,8 +115,15 @@ export const managerBlogService = {
   // Reject blog
   rejectBlog: async (blogId, reason) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.REJECT, blogId);
-      const response = await apiClient.post(url, { reason });
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      const payload = {
+        blogId: blogId,
+        approvedBy: userInfo.userId || 0,
+        approvedOn: new Date().toISOString(),
+        status: "Rejected",
+        message: reason || "Bài viết không đạt yêu cầu",
+      };
+      const response = await apiClient.post(API_ENDPOINTS.BLOG.REJECT, payload);
       return response;
     } catch (error) {
       console.error("Error rejecting blog:", error);
@@ -118,25 +145,20 @@ export const managerBlogService = {
   // Update blog post
   updateBlog: async (blogId, blogData) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.UPDATE, blogId);
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
 
-      // API hiện tại chỉ chấp nhận các field cụ thể, loại bỏ các field dư
-      const { title, content, status, image, updatedBy, isDeleted } = blogData;
-
+      // API mới yêu cầu blogID trong body
       const payload = {
-        title,
-        content,
-        status,
-        image,
-        isDeleted: typeof isDeleted === "boolean" ? isDeleted : false,
-        updatedBy:
-          updatedBy ||
-          JSON.parse(localStorage.getItem("userInfo") || "{}").userId ||
-          0,
-        updatedAt: new Date().toISOString(),
+        blogID: blogId,
+        title: blogData.title,
+        content: blogData.content,
+        updatedBy: userInfo.userId || 0,
+        status: blogData.status || "Draft",
+        isDeleted:
+          typeof blogData.isDeleted === "boolean" ? blogData.isDeleted : false,
       };
 
-      const response = await apiClient.put(url, payload);
+      const response = await apiClient.put(API_ENDPOINTS.BLOG.UPDATE, payload);
       return response;
     } catch (error) {
       console.error("Error updating blog:", error);
@@ -144,11 +166,12 @@ export const managerBlogService = {
     }
   },
 
-  // Delete blog post
+  // Delete blog post (soft delete)
   deleteBlog: async (blogId) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.DELETE, blogId);
-      const response = await apiClient.delete(url);
+      const response = await apiClient.delete(
+        `${API_ENDPOINTS.BLOG.DELETE}?id=${blogId}`
+      );
       return response;
     } catch (error) {
       console.error("Error deleting blog:", error);
@@ -542,68 +565,55 @@ export const managerAccountService = {
   },
 };
 
-// Vaccination Services (Need to create API endpoints)
-export const managerVaccinationService = {
-  // Get vaccination list - MOCK DATA (API chưa có)
-  getVaccinationList: async () => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: 1,
-            studentName: "Nguyễn Văn An",
-            studentId: 1,
-            vaccineName: "Vắc xin COVID-19",
-            scheduledDate: "2024-03-20",
-            status: "scheduled",
-            dose: "Mũi 1",
-            notes: "Kiểm tra sức khỏe trước khi tiêm",
-            class: "Lớp 1A",
-          },
-          {
-            id: 2,
-            studentName: "Trần Thị Bình",
-            studentId: 2,
-            vaccineName: "Vắc xin Cúm mùa",
-            scheduledDate: "2024-03-18",
-            status: "completed",
-            dose: "Mũi duy nhất",
-            completedDate: "2024-03-18",
-            class: "Lớp 2B",
-          },
-        ]);
-      }, 500);
-    });
+// Manager Health Record Services
+export const managerHealthService = {
+  // Get health records by student ID
+  getHealthRecordsByStudent: async (studentId) => {
+    try {
+      console.log("🔍 Getting health records for student:", studentId);
+      console.log("📍 Endpoint:", API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT);
+
+      // Use query parameter instead of path parameter
+      const url = `${API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT}?studentId=${studentId}`;
+      console.log("🌐 Built URL:", url);
+      console.log(
+        "🌐 Full URL will be:",
+        `${apiClient.defaults.baseURL}${url}`
+      );
+
+      const response = await apiClient.get(url);
+      console.log("✅ API Response:", response);
+      return Array.isArray(response) ? response : [];
+    } catch (error) {
+      console.error("❌ Error getting health records by student:", error);
+      throw error;
+    }
   },
 
-  // Schedule vaccination - MOCK DATA (API chưa có)
-  scheduleVaccination: async (vaccinationData) => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: Date.now(),
-          ...vaccinationData,
-          status: "scheduled",
-          createdAt: new Date().toISOString(),
-        });
-      }, 300);
-    });
-  },
+  // Get full health record by student ID
+  getFullHealthRecord: async (studentId) => {
+    try {
+      console.log("🔍 Getting full health record for studentId:", studentId);
+      console.log(
+        "📍 Endpoint:",
+        API_ENDPOINTS.HEALTH_RECORD.GET_FULL_BY_STUDENT
+      );
 
-  // Update vaccination status - MOCK DATA (API chưa có)
-  updateVaccinationStatus: async (vaccinationId, status) => {
-    // TODO: Replace with real API call when backend creates endpoint
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: vaccinationId,
-          status: status,
-          updatedAt: new Date().toISOString(),
-        });
-      }, 300);
-    });
+      // Use query parameter
+      const url = `${API_ENDPOINTS.HEALTH_RECORD.GET_FULL_BY_STUDENT}?studentId=${studentId}`;
+      console.log("🌐 Built URL:", url);
+      console.log(
+        "🌐 Full URL will be:",
+        `${apiClient.defaults.baseURL}${url}`
+      );
+
+      const response = await apiClient.get(url);
+      console.log("✅ Full health record response:", response);
+      return response;
+    } catch (error) {
+      console.error("❌ Error getting full health record:", error);
+      throw error;
+    }
   },
 };
 
@@ -614,5 +624,5 @@ export default {
   managerNotificationService,
   managerEmailService,
   managerAccountService,
-  managerVaccinationService,
+  managerHealthService,
 };

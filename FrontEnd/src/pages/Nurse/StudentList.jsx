@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../css/Nurse/StudentList.css";
 import { useNurseStudents } from "../../utils/hooks/useNurse";
 
 function StudentList() {
-  // Use API hooks
+  // Use hooks
+  const navigate = useNavigate();
   const { data: students, loading, error, refetch } = useNurseStudents();
 
   // Mock data for fallback (remove when API is stable)
@@ -161,6 +163,15 @@ function StudentList() {
   const handleViewStudent = (student) => {
     setSelectedStudent(student);
     setShowModal(true);
+  };
+
+  const handleViewHealthRecords = (student) => {
+    console.log("🏥 NAVIGATING TO HEALTH RECORDS PAGE");
+    console.log("📋 Student Object:", student);
+    console.log("🆔 Student ID:", student.id);
+
+    // Navigate to student health record detail page
+    navigate(`/nurse/student-health-record/${student.id}`);
   };
 
   const getHealthStatusClass = (status) => {
@@ -372,13 +383,22 @@ function StudentList() {
                   </span>
                 </td>
                 <td>
-                  <button
-                    className="btn-view"
-                    onClick={() => handleViewStudent(student)}
-                    title="Xem chi tiết"
-                  >
-                    👁️
-                  </button>
+                  <div className="action-buttons">
+                    <button
+                      className="btn-view"
+                      onClick={() => handleViewStudent(student)}
+                      title="Xem chi tiết"
+                    >
+                      👁️
+                    </button>
+                    <button
+                      className="btn-health"
+                      onClick={() => handleViewHealthRecords(student)}
+                      title="Xem hồ sơ sức khỏe"
+                    >
+                      🏥
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

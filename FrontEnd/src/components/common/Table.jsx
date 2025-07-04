@@ -34,7 +34,7 @@ const Table = ({
           {data.length > 0 ? (
             data.map((row, rowIndex) => (
               <tr
-                key={rowIndex}
+                key={row.id || rowIndex}
                 onClick={() => onRowClick?.(row)}
                 style={{ cursor: onRowClick ? "pointer" : "default" }}
               >

@@ -5,7 +5,6 @@ import {
   managerStaffService,
   managerNotificationService,
   managerEmailService,
-  managerVaccinationService,
   managerAccountService,
 } from "../../services/managerService";
 import { useState, useCallback } from "react";
@@ -116,11 +115,6 @@ export const useManagerNotifications = () => {
   };
 };
 
-// Hook for vaccination data
-export const useVaccinations = () => {
-  return useApi(managerVaccinationService.getVaccinationList);
-};
-
 // Hook for parent accounts
 export const useParentAccounts = () => {
   return useApi(managerAccountService.getAllParents);
@@ -188,12 +182,6 @@ export const useManagerActions = () => {
     return execute(() => managerEmailService.sendEmail(emailData));
   };
 
-  const scheduleVaccination = async (vaccinationData) => {
-    return execute(() =>
-      managerVaccinationService.scheduleVaccination(vaccinationData)
-    );
-  };
-
   return {
     approveBlog,
     rejectBlog,
@@ -209,7 +197,7 @@ export const useManagerActions = () => {
     deleteStaff,
     sendNotification,
     sendEmail,
-    scheduleVaccination,
+
     loading,
     error,
   };
@@ -434,7 +422,6 @@ export default {
   useManagerStudents,
   useManagerStaff,
   useManagerNotifications,
-  useVaccinations,
   useParentAccounts,
   useManagerActions,
   useManagerAccounts,
