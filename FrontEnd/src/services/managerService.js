@@ -33,7 +33,8 @@ const mapStudentData = (apiStudent) => {
 // Mapping function for blog data (ensures unified fields)
 const mapBlogData = (apiBlog) => {
   return {
-    id: apiBlog.id || apiBlog.blogid || apiBlog.blogId,
+    id: apiBlog.blogId || apiBlog.id || apiBlog.blogid,
+    blogId: apiBlog.blogId || apiBlog.id || apiBlog.blogid,
     title: apiBlog.title,
     content: apiBlog.content,
     author: "", // to be filled later
@@ -44,6 +45,14 @@ const mapBlogData = (apiBlog) => {
     featured: apiBlog.featured || false,
     isDeleted: apiBlog.isDeleted ?? apiBlog.isdeleted ?? false,
     createdById: apiBlog.createdBy || apiBlog.createdby || apiBlog.authorId,
+    createdByName: apiBlog.createdByName || "",
+    updatedBy: apiBlog.updatedBy,
+    updatedByName: apiBlog.updatedByName || "",
+    updatedAt: apiBlog.updatedAt,
+    approvedBy: apiBlog.approvedBy,
+    approvedByName: apiBlog.approvedByName || "",
+    approvedOn: apiBlog.approvedOn,
+    image: apiBlog.image,
   };
 };
 
@@ -84,8 +93,18 @@ export const managerBlogService = {
   // Approve blog
   approveBlog: async (blogId, approvalData) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.APPROVE, blogId);
-      const response = await apiClient.post(url, approvalData);
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      const payload = {
+        blogId: blogId,
+        approvedBy: userInfo.userId || 0,
+        approvedOn: new Date().toISOString(),
+        status: "Published",
+        ...approvalData,
+      };
+      const response = await apiClient.post(
+        API_ENDPOINTS.BLOG.APPROVE,
+        payload
+      );
       return response;
     } catch (error) {
       console.error("Error approving blog:", error);
@@ -96,8 +115,15 @@ export const managerBlogService = {
   // Reject blog
   rejectBlog: async (blogId, reason) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.REJECT, blogId);
-      const response = await apiClient.post(url, { reason });
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      const payload = {
+        blogId: blogId,
+        approvedBy: userInfo.userId || 0,
+        approvedOn: new Date().toISOString(),
+        status: "Rejected",
+        message: reason || "Bài viết không đạt yêu cầu",
+      };
+      const response = await apiClient.post(API_ENDPOINTS.BLOG.REJECT, payload);
       return response;
     } catch (error) {
       console.error("Error rejecting blog:", error);
@@ -119,25 +145,20 @@ export const managerBlogService = {
   // Update blog post
   updateBlog: async (blogId, blogData) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.UPDATE, blogId);
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
 
-      // API hiện tại chỉ chấp nhận các field cụ thể, loại bỏ các field dư
-      const { title, content, status, image, updatedBy, isDeleted } = blogData;
-
+      // API mới yêu cầu blogID trong body
       const payload = {
-        title,
-        content,
-        status,
-        image,
-        isDeleted: typeof isDeleted === "boolean" ? isDeleted : false,
-        updatedBy:
-          updatedBy ||
-          JSON.parse(localStorage.getItem("userInfo") || "{}").userId ||
-          0,
-        updatedAt: new Date().toISOString(),
+        blogID: blogId,
+        title: blogData.title,
+        content: blogData.content,
+        updatedBy: userInfo.userId || 0,
+        status: blogData.status || "Draft",
+        isDeleted:
+          typeof blogData.isDeleted === "boolean" ? blogData.isDeleted : false,
       };
 
-      const response = await apiClient.put(url, payload);
+      const response = await apiClient.put(API_ENDPOINTS.BLOG.UPDATE, payload);
       return response;
     } catch (error) {
       console.error("Error updating blog:", error);
@@ -145,11 +166,12 @@ export const managerBlogService = {
     }
   },
 
-  // Delete blog post
+  // Delete blog post (soft delete)
   deleteBlog: async (blogId) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.BLOG.DELETE, blogId);
-      const response = await apiClient.delete(url);
+      const response = await apiClient.delete(
+        `${API_ENDPOINTS.BLOG.DELETE}?id=${blogId}`
+      );
       return response;
     } catch (error) {
       console.error("Error deleting blog:", error);

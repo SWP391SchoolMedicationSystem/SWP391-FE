@@ -29,7 +29,7 @@ function BlogManagement() {
   }, [blogs]);
 
   // Available statuses
-  const statuses = ["Draft", "Published", "Scheduled", "Archived"];
+  const statuses = ["Draft", "Published", "Rejected"];
 
   // Modal and form states
   const [showModal, setShowModal] = useState(false);
@@ -136,6 +136,17 @@ function BlogManagement() {
     setShowModal(true);
   };
 
+  // Open modal for rejecting post
+  const handleRejectPost = (post) => {
+    setModalMode("approve");
+    setCurrentPost(post);
+    setApprovalData({
+      approvalStatus: "Rejected",
+      rejectionReason: "",
+    });
+    setShowModal(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -161,40 +172,20 @@ function BlogManagement() {
   const handleApprovalSubmit = async (e) => {
     e.preventDefault();
     try {
+      const blogId = currentPost.blogId || currentPost.id;
+
       if (approvalData.approvalStatus === "Approved") {
-        await approveBlog(currentPost.id);
-        setLocalBlogPosts(
-          localBlogPosts.map((post) =>
-            post.id === currentPost.id
-              ? {
-                  ...post,
-                  approvalStatus: "Approved",
-                  status: "Published",
-                  publishedDate: new Date().toISOString().split("T")[0],
-                  approvedBy: "Manager", // Get from user context
-                }
-              : post
-          )
-        );
+        await approveBlog(blogId);
+        alert("Phê duyệt bài viết thành công!");
       } else if (approvalData.approvalStatus === "Rejected") {
-        await rejectBlog(currentPost.id, approvalData.rejectionReason);
-        setLocalBlogPosts(
-          localBlogPosts.map((post) =>
-            post.id === currentPost.id
-              ? {
-                  ...post,
-                  approvalStatus: "Rejected",
-                  rejectionReason: approvalData.rejectionReason,
-                }
-              : post
-          )
-        );
+        await rejectBlog(blogId, approvalData.rejectionReason);
+        alert("Từ chối bài viết thành công!");
       }
       setShowModal(false);
       refetch(); // Refresh data from API
     } catch (error) {
       console.error("Error processing approval:", error);
-      // Handle error - show toast or alert
+      alert("Có lỗi xảy ra khi xử lý phê duyệt. Vui lòng thử lại!");
     }
   };
 
@@ -215,9 +206,17 @@ function BlogManagement() {
   const getStatusBadgeClass = (status) => {
     switch (status) {
       case "Published":
+      case "Đã đăng":
         return "status-published";
       case "Draft":
+      case "Bản nháp":
         return "status-draft";
+      case "Rejected":
+      case "Từ chối":
+        return "status-rejected";
+      case "Pending":
+      case "Chờ duyệt":
+        return "status-pending";
       case "Scheduled":
         return "status-scheduled";
       case "Archived":
@@ -320,6 +319,7 @@ function BlogManagement() {
                   <th>Tiêu đề</th>
                   <th>Tác giả</th>
                   <th>Trạng thái</th>
+                  <th>Phê duyệt</th>
                   <th>Ngày tạo</th>
                   <th>Đã xóa</th>
                   <th>Thao tác</th>
@@ -343,7 +343,7 @@ function BlogManagement() {
                         )}
                       </div>
                     </td>
-                    <td>{post.author}</td>
+                    <td>{post.createdByName || post.author}</td>
                     <td>
                       <span
                         className={`status-badge ${getStatusBadgeClass(
@@ -352,6 +352,23 @@ function BlogManagement() {
                       >
                         {post.status}
                       </span>
+                    </td>
+                    <td>
+                      <div className="approval-info">
+                        <span
+                          className={`approval-badge ${
+                            post.approvedBy ? "approved" : "pending"
+                          }`}
+                        >
+                          {post.approvedBy ? "✅ Đã duyệt" : "⏳ Chờ duyệt"}
+                        </span>
+                        {post.approvedBy && (
+                          <div className="approval-details">
+                            <small>Bởi: {post.approvedByName}</small>
+                            <small>{post.approvedOn?.split("T")[0]}</small>
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td>{post.createdDate}</td>
                     <td>
@@ -379,16 +396,30 @@ function BlogManagement() {
                         >
                           ✏️
                         </button>
-                        {post.approvalStatus === "Pending" && (
-                          <button
-                            onClick={() => handleApprovePost(post)}
-                            className="btn btn-approve"
-                            title="Phê duyệt"
-                            disabled={actionLoading}
-                          >
-                            {actionLoading ? "⏳" : "✅"}
-                          </button>
-                        )}
+                        {/* Hiển thị button approve/reject cho blog chưa được phê duyệt */}
+                        {(post.status === "Draft" ||
+                          post.status === "Pending" ||
+                          !post.approvedBy) &&
+                          !post.isDeleted && (
+                            <>
+                              <button
+                                onClick={() => handleApprovePost(post)}
+                                className="btn btn-approve"
+                                title="Phê duyệt"
+                                disabled={actionLoading}
+                              >
+                                {actionLoading ? "⏳" : "✅"}
+                              </button>
+                              <button
+                                onClick={() => handleRejectPost(post)}
+                                className="btn btn-reject"
+                                title="Từ chối"
+                                disabled={actionLoading}
+                              >
+                                {actionLoading ? "⏳" : "❌"}
+                              </button>
+                            </>
+                          )}
                         <button
                           onClick={() => handleDeletePost(post.id)}
                           className="btn btn-delete"
@@ -457,24 +488,58 @@ function BlogManagement() {
 
                 <div className="view-info">
                   <p>
-                    <strong>ID:</strong> {currentPost.id}
+                    <strong>ID:</strong> {currentPost.blogId || currentPost.id}
                   </p>
                   <p>
-                    <strong>Author:</strong> {currentPost.author}
+                    <strong>Tác giả:</strong>{" "}
+                    {currentPost.createdByName || currentPost.author}
                   </p>
                   <p>
-                    <strong>Created:</strong> {currentPost.createdDate}
+                    <strong>Ngày tạo:</strong> {currentPost.createdDate}
                   </p>
                   <p>
-                    <strong>Deleted:</strong>{" "}
-                    {currentPost.isDeleted ? "Đã xóa" : "Hoạt động"}
+                    <strong>Cập nhật lần cuối:</strong>{" "}
+                    {currentPost.updatedByName || "Chưa cập nhật"}
+                    {currentPost.updatedAt && (
+                      <span> - {currentPost.updatedAt.split("T")[0]}</span>
+                    )}
+                  </p>
+                  <p>
+                    <strong>Trạng thái:</strong>
+                    <span
+                      className={`status-badge ${getStatusBadgeClass(
+                        currentPost.status
+                      )}`}
+                    >
+                      {currentPost.status}
+                    </span>
+                  </p>
+                  <p>
+                    <strong>Phê duyệt:</strong>
+                    <span
+                      className={`approval-badge ${
+                        currentPost.approvedBy ? "approved" : "pending"
+                      }`}
+                    >
+                      {currentPost.approvedBy ? "✅ Đã duyệt" : "⏳ Chờ duyệt"}
+                    </span>
                   </p>
                   {currentPost.approvedBy && (
                     <p>
-                      <strong>Approved by:</strong> {currentPost.approvedBy} on{" "}
-                      {currentPost.approvedDate}
+                      <strong>Người duyệt:</strong> {currentPost.approvedByName}
+                      <span> - {currentPost.approvedOn?.split("T")[0]}</span>
                     </p>
                   )}
+                  <p>
+                    <strong>Tình trạng:</strong>{" "}
+                    <span
+                      className={`deleted-badge ${
+                        currentPost.isDeleted ? "deleted-true" : "deleted-false"
+                      }`}
+                    >
+                      {currentPost.isDeleted ? "Đã xóa" : "Hoạt động"}
+                    </span>
+                  </p>
                 </div>
 
                 <div className="view-content">
@@ -487,8 +552,36 @@ function BlogManagement() {
                     className="btn btn-primary"
                     onClick={() => handleEditPost(currentPost)}
                   >
-                    ✏️ Edit Post
+                    ✏️ Chỉnh sửa
                   </button>
+                  {/* Hiển thị button approve/reject trong modal view */}
+                  {(currentPost.status === "Draft" ||
+                    currentPost.status === "Pending" ||
+                    !currentPost.approvedBy) &&
+                    !currentPost.isDeleted && (
+                      <>
+                        <button
+                          className="btn btn-approve"
+                          onClick={() => {
+                            setShowModal(false);
+                            handleApprovePost(currentPost);
+                          }}
+                          disabled={actionLoading}
+                        >
+                          {actionLoading ? "⏳" : "✅ Phê duyệt"}
+                        </button>
+                        <button
+                          className="btn btn-reject"
+                          onClick={() => {
+                            setShowModal(false);
+                            handleRejectPost(currentPost);
+                          }}
+                          disabled={actionLoading}
+                        >
+                          {actionLoading ? "⏳" : "❌ Từ chối"}
+                        </button>
+                      </>
+                    )}
                 </div>
               </div>
             ) : modalMode === "approve" ? (

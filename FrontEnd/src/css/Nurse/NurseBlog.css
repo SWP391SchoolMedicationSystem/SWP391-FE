@@ -174,13 +174,17 @@
 
 .blog-card {
   border-radius: 15px;
-  border: 1px solid transparent;
+  border: 1px solid #c1cbc2;
   overflow: hidden;
   transition: all 0.3s ease;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .blog-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-color: #73ad67;
 }
 
 .blog-header-section {
@@ -188,7 +192,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 25px 15px;
-  border-bottom: 1px solid transparent;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .blog-meta {
@@ -608,5 +612,308 @@
 
   .meta-label {
     min-width: auto;
+  }
+}
+
+/* Table Styles */
+.table-container {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #c1cbc2;
+  margin-bottom: 30px;
+}
+
+.blog-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.blog-table thead {
+  background: linear-gradient(135deg, #2f5148 0%, #73ad67 100%);
+  color: white;
+}
+
+.blog-table thead th {
+  padding: 15px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-bottom: 2px solid #c1cbc2;
+  color: white;
+}
+
+.blog-table tbody td {
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
+}
+
+.blog-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.blog-title-cell {
+  max-width: 300px;
+}
+
+.blog-title-wrapper h4 {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2f5148;
+  line-height: 1.3;
+}
+
+.blog-title-wrapper .blog-excerpt {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  color: #97a19b;
+  line-height: 1.4;
+}
+
+.blog-title-wrapper .blog-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.blog-title-wrapper .tag {
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  background: #bfefa1;
+  color: #2f5148;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-view {
+  background: linear-gradient(135deg, #97a19b 0%, #c1cbc2 100%);
+  color: white;
+}
+
+.btn-view:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(151, 161, 155, 0.3);
+}
+
+.btn-edit {
+  background: linear-gradient(135deg, #73ad67 0%, #85b06d 100%);
+  color: white;
+}
+
+.btn-edit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(115, 173, 103, 0.3);
+}
+
+.btn-delete {
+  background: linear-gradient(135deg, #c3555c 0%, #e74c3c 100%);
+  color: white;
+}
+
+.btn-delete:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(195, 85, 92, 0.3);
+}
+
+/* Update existing status badge styles */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  min-width: 80px;
+  display: inline-block;
+}
+
+.status-published {
+  background: linear-gradient(135deg, #85b06d 0%, #bfefa1 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(133, 176, 109, 0.3);
+}
+
+.status-draft {
+  background: linear-gradient(135deg, #ffc107 0%, #ffeb3b 100%);
+  color: #2f5148;
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+}
+
+.status-rejected {
+  background: linear-gradient(135deg, #c3555c 0%, #e74c3c 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(195, 85, 92, 0.3);
+}
+
+.status-pending {
+  background: linear-gradient(135deg, #97a19b 0%, #c1cbc2 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(151, 161, 155, 0.3);
+  animation: pendingPulse 2s infinite;
+}
+
+@keyframes pendingPulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Update category badge styles */
+.category-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  min-width: 80px;
+  display: inline-block;
+}
+
+.category-health {
+  background: linear-gradient(135deg, #85b06d 0%, #bfefa1 100%);
+  color: white;
+}
+
+.category-nutrition {
+  background: linear-gradient(135deg, #73ad67 0%, #a8d895 100%);
+  color: white;
+}
+
+.category-hygiene {
+  background: linear-gradient(135deg, #2f5148 0%, #73ad67 100%);
+  color: white;
+}
+
+.category-safety {
+  background: linear-gradient(135deg, #c3555c 0%, #e74c3c 100%);
+  color: white;
+}
+
+.category-development {
+  background: linear-gradient(135deg, #97a19b 0%, #c1cbc2 100%);
+  color: white;
+}
+
+.category-default {
+  background: linear-gradient(135deg, #97a19b 0%, #c1cbc2 100%);
+  color: white;
+}
+
+/* Condition Badge */
+.condition-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  min-width: 70px;
+  display: inline-block;
+}
+
+.condition-badge.active {
+  background: linear-gradient(135deg, #85b06d 0%, #bfefa1 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(133, 176, 109, 0.3);
+}
+
+.condition-badge.deleted {
+  background: linear-gradient(135deg, #c3555c 0%, #e74c3c 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(195, 85, 92, 0.3);
+}
+
+.read-count {
+  font-size: 0.9rem;
+  color: #97a19b;
+  font-weight: 500;
+}
+
+.deleted-row {
+  background-color: #fdf2f2;
+  opacity: 0.8;
+}
+
+.retry-btn {
+  background: linear-gradient(135deg, #73ad67 0%, #85b06d 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 15px;
+  transition: all 0.3s ease;
+}
+
+.retry-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(115, 173, 103, 0.3);
+}
+
+/* Responsive Table */
+@media (max-width: 1200px) {
+  .blog-table {
+    font-size: 0.9rem;
+  }
+
+  .blog-table th,
+  .blog-table td {
+    padding: 10px 8px;
+  }
+
+  .blog-title-cell {
+    max-width: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .blog-table {
+    min-width: 800px;
+  }
+
+  .action-buttons {
+    flex-direction: row;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+    min-width: 30px;
   }
 }
