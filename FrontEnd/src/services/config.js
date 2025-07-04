@@ -74,6 +74,7 @@ export const API_ENDPOINTS = {
     FORGOT_PASSWORD: "/User/ForgotPassword", // POST - Send OTP to email
     VALIDATE_OTP: "/User/ValidateOTP", // POST - Validate OTP code
     RESET_PASSWORD: "/User/ResetPassword", // POST - Reset password
+    GOOGLE_LOGIN: "/User/google", // POST endpoint for Google login
   },
 
   // Blog (5/7 - workflow: Nurse create → Manager approve → Parent view)
