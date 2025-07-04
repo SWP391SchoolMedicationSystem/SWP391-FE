@@ -78,7 +78,7 @@ function Blog() {
     "An toàn",
     "Phát triển",
   ];
-  const statuses = ["Bản nháp", "Đã đăng"];
+  const statuses = ["Draft", "Published", "Pending", "Rejected"];
 
   // Use real blogs or fallback to mock data
   const blogData = blogs || mockBlogs;
@@ -158,8 +158,19 @@ function Blog() {
 
       if (isEditing) {
         const blogId =
-          selectedBlog?.id ?? selectedBlog?.blogid ?? selectedBlog?.blogId;
-        await updateBlog(blogId, blogData);
+          selectedBlog?.blogId ?? selectedBlog?.id ?? selectedBlog?.blogid;
+
+        // Format data for update API (need blogID in body)
+        const updateData = {
+          blogID: blogId,
+          title: formData.title,
+          content: formData.content,
+          updatedBy: userId,
+          status: "Draft",
+          isDeleted: false,
+        };
+
+        await updateBlog(blogId, updateData);
         alert("Đã cập nhật blog thành công!");
       } else {
         await createBlog(blogData);
@@ -191,9 +202,17 @@ function Blog() {
   const getStatusClass = (status) => {
     switch (status) {
       case "Đã đăng":
+      case "Published":
         return "status-published";
       case "Bản nháp":
+      case "Draft":
         return "status-draft";
+      case "Rejected":
+      case "Từ chối":
+        return "status-rejected";
+      case "Pending":
+      case "Chờ duyệt":
+        return "status-pending";
       default:
         return "status-draft";
     }
@@ -358,14 +377,14 @@ function Blog() {
                 </span>
               </div>
               <div className="blog-stats">
-                <span className="read-count">👁️ {blog.readCount}</span>
+                <span className="read-count">👁️ {blog.readCount || 0}</span>
               </div>
             </div>
 
             <div className="blog-content-section">
               <h3 className="blog-title">{blog.title}</h3>
               <p className="blog-excerpt">
-                {blog.content.length > 100
+                {blog.content?.length > 100
                   ? blog.content.substring(0, 100) + "..."
                   : blog.content}
               </p>
@@ -386,10 +405,14 @@ function Blog() {
                 {blog.isDeleted && (
                   <span className="deleted-badge">Đã xóa</span>
                 )}
-                <span className="author">{blog.author}</span>
+                <span className="author">
+                  {blog.createdByName || blog.author}
+                </span>
                 <span className="date">{blog.createdDate}</span>
-                {blog.updatedDate !== blog.createdDate && (
-                  <span className="updated">Cập nhật: {blog.updatedDate}</span>
+                {blog.updatedAt && blog.updatedAt !== blog.createdDate && (
+                  <span className="updated">
+                    Cập nhật: {blog.updatedAt.split("T")[0]}
+                  </span>
                 )}
               </div>
 
