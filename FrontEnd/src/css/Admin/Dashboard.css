@@ -1,127 +1,655 @@
+/* Admin Dashboard - Modern & Clean */
 .admin-dashboard {
   padding: 24px;
   min-height: 100vh;
-  background-color: #f7f7f7;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
 .dashboard-header {
   margin-bottom: 32px;
+  text-align: center;
+  padding: 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  color: white;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
 }
 
 .dashboard-header h1 {
   margin: 0;
-  color: #1f2937;
-  font-weight: 700;
+  font-weight: 800;
+  font-size: 2.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.dashboard-header .MuiTypography-body1 {
+  opacity: 0.9;
+  font-size: 1.1rem;
+  margin-top: 8px;
+}
+
+/* Statistics Cards */
 .stat-card {
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 10px 25px rgba(0, 0, 0, 0.08),
+    0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #4facfe);
+  background-size: 300% 100%;
+  animation: gradientMove 3s ease-in-out infinite;
+}
+
+@keyframes gradientMove {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: translateY(-8px);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.12),
+    0 8px 16px rgba(0, 0, 0, 0.08);
 }
 
 .stat-content {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
+  padding: 24px;
 }
 
 .stat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
   color: white;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover .stat-icon {
+  transform: scale(1.1);
+}
+
+.stat-info {
+  flex: 1;
 }
 
 .stat-info h4 {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
+  margin: 0 0 8px 0;
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .stat-info .MuiTypography-body2 {
-  margin: 4px 0 0 0;
-  font-weight: 500;
+  margin: 0 0 12px 0;
+  font-weight: 600;
+  color: #64748b;
+  font-size: 0.95rem;
 }
 
+.stat-info .MuiTypography-caption {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+/* Report Section Styles */
+.report-section-card {
+  border-radius: 20px;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 15px 35px rgba(0, 0, 0, 0.08),
+    0 6px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.report-title {
+  font-weight: 700 !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.report-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.export-pdf-btn {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%) !important;
+  box-shadow: 0 4px 15px rgba(229, 62, 62, 0.4) !important;
+  border-radius: 12px !important;
+  padding: 8px 20px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  transition: all 0.3s ease !important;
+}
+
+.export-pdf-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(229, 62, 62, 0.5) !important;
+}
+
+/* Report Cards */
+.report-card {
+  border-radius: 16px;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 8px 20px rgba(0, 0, 0, 0.06),
+    0 3px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
+}
+
+.report-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  transition: all 0.3s ease;
+}
+
+.report-card.sick-reports::before {
+  background: linear-gradient(90deg, #f56565, #e53e3e);
+}
+
+.report-card.leave-requests::before {
+  background: linear-gradient(90deg, #4299e1, #3182ce);
+}
+
+.report-card.medicines-sent::before {
+  background: linear-gradient(90deg, #48bb78, #38a169);
+}
+
+.report-card.medicine-schedules::before {
+  background: linear-gradient(90deg, #ed8936, #dd6b20);
+}
+
+.report-card.incidents::before {
+  background: linear-gradient(90deg, #9f7aea, #805ad5);
+}
+
+.report-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 
+    0 15px 35px rgba(0, 0, 0, 0.1),
+    0 6px 15px rgba(0, 0, 0, 0.08);
+}
+
+.report-card-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+}
+
+.report-icon {
+  font-size: 40px !important;
+  padding: 12px;
+  border-radius: 12px;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.report-card:hover .report-icon {
+  transform: scale(1.1);
+}
+
+.sick-reports .report-icon {
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+}
+
+.leave-requests .report-icon {
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+}
+
+.medicines-sent .report-icon {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.medicine-schedules .report-icon {
+  background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+}
+
+.incidents .report-icon {
+  background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+}
+
+.report-value {
+  font-weight: 800 !important;
+  margin-bottom: 4px !important;
+  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.report-label {
+  color: #64748b !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+}
+
+/* Tab Styles */
+.MuiTabs-root {
+  margin-top: 16px;
+}
+
+.MuiTab-root {
+  font-weight: 600 !important;
+  text-transform: none !important;
+  font-size: 0.95rem !important;
+  padding: 12px 24px !important;
+  border-radius: 12px 12px 0 0 !important;
+  margin-right: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.MuiTab-root.Mui-selected {
+  background: linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%) !important;
+  color: #667eea !important;
+}
+
+.MuiTabs-indicator {
+  height: 3px !important;
+  background: linear-gradient(90deg, #667eea, #764ba2) !important;
+  border-radius: 3px !important;
+}
+
+/* Chart Container Enhancements */
+.report-section-card .recharts-wrapper {
+  margin: 0 auto;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #f8fafc 0%, #ffffff 100%);
+  padding: 16px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.report-section-card .recharts-cartesian-grid-horizontal line,
+.report-section-card .recharts-cartesian-grid-vertical line {
+  stroke: rgba(148, 163, 184, 0.2);
+}
+
+.report-section-card .recharts-bar {
+  transition: all 0.3s ease;
+}
+
+.report-section-card .recharts-bar:hover {
+  filter: brightness(1.1);
+  cursor: pointer;
+}
+
+.report-section-card .recharts-pie-sector {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.report-section-card .recharts-pie-sector:hover {
+  filter: brightness(1.1) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.report-section-card .recharts-line {
+  stroke-width: 3px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.report-section-card .recharts-tooltip-wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+/* Action Cards */
 .quick-actions-card,
 .activities-card,
 .system-health-card {
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 10px 25px rgba(0, 0, 0, 0.08),
+    0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
   height: fit-content;
 }
 
-.quick-actions .MuiButton-root {
-  border-radius: 8px;
-  padding: 12px;
-  font-weight: 600;
-  text-transform: none;
+.quick-actions-card:hover,
+.activities-card:hover,
+.system-health-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 15px 35px rgba(0, 0, 0, 0.1),
+    0 6px 12px rgba(0, 0, 0, 0.08);
 }
 
+.quick-actions-card .MuiCardContent-root,
+.activities-card .MuiCardContent-root,
+.system-health-card .MuiCardContent-root {
+  padding: 28px;
+}
+
+.quick-actions-card h6,
+.activities-card h6,
+.system-health-card h6 {
+  margin-bottom: 24px;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quick-actions-card h6::before {
+  content: '⚡';
+  font-size: 1.5rem;
+}
+
+.activities-card h6::before {
+  content: '📊';
+  font-size: 1.5rem;
+}
+
+.system-health-card h6::before {
+  content: '🛡️';
+  font-size: 1.5rem;
+}
+
+/* Quick Actions */
+.quick-actions .MuiButton-root {
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-weight: 600;
+  text-transform: none;
+  margin-bottom: 12px;
+  width: 100%;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.quick-actions .MuiButton-contained {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.quick-actions .MuiButton-contained:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+.quick-actions .MuiButton-outlined {
+  border: 2px solid #e2e8f0;
+  color: #475569;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.quick-actions .MuiButton-outlined:hover {
+  border-color: #667eea;
+  background: linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+/* Activities List */
 .activities-list {
-  max-height: 300px;
+  max-height: 320px;
   overflow-y: auto;
+  padding-right: 4px;
+}
+
+.activities-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.activities-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.activities-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 3px;
 }
 
 .activity-item {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid #f3f4f6;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
 }
 
 .activity-item:last-child {
   border-bottom: none;
 }
 
+.activity-item:hover {
+  background: linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 12px;
+  padding: 16px 12px;
+  margin: 0 -12px;
+}
+
 .activity-icon {
-  font-size: 20px;
-  width: 32px;
-  height: 32px;
+  font-size: 24px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f9fafb;
-  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
   flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .activity-content {
   flex: 1;
 }
 
+.activity-content .MuiTypography-body2 {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.activity-content .MuiTypography-caption {
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* System Health */
 .system-health-list {
-  max-height: 300px;
+  max-height: 320px;
   overflow-y: auto;
+  padding-right: 4px;
+}
+
+.system-health-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.system-health-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.system-health-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 3px;
 }
 
 .health-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f3f4f6;
+  padding: 16px 0;
+  border-bottom: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
 }
 
 .health-item:last-child {
   border-bottom: none;
 }
 
+.health-item:hover {
+  background: linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 12px;
+  padding: 16px 12px;
+  margin: 0 -12px;
+}
+
 .health-info {
   flex: 1;
 }
 
-/* Responsive */
+.health-info .MuiTypography-body2 {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.health-info .MuiTypography-caption {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.health-item .MuiChip-root {
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading State */
+.admin-dashboard .MuiCard-root:has(.loading-content) {
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Responsive Design for Reports */
+@media (max-width: 1200px) {
+  .report-header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .report-controls {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .report-section-card {
+    margin: 0 -8px;
+  }
+
+  .report-header {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .report-title {
+    font-size: 1.4rem !important;
+  }
+
+  .report-card-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .report-icon {
+    font-size: 32px !important;
+    padding: 10px;
+  }
+
+  .report-value {
+    font-size: 1.8rem !important;
+  }
+
+  .report-label {
+    font-size: 0.8rem !important;
+  }
+
+  .MuiTab-root {
+    font-size: 0.85rem !important;
+    padding: 10px 16px !important;
+    margin-right: 4px !important;
+  }
+
+  .report-section-card .recharts-wrapper {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .report-controls {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .export-pdf-btn {
+    width: 100% !important;
+  }
+
+  .report-card {
+    margin-bottom: 12px;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .admin-dashboard {
+    padding: 20px;
+  }
+}
+
 @media (max-width: 768px) {
   .admin-dashboard {
     padding: 16px;
@@ -129,16 +657,96 @@
 
   .dashboard-header {
     margin-bottom: 24px;
+    padding: 24px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 2rem;
   }
 
   .stat-content {
     flex-direction: column;
     text-align: center;
-    gap: 12px;
+    gap: 16px;
+    padding: 20px;
   }
 
   .stat-icon {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
+  }
+
+  .stat-info h4 {
+    font-size: 1.8rem;
+  }
+
+  .quick-actions-card .MuiCardContent-root,
+  .activities-card .MuiCardContent-root,
+  .system-health-card .MuiCardContent-root {
+    padding: 20px;
+  }
+
+  .activity-item:hover,
+  .health-item:hover {
+    margin: 0;
+    padding: 16px 0;
+    background: none;
   }
 }
+
+@media (max-width: 480px) {
+  .admin-dashboard {
+    padding: 12px;
+  }
+
+  .dashboard-header {
+    padding: 20px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .stat-content {
+    padding: 16px;
+  }
+}
+
+/* Animation for smooth loading */
+.stat-card,
+.quick-actions-card,
+.activities-card,
+.system-health-card,
+.report-section-card,
+.report-card {
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stagger animation delays */
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+.report-section-card { animation-delay: 0.5s; }
+.quick-actions-card { animation-delay: 0.6s; }
+.activities-card { animation-delay: 0.7s; }
+.system-health-card { animation-delay: 0.8s; }
+
+/* Report cards animation */
+.report-card:nth-child(1) { animation-delay: 0.1s; }
+.report-card:nth-child(2) { animation-delay: 0.2s; }
+.report-card:nth-child(3) { animation-delay: 0.3s; }
+.report-card:nth-child(4) { animation-delay: 0.4s; }
+.report-card:nth-child(5) { animation-delay: 0.5s; }
