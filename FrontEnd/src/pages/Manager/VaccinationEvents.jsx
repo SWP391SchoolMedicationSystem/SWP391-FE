@@ -337,19 +337,19 @@ function VaccinationEvents() {
                     className="edit-btn"
                     onClick={() => handleEditEvent(event)}
                   >
-                    ✏️ Chỉnh sửa
+                     Chỉnh sửa
                   </button>
                   <button
                     className="email-btn"
                     onClick={() => handleSendEmailAll(event)}
                   >
-                    📧 Gửi email
+                     Gửi email
                   </button>
                   <button
                     className="delete-btn"
                     onClick={() => handleDeleteEvent(event)}
                   >
-                    🗑️ Xóa
+                     Xóa
                   </button>
                 </div>
               </div>
@@ -514,7 +514,7 @@ function VaccinationEvents() {
                   Hủy
                 </button>
                 <button type="submit" className="submit-btn">
-                  💾 Cập nhật
+                   Cập nhật
                 </button>
               </div>
             </form>

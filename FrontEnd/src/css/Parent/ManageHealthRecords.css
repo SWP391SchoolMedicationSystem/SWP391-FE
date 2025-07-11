@@ -1,10 +1,11 @@
 .parent-health-records-container {
   padding: 20px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, #f2f6f3 0%, #e8f0e9 100%);
   min-height: 100vh;
 }
 
 .page-header {
+  background: linear-gradient(135deg, #2f5148 0%, #73ad67 100%);
   color: white;
   padding: 30px;
   border-radius: 15px;
@@ -95,7 +96,7 @@
 }
 
 .stat-card.total .stat-icon {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2f5148 0%, #73ad67 100%);
 }
 
 .stat-card.active .stat-icon {
@@ -250,7 +251,7 @@
 
 .student-class {
   margin: 2px 0;
-  color: #007bff;
+  color: #73ad67;
   font-size: 0.9rem;
   font-weight: 500;
 }
@@ -369,7 +370,7 @@
 
 .student-main-info h2 {
   margin: 0 0 10px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 2rem;
 }
 
@@ -393,7 +394,7 @@
   padding: 15px;
   background: #f8fafc;
   border-radius: 10px;
-  border-left: 4px solid #56d0db;
+  border-left: 4px solid #73ad67;
 }
 
 .detail-item label {
@@ -411,12 +412,12 @@
   background: #f0f9ff;
   padding: 20px;
   border-radius: 10px;
-  border-left: 4px solid #56d0db;
+  border-left: 4px solid #73ad67;
 }
 
 .description-section h4 {
   margin: 0 0 10px 0;
-  color: #2d77c1;
+  color: #2f5148;
 }
 
 .description-section p {
@@ -436,7 +437,7 @@
 
 .health-records-detail-section h3 {
   margin: 0 0 20px 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.5rem;
   display: flex;
   align-items: center;
@@ -458,7 +459,7 @@
 }
 
 .record-item:hover {
-  border-color: #56d0db;
+  border-color: #73ad67;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
@@ -478,7 +479,7 @@
 
 .record-title h4 {
   margin: 0;
-  color: #2d77c1;
+  color: #2f5148;
   font-size: 1.2rem;
   display: flex;
   align-items: center;
@@ -486,7 +487,7 @@
 }
 
 .record-number {
-  background: linear-gradient(135deg, #56d0db, #2d77c1);
+  background: linear-gradient(135deg, #73ad67, #2f5148);
   color: white;
   padding: 4px 8px;
   border-radius: 6px;
@@ -555,7 +556,7 @@
 .empty-records p:first-child {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #2d77c1;
+  color: #2f5148;
 }
 
 /* Status badges */
@@ -688,7 +689,7 @@
 }
 
 .child-class {
-  color: #007bff;
+  color: #73ad67;
   font-weight: 500;
 }
 
@@ -734,7 +735,7 @@
 .contact-info .note {
   margin-top: 15px;
   padding: 10px;
-  background: rgba(86, 208, 219, 0.1);
+  background: rgba(115, 173, 103, 0.1);
   border-radius: 8px;
   font-size: 0.9rem;
 }
@@ -752,7 +753,7 @@
 
 .view-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(45, 119, 193, 0.3);
+  box-shadow: 0 5px 15px rgba(47, 81, 72, 0.3);
 }
 
 /* Modal Styles */

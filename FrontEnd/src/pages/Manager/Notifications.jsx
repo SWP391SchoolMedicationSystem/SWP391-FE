@@ -1,37 +1,37 @@
-import React, { useState, useEffect } from "react";
-import { useManagerNotifications } from "../../utils/hooks/useManager";
-import Modal from "../../components/common/Modal";
-import "../../css/Manager/Notifications.css";
+import React, { useState, useEffect } from 'react';
+import { useManagerNotifications } from '../../utils/hooks/useManager';
+import { managerNotificationService } from '../../services/managerService';
+import '../../css/Manager/Notifications.css';
 
 const Notifications = () => {
-  const {
-    notifications,
-    loading,
-    error,
-    fetchNotifications,
-    createNotificationForParents,
-    createNotificationForStaff,
-    refetch,
-  } = useManagerNotifications();
-
+  const [notificationType, setNotificationType] = useState('staff'); // "staff" hoặc "parent"
+  const [selectedNotification, setSelectedNotification] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [notificationType, setNotificationType] = useState("parent"); // 'parent' or 'staff'
   const [submitLoading, setSubmitLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: "",
-    message: "",
-    type: "general",
+    title: '',
+    message: '',
+    type: 'general',
   });
 
-  // Load notifications on mount
+  const {
+    data: notifications,
+    loading,
+    error,
+    refetch,
+    fetchNotifications,
+  } = useManagerNotifications(notificationType);
+
+  // Gọi API khi component mount hoặc khi thay đổi loại thông báo
   useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
+    fetchNotifications(notificationType);
+  }, [fetchNotifications, notificationType]);
 
   // Handle form input change
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
@@ -40,129 +40,179 @@ const Notifications = () => {
   // Handle create notification
   const handleCreateNotification = () => {
     setFormData({
-      title: "",
-      message: "",
-      type: "general",
+      title: '',
+      message: '',
+      type: 'general',
     });
-    setNotificationType("parent");
+    setNotificationType('parent');
     setShowCreateModal(true);
   };
 
   // Handle form submit
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setSubmitLoading(true);
 
     try {
-      // Multiple DTO options to try - uncomment one at a time
-
-      // Option 1: Minimal lowercase
       const notificationData = {
         title: formData.title,
         message: formData.message,
         type: formData.type,
       };
 
-      // Option 2: PascalCase (uncomment if option 1 fails)
-      // const notificationData = {
-      //   Title: formData.title,
-      //   Message: formData.message,
-      //   Type: formData.type
-      // };
-
-      // Option 3: With content field (uncomment if option 1 fails)
-      // const notificationData = {
-      //   title: formData.title,
-      //   content: formData.message,
-      //   type: formData.type
-      // };
-
-      // Option 4: Full DTO (uncomment if option 1 fails)
-      // const notificationData = {
-      //   title: formData.title,
-      //   message: formData.message,
-      //   type: formData.type,
-      //   isDeleted: false,
-      //   createdBy: "Manager",
-      //   createdDate: new Date().toISOString()
-      // };
-
-      console.log("Sending notification data:", notificationData);
-      console.log("Notification type:", notificationType);
-
-      if (notificationType === "parent") {
-        console.log("Calling createNotificationForParents...");
-        await createNotificationForParents(notificationData);
+      if (notificationType === 'parent') {
+        await managerNotificationService.createNotificationForParents(
+          notificationData
+        );
       } else {
-        console.log("Calling createNotificationForStaff...");
-        await createNotificationForStaff(notificationData);
+        await managerNotificationService.createNotificationForStaff(
+          notificationData
+        );
       }
 
       setShowCreateModal(false);
       setFormData({
-        title: "",
-        message: "",
-        type: "general",
+        title: '',
+        message: '',
+        type: 'general',
       });
 
-      alert(`Notification sent to ${notificationType}s successfully!`);
+      // Refresh notifications
+      await fetchNotifications(notificationType);
+      alert(`Thông báo đã được gửi thành công!`);
     } catch (error) {
-      console.error("Create notification failed:", error);
-      console.error("Error details:", error.response?.data);
-
-      // Better error handling
-      let errorMessage = "Failed to create notification. ";
-      if (error.response?.status === 500) {
-        errorMessage +=
-          "This appears to be a server issue. Please contact the backend team.";
-      } else if (error.response?.data?.message) {
+      console.error('Create notification failed:', error);
+      let errorMessage = 'Không thể tạo thông báo. ';
+      if (error.response?.data?.message) {
         errorMessage += error.response.data.message;
       } else {
-        errorMessage += "Please try again later.";
+        errorMessage += 'Vui lòng thử lại sau.';
       }
-
       alert(errorMessage);
     } finally {
       setSubmitLoading(false);
     }
   };
 
-  // Get notification type badge
-  const getTypeBadge = (type) => {
+  // Hàm xử lý dữ liệu từ API để hiển thị
+  const processNotificationData = apiData => {
+    if (!apiData) {
+      return [];
+    }
+
+    if (!Array.isArray(apiData)) {
+      return [];
+    }
+
+    if (apiData.length === 0) {
+      return [];
+    }
+
+    const processed = apiData
+      .map(notification => {
+        if (!notification.notificationId) {
+          return null;
+        }
+
+        // Lấy thông tin chi tiết dựa trên loại thông báo
+        let details = [];
+        let message = 'Không có nội dung';
+
+        if (notificationType === 'parent') {
+          details = notification.notificationParentDetails || [];
+          // Lấy message từ parent detail đầu tiên
+          if (details.length > 0) {
+            message = details[0].message || 'Không có nội dung';
+          }
+        } else {
+          details = notification.notificationstaffdetails || [];
+          // Lấy thông tin cho staff hiện tại (giả sử staffid = 2 cho Manager)
+          const currentStaffDetail =
+            details.find(detail => detail.staffid === 2) || details[0];
+          if (currentStaffDetail) {
+            message = currentStaffDetail.message || 'Không có nội dung';
+          }
+        }
+
+        return {
+          id: notification.notificationId,
+          title: notification.title || 'Không có tiêu đề',
+          message: message,
+          type: notification.type || 'Chung',
+          targetType: notificationType,
+          createdAt: notification.createdAt || new Date().toISOString(),
+          createdBy: notification.createdby || 'Hệ thống',
+          details: details,
+          notificationParentDetails:
+            notification.notificationParentDetails || [],
+          notificationstaffdetails: notification.notificationstaffdetails || [],
+        };
+      })
+      .filter(Boolean);
+
+    return processed;
+  };
+
+  const processedNotifications = processNotificationData(notifications);
+
+  // Thống kê
+  const stats = {
+    total: processedNotifications.length,
+    urgent: processedNotifications.filter(n => n.type === 'Khẩn cấp').length,
+  };
+
+  const getTypeBadge = type => {
     const typeMap = {
-      general: { label: "General", class: "type-general" },
-      health: { label: "Health", class: "type-health" },
-      event: { label: "Event", class: "type-event" },
-      emergency: { label: "Emergency", class: "type-emergency" },
-      reminder: { label: "Reminder", class: "type-reminder" },
+      'Sức khỏe': { label: 'Sức khỏe', class: 'type-sức-khỏe' },
+      'Khẩn cấp': { label: 'Khẩn cấp', class: 'type-khẩn-cấp' },
+      'Nhắc nhở': { label: 'Nhắc nhở', class: 'type-nhắc-nhở' },
+      'Sự kiện': { label: 'Sự kiện', class: 'type-sự-kiện' },
+      Chung: { label: 'Chung', class: 'type-chung' },
+      general: { label: 'Chung', class: 'type-general' },
+      health: { label: 'Sức khỏe', class: 'type-health' },
+      emergency: { label: 'Khẩn cấp', class: 'type-emergency' },
+      reminder: { label: 'Nhắc nhở', class: 'type-reminder' },
+      event: { label: 'Sự kiện', class: 'type-event' },
     };
 
-    const typeInfo = typeMap[type] || typeMap.general;
+    const typeInfo = typeMap[type] || typeMap['Chung'];
     return (
       <span className={`type-badge ${typeInfo.class}`}>{typeInfo.label}</span>
     );
   };
 
-  // Loading state
+  const handleViewDetail = notification => {
+    setSelectedNotification(notification);
+    setShowDetailModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowDetailModal(false);
+    setSelectedNotification(null);
+  };
+
+  const handleTypeChange = newType => {
+    setNotificationType(newType);
+  };
+
   if (loading) {
     return (
-      <div className="notifications-page">
+      <div className="notifications-container">
         <div className="loading-container">
           <div className="spinner"></div>
-          <p>⏳ Loading notifications...</p>
+          <p>⏳ Đang tải thông báo...</p>
         </div>
       </div>
     );
   }
 
-  // Error state
   if (error) {
     return (
-      <div className="notifications-page">
+      <div className="notifications-container">
         <div className="error-container">
           <p>❌ {error}</p>
           <button onClick={refetch} className="retry-btn">
-            🔄 Retry
+            🔄 Thử lại
           </button>
         </div>
       </div>
@@ -170,261 +220,355 @@ const Notifications = () => {
   }
 
   return (
-    <div className="notifications-page">
+    <div className="notifications-container">
       <div className="page-header">
         <div className="header-content">
-          <h1>📢 Notifications Management</h1>
-          <p>Create and manage notifications for parents and staff</p>
+          <h1>📢 Quản Lý Thông Báo</h1>
+          <p>Xem và quản lý thông báo từ nhà trường</p>
         </div>
-        <button onClick={handleCreateNotification} className="create-btn">
-          ➕ Create Notification
+        <div className="header-actions">
+          <button onClick={handleCreateNotification} className="create-btn">
+            ➕ Tạo Thông Báo
+          </button>
+        </div>
+      </div>
+
+      {/* Category Toggle */}
+      <div className="category-toggle">
+        <button
+          className={`toggle-btn ${
+            notificationType === 'staff' ? 'active' : ''
+          }`}
+          onClick={() => handleTypeChange('staff')}
+        >
+          👩‍💼 Thông Báo Nhân Viên
+        </button>
+        <button
+          className={`toggle-btn ${
+            notificationType === 'parent' ? 'active' : ''
+          }`}
+          onClick={() => handleTypeChange('parent')}
+        >
+          👨‍👩‍👧‍👦 Thông Báo Phụ Huynh
         </button>
       </div>
 
-      {/* Statistics Cards */}
-      <div className="stats-container">
+      {/* Thống kê */}
+      <div className="stats-section">
         <div className="stat-card">
           <div className="stat-icon">📨</div>
           <div className="stat-content">
-            <h3>{notifications.length}</h3>
-            <p>Total Notifications</p>
+            <div className="stat-value">{stats.total}</div>
+            <div className="stat-title">Tổng Thông Báo</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon">👨‍👩‍👧‍👦</div>
+          <div className="stat-icon">🚨</div>
           <div className="stat-content">
-            <h3>
-              {notifications.filter((n) => n.targetType === "parent").length}
-            </h3>
-            <p>Parent Notifications</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">👩‍💼</div>
-          <div className="stat-content">
-            <h3>
-              {notifications.filter((n) => n.targetType === "staff").length}
-            </h3>
-            <p>Staff Notifications</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">🆕</div>
-          <div className="stat-content">
-            <h3>
-              {
-                notifications.filter((n) => {
-                  const today = new Date().toDateString();
-                  return new Date(n.createdAt).toDateString() === today;
-                }).length
-              }
-            </h3>
-            <p>Today's Notifications</p>
+            <div className="stat-value">{stats.urgent}</div>
+            <div className="stat-title">Khẩn Cấp</div>
           </div>
         </div>
       </div>
 
-      {/* Notifications List */}
+      {/* Danh sách thông báo */}
       <div className="notifications-section">
         <div className="section-header">
-          <h2>Recent Notifications</h2>
-          <button onClick={fetchNotifications} className="refresh-btn">
-            🔄 Refresh
-          </button>
+          <h2>
+            {notificationType === 'staff'
+              ? 'Thông Báo Nhân Viên'
+              : 'Thông Báo Phụ Huynh'}
+          </h2>
         </div>
 
-        {notifications.length === 0 ? (
+        {processedNotifications.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">📭</div>
-            <h3>No notifications yet</h3>
-            <p>Create your first notification to get started</p>
-            <button onClick={handleCreateNotification} className="create-btn">
-              ➕ Create Notification
-            </button>
+            <h3>Chưa có thông báo nào</h3>
+            <p>Chưa có thông báo nào được gửi</p>
           </div>
         ) : (
-          <div className="notifications-list">
-            {notifications.map((notification, index) => (
-              <div key={notification.id || index} className="notification-card">
-                <div className="notification-header">
-                  <div className="notification-title">
-                    <h3>{notification.title}</h3>
-                    {getTypeBadge(notification.type)}
-                  </div>
-                  <div className="notification-meta">
-                    <span className="notification-date">
-                      {new Date(notification.createdAt).toLocaleDateString()}
-                    </span>
-                    <span
-                      className={`target-badge target-${
-                        notification.targetType || "unknown"
-                      }`}
-                    >
-                      {notification.targetType === "parent"
-                        ? "👨‍👩‍👧‍👦 Parents"
-                        : "👩‍💼 Staff"}
-                    </span>
-                  </div>
-                </div>
-                <div className="notification-content">
-                  <p>{notification.message}</p>
-                </div>
-                <div className="notification-footer">
-                  <span className="created-by">
-                    Created by: {notification.createdby || "Manager"}
-                  </span>
-                </div>
-              </div>
-            ))}
+          <div className="notifications-table-container">
+            <table className="notifications-table">
+              <thead>
+                <tr>
+                  <th>Tiêu đề</th>
+                  <th>Loại</th>
+                  <th>Nội dung</th>
+                  <th>Đối tượng</th>
+                  <th>Ngày tạo</th>
+                  <th>Người tạo</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {processedNotifications.map((notification, index) => (
+                  <tr
+                    key={notification.id || index}
+                    className="notification-row"
+                  >
+                    <td className="title-cell">
+                      <div className="title-content">{notification.title}</div>
+                    </td>
+                    <td className="type-cell">
+                      {getTypeBadge(notification.type)}
+                    </td>
+                    <td className="message-cell">
+                      <div className="message-content">
+                        {notification.message.length > 100
+                          ? `${notification.message.substring(0, 100)}...`
+                          : notification.message}
+                      </div>
+                    </td>
+                    <td className="target-cell">
+                      <span
+                        className={`target-badge target-${
+                          notification.targetType || 'unknown'
+                        }`}
+                      >
+                        {notification.targetType === 'parent'
+                          ? '👨‍👩‍👧‍👦 Phụ Huynh'
+                          : '👩‍💼 Nhân Viên'}
+                      </span>
+                    </td>
+                    <td className="date-cell">
+                      {new Date(notification.createdAt).toLocaleDateString(
+                        'vi-VN'
+                      )}
+                    </td>
+                    <td className="creator-cell">
+                      {notification.createdBy || 'Hệ thống'}
+                    </td>
+                    <td className="action-cell">
+                      <button
+                        onClick={() => handleViewDetail(notification)}
+                        className="view-detail-btn"
+                        title="Xem chi tiết"
+                      >
+                        👁️
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
 
-      {/* Create Notification Modal */}
-      {showCreateModal && (
-        <Modal
-          isOpen={showCreateModal}
-          onClose={() => {
-            setShowCreateModal(false);
-            setFormData({
-              title: "",
-              message: "",
-              type: "general",
-            });
-          }}
-          title="Create New Notification"
-        >
-          <form onSubmit={handleSubmit} className="notification-form">
-            {/* Target Selection */}
-            <div className="form-group">
-              <label htmlFor="target">Send To:</label>
-              <div className="radio-group">
-                <label className="radio-option">
-                  <input
-                    type="radio"
-                    name="target"
-                    value="parent"
-                    checked={notificationType === "parent"}
-                    onChange={(e) => setNotificationType(e.target.value)}
-                  />
-                  <span className="radio-label">👨‍👩‍👧‍👦 All Parents</span>
-                </label>
-                <label className="radio-option">
-                  <input
-                    type="radio"
-                    name="target"
-                    value="staff"
-                    checked={notificationType === "staff"}
-                    onChange={(e) => setNotificationType(e.target.value)}
-                  />
-                  <span className="radio-label">👩‍💼 All Staff</span>
-                </label>
-              </div>
+      {/* Modal xem chi tiết */}
+      {showDetailModal && selectedNotification && (
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>📋 Chi Tiết Thông Báo</h3>
+              <button onClick={handleCloseModal} className="close-btn">
+                ✕
+              </button>
             </div>
-
-            {/* Title */}
-            <div className="form-group">
-              <label htmlFor="title">Title:</label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                placeholder="Enter notification title"
-                required
-                maxLength={100}
-              />
-            </div>
-
-            {/* Type */}
-            <div className="form-group">
-              <label htmlFor="type">Type:</label>
-              <select
-                id="type"
-                name="type"
-                value={formData.type}
-                onChange={handleInputChange}
-                required
-              >
-                <option value="general">📋 General</option>
-                <option value="health">🏥 Health</option>
-                <option value="event">📅 Event</option>
-                <option value="emergency">🚨 Emergency</option>
-                <option value="reminder">⏰ Reminder</option>
-              </select>
-            </div>
-
-            {/* Message */}
-            <div className="form-group">
-              <label htmlFor="message">Message:</label>
-              <textarea
-                id="message"
-                name="message"
-                value={formData.message}
-                onChange={handleInputChange}
-                placeholder="Enter your notification message here..."
-                rows="5"
-                required
-                maxLength={500}
-              />
-              <small className="char-count">
-                {formData.message.length}/500 characters
-              </small>
-            </div>
-
-            {/* Preview */}
-            {(formData.title || formData.message) && (
-              <div className="notification-preview">
-                <h4>Preview:</h4>
-                <div className="preview-card">
-                  <div className="preview-header">
-                    <strong>{formData.title || "Notification Title"}</strong>
-                    {getTypeBadge(formData.type)}
-                  </div>
-                  <div className="preview-content">
-                    {formData.message ||
-                      "Your notification message will appear here..."}
-                  </div>
-                  <div className="preview-footer">
-                    <small>
-                      To:{" "}
-                      {notificationType === "parent"
-                        ? "All Parents"
-                        : "All Staff"}
-                    </small>
-                  </div>
+            <div className="modal-body">
+              <div className="detail-section">
+                <h4>Thông tin chung</h4>
+                <div className="detail-row">
+                  <strong>Tiêu đề:</strong> {selectedNotification.title}
+                </div>
+                <div className="detail-row">
+                  <strong>Loại:</strong>{' '}
+                  {getTypeBadge(selectedNotification.type)}
+                </div>
+                <div className="detail-row">
+                  <strong>Ngày tạo:</strong>{' '}
+                  {new Date(selectedNotification.createdAt).toLocaleString(
+                    'vi-VN'
+                  )}
+                </div>
+                <div className="detail-row">
+                  <strong>Người tạo:</strong> {selectedNotification.createdBy}
+                </div>
+                <div className="detail-row">
+                  <strong>Đối tượng:</strong>{' '}
+                  {selectedNotification.targetType === 'parent'
+                    ? 'Phụ Huynh'
+                    : 'Nhân Viên'}
                 </div>
               </div>
-            )}
 
-            {/* Form Actions */}
-            <div className="form-actions">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowCreateModal(false);
-                  setFormData({
-                    title: "",
-                    message: "",
-                    type: "general",
-                  });
-                }}
-                className="cancel-btn"
-                disabled={submitLoading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="send-btn"
-                disabled={submitLoading || !formData.title || !formData.message}
-              >
-                {submitLoading ? "⏳ Sending..." : "📤 Send Notification"}
+              <div className="detail-section">
+                <h4>Nội dung chi tiết</h4>
+                <div className="message-detail">
+                  {selectedNotification.message}
+                </div>
+              </div>
+
+              {selectedNotification.targetType === 'parent' && (
+                <div className="detail-section">
+                  <h4>Danh sách phụ huynh nhận thông báo</h4>
+                  <div className="recipients-list">
+                    {selectedNotification.notificationParentDetails.map(
+                      (detail, index) => (
+                        <div key={index} className="recipient-item">
+                          <div className="recipient-info">
+                            <span className="recipient-id">
+                              Phụ huynh ID: {detail.parentId}
+                            </span>
+                          </div>
+                          <div className="recipient-message">
+                            {detail.message}
+                          </div>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {selectedNotification.targetType === 'staff' && (
+                <div className="detail-section">
+                  <h4>Danh sách nhân viên nhận thông báo</h4>
+                  <div className="recipients-list">
+                    {selectedNotification.notificationstaffdetails.map(
+                      (detail, index) => (
+                        <div key={index} className="recipient-item">
+                          <div className="recipient-info">
+                            <span className="recipient-id">
+                              Nhân viên ID: {detail.staffid}
+                            </span>
+                          </div>
+                          <div className="recipient-message">
+                            {detail.message}
+                          </div>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button onClick={handleCloseModal} className="close-modal-btn">
+                Đóng
               </button>
             </div>
-          </form>
-        </Modal>
+          </div>
+        </div>
+      )}
+
+      {/* Modal tạo thông báo */}
+      {showCreateModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowCreateModal(false)}
+        >
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>📝 Tạo Thông Báo Mới</h3>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="close-btn"
+              >
+                ✕
+              </button>
+            </div>
+            <form onSubmit={handleSubmit} className="notification-form">
+              <div className="form-group">
+                <label htmlFor="target">Gửi đến:</label>
+                <div className="radio-group">
+                  <label className="radio-option">
+                    <input
+                      type="radio"
+                      name="target"
+                      value="parent"
+                      checked={notificationType === 'parent'}
+                      onChange={e => setNotificationType(e.target.value)}
+                    />
+                    <span className="radio-label">👨‍👩‍👧‍👦 Tất cả Phụ huynh</span>
+                  </label>
+                  <label className="radio-option">
+                    <input
+                      type="radio"
+                      name="target"
+                      value="staff"
+                      checked={notificationType === 'staff'}
+                      onChange={e => setNotificationType(e.target.value)}
+                    />
+                    <span className="radio-label">👩‍💼 Tất cả Nhân viên</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="title">Tiêu đề:</label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  placeholder="Nhập tiêu đề thông báo"
+                  required
+                  maxLength={100}
+                  className="form-input"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="type">Loại:</label>
+                <select
+                  id="type"
+                  name="type"
+                  value={formData.type}
+                  onChange={handleInputChange}
+                  required
+                  className="form-select"
+                >
+                  <option value="general">📋 Chung</option>
+                  <option value="health">🏥 Sức khỏe</option>
+                  <option value="event">📅 Sự kiện</option>
+                  <option value="emergency">🚨 Khẩn cấp</option>
+                  <option value="reminder">⏰ Nhắc nhở</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="message">Nội dung:</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  placeholder="Nhập nội dung thông báo..."
+                  rows="5"
+                  required
+                  maxLength={500}
+                  className="form-textarea"
+                />
+                <small className="char-count">
+                  {formData.message.length}/500 ký tự
+                </small>
+              </div>
+
+              <div className="form-actions">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="cancel-btn"
+                  disabled={submitLoading}
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="send-btn"
+                  disabled={
+                    submitLoading || !formData.title || !formData.message
+                  }
+                >
+                  {submitLoading ? '⏳ Đang gửi...' : '📤 Gửi Thông Báo'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

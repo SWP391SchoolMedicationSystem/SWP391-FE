@@ -18,16 +18,6 @@ function BlogManagement() {
     loading: actionLoading,
   } = useManagerActions();
 
-  // State for blog posts (for local updates)
-  const [localBlogPosts, setLocalBlogPosts] = useState([]);
-
-  // Update local posts when API data changes
-  React.useEffect(() => {
-    if (blogs) {
-      setLocalBlogPosts(blogs);
-    }
-  }, [blogs]);
-
   // Available statuses
   const statuses = ["Draft", "Published", "Rejected"];
 
@@ -54,8 +44,7 @@ function BlogManagement() {
   });
 
   // Filter blogs based on search and filters
-  const filteredBlogs = localBlogPosts
-    ? localBlogPosts.filter((blog) => {
+  const filteredBlogs = (blogs || []).filter((blog) => {
         const matchesSearch =
           blog.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           blog.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -64,8 +53,7 @@ function BlogManagement() {
           filterStatus === "" || blog.status === filterStatus;
         const matchesDeleted = showDeleted ? blog.isDeleted : !blog.isDeleted;
         return matchesSearch && matchesStatus && matchesDeleted;
-      })
-    : [];
+  });
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -176,10 +164,12 @@ function BlogManagement() {
 
       if (approvalData.approvalStatus === "Approved") {
         await approveBlog(blogId);
-        alert("Phê duyệt bài viết thành công!");
+        alert(
+          "✅ Phê duyệt thành công! Bài viết đã được xuất bản và hiển thị công khai."
+        );
       } else if (approvalData.approvalStatus === "Rejected") {
         await rejectBlog(blogId, approvalData.rejectionReason);
-        alert("Từ chối bài viết thành công!");
+        alert("❌ Từ chối bài viết thành công!");
       }
       setShowModal(false);
       refetch(); // Refresh data from API
@@ -236,21 +226,47 @@ function BlogManagement() {
   return (
     <div className="blog-management-container">
       {/* Header */}
-      <div className="page-header">
-        <div className="header-content">
+      <div className="blog-header">
           <h1>📝 Quản Lý Blog</h1>
           <p>Quản lý các bài viết blog sức khỏe và thông tin y tế</p>
         </div>
-        <div style={{ display: "flex", gap: "12px" }}>
-          <button
-            className="btn btn-sm btn-toggle"
-            onClick={() => setShowDeleted((prev) => !prev)}
-          >
-            {showDeleted ? "↩️ Hoạt động" : "🗑️ Đã xóa"}
-          </button>
-          <button className="btn btn-primary" onClick={handleAddPost}>
-            ➕ Tạo Bài Viết Mới
-          </button>
+
+      {/* Statistics */}
+      <div className="stats-container">
+        <div className="stat-card total">
+          <div className="stat-icon">📚</div>
+          <div className="stat-content">
+            <h3>{filteredBlogs.length}</h3>
+            <p>Tổng bài viết</p>
+          </div>
+        </div>
+        <div className="stat-card published">
+          <div className="stat-icon">✅</div>
+          <div className="stat-content">
+            <h3>
+              {filteredBlogs.filter((b) => b.status === "Published").length}
+            </h3>
+            <p>Đã đăng</p>
+          </div>
+        </div>
+        <div className="stat-card draft">
+          <div className="stat-icon">📝</div>
+          <div className="stat-content">
+            <h3>{filteredBlogs.filter((b) => b.status === "Draft").length}</h3>
+            <p>Bản nháp</p>
+          </div>
+        </div>
+        <div className="stat-card reads">
+          <div className="stat-icon">👁️</div>
+          <div className="stat-content">
+            <h3>
+              {filteredBlogs.reduce(
+                (sum, blog) => sum + (blog.readCount || 0),
+                0
+              )}
+            </h3>
+            <p>Lượt đọc</p>
+          </div>
         </div>
       </div>
 
@@ -281,19 +297,21 @@ function BlogManagement() {
         </div>
       )}
 
-      {/* Filters and Search */}
+      {/* Controls */}
       {!loading && !error && blogs && blogs.length > 0 && (
         <>
-          <div className="search-filter-container">
-            <div className="search-box">
+          <div className="controls-container">
+            <div className="search-filter-controls">
+              <div className="search-controls">
               <input
                 type="text"
-                placeholder="Tìm kiếm theo tiêu đề, tác giả, nội dung..."
+                  placeholder="Tìm kiếm blog..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
               />
             </div>
+
             <div className="filter-controls">
               <select
                 value={filterStatus}
@@ -310,93 +328,500 @@ function BlogManagement() {
             </div>
           </div>
 
-          {/* Blog Posts Table */}
-          <div className="table-container">
-            <table className="blog-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Tiêu đề</th>
-                  <th>Tác giả</th>
-                  <th>Trạng thái</th>
-                  <th>Phê duyệt</th>
-                  <th>Ngày tạo</th>
-                  <th>Đã xóa</th>
-                  <th>Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button
+                onClick={() => setShowDeleted((prev) => !prev)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "10px 16px",
+                  backgroundColor: showDeleted ? "#fff3cd" : "#f0f2f5",
+                  border: "none",
+                  borderRadius: "10px",
+                  color: showDeleted ? "#856404" : "#65676b",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = showDeleted
+                    ? "#fff8dc"
+                    : "#e4e6ea";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = showDeleted
+                    ? "#fff3cd"
+                    : "#f0f2f5";
+                }}
+              >
+                {showDeleted ? "↩️ Hoạt động" : "🗑️ Đã xóa"}
+              </button>
+              <button
+                onClick={handleAddPost}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "10px 20px",
+                  backgroundColor: "#2f5148",
+                  border: "none",
+                  borderRadius: "10px",
+                  color: "white",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  boxShadow: "0 4px 12px rgba(47, 81, 72, 0.3)",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#1e342a";
+                  e.target.style.transform = "translateY(-1px)";
+                  e.target.style.boxShadow = "0 6px 16px rgba(47, 81, 72, 0.4)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "#2f5148";
+                  e.target.style.transform = "translateY(0)";
+                  e.target.style.boxShadow = "0 4px 12px rgba(47, 81, 72, 0.3)";
+                }}
+              >
+                ➕ Tạo bài viết mới
+              </button>
+            </div>
+          </div>
+
+          {/* Blog Posts Cards - Facebook Style */}
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "20px" }}
+          >
                 {filteredBlogs.map((post) => (
-                  <tr
+              <div
                     key={post.id}
-                    className={post.isDeleted ? "deleted-row" : ""}
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: "16px",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                  border: "1px solid #e4e6ea",
+                  overflow: "hidden",
+                  transition: "all 0.3s ease",
+                  opacity: post.isDeleted ? 0.7 : 1,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 16px rgba(0, 0, 0, 0.15)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow =
+                    "0 2px 8px rgba(0, 0, 0, 0.1)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                {/* Post Header */}
+                <div
+                  style={{
+                    padding: "16px 20px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    borderBottom: "1px solid #f0f2f5",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                    }}
                   >
-                    <td>{post.id}</td>
-                    <td className="blog-title-cell">
-                      <div className="blog-title-wrapper">
-                        <h4>{post.title}</h4>
-                        <p className="blog-excerpt">
-                          {truncateContent(post.excerpt || post.content)}
-                        </p>
-                        {post.featured && (
-                          <span className="featured-badge">⭐ Nổi bật</span>
+                    {/* Author Avatar */}
+                    <div
+                      style={{
+                        width: "44px",
+                        height: "44px",
+                        backgroundColor: "#2f5148",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontWeight: "600",
+                        fontSize: "16px",
+                        boxShadow: "0 2px 6px rgba(47, 81, 72, 0.2)",
+                      }}
+                    >
+                      {(post.createdByName || post.author || "A")
+                        .charAt(0)
+                        .toUpperCase()}
+                    </div>
+                    <div>
+                      <div
+                        style={{
+                          fontWeight: "600",
+                          color: "#1c1e21",
+                          fontSize: "15px",
+                          marginBottom: "2px",
+                        }}
+                      >
+                        {post.createdByName || post.author || "Quản lý"}
+                      </div>
+                      <div
+                        style={{
+                          color: "#65676b",
+                          fontSize: "13px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                        }}
+                      >
+                        <span>
+                          {new Date(
+                            post.createdAt || post.createdDate
+                          ).toLocaleDateString("vi-VN")}
+                        </span>
+                        {post.updatedAt &&
+                          post.updatedAt !== post.createdDate && (
+                            <>
+                              <span>•</span>
+                              <span>Đã chỉnh sửa</span>
+                            </>
+                          )}
+                        <span>•</span>
+                        <span>ID: {post.blogId || post.id}</span>
+                        {post.isDeleted && (
+                          <>
+                            <span>•</span>
+                            <span
+                              style={{ color: "#e41e3f", fontWeight: "500" }}
+                            >
+                              Đã xóa
+                            </span>
+                          </>
                         )}
                       </div>
-                    </td>
-                    <td>{post.createdByName || post.author}</td>
-                    <td>
+                    </div>
+                  </div>
+                  {/* Status & Category */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    {post.category && (
                       <span
-                        className={`status-badge ${getStatusBadgeClass(
-                          post.status
-                        )}`}
+                        style={{
+                          padding: "4px 10px",
+                          borderRadius: "16px",
+                          fontSize: "12px",
+                          fontWeight: "500",
+                          backgroundColor: "#e7f3ff",
+                          color: "#1877f2",
+                        }}
+                      >
+                        {post.category}
+                      </span>
+                    )}
+                    <span
+                      style={{
+                        padding: "4px 10px",
+                        borderRadius: "16px",
+                        fontSize: "12px",
+                        fontWeight: "600",
+                        backgroundColor:
+                          post.status === "Published"
+                            ? "#d4edda"
+                            : post.status === "Draft"
+                            ? "#fff3cd"
+                            : post.status === "Rejected"
+                            ? "#f8d7da"
+                            : "#f0f2f5",
+                        color:
+                          post.status === "Published"
+                            ? "#155724"
+                            : post.status === "Draft"
+                            ? "#856404"
+                            : post.status === "Rejected"
+                            ? "#721c24"
+                            : "#65676b",
+                      }}
                       >
                         {post.status}
                       </span>
-                    </td>
-                    <td>
-                      <div className="approval-info">
+                    {post.approvedBy ? (
                         <span
-                          className={`approval-badge ${
-                            post.approvedBy ? "approved" : "pending"
-                          }`}
-                        >
-                          {post.approvedBy ? "✅ Đã duyệt" : "⏳ Chờ duyệt"}
-                        </span>
-                        {post.approvedBy && (
-                          <div className="approval-details">
-                            <small>Bởi: {post.approvedByName}</small>
-                            <small>{post.approvedOn?.split("T")[0]}</small>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td>{post.createdDate}</td>
-                    <td>
-                      <span
-                        className={`deleted-badge ${
-                          post.isDeleted ? "deleted-true" : "deleted-false"
-                        }`}
+                        style={{
+                          padding: "4px 10px",
+                          borderRadius: "16px",
+                          fontSize: "12px",
+                          fontWeight: "600",
+                          backgroundColor: "#d4edda",
+                          color: "#155724",
+                        }}
                       >
-                        {post.isDeleted ? "Đã xóa" : "Hoạt động"}
+                        ✅ Đã duyệt
+                        </span>
+                    ) : (
+                      <span
+                        style={{
+                          padding: "4px 10px",
+                          borderRadius: "16px",
+                          fontSize: "12px",
+                          fontWeight: "600",
+                          backgroundColor: "#fff3cd",
+                          color: "#856404",
+                        }}
+                      >
+                        ⏳ Chờ duyệt
                       </span>
-                    </td>
-                    <td>
-                      <div className="action-buttons">
+                    )}
+                          </div>
+                </div>
+                {/* Post Content */}
+                <div style={{ padding: "0 20px 16px" }}>
+                  <h3
+                    style={{
+                      margin: "12px 0 8px",
+                      color: "#1c1e21",
+                      fontSize: "18px",
+                      fontWeight: "600",
+                      lineHeight: "1.4",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleViewPost(post)}
+                  >
+                    {post.title}
+                    {post.featured && (
+                      <span
+                        style={{
+                          marginLeft: "8px",
+                          padding: "2px 8px",
+                          backgroundColor: "#fff3cd",
+                          color: "#856404",
+                          borderRadius: "12px",
+                          fontSize: "12px",
+                          fontWeight: "500",
+                        }}
+                      >
+                        ⭐ Nổi bật
+                      </span>
+                    )}
+                  </h3>
+                  <p
+                    style={{
+                      color: "#65676b",
+                      fontSize: "15px",
+                      lineHeight: "1.5",
+                      margin: "0 0 12px",
+                    }}
+                  >
+                    {truncateContent(post.excerpt || post.content, 150)}
+                  </p>
+                  {/* Tags */}
+                  {post.tags &&
+                    Array.isArray(post.tags) &&
+                    post.tags.length > 0 && (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: "6px",
+                          marginBottom: "12px",
+                        }}
+                      >
+                        {post.tags.map((tag, index) => (
+                          <span
+                            key={index}
+                            style={{
+                              padding: "2px 8px",
+                              backgroundColor: "#f0f2f5",
+                              color: "#65676b",
+                              borderRadius: "12px",
+                              fontSize: "12px",
+                              fontWeight: "500",
+                            }}
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  {/* Rejection Notice */}
+                  {post.status === "Rejected" && post.rejectionReason && (
+                    <div
+                      style={{
+                        backgroundColor: "#fef2f2",
+                        border: "1px solid #fecaca",
+                        borderRadius: "8px",
+                        padding: "12px",
+                        margin: "12px 0",
+                        fontSize: "14px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          color: "#dc2626",
+                          fontWeight: "600",
+                          marginBottom: "4px",
+                        }}
+                      >
+                        ❌ Lý do từ chối:
+                      </div>
+                      <div style={{ color: "#7f1d1d", lineHeight: "1.4" }}>
+                        {post.rejectionReason}
+                      </div>
+                    </div>
+                  )}
+                  {/* Post Image */}
+                  {post.image && (
+                    <div
+                      style={{
+                        marginTop: "16px",
+                        borderRadius: "16px",
+                        overflow: "hidden",
+                        backgroundColor: "#f0f2f5",
+                        cursor: "pointer",
+                        boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
+                        transition: "all 0.3s ease",
+                      }}
+                      onClick={() => handleViewPost(post)}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "scale(1.02)";
+                        e.currentTarget.style.boxShadow =
+                          "0 8px 24px rgba(0, 0, 0, 0.15)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "scale(1)";
+                        e.currentTarget.style.boxShadow =
+                          "0 4px 16px rgba(0, 0, 0, 0.1)";
+                      }}
+                    >
+                      <img
+                        src={post.image}
+                        alt={post.title}
+                        style={{
+                          width: "100%",
+                          height: "auto",
+                          minHeight: "380px",
+                          maxHeight: "650px",
+                          objectFit: "cover",
+                          display: "block",
+                        }}
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                          e.target.nextSibling.style.display = "flex";
+                        }}
+                      />
+                      <div
+                        style={{
+                          display: "none",
+                          width: "100%",
+                          height: "380px",
+                          backgroundColor: "#f0f2f5",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexDirection: "column",
+                          gap: "12px",
+                          color: "#65676b",
+                        }}
+                      >
+                        <span style={{ fontSize: "48px" }}>🖼️</span>
+                        <span style={{ fontSize: "16px", fontWeight: "500" }}>
+                          Không thể tải hình ảnh
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {/* Engagement Bar */}
+                {(post.readCount || 0) > 0 && (
+                  <div
+                    style={{
+                      padding: "8px 20px",
+                      borderTop: "1px solid #f0f2f5",
+                      borderBottom: "1px solid #f0f2f5",
+                      backgroundColor: "#f8f9fa",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      fontSize: "13px",
+                      color: "#65676b",
+                    }}
+                  >
+                      <span
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "4px",
+                      }}
+                    >
+                      👁️ {post.readCount} lượt xem
+                      </span>
+                  </div>
+                )}
+                {/* Action Buttons */}
+                <div
+                  style={{
+                    padding: "12px 20px",
+                    display: "flex",
+                    gap: "8px",
+                    flexWrap: "wrap",
+                  }}
+                >
                         <button
                           onClick={() => handleViewPost(post)}
-                          className="btn btn-view"
-                          title="Xem chi tiết"
-                        >
-                          👁️
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "8px 16px",
+                      backgroundColor: "#f0f2f5",
+                      border: "none",
+                      borderRadius: "8px",
+                      color: "#65676b",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.target.style.backgroundColor = "#e4e6ea")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.target.style.backgroundColor = "#f0f2f5")
+                    }
+                  >
+                    👁️ Xem chi tiết
                         </button>
                         <button
                           onClick={() => handleEditPost(post)}
-                          className="btn btn-edit"
-                          title="Chỉnh sửa"
-                        >
-                          ✏️
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "8px 16px",
+                      backgroundColor: "#e7f3ff",
+                      border: "none",
+                      borderRadius: "8px",
+                      color: "#1877f2",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.target.style.backgroundColor = "#d0e8ff")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.target.style.backgroundColor = "#e7f3ff")
+                    }
+                  >
+                    ✏️ Chỉnh sửa
                         </button>
-                        {/* Hiển thị button approve/reject cho blog chưa được phê duyệt */}
+                  {/* Approval Buttons */}
                         {(post.status === "Draft" ||
                           post.status === "Pending" ||
                           !post.approvedBy) &&
@@ -404,36 +829,113 @@ function BlogManagement() {
                             <>
                               <button
                                 onClick={() => handleApprovePost(post)}
-                                className="btn btn-approve"
-                                title="Phê duyệt"
                                 disabled={actionLoading}
-                              >
-                                {actionLoading ? "⏳" : "✅"}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            padding: "8px 16px",
+                            backgroundColor: "#d4edda",
+                            border: "none",
+                            borderRadius: "8px",
+                            color: "#155724",
+                            fontSize: "14px",
+                            fontWeight: "500",
+                            cursor: actionLoading ? "not-allowed" : "pointer",
+                            opacity: actionLoading ? 0.6 : 1,
+                            transition: "all 0.2s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!actionLoading)
+                              e.target.style.backgroundColor = "#c3e6cb";
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!actionLoading)
+                              e.target.style.backgroundColor = "#d4edda";
+                          }}
+                        >
+                          {actionLoading ? "⏳" : "✅"} Phê duyệt
                               </button>
                               <button
                                 onClick={() => handleRejectPost(post)}
-                                className="btn btn-reject"
-                                title="Từ chối"
                                 disabled={actionLoading}
-                              >
-                                {actionLoading ? "⏳" : "❌"}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            padding: "8px 16px",
+                            backgroundColor: "#f8d7da",
+                            border: "none",
+                            borderRadius: "8px",
+                            color: "#721c24",
+                            fontSize: "14px",
+                            fontWeight: "500",
+                            cursor: actionLoading ? "not-allowed" : "pointer",
+                            opacity: actionLoading ? 0.6 : 1,
+                            transition: "all 0.2s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!actionLoading)
+                              e.target.style.backgroundColor = "#f1b0b7";
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!actionLoading)
+                              e.target.style.backgroundColor = "#f8d7da";
+                          }}
+                        >
+                          {actionLoading ? "⏳" : "❌"} Từ chối
                               </button>
                             </>
                           )}
                         <button
-                          onClick={() => handleDeletePost(post.id)}
-                          className="btn btn-delete"
-                          title="Xóa"
-                        >
-                          🗑️
+                    onClick={() => handleDeletePost(post.blogId || post.id)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "8px 16px",
+                      backgroundColor: "#ffebee",
+                      border: "none",
+                      borderRadius: "8px",
+                      color: "#c62828",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.target.style.backgroundColor = "#ffcdd2")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.target.style.backgroundColor = "#ffebee")
+                    }
+                  >
+                    🗑️ Xóa
                         </button>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
+                {/* Approval Details */}
+                {post.approvedBy && (
+                  <div
+                    style={{
+                      padding: "12px 20px",
+                      backgroundColor: "#f8f9fa",
+                      borderTop: "1px solid #f0f2f5",
+                      fontSize: "13px",
+                      color: "#65676b",
+                    }}
+                  >
+                    <span style={{ fontWeight: "500" }}>
+                      Đã được phê duyệt bởi:
+                    </span>{" "}
+                    {post.approvedByName}
+                    <span style={{ margin: "0 8px" }}>•</span>
+                    <span>
+                      {new Date(post.approvedOn).toLocaleDateString("vi-VN")}
+                    </span>
+                  </div>
+                )}
+              </div>
+            ))}
             {filteredBlogs.length === 0 && (
               <div className="no-data">
                 <p>Không tìm thấy blog phù hợp với bộ lọc</p>
@@ -455,14 +957,17 @@ function BlogManagement() {
       {/* Modal */}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-content large"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
-              <h2>
-                {modalMode === "add" && "➕ Add New Blog Post"}
-                {modalMode === "edit" && "✏️ Edit Blog Post"}
-                {modalMode === "view" && "👁 View Blog Post"}
-                {modalMode === "approve" && "✅ Blog Approval"}
-              </h2>
+              <h3>
+                {modalMode === "add" && "➕ Thêm bài viết mới"}
+                {modalMode === "edit" && "✏️ Chỉnh sửa bài viết"}
+                {modalMode === "view" && currentPost?.title}
+                {modalMode === "approve" && "✅ Phê duyệt & Xuất bản"}
+              </h3>
               <button
                 className="modal-close"
                 onClick={() => setShowModal(false)}
@@ -472,160 +977,180 @@ function BlogManagement() {
             </div>
 
             {modalMode === "view" ? (
-              <div className="post-view">
-                <div className="view-header">
-                  <h3>{currentPost.title}</h3>
-                  <div className="view-meta">
-                    <span
-                      className={`status ${getStatusBadgeClass(
-                        currentPost.status
-                      )}`}
+              <div className="modal-body">
+                {/* Hiển thị hình ảnh nếu có */}
+                {currentPost?.image && (
+                  <div className="blog-detail-image">
+                    <img
+                      src={currentPost.image}
+                      alt={currentPost.title}
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        minHeight: "450px",
+                        maxHeight: "600px",
+                        objectFit: "cover",
+                        borderRadius: "16px",
+                        marginBottom: "24px",
+                        border: "none",
+                        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+                      }}
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.nextSibling.style.display = "flex";
+                      }}
+                    />
+                    <div
+                      style={{
+                        display: "none",
+                        width: "100%",
+                        height: "450px",
+                        backgroundColor: "#f8f9fa",
+                        borderRadius: "16px",
+                        border: "none",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexDirection: "column",
+                        gap: "16px",
+                        color: "#65676b",
+                        marginBottom: "24px",
+                        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+                      }}
                     >
-                      {currentPost.status}
+                      <span style={{ fontSize: "4rem" }}>🖼️</span>
+                      <span style={{ fontSize: "1.1rem", fontWeight: "500" }}>
+                        Không thể tải hình ảnh
                     </span>
                   </div>
                 </div>
-
-                <div className="view-info">
-                  <p>
-                    <strong>ID:</strong> {currentPost.blogId || currentPost.id}
-                  </p>
-                  <p>
-                    <strong>Tác giả:</strong>{" "}
-                    {currentPost.createdByName || currentPost.author}
-                  </p>
-                  <p>
-                    <strong>Ngày tạo:</strong> {currentPost.createdDate}
-                  </p>
-                  <p>
-                    <strong>Cập nhật lần cuối:</strong>{" "}
-                    {currentPost.updatedByName || "Chưa cập nhật"}
-                    {currentPost.updatedAt && (
-                      <span> - {currentPost.updatedAt.split("T")[0]}</span>
-                    )}
-                  </p>
-                  <p>
-                    <strong>Trạng thái:</strong>
+                )}
+                <div className="blog-detail-meta">
+                  <div className="meta-row">
+                    <span className="meta-label">Danh mục:</span>
+                    <span className="category-badge">
+                      {currentPost?.category || "Không phân loại"}
+                    </span>
+                  </div>
+                  <div className="meta-row">
+                    <span className="meta-label">Trạng thái:</span>
                     <span
                       className={`status-badge ${getStatusBadgeClass(
-                        currentPost.status
+                        currentPost?.status
                       )}`}
                     >
-                      {currentPost.status}
+                      {currentPost?.status}
                     </span>
-                  </p>
-                  <p>
-                    <strong>Phê duyệt:</strong>
-                    <span
-                      className={`approval-badge ${
-                        currentPost.approvedBy ? "approved" : "pending"
-                      }`}
-                    >
-                      {currentPost.approvedBy ? "✅ Đã duyệt" : "⏳ Chờ duyệt"}
-                    </span>
-                  </p>
-                  {currentPost.approvedBy && (
-                    <p>
-                      <strong>Người duyệt:</strong> {currentPost.approvedByName}
-                      <span> - {currentPost.approvedOn?.split("T")[0]}</span>
-                    </p>
-                  )}
-                  <p>
-                    <strong>Tình trạng:</strong>{" "}
-                    <span
-                      className={`deleted-badge ${
-                        currentPost.isDeleted ? "deleted-true" : "deleted-false"
-                      }`}
-                    >
-                      {currentPost.isDeleted ? "Đã xóa" : "Hoạt động"}
-                    </span>
-                  </p>
+                  </div>
+                  {currentPost?.status === "Rejected" &&
+                    currentPost?.rejectionReason && (
+                      <div className="meta-row rejection-info">
+                        <span className="meta-label">Lý do từ chối:</span>
+                        <div className="rejection-reason">
+                          <p
+                            style={{
+                              backgroundColor: "#fef2f2",
+                              border: "1px solid #fecaca",
+                              borderRadius: "8px",
+                              padding: "12px",
+                              margin: "8px 0",
+                              color: "#dc2626",
+                              fontSize: "0.9rem",
+                              lineHeight: "1.5",
+                            }}
+                          >
+                            ❌ {currentPost.rejectionReason}
+                          </p>
+                          {currentPost.rejectedByName && (
+                            <small
+                              style={{ color: "#6b7280", fontSize: "0.8rem" }}
+                            >
+                              Từ chối bởi: {currentPost.rejectedByName}
+                              {currentPost.rejectedOn &&
+                                ` - ${new Date(
+                                  currentPost.rejectedOn
+                                ).toLocaleDateString("vi-VN")}`}
+                            </small>
+                          )}
                 </div>
-
-                <div className="view-content">
-                  <h4>Content:</h4>
-                  <p>{currentPost.content}</p>
                 </div>
-
-                <div className="view-actions">
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => handleEditPost(currentPost)}
-                  >
-                    ✏️ Chỉnh sửa
-                  </button>
-                  {/* Hiển thị button approve/reject trong modal view */}
-                  {(currentPost.status === "Draft" ||
-                    currentPost.status === "Pending" ||
-                    !currentPost.approvedBy) &&
-                    !currentPost.isDeleted && (
-                      <>
-                        <button
-                          className="btn btn-approve"
-                          onClick={() => {
-                            setShowModal(false);
-                            handleApprovePost(currentPost);
-                          }}
-                          disabled={actionLoading}
-                        >
-                          {actionLoading ? "⏳" : "✅ Phê duyệt"}
-                        </button>
-                        <button
-                          className="btn btn-reject"
-                          onClick={() => {
-                            setShowModal(false);
-                            handleRejectPost(currentPost);
-                          }}
-                          disabled={actionLoading}
-                        >
-                          {actionLoading ? "⏳" : "❌ Từ chối"}
-                        </button>
-                      </>
                     )}
+                  <div className="meta-row">
+                    <span className="meta-label">Tác giả:</span>
+                    <span>
+                      {currentPost?.createdByName || currentPost?.author}
+                    </span>
+                </div>
+                  <div className="meta-row">
+                    <span className="meta-label">Ngày tạo:</span>
+                    <span>
+                      {new Date(
+                        currentPost?.createdAt || currentPost?.createdDate
+                      ).toLocaleDateString("vi-VN")}
+                    </span>
+              </div>
+                  <div className="meta-row">
+                    <span className="meta-label">Lượt đọc:</span>
+                    <span>{currentPost?.readCount || 0}</span>
+                  </div>
+                  {currentPost?.approvedBy && (
+                    <div className="meta-row">
+                      <span className="meta-label">Đã phê duyệt bởi:</span>
+                      <span>{currentPost.approvedByName}</span>
+                    </div>
+                  )}
+                  {currentPost?.approvedOn && (
+                    <div className="meta-row">
+                      <span className="meta-label">Ngày phê duyệt:</span>
+                      <span>
+                        {new Date(currentPost.approvedOn).toLocaleDateString(
+                          "vi-VN"
+                        )}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="blog-content">
+                  <p>{currentPost?.content}</p>
+                </div>
+
+                <div className="blog-tags-section">
+                  <span className="tags-label">Tags:</span>
+                  {currentPost?.tags &&
+                    Array.isArray(currentPost.tags) &&
+                    currentPost.tags.map((tag, index) => (
+                      <span key={index} className="tag">
+                        #{tag}
+                      </span>
+                    ))}
                 </div>
               </div>
             ) : modalMode === "approve" ? (
-              <form className="approval-form" onSubmit={handleApprovalSubmit}>
-                <div className="approval-info">
-                  <h4>Post Information</h4>
-                  <p>
-                    <strong>Title:</strong> {currentPost.title}
-                  </p>
-                  <p>
-                    <strong>ID:</strong> {currentPost.id}
-                  </p>
-                  <p>
-                    <strong>Author:</strong> {currentPost.author}
-                  </p>
-                </div>
-
+              <div className="modal-body">
+                <form onSubmit={handleApprovalSubmit} className="approval-form">
                 <div className="form-group">
-                  <label htmlFor="approvalStatus">Approval Decision:</label>
+                    <label>Trạng thái phê duyệt *</label>
                   <select
-                    id="approvalStatus"
                     name="approvalStatus"
                     value={approvalData.approvalStatus}
                     onChange={handleApprovalChange}
-                    className="form-select"
                     required
                   >
-                    <option value="Approved">✅ Approve</option>
-                    <option value="Rejected">❌ Reject</option>
+                      <option value="Approved">✅ Phê duyệt</option>
+                    <option value="Rejected">❌ Từ chối</option>
                   </select>
                 </div>
 
                 {approvalData.approvalStatus === "Rejected" && (
                   <div className="form-group">
-                    <label htmlFor="rejectionReason">Rejection Reason:</label>
+                      <label>Lý do từ chối *</label>
                     <textarea
-                      id="rejectionReason"
                       name="rejectionReason"
                       value={approvalData.rejectionReason}
                       onChange={handleApprovalChange}
-                      className="form-textarea"
-                      rows="4"
-                      placeholder="Please provide a reason for rejection..."
                       required
+                        rows="4"
+                        placeholder="Nhập lý do từ chối..."
                     />
                   </div>
                 )}
@@ -633,93 +1158,72 @@ function BlogManagement() {
                 <div className="form-actions">
                   <button
                     type="button"
-                    className="btn btn-cancel"
+                      className="btn-cancel"
                     onClick={() => setShowModal(false)}
                   >
-                    Cancel
+                      Hủy
                   </button>
-                  <button type="submit" className="btn btn-primary">
+                    <button type="submit" className="btn-save">
                     {approvalData.approvalStatus === "Approved"
-                      ? "✅ Approve Post"
-                      : "❌ Reject Post"}
+                        ? "Phê duyệt"
+                        : "Từ chối"}
                   </button>
                 </div>
               </form>
+              </div>
             ) : (
-              <form className="post-form" onSubmit={handleSubmit}>
+              <div className="modal-body">
+                <form onSubmit={handleSubmit} className="blog-form">
                 <div className="form-group">
-                  <label htmlFor="title">Post Title:</label>
+                    <label>Tiêu đề *</label>
                   <input
                     type="text"
-                    id="title"
                     name="title"
                     value={formData.title}
                     onChange={handleInputChange}
-                    className="form-input"
                     required
-                    placeholder="Enter post title..."
+                      placeholder="Nhập tiêu đề bài viết..."
                   />
                 </div>
 
-                <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="status">Status:</label>
-                    <select
-                      id="status"
-                      name="status"
-                      value={formData.status}
-                      onChange={handleInputChange}
-                      className="form-select"
-                      required
-                    >
-                      {statuses.map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="content">Content:</label>
+                    <label>Nội dung *</label>
                   <textarea
-                    id="content"
                     name="content"
                     value={formData.content}
                     onChange={handleInputChange}
-                    className="form-textarea"
-                    rows="8"
                     required
-                    placeholder="Write your blog post content here..."
+                      rows="12"
+                      placeholder="Nhập nội dung bài viết..."
                   />
                 </div>
 
-                <div className="checkbox-group">
+                  <div className="form-group">
+                    <label>
                   <input
                     type="checkbox"
-                    id="featured"
                     name="featured"
                     checked={formData.featured}
                     onChange={handleInputChange}
-                    className="form-checkbox"
                   />
-                  <label htmlFor="featured">⭐ Mark as Featured Post</label>
+                      Đánh dấu bài viết nổi bật
+                    </label>
                 </div>
 
                 <div className="form-actions">
                   <button
                     type="button"
-                    className="btn btn-cancel"
+                      className="btn-cancel"
                     onClick={() => setShowModal(false)}
                   >
-                    Cancel
+                      Hủy
                   </button>
-                  <button type="submit" className="btn btn-primary">
-                    {modalMode === "add" ? "➕ Create Post" : "💾 Update Post"}
+                    <button type="submit" className="btn-save">
+                      {modalMode === "add" ? "Tạo bài viết" : "Cập nhật"}
                   </button>
                 </div>
               </form>
+              </div>
             )}
           </div>
         </div>

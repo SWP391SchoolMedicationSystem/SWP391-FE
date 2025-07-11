@@ -1,61 +1,64 @@
-// import React, { useState } from "react";
-import "./styles/main.scss";
-import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import ResetPassword from "./pages/ResetPassword";
-import ForgotPassword from "./pages/ForgotPassword";
-import ManagerLayout from "./components/layout/ManagerLayout";
-import Dashboard from "./pages/Manager/Dashboard";
-import AccountManagement from "./pages/Manager/AccountManagement";
-import BlogManagement from "./pages/Manager/BlogManagement";
+import './styles/main.scss';
+import { Routes, Route } from 'react-router-dom';
 
-import ManagerVaccinationEvents from "./pages/Manager/VaccinationEvents";
-import VaccinationEventStudents from "./pages/Manager/VaccinationEventStudents";
-import Notifications from "./pages/Manager/Notifications";
+// Public pages
+import Home from './pages/Home';
+import Login from './pages/Login';
+import ResetPassword from './pages/ResetPassword';
+import ForgotPassword from './pages/ForgotPassword';
 
-import StudentList from "./pages/Manager/StudentList";
-import ManagerStudentHealthRecordDetail from "./pages/Manager/StudentHealthRecordDetail";
-import ProtectedRoute from "./components/ProtectedRoute";
+// Layouts
+import ManagerLayout from './components/layout/ManagerLayout';
+import AdminLayout from './components/layout/AdminLayout';
+import NurseLayout from './components/layout/NurseLayout';
+import ParentLayout from './components/layout/ParentLayout';
 
-// Admin imports
-import AdminLayout from "./components/layout/AdminLayout";
-import AdminDashboard from "./pages/Admin/Dashboard";
-import ManageManagers from "./pages/Admin/ManageManagers";
-import SystemLogs from "./pages/Admin/SystemLogs";
-import FormCategories from "./pages/Admin/FormCategories";
-import EmailTemplates from "./pages/Admin/EmailTemplates";
-import AdminSettings from "./pages/Admin/Settings";
+// Protected route component
+import ProtectedRoute from './components/ProtectedRoute';
 
-// Nurse imports
-import NurseLayout from "./components/layout/NurseLayout";
+// Manager pages
+import Dashboard from './pages/Manager/Dashboard';
+import AccountManagement from './pages/Manager/AccountManagement';
+import BlogManagement from './pages/Manager/BlogManagement';
+import ManagerVaccinationEvents from './pages/Manager/VaccinationEvents';
+import VaccinationEventStudents from './pages/Manager/VaccinationEventStudents';
+import ManagerNotifications from './pages/Manager/Notifications';
+import StudentList from './pages/Manager/StudentList';
+import ManagerStudentHealthRecordDetail from './pages/Manager/StudentHealthRecordDetail';
 
-import NurseVaccinationEvents from "./pages/Nurse/VaccinationEvents";
-import NurseVaccinationEventStudents from "./pages/Nurse/VaccinationEventStudents";
-import MedicationSchedule from "./pages/Nurse/MedicationSchedule";
-import HandleMedicine from "./pages/Nurse/HandleMedicine";
-import MedicineManagement from "./pages/Nurse/MedicineManagement";
-import NurseStudentList from "./pages/Nurse/StudentList";
-import NurseBlog from "./pages/Nurse/Blog";
-import ChatWithParents from "./pages/Nurse/ChatWithParents";
-import StudentHealthRecord from "./pages/Nurse/StudentHealthRecord";
-import NurseStudentHealthRecordDetail from "./pages/Nurse/StudentHealthRecordDetail";
-import NurseNotifications from "./pages/Nurse/Notifications";
-import ViewStudentMedicine from "./pages/Nurse/ViewStudentMedicine";
+// Admin pages
+import AdminDashboard from './pages/Admin/Dashboard';
+import ManageManagers from './pages/Admin/ManageManagers';
+import SystemLogs from './pages/Admin/SystemLogs';
+import FormCategories from './pages/Admin/FormCategories';
+import EmailTemplates from './pages/Admin/EmailTemplates';
+import AdminSettings from './pages/Admin/Settings';
 
-// Parent imports
-import ParentLayout from "./components/layout/ParentLayout";
-import ParentDashboard from "./pages/Parent/Dashboard";
-import ViewBlog from "./pages/Parent/ViewBlog";
-import ParentVaccinationEvents from "./pages/Parent/VaccinationEvents";
-import HealthHistory from "./pages/Parent/HealthHistory";
-import ParentNotifications from "./pages/Parent/Notifications";
-import Consultation from "./pages/Parent/Consultation";
-import ChatWithNurse from "./pages/Parent/ChatWithNurse";
-import ManageHealthRecords from "./pages/Parent/ManageHealthRecords";
-import ParentStudentHealthRecordDetail from "./pages/Parent/StudentHealthRecordDetail";
-import UpdateProfile from "./pages/Parent/UpdateProfile";
-import PersonalMedicine from "./pages/Parent/PersonalMedicine";
+// Nurse pages
+import NurseVaccinationEvents from './pages/Nurse/VaccinationEvents';
+import NurseVaccinationEventStudents from './pages/Nurse/VaccinationEventStudents';
+import MedicationSchedule from './pages/Nurse/MedicationSchedule';
+import HandleMedicine from './pages/Nurse/HandleMedicine';
+import MedicineManagement from './pages/Nurse/MedicineManagement';
+import NurseStudentList from './pages/Nurse/StudentList';
+import NurseBlog from './pages/Nurse/Blog';
+import ChatWithParents from './pages/Nurse/ChatWithParents';
+import NurseStudentHealthRecordDetail from './pages/Nurse/StudentHealthRecordDetail';
+import NurseNotifications from './pages/Nurse/Notifications';
+import ViewStudentMedicine from './pages/Nurse/ViewStudentMedicine';
+
+// Parent pages
+import ParentDashboard from './pages/Parent/Dashboard';
+import ViewBlog from './pages/Parent/ViewBlog';
+import ParentVaccinationEvents from './pages/Parent/VaccinationEvents';
+import HealthHistory from './pages/Parent/HealthHistory';
+import ParentNotifications from './pages/Parent/Notifications';
+import Consultation from './pages/Parent/Consultation';
+import ChatWithNurse from './pages/Parent/ChatWithNurse';
+import ManageHealthRecords from './pages/Parent/ManageHealthRecords';
+import ParentStudentHealthRecordDetail from './pages/Parent/StudentHealthRecordDetail';
+import UpdateProfile from './pages/Parent/UpdateProfile';
+import PersonalMedicine from './pages/Parent/PersonalMedicine';
 
 function App() {
   return (
@@ -71,7 +74,7 @@ function App() {
         <Route
           path="/admin"
           element={
-            <ProtectedRoute allowedRoles={["Admin"]}>
+            <ProtectedRoute allowedRoles={['Admin']}>
               <AdminLayout />
             </ProtectedRoute>
           }
@@ -88,7 +91,7 @@ function App() {
         <Route
           path="/manager"
           element={
-            <ProtectedRoute allowedRoles={["Manager"]}>
+            <ProtectedRoute allowedRoles={['Manager']}>
               <ManagerLayout />
             </ProtectedRoute>
           }
@@ -104,20 +107,19 @@ function App() {
             path="vaccination-events/:eventId/students"
             element={<VaccinationEventStudents />}
           />
-
           <Route path="StudentList" element={<StudentList />} />
           <Route
             path="student-health-record/:studentId"
             element={<ManagerStudentHealthRecordDetail />}
           />
-          <Route path="notifications" element={<Notifications />} />
+          <Route path="notifications" element={<ManagerNotifications />} />
         </Route>
 
         {/* Nurse routes */}
         <Route
           path="/nurse"
           element={
-            <ProtectedRoute allowedRoles={["Nurse"]}>
+            <ProtectedRoute allowedRoles={['Nurse']}>
               <NurseLayout />
             </ProtectedRoute>
           }
@@ -141,7 +143,6 @@ function App() {
           <Route path="student-list" element={<NurseStudentList />} />
           <Route path="blog" element={<NurseBlog />} />
           <Route path="chat" element={<ChatWithParents />} />
-          <Route path="health-records" element={<StudentHealthRecord />} />
           <Route
             path="student-health-record/:studentId"
             element={<NurseStudentHealthRecordDetail />}
@@ -153,7 +154,7 @@ function App() {
         <Route
           path="/parent"
           element={
-            <ProtectedRoute allowedRoles={["Parent"]}>
+            <ProtectedRoute allowedRoles={['Parent']}>
               <ParentLayout />
             </ProtectedRoute>
           }

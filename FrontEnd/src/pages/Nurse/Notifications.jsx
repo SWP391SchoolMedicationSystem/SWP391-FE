@@ -1,328 +1,409 @@
-import React, { useState, useEffect } from "react";
-import { useNurseNotifications } from "../../utils/hooks/useNurse";
-import "../../css/Nurse/Notifications.css";
+import React, { useState, useEffect } from 'react';
+import { useNurseNotifications } from '../../utils/hooks/useNurse';
+import '../../css/Nurse/Notifications.css';
 
-function NurseNotifications() {
-  const [selectedFilter, setSelectedFilter] = useState("all");
-  const [showUnreadOnly, setShowUnreadOnly] = useState(false);
+const Notifications = () => {
+  const [selectedNotification, setSelectedNotification] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
-  // Use API hooks
   const {
     data: notifications,
     loading,
     error,
     refetch,
     fetchNotifications,
-    markAsRead: markNotificationAsRead,
   } = useNurseNotifications();
 
-  // Fetch notifications on component mount
+  // Gọi API khi component mount
   useEffect(() => {
     fetchNotifications();
   }, [fetchNotifications]);
 
-  const filterTypes = [
-    { id: "all", name: "Tất cả", icon: "📋", color: "#73ad67" },
-    { id: "general", name: "Thông báo chung", icon: "📢", color: "#6f42c1" },
-    { id: "health", name: "Sức khỏe", icon: "🏥", color: "#28a745" },
-    { id: "emergency", name: "Khẩn cấp", icon: "🚨", color: "#dc3545" },
-    { id: "reminder", name: "Nhắc nhở", icon: "⏰", color: "#ffc107" },
-  ];
+  // Mock data for fallback - cập nhật theo cấu trúc API thực tế
+  const [mockNotifications] = useState([
+    {
+      notificationId: 1,
+      title: 'Lịch khám sức khỏe định kỳ năm học 2025-2026',
+      createdAt: '2025-07-09T12:12:02.687',
+      type: 'Sức khỏe',
+      isDeleted: false,
+      createdby: 'Admin',
+      notificationParentDetails: [],
+      notificationstaffdetails: [
+        {
+          notificationId: 1,
+          staffid: 3,
+          message:
+            'Đ/c Y Tá chuẩn bị công tác tổ chức khám sức khỏe định kỳ cho học sinh theo kế hoạch.',
+          isRead: true,
+          isDeleted: false,
+          createdDate: '2025-07-09T12:15:38.99',
+          modifiedDate: '2025-07-09T12:15:38.99',
+        },
+        {
+          notificationId: 1,
+          staffid: 4,
+          message:
+            'Đ/c Y Sĩ phối hợp chuẩn bị công tác tổ chức khám sức khỏe định kỳ.',
+          isRead: true,
+          isDeleted: false,
+          createdDate: '2025-07-09T12:15:38.99',
+          modifiedDate: '2025-07-09T12:15:38.99',
+        },
+        {
+          notificationId: 1,
+          staffid: 5,
+          message:
+            'Giáo viên chủ nhiệm thông báo lịch khám sức khỏe cho học sinh và phụ huynh lớp mình.',
+          isRead: false,
+          isDeleted: false,
+          createdDate: '2025-07-09T12:15:38.99',
+          modifiedDate: '2025-07-09T12:15:38.99',
+        },
+      ],
+    },
+    {
+      notificationId: 2,
+      title: 'Thông báo về dịch bệnh cúm A/H1N1',
+      createdAt: '2025-07-10T10:30:00.000',
+      type: 'Khẩn cấp',
+      isDeleted: false,
+      createdby: 'Manager',
+      notificationParentDetails: [],
+      notificationstaffdetails: [
+        {
+          notificationId: 2,
+          staffid: 3,
+          message:
+            'Y Tá cần tăng cường giám sát sức khỏe học sinh, phát hiện sớm các triệu chứng cúm.',
+          isRead: false,
+          isDeleted: false,
+          createdDate: '2025-07-10T10:35:00.000',
+          modifiedDate: '2025-07-10T10:35:00.000',
+        },
+        {
+          notificationId: 2,
+          staffid: 4,
+          message:
+            'Y Sĩ chuẩn bị thuốc và thiết bị y tế để xử lý các trường hợp khẩn cấp.',
+          isRead: false,
+          isDeleted: false,
+          createdDate: '2025-07-10T10:35:00.000',
+          modifiedDate: '2025-07-10T10:35:00.000',
+        },
+      ],
+    },
+    {
+      notificationId: 3,
+      title: 'Nhắc nhở uống thuốc cho học sinh',
+      createdAt: '2025-07-11T08:37:01.283',
+      type: 'Nhắc nhở',
+      isDeleted: false,
+      createdby: 'Nurse',
+      notificationParentDetails: [],
+      notificationstaffdetails: [
+        {
+          notificationId: 3,
+          staffid: 3,
+          message:
+            'Nhắc nhở: Học sinh Nguyễn Văn An cần uống thuốc vào 9h sáng và 3h chiều.',
+          isRead: false,
+          isDeleted: false,
+          createdDate: '2025-07-11T08:37:01.467',
+          modifiedDate: '2025-07-11T08:37:01.613',
+        },
+        {
+          notificationId: 3,
+          staffid: 4,
+          message:
+            'Nhắc nhở: Học sinh Trần Thị Bình cần uống thuốc vào 8h sáng và 2h chiều.',
+          isRead: false,
+          isDeleted: false,
+          createdDate: '2025-07-11T08:37:01.477',
+          modifiedDate: '2025-07-11T08:37:01.613',
+        },
+      ],
+    },
+  ]);
 
-  const filteredNotifications = notifications
-    ? notifications.filter((notification) => {
-        const matchesFilter =
-          selectedFilter === "all" || notification.type === selectedFilter;
-        const matchesReadStatus = !showUnreadOnly || !notification.isRead;
-        return matchesFilter && matchesReadStatus;
+  const notificationData = notifications || mockNotifications;
+
+  // Hàm xử lý dữ liệu từ API để hiển thị
+  const processNotificationData = apiData => {
+    if (!apiData) {
+      return [];
+    }
+
+    if (!Array.isArray(apiData)) {
+      return [];
+    }
+
+    if (apiData.length === 0) {
+      return [];
+    }
+
+    const processed = apiData
+      .map(notification => {
+        // Kiểm tra cấu trúc notification
+        if (!notification.notificationId) {
+          return null;
+        }
+
+        // Lấy thông tin chi tiết cho staff hiện tại (giả sử staffid = 3 cho Nurse)
+        const currentStaffDetail =
+          notification.notificationstaffdetails?.find(
+            detail => detail.staffid === 3
+          ) || notification.notificationstaffdetails?.[0];
+
+        return {
+          id: notification.notificationId,
+          title: notification.title || 'Không có tiêu đề',
+          message: currentStaffDetail?.message || 'Không có nội dung',
+          type: notification.type || 'Chung',
+          targetType: 'staff',
+          createdAt: notification.createdAt || new Date().toISOString(),
+          createdBy: notification.createdby || 'Hệ thống',
+          staffDetails: notification.notificationstaffdetails || [],
+        };
       })
-    : [];
+      .filter(Boolean); // Loại bỏ các item null
 
-  const getPriorityColor = (priority) => {
-    const colors = {
-      high: "#dc3545",
-      medium: "#ffc107",
-      low: "#28a745",
+    return processed;
+  };
+
+  const processedNotifications = processNotificationData(notificationData);
+
+  // Sử dụng mock data nếu không có dữ liệu từ API
+  const displayNotifications =
+    processedNotifications.length > 0
+      ? processedNotifications
+      : processNotificationData(mockNotifications);
+
+  // Thống kê
+  const stats = {
+    total: displayNotifications.length,
+    urgent: displayNotifications.filter(n => n.type === 'Khẩn cấp').length,
+  };
+
+  const getTypeBadge = type => {
+    const typeMap = {
+      'Sức khỏe': { label: 'Sức khỏe', class: 'type-sức-khỏe' },
+      'Khẩn cấp': { label: 'Khẩn cấp', class: 'type-khẩn-cấp' },
+      'Nhắc nhở': { label: 'Nhắc nhở', class: 'type-nhắc-nhở' },
+      'Sự kiện': { label: 'Sự kiện', class: 'type-sự-kiện' },
+      Chung: { label: 'Chung', class: 'type-chung' },
+      general: { label: 'Chung', class: 'type-general' },
+      health: { label: 'Sức khỏe', class: 'type-health' },
+      emergency: { label: 'Khẩn cấp', class: 'type-emergency' },
+      reminder: { label: 'Nhắc nhở', class: 'type-reminder' },
+      event: { label: 'Sự kiện', class: 'type-event' },
     };
-    return colors[priority] || "#6c757d";
+
+    const typeInfo = typeMap[type] || typeMap['Chung'];
+    return (
+      <span className={`type-badge ${typeInfo.class}`}>{typeInfo.label}</span>
+    );
   };
 
-  const getPriorityText = (priority) => {
-    const texts = {
-      high: "Ưu tiên cao",
-      medium: "Ưu tiên trung bình",
-      low: "Ưu tiên thấp",
-    };
-    return texts[priority] || priority;
+  const handleViewDetail = notification => {
+    setSelectedNotification(notification);
+    setShowDetailModal(true);
   };
 
-  const getTypeColor = (type) => {
-    const colors = {
-      general: "#f3e5f5",
-      health: "#e8f5e8",
-      emergency: "#ffebee",
-      reminder: "#fff3e0",
-    };
-    return colors[type] || "#f5f5f5";
+  const handleCloseModal = () => {
+    setShowDetailModal(false);
+    setSelectedNotification(null);
   };
 
-  const getTypeIcon = (type) => {
-    const icons = {
-      general: "📢",
-      health: "🏥",
-      emergency: "🚨",
-      reminder: "⏰",
-    };
-    return icons[type] || "📋";
-  };
-
-  const markAsRead = async (id) => {
-    try {
-      await markNotificationAsRead(id);
-      // No need to call refetch as the hook handles it automatically
-    } catch (error) {
-      console.error("Error marking notification as read:", error);
-      alert("Không thể đánh dấu đã đọc. Vui lòng thử lại.");
-    }
-  };
-
-  const markAllAsRead = async () => {
-    if (!notifications) return;
-
-    try {
-      // Mark all unread notifications as read
-      const unreadNotifications = notifications.filter((n) => !n.isRead);
-      await Promise.all(
-        unreadNotifications.map((notification) =>
-          markNotificationAsRead(notification.id)
-        )
-      );
-      // No need to call refetch as the hook handles it automatically
-    } catch (error) {
-      console.error("Error marking all notifications as read:", error);
-      alert("Không thể đánh dấu tất cả đã đọc. Vui lòng thử lại.");
-    }
-  };
-
-  const unreadCount = notifications
-    ? notifications.filter((n) => !n.isRead).length
-    : 0;
-
-  const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString("vi-VN", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    } catch {
-      return dateString;
-    }
-  };
-
-  return (
-    <div className="nurse-notifications-container">
-      {/* Header */}
-      <div className="page-header">
-        <div className="header-content">
-          <h1>🔔 Thông Báo Y Tá</h1>
-          <p>Theo dõi các thông báo quan trọng từ quản lý</p>
-        </div>
-        <div className="header-actions">
-          <div className="stats-badges">
-            <span className="total-badge">
-              📊 {notifications?.length || 0} thông báo
-            </span>
-            <span className="unread-badge">🔴 {unreadCount} chưa đọc</span>
-          </div>
-          <button
-            className="mark-all-read-btn"
-            onClick={markAllAsRead}
-            disabled={loading || !notifications || unreadCount === 0}
-          >
-            {loading ? "⏳ Đang xử lý..." : "✅ Đánh dấu tất cả đã đọc"}
-          </button>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="filters-section">
-        <div className="filter-buttons">
-          {filterTypes.map((filter) => (
-            <button
-              key={filter.id}
-              className={`filter-btn ${
-                selectedFilter === filter.id ? "active" : ""
-              }`}
-              onClick={() => setSelectedFilter(filter.id)}
-              style={{
-                borderColor: filter.color,
-                backgroundColor:
-                  selectedFilter === filter.id ? filter.color : "transparent",
-                color: selectedFilter === filter.id ? "white" : filter.color,
-              }}
-            >
-              <span className="filter-icon">{filter.icon}</span>
-              <span>{filter.name}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="toggle-controls">
-          <label className="toggle-label">
-            <input
-              type="checkbox"
-              checked={showUnreadOnly}
-              onChange={(e) => setShowUnreadOnly(e.target.checked)}
-            />
-            <span className="toggle-text">Chỉ hiển thị chưa đọc</span>
-          </label>
-          <button onClick={refetch} className="refresh-btn" disabled={loading}>
-            {loading ? "⏳" : "🔄"} Làm mới
-          </button>
-        </div>
-      </div>
-
-      {/* Loading State */}
-      {loading && (
-        <div className="loading-state">
-          <div className="loading-spinner"></div>
+  if (loading) {
+    return (
+      <div className="notifications-container">
+        <div className="loading-container">
+          <div className="spinner"></div>
           <p>⏳ Đang tải thông báo...</p>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {/* Error State */}
-      {error && (
-        <div className="error-state">
-          <div className="error-icon">❌</div>
-          <h3>Lỗi khi tải thông báo</h3>
-          <p>{error}</p>
+  if (error) {
+    return (
+      <div className="notifications-container">
+        <div className="error-container">
+          <p>❌ {error}</p>
           <button onClick={refetch} className="retry-btn">
             🔄 Thử lại
           </button>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {/* Empty State */}
-      {!loading && !error && (!notifications || notifications.length === 0) && (
-        <div className="empty-state">
-          <div className="empty-icon">📭</div>
-          <h3>Chưa có thông báo nào</h3>
-          <p>Bạn sẽ nhận được thông báo từ quản lý tại đây</p>
-          <button onClick={refetch} className="retry-btn">
-            🔄 Tải lại
-          </button>
+  return (
+    <div className="notifications-container">
+      <div className="page-header">
+        <div className="header-content">
+          <h1>📢 Quản Lý Thông Báo</h1>
+          <p>Xem và quản lý thông báo từ nhà trường</p>
         </div>
-      )}
+        <button onClick={refetch} className="refresh-btn">
+          🔄 Làm mới
+        </button>
+      </div>
 
-      {/* Notifications List */}
-      {!loading && !error && notifications && notifications.length > 0 && (
-        <div className="notifications-content">
-          {filteredNotifications.length > 0 ? (
-            <div className="notifications-list">
-              {filteredNotifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`notification-card ${
-                    !notification.isRead ? "unread" : "read"
-                  }`}
-                >
-                  <div className="notification-header">
-                    <div className="notification-meta">
+      {/* Thống kê */}
+      <div className="stats-section">
+        <div className="stat-card">
+          <div className="stat-icon">📨</div>
+          <div className="stat-content">
+            <div className="stat-value">{stats.total}</div>
+            <div className="stat-title">Tổng Thông Báo</div>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">🚨</div>
+          <div className="stat-content">
+            <div className="stat-value">{stats.urgent}</div>
+            <div className="stat-title">Khẩn Cấp</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Danh sách thông báo */}
+      <div className="notifications-section">
+        <div className="section-header">
+          <h2>Thông Báo Gần Đây</h2>
+        </div>
+
+        {displayNotifications.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-icon">📭</div>
+            <h3>Chưa có thông báo nào</h3>
+            <p>Chưa có thông báo nào được gửi</p>
+          </div>
+        ) : (
+          <div className="notifications-table-container">
+            <table className="notifications-table">
+              <thead>
+                <tr>
+                  <th>Tiêu đề</th>
+                  <th>Loại</th>
+                  <th>Nội dung</th>
+                  <th>Đối tượng</th>
+                  <th>Ngày tạo</th>
+                  <th>Người tạo</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {displayNotifications.map((notification, index) => (
+                  <tr
+                    key={notification.id || index}
+                    className="notification-row"
+                  >
+                    <td className="title-cell">
+                      <div className="title-content">{notification.title}</div>
+                    </td>
+                    <td className="type-cell">
+                      {getTypeBadge(notification.type)}
+                    </td>
+                    <td className="message-cell">
+                      <div className="message-content">
+                        {notification.message.length > 100
+                          ? `${notification.message.substring(0, 100)}...`
+                          : notification.message}
+                      </div>
+                    </td>
+                    <td className="target-cell">
                       <span
-                        className="notification-type"
-                        style={{
-                          backgroundColor: getTypeColor(notification.type),
-                        }}
+                        className={`target-badge target-${
+                          notification.targetType || 'unknown'
+                        }`}
                       >
-                        {getTypeIcon(notification.type)}{" "}
-                        {
-                          filterTypes.find((f) => f.id === notification.type)
-                            ?.name
-                        }
+                        {notification.targetType === 'parent'
+                          ? '👨‍👩‍👧‍👦 Phụ Huynh'
+                          : '👩‍💼 Nhân Viên'}
                       </span>
-                      {notification.priority && (
-                        <span
-                          className="notification-priority"
-                          style={{
-                            color: getPriorityColor(notification.priority),
-                            backgroundColor: `${getPriorityColor(
-                              notification.priority
-                            )}20`,
-                          }}
-                        >
-                          {getPriorityText(notification.priority)}
-                        </span>
+                    </td>
+                    <td className="date-cell">
+                      {new Date(notification.createdAt).toLocaleDateString(
+                        'vi-VN'
                       )}
-                    </div>
-                    <div className="notification-actions">
-                      <span className="notification-date">
-                        {formatDate(
-                          notification.createdAt || notification.date
-                        )}
-                      </span>
-                      {!notification.isRead && (
-                        <button
-                          className="mark-read-btn"
-                          onClick={() => markAsRead(notification.id)}
-                          title="Đánh dấu đã đọc"
-                        >
-                          ✓
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                    </td>
+                    <td className="creator-cell">
+                      {notification.createdBy || 'Hệ thống'}
+                    </td>
+                    <td className="action-cell">
+                      <button
+                        onClick={() => handleViewDetail(notification)}
+                        className="view-detail-btn"
+                        title="Xem chi tiết"
+                      >
+                        👁️
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
-                  <div className="notification-body">
-                    <h3 className="notification-title">{notification.title}</h3>
-                    <p className="notification-message">
-                      {notification.message || notification.content}
-                    </p>
-                  </div>
-
-                  {notification.createdby && (
-                    <div className="notification-footer">
-                      <span className="notification-sender">
-                        👤 Từ: {notification.createdby}
-                      </span>
-                    </div>
-                  )}
-
-                  {!notification.isRead && (
-                    <div className="unread-indicator">
-                      <span className="unread-dot"></span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="no-results">
-              <div className="no-results-icon">🔍</div>
-              <h3>Không tìm thấy thông báo</h3>
-              <p>
-                Không có thông báo nào phù hợp với bộ lọc "
-                {filterTypes.find((f) => f.id === selectedFilter)?.name}"
-                {showUnreadOnly && " chưa đọc"}.
-              </p>
-              <button
-                onClick={() => {
-                  setSelectedFilter("all");
-                  setShowUnreadOnly(false);
-                }}
-                className="clear-filters-btn"
-              >
-                🔄 Xóa bộ lọc
+      {/* Modal xem chi tiết */}
+      {showDetailModal && selectedNotification && (
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>📋 Chi Tiết Thông Báo</h3>
+              <button onClick={handleCloseModal} className="close-btn">
+                ✕
               </button>
             </div>
-          )}
+            <div className="modal-body">
+              <div className="detail-section">
+                <h4>Thông tin chung</h4>
+                <div className="detail-row">
+                  <strong>Tiêu đề:</strong> {selectedNotification.title}
+                </div>
+                <div className="detail-row">
+                  <strong>Loại:</strong>{' '}
+                  {getTypeBadge(selectedNotification.type)}
+                </div>
+                <div className="detail-row">
+                  <strong>Ngày tạo:</strong>{' '}
+                  {new Date(selectedNotification.createdAt).toLocaleString(
+                    'vi-VN'
+                  )}
+                </div>
+                <div className="detail-row">
+                  <strong>Người tạo:</strong> {selectedNotification.createdBy}
+                </div>
+                <div className="detail-row">
+                  <strong>Đối tượng:</strong>{' '}
+                  {selectedNotification.targetType === 'parent'
+                    ? 'Phụ Huynh'
+                    : 'Nhân Viên'}
+                </div>
+              </div>
+
+              <div className="detail-section">
+                <h4>Nội dung chi tiết</h4>
+                <div className="message-detail">
+                  {selectedNotification.message}
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button onClick={handleCloseModal} className="close-modal-btn">
+                Đóng
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
-}
+};
 
-export default NurseNotifications;
+export default Notifications;

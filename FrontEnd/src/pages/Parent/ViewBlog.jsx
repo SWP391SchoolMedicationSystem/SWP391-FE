@@ -3,27 +3,20 @@ import { useOutletContext } from "react-router-dom";
 import { useParentBlogs } from "../../utils/hooks/useParent";
 
 // Material-UI Icons
-import ArticleIcon from "@mui/icons-material/Article";
-import SearchIcon from "@mui/icons-material/Search";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import VaccinesIcon from "@mui/icons-material/Vaccines";
 import EventIcon from "@mui/icons-material/Event";
-import PersonIcon from "@mui/icons-material/Person";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import BookmarkIcon from "@mui/icons-material/Bookmark";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
-import ErrorIcon from "@mui/icons-material/Error";
-import InboxIcon from "@mui/icons-material/Inbox";
 
 function ViewBlog() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [selectedBlog, setSelectedBlog] = useState(null);
 
   // Get theme from parent layout
   const context = useOutletContext();
-  const { theme, isDarkMode } = context || { theme: null, isDarkMode: false };
+  const { theme } = context || { theme: null };
 
   // Use API hooks
   const { data: blogs, loading, error, refetch } = useParentBlogs();
@@ -51,608 +44,321 @@ function ViewBlog() {
     },
   ];
 
-  const filteredBlogs = (blogs || []).filter((b) =>
-    b.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter blogs
+  const filteredBlogs = (blogs || []).filter((blog) => {
+    const matchesSearch =
+      (blog.title &&
+        blog.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (blog.content &&
+        blog.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (blog.tags &&
+        Array.isArray(blog.tags) &&
+        blog.tags.some((tag) =>
+          tag.toLowerCase().includes(searchTerm.toLowerCase())
+        ));
+    const matchesCategory =
+      filterCategory === "" || blog.category === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
 
-  const featuredBlogs = filteredBlogs.slice(0, 3);
-  const otherBlogs = filteredBlogs.slice(3);
+  const handleViewBlog = (blog) => {
+    setSelectedBlog(blog);
+    setShowModal(true);
+  };
 
   const getCategoryName = (category) => {
     const cat = categories.find((c) => c.id === category);
     return cat ? cat.name : category;
   };
 
-  const getCategoryColor = (category) => {
-    const colors = {
-      health: "#e8f5e8",
-      nutrition: "#fff3e0",
-      vaccination: "#e3f2fd",
-      event: "#fce4ec",
-    };
-    return colors[category] || "#f5f5f5";
+  // Statistics
+  const stats = {
+    total: filteredBlogs.length,
+    published: filteredBlogs.filter((b) => b.status === "Published").length,
+    draft: filteredBlogs.filter((b) => b.status === "Draft").length,
+    totalReads: filteredBlogs.reduce(
+      (sum, blog) => sum + (blog.readCount || 0),
+      0
+    ),
   };
 
-  return (
-    <div
-      style={{
-        padding: "20px",
-        background: theme ? theme.background : "#f2f6f3",
-        minHeight: "100vh",
-        fontFamily:
-          "Satoshi, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
-        transition: "all 0.3s ease",
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "30px",
-          padding: "30px",
-          borderRadius: "20px",
-          background: theme
-            ? isDarkMode
-              ? "linear-gradient(135deg, #2a2a2a 0%, #333333 100%)"
-              : "linear-gradient(135deg, #2f5148 0%, #73ad67 100%)"
-            : "linear-gradient(135deg, #2f5148 0%, #73ad67 100%)",
-          color: "white",
-          boxShadow: "0 4px 20px rgba(47, 81, 72, 0.3)",
-        }}
-      >
-        <div>
-          <h1
-            style={{
-              fontSize: "2.5rem",
-              margin: 0,
-              fontWeight: 700,
-              fontFamily: "Satoshi, sans-serif",
-              color: "white",
-              display: "flex",
-              alignItems: "center",
-              gap: "15px",
-            }}
-          >
-            <ArticleIcon sx={{ color: "white", fontSize: "2.5rem" }} />
-            Blog Sức Khỏe
-          </h1>
-          <p
-            style={{
-              fontSize: "1.1rem",
-              margin: "10px 0 0 0",
-              opacity: 0.9,
-              fontFamily: "Satoshi, sans-serif",
-              color: "white",
-            }}
-          >
-            Những thông tin hữu ích về sức khỏe và dinh dưỡng cho con em
-          </p>
+  // Common styles
+  const containerStyle = {
+    padding: "20px",
+    background: theme ? theme.background : "#f2f6f3",
+    minHeight: "100vh",
+    fontFamily:
+      "Satoshi, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+    transition: "all 0.3s ease",
+  };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div style={containerStyle}>
+        <div className="loading-state">
+          <p>⏳ Đang tải danh sách blog...</p>
         </div>
       </div>
+    );
+  }
 
-      {/* Search Bar */}
-      <div
-        style={{
-          background: theme ? theme.cardBg : "white",
-          borderRadius: "20px",
-          padding: "25px",
-          marginBottom: "30px",
-          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-          border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
-          transition: "all 0.3s ease",
-        }}
-      >
-        <div
-          style={{
-            position: "relative",
-            maxWidth: "500px",
-          }}
-        >
-          <SearchIcon
-            sx={{
-              position: "absolute",
-              left: "15px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: "#97a19b",
-              fontSize: "1.5rem",
-            }}
-          />
-          <input
-            type="text"
-            placeholder="Tìm kiếm bài viết..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "15px 20px 15px 50px",
-              border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
-              borderRadius: "15px",
-              fontSize: "1rem",
-              fontFamily: "Satoshi, sans-serif",
-              background: theme ? (isDarkMode ? "#333333" : "white") : "white",
-              color: theme ? theme.textPrimary : "#2f5148",
-              outline: "none",
-              transition: "all 0.3s ease",
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Featured Section */}
-      {!loading && !error && featuredBlogs.length > 0 && (
-        <div
-          style={{
-            background: theme ? theme.cardBg : "white",
-            borderRadius: "20px",
-            padding: "25px",
-            marginBottom: "30px",
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-            border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
-            transition: "all 0.3s ease",
-          }}
-        >
-          <h3
-            style={{
-              margin: "0 0 20px 0",
-              color: theme ? theme.textPrimary : "#2f5148",
-              fontFamily: "Satoshi, sans-serif",
-              fontSize: "1.5rem",
-              fontWeight: 600,
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <ArticleIcon sx={{ color: "#97a19b", fontSize: "1.5rem" }} />
-            Bài viết nổi bật
-          </h3>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-              gap: "20px",
-            }}
-          >
-            {featuredBlogs.map((blog) => (
-              <div
-                key={blog.id}
-                style={{
-                  background: theme
-                    ? isDarkMode
-                      ? "#333333"
-                      : "#f8f9fa"
-                    : "#f8f9fa",
-                  borderRadius: "15px",
-                  padding: "20px",
-                  border: theme
-                    ? `1px solid ${theme.border}`
-                    : "1px solid #e9ecef",
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    transform: "translateY(-3px)",
-                    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.15)",
-                  },
-                }}
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: "15px",
-                  }}
-                >
-                  <span
-                    style={{
-                      background: theme
-                        ? isDarkMode
-                          ? "#4a5568"
-                          : "#bfefa1"
-                        : "#bfefa1",
-                      color: theme
-                        ? isDarkMode
-                          ? "#ffffff"
-                          : "#1a3a2e"
-                        : "#1a3a2e",
-                      padding: "4px 12px",
-                      borderRadius: "20px",
-                      fontSize: "0.8rem",
-                      fontWeight: 500,
-                      fontFamily: "Satoshi, sans-serif",
-                    }}
-                  >
-                    {getCategoryName(blog.category)}
-                  </span>
-                  <span
-                    style={{
-                      color: theme ? theme.textSecondary : "#97a19b",
-                      fontSize: "0.8rem",
-                      fontFamily: "Satoshi, sans-serif",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "5px",
-                    }}
-                  >
-                    <CalendarTodayIcon
-                      sx={{ color: "#97a19b", fontSize: "0.8rem" }}
-                    />
-                    {blog.date || blog.createdDate}
-                  </span>
-                </div>
-                <h4
-                  style={{
-                    margin: "0 0 10px 0",
-                    color: theme ? theme.textPrimary : "#2f5148",
-                    fontFamily: "Satoshi, sans-serif",
-                    fontSize: "1.1rem",
-                    fontWeight: 600,
-                    lineHeight: 1.4,
-                  }}
-                >
-                  {blog.title}
-                </h4>
-                <p
-                  style={{
-                    margin: 0,
-                    color: theme ? theme.textSecondary : "#97a19b",
-                    fontFamily: "Satoshi, sans-serif",
-                    fontSize: "0.9rem",
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {blog.excerpt || blog.content?.substring(0, 120) + "..."}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Loading State */}
-      {loading && (
-        <div
-          style={{
-            background: theme ? theme.cardBg : "white",
-            borderRadius: "20px",
-            padding: "40px",
-            textAlign: "center",
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-            border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
-          }}
-        >
-          <HourglassEmptyIcon
-            sx={{ color: "#97a19b", fontSize: "3rem", marginBottom: "15px" }}
-          />
-          <p
-            style={{
-              margin: 0,
-              color: theme ? theme.textSecondary : "#97a19b",
-              fontFamily: "Satoshi, sans-serif",
-              fontSize: "1.1rem",
-            }}
-          >
-            Đang tải blog...
-          </p>
-        </div>
-      )}
-
-      {/* Error State */}
-      {error && (
-        <div
-          style={{
-            background: theme ? theme.cardBg : "white",
-            borderRadius: "20px",
-            padding: "40px",
-            textAlign: "center",
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-            border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
-          }}
-        >
-          <ErrorIcon
-            sx={{ color: "#c3555c", fontSize: "3rem", marginBottom: "15px" }}
-          />
-          <p
-            style={{
-              margin: "0 0 20px 0",
-              color: theme ? theme.textPrimary : "#2f5148",
-              fontFamily: "Satoshi, sans-serif",
-              fontSize: "1.1rem",
-            }}
-          >
-            Lỗi khi tải blog: {error}
-          </p>
-          <button
-            onClick={refetch}
-            style={{
-              background: theme
-                ? isDarkMode
-                  ? "#2d4739"
-                  : "#2f5148"
-                : "#2f5148",
-              color: "white",
-              border: "none",
-              padding: "12px 24px",
-              borderRadius: "10px",
-              cursor: "pointer",
-              fontSize: "1rem",
-              fontWeight: 500,
-              fontFamily: "Satoshi, sans-serif",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              margin: "0 auto",
-              transition: "all 0.3s ease",
-            }}
-          >
-            <RefreshIcon sx={{ fontSize: "1.2rem" }} />
-            Thử lại
+  // Show error state
+  if (error) {
+    return (
+      <div style={containerStyle}>
+        <div className="error-state">
+          <p>❌ Lỗi khi tải blog: {error}</p>
+          <button onClick={refetch} className="retry-btn">
+            🔄 Thử lại
           </button>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div style={containerStyle}>
+      {/* Header */}
+      <div className="blog-header">
+        <h1>📝 Blog Sức Khỏe</h1>
+        <p>Những thông tin hữu ích về sức khỏe và dinh dưỡng cho con em</p>
+      </div>
+
+      {/* Statistics */}
+      <div className="stats-container">
+        <div className="stat-card total">
+          <div className="stat-icon">📚</div>
+          <div className="stat-content">
+            <h3>{stats.total}</h3>
+            <p>Tổng bài viết</p>
+          </div>
+        </div>
+        <div className="stat-card published">
+          <div className="stat-icon">✅</div>
+          <div className="stat-content">
+            <h3>{stats.published}</h3>
+            <p>Đã đăng</p>
+          </div>
+        </div>
+        <div className="stat-card draft">
+          <div className="stat-icon">📝</div>
+          <div className="stat-content">
+            <h3>{stats.draft}</h3>
+            <p>Bản nháp</p>
+          </div>
+        </div>
+        <div className="stat-card reads">
+          <div className="stat-icon">👁️</div>
+          <div className="stat-content">
+            <h3>{stats.totalReads}</h3>
+            <p>Lượt đọc</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div className="controls-container">
+        <div className="search-filter-controls">
+          <div className="search-controls">
+            <input
+              type="text"
+              placeholder="Tìm kiếm blog..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+
+          <div className="filter-controls">
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">Tất cả danh mục</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
 
       {/* Empty State */}
       {!loading && !error && (!blogs || blogs.length === 0) && (
-        <div
-          style={{
-            background: theme ? theme.cardBg : "white",
-            borderRadius: "20px",
-            padding: "40px",
-            textAlign: "center",
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-            border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
-          }}
-        >
-          <InboxIcon
-            sx={{ color: "#97a19b", fontSize: "3rem", marginBottom: "15px" }}
-          />
-          <p
-            style={{
-              margin: "0 0 20px 0",
-              color: theme ? theme.textSecondary : "#97a19b",
-              fontFamily: "Satoshi, sans-serif",
-              fontSize: "1.1rem",
-            }}
-          >
-            Chưa có blog nào được đăng tải
-          </p>
-          <button
-            onClick={refetch}
-            style={{
-              background: theme
-                ? isDarkMode
-                  ? "#3a3a3a"
-                  : "#bfefa1"
-                : "#bfefa1",
-              color: theme ? (isDarkMode ? "#ffffff" : "#1a3a2e") : "#1a3a2e",
-              border: "none",
-              padding: "12px 24px",
-              borderRadius: "10px",
-              cursor: "pointer",
-              fontSize: "1rem",
-              fontWeight: 500,
-              fontFamily: "Satoshi, sans-serif",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              margin: "0 auto",
-              transition: "all 0.3s ease",
-            }}
-          >
-            <RefreshIcon sx={{ fontSize: "1.2rem" }} />
-            Tải lại
+        <div className="empty-state">
+          <p>📭 Chưa có blog nào được đăng tải</p>
+          <button onClick={refetch} className="retry-btn">
+            🔄 Tải lại
           </button>
         </div>
       )}
 
-      {/* Blog Grid */}
-      {!loading && !error && otherBlogs.length > 0 && (
-        <div
-          style={{
-            background: theme ? theme.cardBg : "white",
-            borderRadius: "20px",
-            padding: "25px",
-            marginBottom: "30px",
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-            border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
-            transition: "all 0.3s ease",
-          }}
-        >
-          <h3
-            style={{
-              margin: "0 0 30px 0",
-              color: theme ? theme.textPrimary : "#2f5148",
-              fontFamily: "Satoshi, sans-serif",
-              fontSize: "1.5rem",
-              fontWeight: 600,
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <ArticleIcon sx={{ color: "#97a19b", fontSize: "1.5rem" }} />
-            Tất cả bài viết
-          </h3>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
-              gap: "25px",
-            }}
-          >
-            {otherBlogs.map((blog) => (
+      {/* Blog Feed - Facebook Style */}
+      {!loading && !error && blogs && blogs.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          {filteredBlogs.map((blog) => (
+            <div
+              key={blog.id}
+              style={{
+                backgroundColor: "white",
+                borderRadius: "16px",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                border: "1px solid #e4e6ea",
+                overflow: "hidden",
+                transition: "all 0.3s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow =
+                  "0 4px 16px rgba(0, 0, 0, 0.15)";
+                e.currentTarget.style.transform = "translateY(-2px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow =
+                  "0 2px 8px rgba(0, 0, 0, 0.1)";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              {/* Post Header */}
               <div
-                key={blog.id}
                 style={{
-                  background: theme
-                    ? isDarkMode
-                      ? "#2a2a2a"
-                      : "white"
-                    : "white",
-                  borderRadius: "18px",
-                  overflow: "hidden",
-                  boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
-                  border: theme
-                    ? `1px solid ${theme.border}`
-                    : "1px solid #e9ecef",
-                  transition: "all 0.3s ease",
-                  cursor: "pointer",
-                  "&:hover": {
-                    transform: "translateY(-5px)",
-                    boxShadow: "0 8px 30px rgba(0, 0, 0, 0.15)",
-                  },
+                  padding: "16px 20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  borderBottom: "1px solid #f0f2f5",
                 }}
               >
                 <div
-                  style={{
-                    position: "relative",
-                    height: "180px",
-                    background: theme
-                      ? isDarkMode
-                        ? "#333333"
-                        : "#f8f9fa"
-                      : "#f8f9fa",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
+                  style={{ display: "flex", alignItems: "center", gap: "12px" }}
                 >
-                  <ArticleIcon sx={{ color: "#97a19b", fontSize: "4rem" }} />
+                  {/* Author Avatar */}
                   <div
                     style={{
-                      position: "absolute",
-                      top: "15px",
-                      right: "15px",
-                      background: theme
-                        ? isDarkMode
-                          ? "#4a5568"
-                          : "#bfefa1"
-                        : "#bfefa1",
-                      color: theme
-                        ? isDarkMode
-                          ? "#ffffff"
-                          : "#1a3a2e"
-                        : "#1a3a2e",
-                      padding: "6px 14px",
-                      borderRadius: "20px",
-                      fontSize: "0.8rem",
-                      fontWeight: 500,
-                      fontFamily: "Satoshi, sans-serif",
+                      width: "44px",
+                      height: "44px",
+                      backgroundColor: "#73ad67",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "white",
+                      fontWeight: "600",
+                      fontSize: "16px",
+                      boxShadow: "0 2px 6px rgba(115, 173, 103, 0.3)",
                     }}
                   >
-                    {getCategoryName(blog.category)}
+                    {(blog.createdByName || blog.author || "P")
+                      .charAt(0)
+                      .toUpperCase()}
+                  </div>
+                  <div>
+                    <div
+                      style={{
+                        fontWeight: "600",
+                        color: "#1c1e21",
+                        fontSize: "15px",
+                        marginBottom: "2px",
+                      }}
+                    >
+                      {blog.createdByName || blog.author || "Phụ huynh"}
+                    </div>
+                    <div
+                      style={{
+                        color: "#65676b",
+                        fontSize: "13px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                      }}
+                    >
+                      <span>
+                        {new Date(
+                          blog.createdAt || blog.createdDate
+                        ).toLocaleDateString("vi-VN")}
+                      </span>
+                      {blog.updatedAt &&
+                        blog.updatedAt !== blog.createdDate && (
+                          <>
+                            <span>•</span>
+                            <span>Đã chỉnh sửa</span>
+                          </>
+                        )}
+                    </div>
                   </div>
                 </div>
-
-                <div style={{ padding: "20px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginBottom: "15px",
-                      flexWrap: "wrap",
-                      gap: "10px",
-                    }}
-                  >
+                {/* Category */}
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                >
+                  {blog.category && (
                     <span
                       style={{
-                        color: theme ? theme.textSecondary : "#97a19b",
-                        fontSize: "0.8rem",
-                        fontFamily: "Satoshi, sans-serif",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
+                        padding: "4px 10px",
+                        borderRadius: "16px",
+                        fontSize: "12px",
+                        fontWeight: "500",
+                        backgroundColor: "#e7f3ff",
+                        color: "#1877f2",
                       }}
                     >
-                      <PersonIcon
-                        sx={{ color: "#97a19b", fontSize: "0.9rem" }}
-                      />
-                      {blog.author}
+                      {getCategoryName(blog.category)}
                     </span>
-                    <span
-                      style={{
-                        color: theme ? theme.textSecondary : "#97a19b",
-                        fontSize: "0.8rem",
-                        fontFamily: "Satoshi, sans-serif",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                      }}
-                    >
-                      <CalendarTodayIcon
-                        sx={{ color: "#97a19b", fontSize: "0.9rem" }}
-                      />
-                      {blog.date || blog.createdDate}
-                    </span>
-                    <span
-                      style={{
-                        color: theme ? theme.textSecondary : "#97a19b",
-                        fontSize: "0.8rem",
-                        fontFamily: "Satoshi, sans-serif",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                      }}
-                    >
-                      <AccessTimeIcon
-                        sx={{ color: "#97a19b", fontSize: "0.9rem" }}
-                      />
-                      {blog.readTime || "5 phút"}
-                    </span>
-                  </div>
-
-                  <h3
-                    style={{
-                      margin: "0 0 12px 0",
-                      color: theme ? theme.textPrimary : "#2f5148",
-                      fontFamily: "Satoshi, sans-serif",
-                      fontSize: "1.2rem",
-                      fontWeight: 600,
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    {blog.title}
-                  </h3>
-                  <p
-                    style={{
-                      margin: "0 0 15px 0",
-                      color: theme ? theme.textSecondary : "#97a19b",
-                      fontFamily: "Satoshi, sans-serif",
-                      fontSize: "0.9rem",
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {blog.excerpt || blog.content?.substring(0, 100) + "..."}
-                  </p>
-
-                  {blog.tags && (
+                  )}
+                </div>
+              </div>
+              {/* Post Content */}
+              <div style={{ padding: "0 20px 16px" }}>
+                <h3
+                  style={{
+                    margin: "12px 0 8px",
+                    color: "#1c1e21",
+                    fontSize: "18px",
+                    fontWeight: "600",
+                    lineHeight: "1.4",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleViewBlog(blog)}
+                >
+                  {blog.title}
+                </h3>
+                <p
+                  style={{
+                    color: "#65676b",
+                    fontSize: "15px",
+                    lineHeight: "1.5",
+                    margin: "0 0 12px",
+                  }}
+                >
+                  {blog.content?.length > 120
+                    ? blog.content.substring(0, 120) + "..."
+                    : blog.content}
+                </p>
+                {/* Tags */}
+                {blog.tags &&
+                  Array.isArray(blog.tags) &&
+                  blog.tags.length > 0 && (
                     <div
                       style={{
                         display: "flex",
                         flexWrap: "wrap",
-                        gap: "8px",
-                        marginBottom: "15px",
+                        gap: "6px",
+                        marginBottom: "12px",
                       }}
                     >
                       {blog.tags.map((tag, index) => (
                         <span
                           key={index}
                           style={{
-                            background: theme
-                              ? isDarkMode
-                                ? "#3a3a3a"
-                                : "#f0f2f5"
-                              : "#f0f2f5",
-                            color: theme ? theme.textSecondary : "#97a19b",
-                            padding: "4px 10px",
+                            padding: "2px 8px",
+                            backgroundColor: "#f0f2f5",
+                            color: "#65676b",
                             borderRadius: "12px",
-                            fontSize: "0.75rem",
-                            fontFamily: "Satoshi, sans-serif",
+                            fontSize: "12px",
+                            fontWeight: "500",
                           }}
                         >
                           #{tag}
@@ -660,102 +366,219 @@ function ViewBlog() {
                       ))}
                     </div>
                   )}
-
+                {/* Post Image */}
+                {blog.image && (
                   <div
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      gap: "10px",
+                      marginTop: "16px",
+                      borderRadius: "16px",
+                      overflow: "hidden",
+                      backgroundColor: "#f0f2f5",
+                      cursor: "pointer",
+                      boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
+                      transition: "all 0.3s ease",
+                    }}
+                    onClick={() => handleViewBlog(blog)}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "scale(1.02)";
+                      e.currentTarget.style.boxShadow =
+                        "0 8px 24px rgba(0, 0, 0, 0.15)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "scale(1)";
+                      e.currentTarget.style.boxShadow =
+                        "0 4px 16px rgba(0, 0, 0, 0.1)";
                     }}
                   >
-                    <button
+                    <img
+                      src={blog.image}
+                      alt={blog.title}
                       style={{
-                        background: theme
-                          ? isDarkMode
-                            ? "#2d4739"
-                            : "#2f5148"
-                          : "#2f5148",
-                        color: "white",
-                        border: "none",
-                        padding: "10px 20px",
-                        borderRadius: "10px",
-                        cursor: "pointer",
-                        fontSize: "0.9rem",
-                        fontWeight: 500,
-                        fontFamily: "Satoshi, sans-serif",
-                        flex: 1,
-                        transition: "all 0.3s ease",
+                        width: "100%",
+                        height: "auto",
+                        minHeight: "380px",
+                        maxHeight: "650px",
+                        objectFit: "cover",
+                        display: "block",
                       }}
-                    >
-                      Đọc tiếp
-                    </button>
-                    <button
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.nextSibling.style.display = "flex";
+                      }}
+                    />
+                    <div
                       style={{
-                        background: theme
-                          ? isDarkMode
-                            ? "#3a3a3a"
-                            : "#bfefa1"
-                          : "#bfefa1",
-                        color: theme
-                          ? isDarkMode
-                            ? "#ffffff"
-                            : "#1a3a2e"
-                          : "#1a3a2e",
-                        border: "none",
-                        padding: "10px 15px",
-                        borderRadius: "10px",
-                        cursor: "pointer",
-                        fontSize: "0.9rem",
-                        fontWeight: 500,
-                        fontFamily: "Satoshi, sans-serif",
-                        display: "flex",
+                        display: "none",
+                        width: "100%",
+                        height: "380px",
+                        backgroundColor: "#f0f2f5",
                         alignItems: "center",
-                        gap: "5px",
-                        transition: "all 0.3s ease",
+                        justifyContent: "center",
+                        flexDirection: "column",
+                        gap: "12px",
+                        color: "#65676b",
                       }}
                     >
-                      <BookmarkIcon sx={{ fontSize: "1rem" }} />
-                      Lưu
-                    </button>
+                      <span style={{ fontSize: "48px" }}>🖼️</span>
+                      <span style={{ fontSize: "16px", fontWeight: "500" }}>
+                        Không thể tải hình ảnh
+                      </span>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
-            ))}
-          </div>
+              {/* Engagement Bar */}
+              {(blog.readCount || 0) > 0 && (
+                <div
+                  style={{
+                    padding: "8px 20px",
+                    borderTop: "1px solid #f0f2f5",
+                    borderBottom: "1px solid #f0f2f5",
+                    backgroundColor: "#f8f9fa",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    fontSize: "13px",
+                    color: "#65676b",
+                  }}
+                >
+                  <span
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}
+                  >
+                    👁️ {blog.readCount} lượt xem
+                  </span>
+                </div>
+              )}
+              {/* Action Buttons */}
+              <div
+                style={{
+                  padding: "12px 20px",
+                  display: "flex",
+                  gap: "8px",
+                  flexWrap: "wrap",
+                }}
+              >
+                <button
+                  onClick={() => handleViewBlog(blog)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    padding: "8px 16px",
+                    backgroundColor: "#f0f2f5",
+                    border: "none",
+                    borderRadius: "8px",
+                    color: "#65676b",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.target.style.backgroundColor = "#e4e6ea")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.target.style.backgroundColor = "#f0f2f5")
+                  }
+                >
+                  👁️ Xem chi tiết
+                </button>
+              </div>
+            </div>
+          ))}
+          {filteredBlogs.length === 0 && (
+            <div className="no-data">
+              <p>Không tìm thấy blog phù hợp với bộ lọc</p>
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setFilterCategory("");
+                }}
+                className="retry-btn"
+              >
+                🔄 Đặt lại bộ lọc
+              </button>
+            </div>
+          )}
         </div>
       )}
 
-      {/* No filtered results */}
-      {!loading &&
-        !error &&
-        blogs &&
-        blogs.length > 0 &&
-        filteredBlogs.length === 0 && (
+      {/* View Blog Modal */}
+      {showModal && selectedBlog && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div
-            style={{
-              background: theme ? theme.cardBg : "white",
-              borderRadius: "20px",
-              padding: "40px",
-              textAlign: "center",
-              boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-              border: theme ? `1px solid ${theme.border}` : "1px solid #c1cbc2",
-            }}
+            className="modal-content large"
+            onClick={(e) => e.stopPropagation()}
           >
-            <SearchIcon
-              sx={{ color: "#97a19b", fontSize: "3rem", marginBottom: "15px" }}
-            />
-            <p
-              style={{
-                margin: 0,
-                color: theme ? theme.textSecondary : "#97a19b",
-                fontFamily: "Satoshi, sans-serif",
-                fontSize: "1.1rem",
-              }}
-            >
-              Không tìm thấy bài viết phù hợp
-            </p>
+            <div className="modal-header">
+              <h3>{selectedBlog.title}</h3>
+              <button
+                className="modal-close"
+                onClick={() => setShowModal(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-body">
+              {/* Hiển thị hình ảnh nếu có */}
+              {selectedBlog.image && (
+                <div className="blog-detail-image">
+                  <img
+                    src={selectedBlog.image}
+                    alt={selectedBlog.title}
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      minHeight: "450px",
+                      maxHeight: "600px",
+                      objectFit: "cover",
+                      borderRadius: "16px",
+                      marginBottom: "24px",
+                      border: "none",
+                      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+                    }}
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                      e.target.nextSibling.style.display = "flex";
+                    }}
+                  />
+                  <div
+                    style={{
+                      display: "none",
+                      width: "100%",
+                      height: "450px",
+                      backgroundColor: "#f8f9fa",
+                      borderRadius: "16px",
+                      border: "none",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                      gap: "16px",
+                      color: "#65676b",
+                      marginBottom: "24px",
+                      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+                    }}
+                  >
+                    <span style={{ fontSize: "4rem" }}>🖼️</span>
+                    <span style={{ fontSize: "1.1rem", fontWeight: "500" }}>
+                      Không thể tải hình ảnh
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <div className="blog-content">
+                <p>{selectedBlog.content}</p>
+              </div>
+            </div>
           </div>
-        )}
+        </div>
+      )}
     </div>
   );
 }

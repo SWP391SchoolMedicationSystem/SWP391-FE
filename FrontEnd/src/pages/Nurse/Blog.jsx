@@ -12,49 +12,6 @@ function Blog() {
     loading: actionLoading,
   } = useNurseActions();
 
-  // Mock blog data - remove this when API is working
-  const [mockBlogs] = useState([
-    {
-      id: 1,
-      title: "Hướng dẫn chăm sóc trẻ bị sốt tại trường",
-      content:
-        "Khi trẻ bị sốt tại trường, y tá cần thực hiện các bước sau để đảm bảo an toàn cho trẻ...",
-      author: "Y tá Nguyễn Thị Mai",
-      createdDate: "2024-03-20",
-      updatedDate: "2024-03-20",
-      status: "Đã đăng",
-      category: "Sức khỏe",
-      tags: ["sốt", "chăm sóc", "y tế"],
-      readCount: 45,
-    },
-    {
-      id: 2,
-      title: "Phòng ngừa dị ứng thức ăn ở trẻ mầm non",
-      content:
-        "Dị ứng thức ăn là một vấn đề phổ biến ở trẻ em. Để phòng ngừa và xử lý khi có dị ứng...",
-      author: "Y tá Nguyễn Thị Mai",
-      createdDate: "2024-03-18",
-      updatedDate: "2024-03-19",
-      status: "Đã đăng",
-      category: "Dinh dưỡng",
-      tags: ["dị ứng", "thức ăn", "phòng ngừa"],
-      readCount: 32,
-    },
-    {
-      id: 3,
-      title: "Vệ sinh tay đúng cách cho trẻ em",
-      content:
-        "Vệ sinh tay là biện pháp đơn giản nhưng hiệu quả nhất để ngăn ngừa các bệnh truyền nhiễm...",
-      author: "Y tá Nguyễn Thị Mai",
-      createdDate: "2024-03-15",
-      updatedDate: "2024-03-15",
-      status: "Bản nháp",
-      category: "Vệ sinh",
-      tags: ["vệ sinh", "rửa tay", "phòng bệnh"],
-      readCount: 0,
-    },
-  ]);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -70,7 +27,7 @@ function Blog() {
     content: "",
   });
 
-  // Available options (keep for mock data compatibility)
+  // Available options
   const categories = [
     "Sức khỏe",
     "Dinh dưỡng",
@@ -80,15 +37,8 @@ function Blog() {
   ];
   const statuses = ["Draft", "Published", "Pending", "Rejected"];
 
-  // Use real blogs or fallback to mock data
-  const blogData = blogs || mockBlogs;
-
-  // Debug API response
-  console.log("API blogs response:", blogs);
-  console.log("Using blogData:", blogData);
-
   // Filter blogs
-  const filteredBlogs = blogData.filter((blog) => {
+  const filteredBlogs = (blogs || []).filter((blog) => {
     const matchesSearch =
       (blog.title &&
         blog.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -153,8 +103,6 @@ function Blog() {
         createdBy: userId,
         createdAt: new Date().toISOString(),
       };
-
-      console.log("Sending blog data:", blogData);
 
       if (isEditing) {
         const blogId =
@@ -231,10 +179,13 @@ function Blog() {
 
   // Statistics
   const stats = {
-    total: blogData.length,
-    published: blogData.filter((b) => b.status === "Đã đăng").length,
-    draft: blogData.filter((b) => b.status === "Bản nháp").length,
-    totalReads: blogData.reduce((sum, blog) => sum + (blog.readCount || 0), 0),
+    total: (blogs || []).length,
+    published: (blogs || []).filter((b) => b.status === "Đã đăng").length,
+    draft: (blogs || []).filter((b) => b.status === "Bản nháp").length,
+    totalReads: (blogs || []).reduce(
+      (sum, blog) => sum + (blog.readCount || 0),
+      0
+    ),
   };
 
   // Show loading state
@@ -345,100 +296,474 @@ function Blog() {
 
         <div style={{ display: "flex", gap: "12px" }}>
           <button
-            className="btn-toggle"
             onClick={() => setShowDeleted((prev) => !prev)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "10px 16px",
+              backgroundColor: showDeleted ? "#fff3cd" : "#f0f2f5",
+              border: "none",
+              borderRadius: "10px",
+              color: showDeleted ? "#856404" : "#65676b",
+              fontSize: "14px",
+              fontWeight: "500",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = showDeleted
+                ? "#fff8dc"
+                : "#e4e6ea";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = showDeleted
+                ? "#fff3cd"
+                : "#f0f2f5";
+            }}
           >
             {showDeleted ? "↩️ Hoạt động" : "🗑️ Đã xóa"}
           </button>
-          <button className="create-blog-btn" onClick={handleCreateBlog}>
+          <button
+            onClick={handleCreateBlog}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "10px 20px",
+              backgroundColor: "#42b883",
+              border: "none",
+              borderRadius: "10px",
+              color: "white",
+              fontSize: "14px",
+              fontWeight: "600",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              boxShadow: "0 4px 12px rgba(66, 184, 131, 0.3)",
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = "#369970";
+              e.target.style.transform = "translateY(-1px)";
+              e.target.style.boxShadow = "0 6px 16px rgba(66, 184, 131, 0.4)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = "#42b883";
+              e.target.style.transform = "translateY(0)";
+              e.target.style.boxShadow = "0 4px 12px rgba(66, 184, 131, 0.3)";
+            }}
+          >
             ➕ Tạo blog mới
           </button>
         </div>
       </div>
 
-      {/* Blog List */}
-      <div className="blog-list">
+      {/* Blog Feed - Facebook Style */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
         {filteredBlogs.map((blog) => (
           <div
             key={blog.id}
-            className={`blog-card ${blog.isDeleted ? "deleted" : ""}`}
+            style={{
+              backgroundColor: "white",
+              borderRadius: "16px",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+              border: "1px solid #e4e6ea",
+              overflow: "hidden",
+              transition: "all 0.3s ease",
+              opacity: blog.isDeleted ? 0.7 : 1,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow =
+                "0 4px 16px rgba(0, 0, 0, 0.15)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.1)";
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
           >
-            <div className="blog-header-section">
-              <div className="blog-meta">
-                <span
-                  className={`category-badge ${getCategoryColor(
-                    blog.category
-                  )}`}
+            {/* Post Header */}
+            <div
+              style={{
+                padding: "16px 20px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                borderBottom: "1px solid #f0f2f5",
+              }}
+            >
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "12px" }}
+              >
+                {/* Author Avatar */}
+                <div
+                  style={{
+                    width: "44px",
+                    height: "44px",
+                    backgroundColor: "#42b883",
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "white",
+                    fontWeight: "600",
+                    fontSize: "16px",
+                    boxShadow: "0 2px 6px rgba(66, 184, 131, 0.3)",
+                  }}
                 >
-                  {blog.category}
-                </span>
-                <span className={`status-badge ${getStatusClass(blog.status)}`}>
+                  {(blog.createdByName || blog.author || "Y")
+                    .charAt(0)
+                    .toUpperCase()}
+                </div>
+
+                <div>
+                  <div
+                    style={{
+                      fontWeight: "600",
+                      color: "#1c1e21",
+                      fontSize: "15px",
+                      marginBottom: "2px",
+                    }}
+                  >
+                    {blog.createdByName || blog.author || "Y tá"}
+                  </div>
+                  <div
+                    style={{
+                      color: "#65676b",
+                      fontSize: "13px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    <span>
+                      {new Date(
+                        blog.createdAt || blog.createdDate
+                      ).toLocaleDateString("vi-VN")}
+                    </span>
+                    {blog.updatedAt && blog.updatedAt !== blog.createdDate && (
+                      <>
+                        <span>•</span>
+                        <span>Đã chỉnh sửa</span>
+                      </>
+                    )}
+                    {blog.isDeleted && (
+                      <>
+                        <span>•</span>
+                        <span style={{ color: "#e41e3f", fontWeight: "500" }}>
+                          Đã xóa
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Status & Category */}
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                {blog.category && (
+                  <span
+                    style={{
+                      padding: "4px 10px",
+                      borderRadius: "16px",
+                      fontSize: "12px",
+                      fontWeight: "500",
+                      backgroundColor: "#e7f3ff",
+                      color: "#1877f2",
+                    }}
+                  >
+                    {blog.category}
+                  </span>
+                )}
+
+                <span
+                  style={{
+                    padding: "4px 10px",
+                    borderRadius: "16px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    backgroundColor:
+                      blog.status === "Published"
+                        ? "#d4edda"
+                        : blog.status === "Draft"
+                        ? "#fff3cd"
+                        : blog.status === "Rejected"
+                        ? "#f8d7da"
+                        : "#f0f2f5",
+                    color:
+                      blog.status === "Published"
+                        ? "#155724"
+                        : blog.status === "Draft"
+                        ? "#856404"
+                        : blog.status === "Rejected"
+                        ? "#721c24"
+                        : "#65676b",
+                  }}
+                >
                   {blog.status}
                 </span>
               </div>
-              <div className="blog-stats">
-                <span className="read-count">👁️ {blog.readCount || 0}</span>
-              </div>
             </div>
 
-            <div className="blog-content-section">
-              <h3 className="blog-title">{blog.title}</h3>
-              <p className="blog-excerpt">
-                {blog.content?.length > 100
-                  ? blog.content.substring(0, 100) + "..."
+            {/* Post Content */}
+            <div style={{ padding: "0 20px 16px" }}>
+              <h3
+                style={{
+                  margin: "12px 0 8px",
+                  color: "#1c1e21",
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  lineHeight: "1.4",
+                  cursor: "pointer",
+                }}
+                onClick={() => handleViewBlog(blog)}
+              >
+                {blog.title}
+              </h3>
+
+              <p
+                style={{
+                  color: "#65676b",
+                  fontSize: "15px",
+                  lineHeight: "1.5",
+                  margin: "0 0 12px",
+                }}
+              >
+                {blog.content?.length > 120
+                  ? blog.content.substring(0, 120) + "..."
                   : blog.content}
               </p>
 
-              <div className="blog-tags">
-                {blog.tags &&
-                  Array.isArray(blog.tags) &&
-                  blog.tags.map((tag, index) => (
-                    <span key={index} className="tag">
-                      #{tag}
+              {/* Tags */}
+              {blog.tags &&
+                Array.isArray(blog.tags) &&
+                blog.tags.length > 0 && (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "6px",
+                      marginBottom: "12px",
+                    }}
+                  >
+                    {blog.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        style={{
+                          padding: "2px 8px",
+                          backgroundColor: "#f0f2f5",
+                          color: "#65676b",
+                          borderRadius: "12px",
+                          fontSize: "12px",
+                          fontWeight: "500",
+                        }}
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+              {/* Rejection Notice */}
+              {blog.status === "Rejected" && blog.rejectionReason && (
+                <div
+                  style={{
+                    backgroundColor: "#fef2f2",
+                    border: "1px solid #fecaca",
+                    borderRadius: "8px",
+                    padding: "12px",
+                    margin: "12px 0",
+                    fontSize: "14px",
+                  }}
+                >
+                  <div
+                    style={{
+                      color: "#dc2626",
+                      fontWeight: "600",
+                      marginBottom: "4px",
+                    }}
+                  >
+                    ❌ Lý do từ chối:
+                  </div>
+                  <div style={{ color: "#7f1d1d", lineHeight: "1.4" }}>
+                    {blog.rejectionReason}
+                  </div>
+                </div>
+              )}
+
+              {/* Post Image */}
+              {blog.image && (
+                <div
+                  style={{
+                    marginTop: "16px",
+                    borderRadius: "16px",
+                    overflow: "hidden",
+                    backgroundColor: "#f0f2f5",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
+                    transition: "all 0.3s ease",
+                  }}
+                  onClick={() => handleViewBlog(blog)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scale(1.02)";
+                    e.currentTarget.style.boxShadow =
+                      "0 8px 24px rgba(0, 0, 0, 0.15)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 16px rgba(0, 0, 0, 0.1)";
+                  }}
+                >
+                  <img
+                    src={blog.image}
+                    alt={blog.title}
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      minHeight: "380px",
+                      maxHeight: "650px",
+                      objectFit: "cover",
+                      display: "block",
+                    }}
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                      e.target.nextSibling.style.display = "flex";
+                    }}
+                  />
+                  <div
+                    style={{
+                      display: "none",
+                      width: "100%",
+                      height: "380px",
+                      backgroundColor: "#f0f2f5",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                      gap: "12px",
+                      color: "#65676b",
+                    }}
+                  >
+                    <span style={{ fontSize: "48px" }}>🖼️</span>
+                    <span style={{ fontSize: "16px", fontWeight: "500" }}>
+                      Không thể tải hình ảnh
                     </span>
-                  ))}
-              </div>
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="blog-footer-section">
-              <div className="blog-info">
-                {blog.isDeleted && (
-                  <span className="deleted-badge">Đã xóa</span>
-                )}
-                <span className="author">
-                  {blog.createdByName || blog.author}
+            {/* Engagement Bar */}
+            {(blog.readCount || 0) > 0 && (
+              <div
+                style={{
+                  padding: "8px 20px",
+                  borderTop: "1px solid #f0f2f5",
+                  borderBottom: "1px solid #f0f2f5",
+                  backgroundColor: "#f8f9fa",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  fontSize: "13px",
+                  color: "#65676b",
+                }}
+              >
+                <span
+                  style={{ display: "flex", alignItems: "center", gap: "4px" }}
+                >
+                  👁️ {blog.readCount} lượt xem
                 </span>
-                <span className="date">{blog.createdDate}</span>
-                {blog.updatedAt && blog.updatedAt !== blog.createdDate && (
-                  <span className="updated">
-                    Cập nhật: {blog.updatedAt.split("T")[0]}
-                  </span>
-                )}
               </div>
+            )}
 
-              <div className="blog-actions">
-                <button
-                  className="btn-view"
-                  onClick={() => handleViewBlog(blog)}
-                  title="Xem chi tiết"
-                >
-                  👁️
-                </button>
-                <button
-                  className="btn-edit"
-                  onClick={() => handleEditBlog(blog)}
-                  title="Chỉnh sửa"
-                >
-                  ✏️
-                </button>
-                <button
-                  className="btn-delete"
-                  onClick={() => handleDeleteBlog(blog)}
-                  title="Xóa"
-                >
-                  🗑️
-                </button>
-              </div>
+            {/* Action Buttons */}
+            <div
+              style={{
+                padding: "12px 20px",
+                display: "flex",
+                gap: "8px",
+                flexWrap: "wrap",
+              }}
+            >
+              <button
+                onClick={() => handleViewBlog(blog)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "8px 16px",
+                  backgroundColor: "#f0f2f5",
+                  border: "none",
+                  borderRadius: "8px",
+                  color: "#65676b",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#e4e6ea")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = "#f0f2f5")
+                }
+              >
+                👁️ Xem chi tiết
+              </button>
+
+              <button
+                onClick={() => handleEditBlog(blog)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "8px 16px",
+                  backgroundColor: "#e7f3ff",
+                  border: "none",
+                  borderRadius: "8px",
+                  color: "#1877f2",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#d0e8ff")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = "#e7f3ff")
+                }
+              >
+                ✏️ Chỉnh sửa
+              </button>
+
+              <button
+                onClick={() => handleDeleteBlog(blog)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "8px 16px",
+                  backgroundColor: "#ffebee",
+                  border: "none",
+                  borderRadius: "8px",
+                  color: "#c62828",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#ffcdd2")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = "#ffebee")
+                }
+              >
+                🗑️ Xóa
+              </button>
             </div>
           </div>
         ))}
@@ -468,6 +793,52 @@ function Blog() {
             </div>
 
             <div className="modal-body">
+              {/* Hiển thị hình ảnh nếu có */}
+              {selectedBlog.image && (
+                <div className="blog-detail-image">
+                  <img
+                    src={selectedBlog.image}
+                    alt={selectedBlog.title}
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      minHeight: "450px",
+                      maxHeight: "600px",
+                      objectFit: "cover",
+                      borderRadius: "16px",
+                      marginBottom: "24px",
+                      border: "none",
+                      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+                    }}
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                      e.target.nextSibling.style.display = "flex";
+                    }}
+                  />
+                  <div
+                    style={{
+                      display: "none",
+                      width: "100%",
+                      height: "450px",
+                      backgroundColor: "#f8f9fa",
+                      borderRadius: "16px",
+                      border: "none",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                      gap: "16px",
+                      color: "#65676b",
+                      marginBottom: "24px",
+                      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+                    }}
+                  >
+                    <span style={{ fontSize: "4rem" }}>🖼️</span>
+                    <span style={{ fontSize: "1.1rem", fontWeight: "500" }}>
+                      Không thể tải hình ảnh
+                    </span>
+                  </div>
+                </div>
+              )}
               <div className="blog-detail-meta">
                 <div className="meta-row">
                   <span className="meta-label">Danh mục:</span>
@@ -489,6 +860,39 @@ function Blog() {
                     {selectedBlog.status}
                   </span>
                 </div>
+                {selectedBlog.status === "Rejected" &&
+                  selectedBlog.rejectionReason && (
+                    <div className="meta-row rejection-info">
+                      <span className="meta-label">Lý do từ chối:</span>
+                      <div className="rejection-reason">
+                        <p
+                          style={{
+                            backgroundColor: "#fef2f2",
+                            border: "1px solid #fecaca",
+                            borderRadius: "8px",
+                            padding: "12px",
+                            margin: "8px 0",
+                            color: "#dc2626",
+                            fontSize: "0.9rem",
+                            lineHeight: "1.5",
+                          }}
+                        >
+                          ❌ {selectedBlog.rejectionReason}
+                        </p>
+                        {selectedBlog.rejectedByName && (
+                          <small
+                            style={{ color: "#6b7280", fontSize: "0.8rem" }}
+                          >
+                            Từ chối bởi: {selectedBlog.rejectedByName}
+                            {selectedBlog.rejectedOn &&
+                              ` - ${new Date(
+                                selectedBlog.rejectedOn
+                              ).toLocaleDateString("vi-VN")}`}
+                          </small>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 <div className="meta-row">
                   <span className="meta-label">Tác giả:</span>
                   <span>{selectedBlog.author}</span>
