@@ -2,7 +2,7 @@
   padding: 24px;
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .medicine-header {
@@ -10,11 +10,17 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(
+    135deg,
+    #2f5148 0%,
+    #4a7065 25%,
+    #73ad67 75%,
+    #85b373 100%
+  );
   padding: 32px;
   border-radius: 20px;
   color: white;
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 10px 30px rgba(47, 81, 72, 0.3);
 }
 
 .medicine-header h1 {
@@ -191,9 +197,9 @@
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #73ad67;
   background: white;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(115, 173, 103, 0.1);
 }
 
 .form-group textarea {
@@ -202,7 +208,7 @@
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2f5148 0%, #73ad67 100%);
   color: white;
   padding: 14px 32px;
   border: none;
@@ -211,13 +217,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(47, 81, 72, 0.3);
   margin-top: 16px;
 }
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(47, 81, 72, 0.4);
 }
 
 .submit-btn:disabled {
@@ -371,7 +377,7 @@
 .loading {
   text-align: center;
   padding: 40px;
-  color: #667eea;
+  color: #2f5148;
   font-size: 1.1rem;
 }
 
@@ -461,8 +467,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .medicine-info-section,
@@ -532,7 +542,8 @@
   border-top: 1px solid #e9ecef;
 }
 
-.edit-btn, .delete-btn {
+.edit-btn,
+.delete-btn {
   flex: 1;
   padding: 10px 16px;
   border: none;
@@ -563,7 +574,8 @@
   box-shadow: 0 4px 12px rgba(255, 118, 117, 0.4);
 }
 
-.edit-btn:disabled, .delete-btn:disabled {
+.edit-btn:disabled,
+.delete-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
@@ -647,7 +659,8 @@
   justify-content: center;
 }
 
-.cancel-btn, .confirm-delete-btn {
+.cancel-btn,
+.confirm-delete-btn {
   padding: 12px 24px;
   border: none;
   border-radius: 8px;
@@ -703,7 +716,7 @@
 }
 
 .edit-modal-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2f5148 0%, #4a7065 25%, #73ad67 75%, #85b373 100%);
   padding: 24px 32px;
   border-radius: 20px 20px 0 0;
   display: flex;
@@ -781,21 +794,21 @@
     width: 95%;
     max-height: 95vh;
   }
-  
+
   .edit-modal-header {
     padding: 20px;
   }
-  
+
   .edit-medicine-form {
     padding: 24px;
     grid-template-columns: 1fr;
   }
-  
+
   .edit-medicine-form .form-group:nth-last-child(3),
   .edit-medicine-form .form-group:nth-last-child(4) {
     grid-column: 1;
   }
-  
+
   .edit-medicine-form .modal-actions {
     grid-column: 1;
     flex-direction: column;

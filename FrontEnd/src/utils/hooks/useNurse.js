@@ -1,5 +1,5 @@
-import { useApi, useApiCall } from "./useApi";
-import { useState, useCallback } from "react";
+import { useApi, useApiCall } from './useApi';
+import { useState, useCallback } from 'react';
 import {
   nurseHealthService,
   nurseBlogService,
@@ -7,7 +7,7 @@ import {
   nurseNotificationService,
   nurseMedicationService,
   nurseChatService,
-} from "../../services/nurseService";
+} from '../../services/nurseService';
 
 // Hook for nurse health records
 export const useNurseHealthRecords = () => {
@@ -36,10 +36,11 @@ export const useNurseNotifications = () => {
       setError(null);
 
       const data = await nurseNotificationService.getNotifications();
-      setNotifications(Array.isArray(data) ? data : []);
+      const finalData = Array.isArray(data) ? data : [];
+      setNotifications(finalData);
     } catch (err) {
-      console.error("Failed to fetch nurse notifications:", err);
-      setError("Failed to load notifications");
+      console.error('Failed to fetch nurse notifications:', err);
+      setError('Failed to load notifications');
       setNotifications([]);
     } finally {
       setLoading(false);
@@ -47,13 +48,13 @@ export const useNurseNotifications = () => {
   }, []);
 
   const markAsRead = useCallback(
-    async (notificationId) => {
+    async notificationId => {
       try {
         await nurseNotificationService.markAsRead(notificationId);
         // Refresh notifications after marking as read
         await fetchNotifications();
       } catch (err) {
-        console.error("Failed to mark notification as read:", err);
+        console.error('Failed to mark notification as read:', err);
         throw err;
       }
     },
@@ -88,7 +89,7 @@ export const useNurseChat = () => {
 export const useNurseActions = () => {
   const { execute, loading, error } = useApiCall();
 
-  const createHealthRecord = async (recordData) => {
+  const createHealthRecord = async recordData => {
     return execute(() =>
       nurseHealthRecordService.createHealthRecord(recordData)
     );
@@ -100,11 +101,11 @@ export const useNurseActions = () => {
     );
   };
 
-  const deleteHealthRecord = async (recordId) => {
+  const deleteHealthRecord = async recordId => {
     return execute(() => nurseHealthRecordService.deleteHealthRecord(recordId));
   };
 
-  const createBlog = async (blogData) => {
+  const createBlog = async blogData => {
     return execute(() => nurseBlogService.createBlog(blogData));
   };
 
@@ -112,7 +113,7 @@ export const useNurseActions = () => {
     return execute(() => nurseBlogService.updateBlog(blogId, blogData));
   };
 
-  const deleteBlog = async (blogId) => {
+  const deleteBlog = async blogId => {
     return execute(() => nurseBlogService.deleteBlog(blogId));
   };
 
@@ -122,17 +123,17 @@ export const useNurseActions = () => {
     );
   };
 
-  const sendNotification = async (notificationData) => {
+  const sendNotification = async notificationData => {
     return execute(() =>
       nurseNotificationService.sendNotification(notificationData)
     );
   };
 
-  const markNotificationAsRead = async (notificationId) => {
+  const markNotificationAsRead = async notificationId => {
     return execute(() => nurseNotificationService.markAsRead(notificationId));
   };
 
-  const createMedication = async (medicationData) => {
+  const createMedication = async medicationData => {
     return execute(() => medicationService.createMedication(medicationData));
   };
 
@@ -142,11 +143,11 @@ export const useNurseActions = () => {
     );
   };
 
-  const deleteMedication = async (medicationId) => {
+  const deleteMedication = async medicationId => {
     return execute(() => medicationService.deleteMedication(medicationId));
   };
 
-  const sendChatMessage = async (messageData) => {
+  const sendChatMessage = async messageData => {
     return execute(() => nurseChatService.sendMessage(messageData));
   };
 

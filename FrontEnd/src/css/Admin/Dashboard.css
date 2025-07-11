@@ -9,10 +9,16 @@
   margin-bottom: 32px;
   text-align: center;
   padding: 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(
+    135deg,
+    #2f5148 0%,
+    #4a7065 25%,
+    #73ad67 75%,
+    #85b373 100%
+  );
   border-radius: 20px;
   color: white;
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 10px 30px rgba(47, 81, 72, 0.3);
 }
 
 .dashboard-header h1 {
@@ -33,36 +39,37 @@
   border-radius: 20px;
   background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
   border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 
-    0 10px 25px rgba(0, 0, 0, 0.08),
-    0 4px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   position: relative;
 }
 
 .stat-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #4facfe);
+  background: linear-gradient(90deg, #2f5148, #4a7065, #73ad67, #85b373);
   background-size: 300% 100%;
   animation: gradientMove 3s ease-in-out infinite;
 }
 
 @keyframes gradientMove {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .stat-card:hover {
   transform: translateY(-8px);
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.12),
-    0 8px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
 }
 
 .stat-content {
@@ -123,9 +130,7 @@
   border-radius: 20px;
   background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
   border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 
-    0 15px 35px rgba(0, 0, 0, 0.08),
-    0 6px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08), 0 6px 15px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 }
 
@@ -140,7 +145,7 @@
 
 .report-title {
   font-weight: 700 !important;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2f5148 0%, #73ad67 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -172,16 +177,14 @@
   border-radius: 16px;
   background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
   border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 
-    0 8px 20px rgba(0, 0, 0, 0.06),
-    0 3px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06), 0 3px 8px rgba(0, 0, 0, 0.04);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   position: relative;
 }
 
 .report-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -212,9 +215,7 @@
 
 .report-card:hover {
   transform: translateY(-6px);
-  box-shadow: 
-    0 15px 35px rgba(0, 0, 0, 0.1),
-    0 6px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 6px 15px rgba(0, 0, 0, 0.08);
 }
 
 .report-card-content {
@@ -295,7 +296,7 @@
 
 .MuiTabs-indicator {
   height: 3px !important;
-  background: linear-gradient(90deg, #667eea, #764ba2) !important;
+  background: linear-gradient(90deg, #2f5148, #73ad67) !important;
   border-radius: 3px !important;
 }
 
@@ -349,9 +350,7 @@
   border-radius: 20px;
   background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
   border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 
-    0 10px 25px rgba(0, 0, 0, 0.08),
-    0 4px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   height: fit-content;
 }
@@ -360,9 +359,7 @@
 .activities-card:hover,
 .system-health-card:hover {
   transform: translateY(-4px);
-  box-shadow: 
-    0 15px 35px rgba(0, 0, 0, 0.1),
-    0 6px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 6px 12px rgba(0, 0, 0, 0.08);
 }
 
 .quick-actions-card .MuiCardContent-root,
@@ -384,17 +381,17 @@
 }
 
 .quick-actions-card h6::before {
-  content: '⚡';
+  content: "⚡";
   font-size: 1.5rem;
 }
 
 .activities-card h6::before {
-  content: '📊';
+  content: "📊";
   font-size: 1.5rem;
 }
 
 .system-health-card h6::before {
-  content: '🛡️';
+  content: "🛡️";
   font-size: 1.5rem;
 }
 
@@ -734,19 +731,45 @@
 }
 
 /* Stagger animation delays */
-.stat-card:nth-child(1) { animation-delay: 0.1s; }
-.stat-card:nth-child(2) { animation-delay: 0.2s; }
-.stat-card:nth-child(3) { animation-delay: 0.3s; }
-.stat-card:nth-child(4) { animation-delay: 0.4s; }
+.stat-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.stat-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.stat-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.stat-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
 
-.report-section-card { animation-delay: 0.5s; }
-.quick-actions-card { animation-delay: 0.6s; }
-.activities-card { animation-delay: 0.7s; }
-.system-health-card { animation-delay: 0.8s; }
+.report-section-card {
+  animation-delay: 0.5s;
+}
+.quick-actions-card {
+  animation-delay: 0.6s;
+}
+.activities-card {
+  animation-delay: 0.7s;
+}
+.system-health-card {
+  animation-delay: 0.8s;
+}
 
 /* Report cards animation */
-.report-card:nth-child(1) { animation-delay: 0.1s; }
-.report-card:nth-child(2) { animation-delay: 0.2s; }
-.report-card:nth-child(3) { animation-delay: 0.3s; }
-.report-card:nth-child(4) { animation-delay: 0.4s; }
-.report-card:nth-child(5) { animation-delay: 0.5s; }
+.report-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.report-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.report-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.report-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.report-card:nth-child(5) {
+  animation-delay: 0.5s;
+}

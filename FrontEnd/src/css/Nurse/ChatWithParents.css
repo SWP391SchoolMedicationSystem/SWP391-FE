@@ -109,7 +109,7 @@
 
 .search-box input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #73ad67;
 }
 
 .filter-group {
@@ -130,7 +130,7 @@
 
 .filter-group select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #73ad67;
 }
 
 /* Contacts Table */
@@ -147,7 +147,7 @@
 }
 
 .contacts-table th {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2f5148, #73ad67);
   color: white;
   padding: 15px;
   text-align: left;
@@ -196,7 +196,7 @@
   background: linear-gradient(135deg, #f093fb, #f5576c);
 }
 .badge-la3 {
-  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  background: linear-gradient(135deg, #5cbfa3, #85d1c0);
 }
 
 .status-badge {
@@ -251,13 +251,13 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2f5148, #73ad67);
   color: white;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(47, 81, 72, 0.4);
 }
 
 .btn-success {
@@ -436,7 +436,7 @@
 }
 
 .message.nurse .message-content {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2f5148, #73ad67);
   color: white;
   border-bottom-right-radius: 5px;
 }

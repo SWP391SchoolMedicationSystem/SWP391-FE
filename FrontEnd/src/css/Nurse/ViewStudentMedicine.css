@@ -136,7 +136,7 @@
 }
 
 .medicine-table th {
-  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+  background: linear-gradient(135deg, #2f5148 0%, #73ad67 100%);
   color: white;
   padding: 16px 12px;
   text-align: left;
@@ -162,7 +162,7 @@
 }
 
 .medicine-table tr:hover {
-  background-color: rgba(25, 118, 210, 0.05);
+  background-color: rgba(47, 81, 72, 0.05);
 }
 
 .medicine-table tr:last-child td {
@@ -247,7 +247,7 @@
 .loading {
   text-align: center;
   padding: 40px;
-  color: #1976d2;
+  color: #2f5148;
   font-size: 1.1rem;
 }
 
@@ -351,7 +351,7 @@
 .table-loading {
   text-align: center;
   padding: 40px;
-  color: #1976d2;
+  color: #2f5148;
 }
 
 .table-loading::after {
@@ -360,7 +360,7 @@
   width: 20px;
   height: 20px;
   border: 3px solid #f3f3f3;
-  border-top: 3px solid #1976d2;
+  border-top: 3px solid #2f5148;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-left: 10px;
