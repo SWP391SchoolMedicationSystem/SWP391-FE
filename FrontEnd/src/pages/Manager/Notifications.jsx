@@ -1,7 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useManagerNotifications } from '../../utils/hooks/useManager';
-import { managerNotificationService } from '../../services/managerService';
+import {
+  managerNotificationService,
+  managerStaffService,
+} from '../../services/managerService';
 import '../../css/Manager/Notifications.css';
+
+// Material-UI Icons
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import PersonIcon from '@mui/icons-material/Person';
+import GroupIcon from '@mui/icons-material/Group';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import CategoryIcon from '@mui/icons-material/Category';
+import MessageIcon from '@mui/icons-material/Message';
+import BadgeIcon from '@mui/icons-material/Badge';
+import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
+import CloseIcon from '@mui/icons-material/Close';
+import InfoIcon from '@mui/icons-material/Info';
 
 const Notifications = () => {
   const [notificationType, setNotificationType] = useState('staff'); // "staff" hoặc "parent"
@@ -9,6 +24,7 @@ const Notifications = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [staffMap, setStaffMap] = useState({}); // Map staff ID to staff name
   const [formData, setFormData] = useState({
     title: '',
     message: '',
@@ -22,6 +38,26 @@ const Notifications = () => {
     refetch,
     fetchNotifications,
   } = useManagerNotifications(notificationType);
+
+  // Fetch staff list to map IDs to names
+  useEffect(() => {
+    const fetchStaffList = async () => {
+      try {
+        const staffList = await managerStaffService.getAllStaff();
+        if (Array.isArray(staffList)) {
+          const staffMapping = staffList.reduce((acc, staff) => {
+            acc[staff.staffid] = staff.fullname;
+            return acc;
+          }, {});
+          setStaffMap(staffMapping);
+        }
+      } catch (error) {
+        console.error('Error fetching staff list:', error);
+      }
+    };
+
+    fetchStaffList();
+  }, []);
 
   // Gọi API khi component mount hoặc khi thay đổi loại thông báo
   useEffect(() => {
@@ -186,6 +222,7 @@ const Notifications = () => {
     setShowDetailModal(true);
   };
 
+  // Handle close modal
   const handleCloseModal = () => {
     setShowDetailModal(false);
     setSelectedNotification(null);
@@ -358,63 +395,473 @@ const Notifications = () => {
 
       {/* Modal xem chi tiết */}
       {showDetailModal && selectedNotification && (
-        <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>📋 Chi Tiết Thông Báo</h3>
-              <button onClick={handleCloseModal} className="close-btn">
-                ✕
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px',
+          }}
+          onClick={handleCloseModal}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '20px',
+              width: '100%',
+              maxWidth: '800px',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              border: '1px solid #c1cbc2',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(20px)',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '25px',
+                borderBottom: '1px solid #e9ecef',
+                background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                color: 'white',
+                borderRadius: '20px 20px 0 0',
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  color: 'white',
+                  fontFamily:
+                    "Satoshi, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+                  fontSize: '1.5rem',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+              >
+                <InfoIcon sx={{ color: 'white', fontSize: '1.5rem' }} />
+                Chi Tiết Thông Báo
+              </h3>
+              <button
+                onClick={handleCloseModal}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  border: 'none',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: '1.5rem',
+                  padding: '8px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.3s ease',
+                  backdropFilter: 'blur(10px)',
+                }}
+              >
+                <CloseIcon sx={{ fontSize: '1.5rem' }} />
               </button>
             </div>
-            <div className="modal-body">
-              <div className="detail-section">
-                <h4>Thông tin chung</h4>
-                <div className="detail-row">
-                  <strong>Tiêu đề:</strong> {selectedNotification.title}
+
+            {/* Modal Body */}
+            <div style={{ padding: '30px' }}>
+              {/* Notification Title Header */}
+              <div
+                style={{
+                  background:
+                    'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+                  padding: '20px',
+                  borderRadius: '15px',
+                  marginBottom: '25px',
+                  textAlign: 'center',
+                  border: '1px solid #e9ecef',
+                }}
+              >
+                <h4
+                  style={{
+                    margin: 0,
+                    color: '#2f5148',
+                    fontFamily: 'Satoshi, sans-serif',
+                    fontSize: '1.6rem',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '10px',
+                  }}
+                >
+                  <NotificationsIcon
+                    sx={{ color: '#97a19b', fontSize: '1.6rem' }}
+                  />
+                  {selectedNotification.title}
+                </h4>
+              </div>
+
+              {/* Notification Details Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+                  gap: '20px',
+                  marginBottom: '25px',
+                }}
+              >
+                {/* General Information */}
+                <div
+                  style={{
+                    background: '#f8f9fa',
+                    padding: '20px',
+                    borderRadius: '15px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <h5
+                    style={{
+                      margin: '0 0 20px 0',
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '1.2rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <InfoIcon sx={{ color: '#97a19b', fontSize: '1.2rem' }} />
+                    Thông tin chung
+                  </h5>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '15px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 15px',
+                        background: 'white',
+                        borderRadius: '10px',
+                        border: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <CategoryIcon
+                          sx={{ color: '#97a19b', fontSize: '1.1rem' }}
+                        />
+                        <span
+                          style={{
+                            color: '#97a19b',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Loại:
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          color: '#2f5148',
+                          fontFamily: 'Satoshi, sans-serif',
+                          fontSize: '0.9rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {getTypeBadge(selectedNotification.type)}
+                      </span>
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 15px',
+                        background: 'white',
+                        borderRadius: '10px',
+                        border: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <CalendarTodayIcon
+                          sx={{ color: '#97a19b', fontSize: '1.1rem' }}
+                        />
+                        <span
+                          style={{
+                            color: '#97a19b',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Ngày tạo:
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          color: '#2f5148',
+                          fontFamily: 'Satoshi, sans-serif',
+                          fontSize: '0.9rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {new Date(
+                          selectedNotification.createdAt
+                        ).toLocaleString('vi-VN')}
+                      </span>
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 15px',
+                        background: 'white',
+                        borderRadius: '10px',
+                        border: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <PersonIcon
+                          sx={{ color: '#97a19b', fontSize: '1.1rem' }}
+                        />
+                        <span
+                          style={{
+                            color: '#97a19b',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Người tạo:
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          color: '#2f5148',
+                          fontFamily: 'Satoshi, sans-serif',
+                          fontSize: '0.9rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {staffMap[selectedNotification.createdBy] ||
+                          `ID: ${selectedNotification.createdBy}`}
+                      </span>
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 15px',
+                        background: 'white',
+                        borderRadius: '10px',
+                        border: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <GroupIcon
+                          sx={{ color: '#97a19b', fontSize: '1.1rem' }}
+                        />
+                        <span
+                          style={{
+                            color: '#97a19b',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Đối tượng:
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          color: '#2f5148',
+                          fontFamily: 'Satoshi, sans-serif',
+                          fontSize: '0.9rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {selectedNotification.targetType === 'parent'
+                          ? 'Phụ Huynh'
+                          : 'Nhân Viên'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="detail-row">
-                  <strong>Loại:</strong>{' '}
-                  {getTypeBadge(selectedNotification.type)}
-                </div>
-                <div className="detail-row">
-                  <strong>Ngày tạo:</strong>{' '}
-                  {new Date(selectedNotification.createdAt).toLocaleString(
-                    'vi-VN'
-                  )}
-                </div>
-                <div className="detail-row">
-                  <strong>Người tạo:</strong> {selectedNotification.createdBy}
-                </div>
-                <div className="detail-row">
-                  <strong>Đối tượng:</strong>{' '}
-                  {selectedNotification.targetType === 'parent'
-                    ? 'Phụ Huynh'
-                    : 'Nhân Viên'}
+
+                {/* Message Content */}
+                <div
+                  style={{
+                    background: '#f8f9fa',
+                    padding: '20px',
+                    borderRadius: '15px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <h5
+                    style={{
+                      margin: '0 0 15px 0',
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '1.2rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <MessageIcon
+                      sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                    />
+                    Nội dung chi tiết
+                  </h5>
+                  <div
+                    style={{
+                      background: 'white',
+                      padding: '15px',
+                      borderRadius: '12px',
+                      border: '1px solid #e9ecef',
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: 0,
+                        color: '#2f5148',
+                        fontSize: '0.9rem',
+                        fontFamily: 'Satoshi, sans-serif',
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {selectedNotification.message}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <div className="detail-section">
-                <h4>Nội dung chi tiết</h4>
-                <div className="message-detail">
-                  {selectedNotification.message}
-                </div>
-              </div>
-
+              {/* Recipients List */}
               {selectedNotification.targetType === 'parent' && (
-                <div className="detail-section">
-                  <h4>Danh sách phụ huynh nhận thông báo</h4>
-                  <div className="recipients-list">
+                <div
+                  style={{
+                    background: '#f8f9fa',
+                    padding: '20px',
+                    borderRadius: '15px',
+                    border: '1px solid #e9ecef',
+                    marginBottom: '20px',
+                  }}
+                >
+                  <h5
+                    style={{
+                      margin: '0 0 20px 0',
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '1.2rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <FamilyRestroomIcon
+                      sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                    />
+                    Danh sách phụ huynh nhận thông báo
+                  </h5>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns:
+                        'repeat(auto-fit, minmax(300px, 1fr))',
+                      gap: '15px',
+                    }}
+                  >
                     {selectedNotification.notificationParentDetails.map(
                       (detail, index) => (
-                        <div key={index} className="recipient-item">
-                          <div className="recipient-info">
-                            <span className="recipient-id">
+                        <div
+                          key={index}
+                          style={{
+                            background: 'white',
+                            padding: '15px',
+                            borderRadius: '10px',
+                            border: '1px solid #e9ecef',
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              marginBottom: '10px',
+                            }}
+                          >
+                            <FamilyRestroomIcon
+                              sx={{ color: '#97a19b', fontSize: '1.1rem' }}
+                            />
+                            <span
+                              style={{
+                                color: '#2f5148',
+                                fontFamily: 'Satoshi, sans-serif',
+                                fontSize: '0.9rem',
+                                fontWeight: 600,
+                              }}
+                            >
                               Phụ huynh ID: {detail.parentId}
                             </span>
                           </div>
-                          <div className="recipient-message">
+                          <p
+                            style={{
+                              margin: 0,
+                              color: '#97a19b',
+                              fontSize: '0.9rem',
+                              fontFamily: 'Satoshi, sans-serif',
+                              lineHeight: 1.5,
+                            }}
+                          >
                             {detail.message}
-                          </div>
+                          </p>
                         </div>
                       )
                     )}
@@ -423,20 +870,89 @@ const Notifications = () => {
               )}
 
               {selectedNotification.targetType === 'staff' && (
-                <div className="detail-section">
-                  <h4>Danh sách nhân viên nhận thông báo</h4>
-                  <div className="recipients-list">
+                <div
+                  style={{
+                    background: '#f8f9fa',
+                    padding: '20px',
+                    borderRadius: '15px',
+                    border: '1px solid #e9ecef',
+                    marginBottom: '20px',
+                  }}
+                >
+                  <h5
+                    style={{
+                      margin: '0 0 20px 0',
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '1.2rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <BadgeIcon sx={{ color: '#97a19b', fontSize: '1.2rem' }} />
+                    Danh sách nhân viên nhận thông báo
+                  </h5>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns:
+                        'repeat(auto-fit, minmax(300px, 1fr))',
+                      gap: '15px',
+                    }}
+                  >
                     {selectedNotification.notificationstaffdetails.map(
                       (detail, index) => (
-                        <div key={index} className="recipient-item">
-                          <div className="recipient-info">
-                            <span className="recipient-id">
-                              Nhân viên ID: {detail.staffid}
+                        <div
+                          key={index}
+                          style={{
+                            background: 'white',
+                            padding: '15px',
+                            borderRadius: '10px',
+                            border: '1px solid #e9ecef',
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              marginBottom: '10px',
+                            }}
+                          >
+                            <BadgeIcon
+                              sx={{ color: '#97a19b', fontSize: '1.1rem' }}
+                            />
+                            <span
+                              style={{
+                                color: '#2f5148',
+                                fontFamily: 'Satoshi, sans-serif',
+                                fontSize: '0.9rem',
+                                fontWeight: 600,
+                              }}
+                            >
+                              {staffMap[detail.staffid] ? (
+                                <>
+                                  {staffMap[detail.staffid]} (ID:{' '}
+                                  {detail.staffid})
+                                </>
+                              ) : (
+                                `Nhân viên ID: ${detail.staffid}`
+                              )}
                             </span>
                           </div>
-                          <div className="recipient-message">
+                          <p
+                            style={{
+                              margin: 0,
+                              color: '#97a19b',
+                              fontSize: '0.9rem',
+                              fontFamily: 'Satoshi, sans-serif',
+                              lineHeight: 1.5,
+                            }}
+                          >
                             {detail.message}
-                          </div>
+                          </p>
                         </div>
                       )
                     )}
@@ -444,8 +960,31 @@ const Notifications = () => {
                 </div>
               )}
             </div>
-            <div className="modal-footer">
-              <button onClick={handleCloseModal} className="close-modal-btn">
+
+            {/* Modal Footer */}
+            <div
+              style={{
+                padding: '20px 30px',
+                borderTop: '1px solid #e9ecef',
+                display: 'flex',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <button
+                onClick={handleCloseModal}
+                style={{
+                  background: '#bfefa1',
+                  color: '#1a3a2e',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  fontFamily: 'Satoshi, sans-serif',
+                  transition: 'all 0.3s ease',
+                }}
+              >
                 Đóng
               </button>
             </div>
