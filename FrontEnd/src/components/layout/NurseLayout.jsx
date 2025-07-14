@@ -514,6 +514,7 @@ export default function NurseLayout() {
             </Box>
 
             <IconButton
+              onClick={() => navigate('/nurse/notifications')}
               sx={{
                 width: 40,
                 height: 40,

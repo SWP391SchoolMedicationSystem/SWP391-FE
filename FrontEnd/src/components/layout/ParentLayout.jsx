@@ -554,6 +554,7 @@ export default function ParentLayout() {
             </Box>
 
             <IconButton
+              onClick={() => navigate('/parent/notifications')}
               sx={{
                 width: 40,
                 height: 40,
