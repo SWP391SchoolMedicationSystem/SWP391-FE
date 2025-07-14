@@ -514,3 +514,50 @@ body,
     font-size: 3rem;
   }
 }
+
+/* About Us Section */
+.about-us-section {
+  padding: 80px 0;
+  background-color: var(--background-light-gray);
+  position: relative;
+}
+
+.about-us-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}
+
+.about-us-section .section-title {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.about-us-section .section-title h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-dark-color);
+  margin-bottom: 16px;
+}
+
+.about-us-section .section-title p {
+  font-size: 1.1rem;
+  color: var(--text-muted-color);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Responsive for About Us */
+@media (max-width: 768px) {
+  .about-us-section {
+    padding: 60px 0;
+  }
+  
+  .about-us-section .section-title h2 {
+    font-size: 2rem;
+  }
+}

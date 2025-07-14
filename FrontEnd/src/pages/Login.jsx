@@ -1,7 +1,6 @@
 // File: src/pages/Login.jsx
 import { Box, Container, Grid, Typography } from "@mui/material";
 import Header from "../components/layout/Header";
-import Footer from "../components/layout/Footer";
 import FeatureCards from "../components/login/FeatureCards";
 import LoginForm from "../components/login/LoginForm";
 
@@ -58,7 +57,6 @@ export default function MedlearnLoginPage() {
           </Box>
         </Box>
       </Container>
-      <Footer />
     </Box>
   );
 }
