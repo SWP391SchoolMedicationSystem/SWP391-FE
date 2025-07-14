@@ -138,10 +138,31 @@ export const managerBlogService = {
   },
 
   // Create blog post
-  createBlog: async blogData => {
+  createBlog: async (blogData, imageFile = null) => {
     try {
-      const response = await apiClient.post(API_ENDPOINTS.BLOG.ADD, blogData);
-      return response;
+      if (imageFile) {
+        // Use FormData for multipart/form-data when image is included
+        const formData = new FormData();
+        formData.append('Title', blogData.title);
+        formData.append('Content', blogData.content);
+        formData.append('CreatedBy', blogData.createdBy);
+        formData.append('ImageFile', imageFile);
+
+        const response = await apiClient.post(
+          API_ENDPOINTS.BLOG.ADD,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+        return response;
+      } else {
+        // Use regular JSON for text-only blog posts
+        const response = await apiClient.post(API_ENDPOINTS.BLOG.ADD, blogData);
+        return response;
+      }
     } catch (error) {
       console.error('Error creating blog:', error);
       throw error;

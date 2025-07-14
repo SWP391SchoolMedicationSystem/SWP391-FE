@@ -105,8 +105,8 @@ export const useNurseActions = () => {
     return execute(() => nurseHealthRecordService.deleteHealthRecord(recordId));
   };
 
-  const createBlog = async blogData => {
-    return execute(() => nurseBlogService.createBlog(blogData));
+  const createBlog = async (blogData, imageFile = null) => {
+    return execute(() => nurseBlogService.createBlog(blogData, imageFile));
   };
 
   const updateBlog = async (blogId, blogData) => {
