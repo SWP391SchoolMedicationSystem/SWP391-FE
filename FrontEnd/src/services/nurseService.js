@@ -198,6 +198,29 @@ export const nurseBlogService = {
     }
   },
 
+  // Upload image for blog
+  uploadBlogImage: async (blogId, imageFile) => {
+    try {
+      const formData = new FormData();
+      formData.append('blogId', blogId);
+      formData.append('image', imageFile);
+
+      const response = await apiClient.post(
+        'https://api-schoolhealth.purintech.id.vn/api/Blog/upload-image',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error('Error uploading blog image:', error);
+      throw error;
+    }
+  },
+
   // Get blog by ID (for editing/view)
   getBlogById: async blogId => {
     try {

@@ -838,148 +838,142 @@ function Blog() {
       {showModal && selectedBlog && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div
-            className="modal-content large"
+            className="modal-content blog-detail-modal"
             onClick={e => e.stopPropagation()}
           >
-            <div className="modal-header">
-              <h3>{selectedBlog.title}</h3>
+            <div className="modal-header blog-detail-header">
+              <div className="header-content">
+                <h2 className="blog-title">{selectedBlog.title}</h2>
+                <div className="blog-meta">
+                  <span className="author">
+                    👤 {selectedBlog.author || 'Không xác định'}
+                  </span>
+                  <span className="date">
+                    📅 {selectedBlog.createdDate}
+                  </span>
+                  <span className="views">
+                    👁️ {selectedBlog.readCount || 0} lượt đọc
+                  </span>
+                </div>
+              </div>
               <button
                 className="modal-close"
                 onClick={() => setShowModal(false)}
               >
-                ×
+                ✕
               </button>
             </div>
 
-            <div className="modal-body">
-              {/* Hiển thị hình ảnh nếu có */}
+            <div className="modal-body blog-detail-body">
+              {/* Hero Image Section */}
               {selectedBlog.image && (
-                <div className="blog-detail-image">
+                <div className="blog-hero-image">
                   <img
                     src={selectedBlog.image}
                     alt={selectedBlog.title}
-                    style={{
-                      width: '100%',
-                      height: 'auto',
-                      minHeight: '450px',
-                      maxHeight: '600px',
-                      objectFit: 'cover',
-                      borderRadius: '16px',
-                      marginBottom: '24px',
-                      border: 'none',
-                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
-                    }}
+                    className="hero-image"
                     onError={e => {
                       e.target.style.display = 'none';
                       e.target.nextSibling.style.display = 'flex';
                     }}
                   />
-                  <div
-                    style={{
-                      display: 'none',
-                      width: '100%',
-                      height: '450px',
-                      backgroundColor: '#f8f9fa',
-                      borderRadius: '16px',
-                      border: 'none',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexDirection: 'column',
-                      gap: '16px',
-                      color: '#65676b',
-                      marginBottom: '24px',
-                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
-                    }}
-                  >
-                    <span style={{ fontSize: '4rem' }}>🖼️</span>
-                    <span style={{ fontSize: '1.1rem', fontWeight: '500' }}>
-                      Không thể tải hình ảnh
-                    </span>
+                  <div className="image-fallback">
+                    <span className="fallback-icon">🖼️</span>
+                    <span className="fallback-text">Không thể tải hình ảnh</span>
                   </div>
                 </div>
               )}
-              <div className="blog-detail-meta">
-                <div className="meta-row">
-                  <span className="meta-label">Danh mục:</span>
-                  <span
-                    className={`category-badge ${getCategoryColor(
-                      selectedBlog.category
-                    )}`}
-                  >
-                    {selectedBlog.category}
-                  </span>
+
+              {/* Blog Info Cards */}
+              <div className="blog-info-cards">
+                <div className="info-card">
+                  <div className="card-icon">📂</div>
+                  <div className="card-content">
+                    <h4>Danh mục</h4>
+                    <span className={`category-badge ${getCategoryColor(selectedBlog.category)}`}>
+                      {selectedBlog.category || 'Không phân loại'}
+                    </span>
+                  </div>
                 </div>
-                <div className="meta-row">
-                  <span className="meta-label">Trạng thái:</span>
-                  <span
-                    className={`status-badge ${getStatusClass(
-                      selectedBlog.status
-                    )}`}
-                  >
-                    {selectedBlog.status}
-                  </span>
+
+                <div className="info-card">
+                  <div className="card-icon">📊</div>
+                  <div className="card-content">
+                    <h4>Trạng thái</h4>
+                    <span className={`status-badge ${getStatusClass(selectedBlog.status)}`}>
+                      {selectedBlog.status}
+                    </span>
+                  </div>
                 </div>
-                {selectedBlog.status === 'Rejected' &&
-                  selectedBlog.rejectionReason && (
-                    <div className="meta-row rejection-info">
-                      <span className="meta-label">Lý do từ chối:</span>
-                      <div className="rejection-reason">
-                        <p
-                          style={{
-                            backgroundColor: '#fef2f2',
-                            border: '1px solid #fecaca',
-                            borderRadius: '8px',
-                            padding: '12px',
-                            margin: '8px 0',
-                            color: '#dc2626',
-                            fontSize: '0.9rem',
-                            lineHeight: '1.5',
-                          }}
-                        >
-                          ❌ {selectedBlog.rejectionReason}
-                        </p>
-                        {selectedBlog.rejectedByName && (
-                          <small
-                            style={{ color: '#6b7280', fontSize: '0.8rem' }}
-                          >
-                            Từ chối bởi: {selectedBlog.rejectedByName}
-                            {selectedBlog.rejectedOn &&
-                              ` - ${new Date(
-                                selectedBlog.rejectedOn
-                              ).toLocaleDateString('vi-VN')}`}
-                          </small>
+
+                {selectedBlog.featured && (
+                  <div className="info-card featured">
+                    <div className="card-icon">⭐</div>
+                    <div className="card-content">
+                      <h4>Nổi bật</h4>
+                      <span className="featured-badge">Bài viết nổi bật</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Rejection Info */}
+              {selectedBlog.status === 'Rejected' && selectedBlog.rejectionReason && (
+                <div className="rejection-section">
+                  <div className="rejection-header">
+                    <span className="rejection-icon">❌</span>
+                    <h4>Lý do từ chối</h4>
+                  </div>
+                  <div className="rejection-content">
+                    <p>{selectedBlog.rejectionReason}</p>
+                    {selectedBlog.rejectedByName && (
+                      <div className="rejection-meta">
+                        <span>Từ chối bởi: {selectedBlog.rejectedByName}</span>
+                        {selectedBlog.rejectedOn && (
+                          <span> - {new Date(selectedBlog.rejectedOn).toLocaleDateString('vi-VN')}</span>
                         )}
                       </div>
-                    </div>
-                  )}
-                <div className="meta-row">
-                  <span className="meta-label">Tác giả:</span>
-                  <span>{selectedBlog.author}</span>
+                    )}
+                  </div>
                 </div>
-                <div className="meta-row">
-                  <span className="meta-label">Ngày tạo:</span>
-                  <span>{selectedBlog.createdDate}</span>
-                </div>
-                <div className="meta-row">
-                  <span className="meta-label">Lượt đọc:</span>
-                  <span>{selectedBlog.readCount}</span>
+              )}
+
+              {/* Blog Content */}
+              <div className="blog-content-section">
+                <h3 className="content-title">📝 Nội dung bài viết</h3>
+                <div className="content-text">
+                  {selectedBlog.content}
                 </div>
               </div>
 
-              <div className="blog-content">
-                <p>{selectedBlog.content}</p>
-              </div>
+              {/* Tags Section */}
+              {selectedBlog.tags && Array.isArray(selectedBlog.tags) && selectedBlog.tags.length > 0 && (
+                <div className="tags-section">
+                  <h4 className="tags-title">🏷️ Tags</h4>
+                  <div className="tags-container">
+                    {selectedBlog.tags.map((tag, index) => (
+                      <span key={index} className="tag-item">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
-              <div className="blog-tags-section">
-                <span className="tags-label">Tags:</span>
-                {selectedBlog.tags &&
-                  Array.isArray(selectedBlog.tags) &&
-                  selectedBlog.tags.map((tag, index) => (
-                    <span key={index} className="tag">
-                      #{tag}
-                    </span>
-                  ))}
-              </div>
+            <div className="modal-footer blog-detail-footer">
+              <button
+                onClick={() => handleEditBlog(selectedBlog)}
+                className="btn-edit"
+              >
+                ✏️ Chỉnh sửa
+              </button>
+              <button
+                onClick={() => setShowModal(false)}
+                className="btn-close"
+              >
+                Đóng
+              </button>
             </div>
           </div>
         </div>
