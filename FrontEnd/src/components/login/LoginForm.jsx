@@ -48,29 +48,29 @@ export default function LoginForm() {
         const userData = JSON.parse(userInfo);
         const role = userData.role;
 
-        // Redirect based on role
-        switch (role) {
-          case 'Manager':
+              // Redirect based on role
+      switch (role) {
+        case 'Manager':
+          navigate('/manager');
+          break;
+        case 'Nurse':
+          navigate('/nurse');
+          break;
+        case 'Parent':
+          navigate('/home');
+          break;
+        case 'Admin':
+          navigate('/admin');
+          break;
+        default:
+          // Fallback logic
+          if (userData.isStaff) {
             navigate('/manager');
-            break;
-          case 'Nurse':
-            navigate('/nurse');
-            break;
-          case 'Parent':
-            navigate('/parent');
-            break;
-          case 'Admin':
-            navigate('/admin');
-            break;
-          default:
-            // Fallback logic
-            if (userData.isStaff) {
-              navigate('/manager');
-            } else {
-              navigate('/parent');
-            }
-            break;
-        }
+          } else {
+            navigate('/home');
+          }
+          break;
+      }
       } catch {
         // If userInfo is corrupted, clear localStorage
         localStorage.removeItem('token');
@@ -102,7 +102,7 @@ export default function LoginForm() {
           navigate('/nurse');
           break;
         case 'Parent':
-          navigate('/parent');
+          navigate('/home');
           break;
         case 'Admin':
           navigate('/admin');
@@ -111,7 +111,7 @@ export default function LoginForm() {
           if (data.isStaff) {
             navigate('/manager');
           } else {
-            navigate('/parent');
+            navigate('/home');
           }
           break;
       }
@@ -159,7 +159,7 @@ export default function LoginForm() {
           navigate('/nurse');
           break;
         case 'Parent':
-          navigate('/parent');
+          navigate('/home');
           break;
         case 'Admin':
           navigate('/admin'); // Trang admin placeholder
@@ -169,7 +169,7 @@ export default function LoginForm() {
           if (data.isStaff) {
             navigate('/manager'); // Backup cho staff
           } else {
-            navigate('/parent'); // Backup cho parent
+            navigate('/home'); // Backup cho parent
           }
           break;
       }
