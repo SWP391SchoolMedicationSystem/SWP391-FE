@@ -3,7 +3,7 @@
   padding: 20px;
   min-height: 100vh;
   background: #f2f6f3; /* $bg-main */
-  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Header Section */
@@ -107,14 +107,13 @@
   box-shadow: 0 0 0 3px rgba(115, 173, 103, 0.1);
 }
 
-.search-box::before {
-  content: "🔍";
+/* .search-box::before {
   position: absolute;
   left: 15px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 1.1rem;
-}
+} */
 
 .filter-controls select {
   padding: 10px 15px;
@@ -191,7 +190,7 @@
 }
 
 .student-table thead th:not(:last-child)::after {
-  content: "";
+  content: '';
   position: absolute;
   right: 0;
   top: 25%;
@@ -230,7 +229,7 @@
 }
 
 .student-id {
-  font-family: "Courier New", monospace;
+  font-family: 'Courier New', monospace;
   font-weight: 600;
   color: #73ad67; /* $secondary-color */
   background: rgba(115, 173, 103, 0.1);

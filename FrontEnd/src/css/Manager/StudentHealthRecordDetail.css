@@ -4,12 +4,12 @@
   padding: 24px;
   background: #f2f6f3; /* $bg-main */
   min-height: 100vh;
-  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   position: relative;
 }
 
 .student-health-record-detail::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -55,7 +55,7 @@
 }
 
 .student-header::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -109,7 +109,7 @@
 }
 
 .section-card::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -140,7 +140,7 @@
 }
 
 .section-header::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: -2px;
   left: 0;
@@ -203,7 +203,7 @@
 }
 
 .detail-item::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -283,7 +283,7 @@
 }
 
 .record-card::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -395,7 +395,7 @@
 }
 
 .metric-card::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -482,7 +482,7 @@
 }
 
 .notes-section::before {
-  content: "💭";
+  content: '💭';
   position: absolute;
   top: 16px;
   right: 16px;
@@ -610,11 +610,43 @@
 }
 
 .loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  flex-direction: column;
+  gap: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 24px;
+  margin: 40px;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(193, 203, 194, 0.3);
   color: #2f5148;
+  font-size: 1.1rem;
+  font-weight: 500;
 }
 
 .error-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  flex-direction: column;
+  gap: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 24px;
+  margin: 40px;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(193, 203, 194, 0.3);
   color: #dc3545;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.error-state .back-button {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  margin-top: 20px;
 }
 
 .loading-spinner {
@@ -633,4 +665,41 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+/* Back Button Styles */
+.back-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+.back-button {
+  background: linear-gradient(135deg, #2f5148 0%, #73ad67 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(47, 81, 72, 0.2);
+}
+
+.back-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(47, 81, 72, 0.3);
+}
+
+.back-button:active {
+  transform: translateY(0);
+}
+
+.back-button .material-icons {
+  font-size: 1.2rem;
 }

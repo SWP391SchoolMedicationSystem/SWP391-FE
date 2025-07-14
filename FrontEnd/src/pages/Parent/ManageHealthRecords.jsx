@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import "../../css/Parent/ManageHealthRecords.css";
-import { useParentStudents } from "../../utils/hooks/useParent";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../../css/Parent/ManageHealthRecords.css';
+import { useParentStudents } from '../../utils/hooks/useParent';
 
 function ManageHealthRecords() {
   const navigate = useNavigate();
@@ -27,37 +27,37 @@ function ManageHealthRecords() {
           setError(null);
 
           // Transform raw API data to component format
-          const transformedStudents = studentsData.map((student) => {
-            console.log("🔍 Raw student data từ API:", student);
-            console.log("🆔 StudentId từ API:", student.studentId);
+          const transformedStudents = studentsData.map(student => {
+            console.log('🔍 Raw student data từ API:', student);
+            console.log('🆔 StudentId từ API:', student.studentId);
 
             return {
               id: student.studentId, // Sử dụng studentId từ API
               studentId: student.studentId, // Field chính để identify
-              fullName: student.fullname || "Không có tên",
-              name: student.fullname || "Không có tên",
-              studentCode: student.studentCode || "Không có mã",
-              dateOfBirth: student.dob || "Không có thông tin",
-              gender: student.gender === false ? "Nữ" : "Nam", // API: false = Nữ, true = Nam
-              className: student.classname || "Không có lớp", // Sử dụng classname từ API
-              address: student.parent?.address || "Không có địa chỉ", // Sử dụng parent.address
-              healthStatus: "Bình thường", // Default value
+              fullName: student.fullname || 'Không có tên',
+              name: student.fullname || 'Không có tên',
+              studentCode: student.studentCode || 'Không có mã',
+              dateOfBirth: student.dob || 'Không có thông tin',
+              gender: student.gender === false ? 'Nữ' : 'Nam', // API: false = Nữ, true = Nam
+              className: student.classname || 'Không có lớp', // Sử dụng classname từ API
+              address: student.parent?.address || 'Không có địa chỉ', // Sử dụng parent.address
+              healthStatus: 'Bình thường', // Default value
               age: student.age || 0,
-              bloodType: student.bloodType || "Không có thông tin",
-              classId: student.classname || "Không có lớp",
+              bloodType: student.bloodType || 'Không có thông tin',
+              classId: student.classname || 'Không có lớp',
               parentId: student.parent?.parentid, // Sử dụng parent.parentid
               isDeleted: false, // Default value
-              avatar: student.gender === false ? "👧" : "👦", // Nữ = 👧, Nam = 👦
+              avatar: student.gender === false ? '👧' : '👦', // Nữ = 👧, Nam = 👦
               parentInfo: student.parent || {}, // Sử dụng parent object
               healthRecords: [], // Initialize empty, will be loaded on demand
             };
           });
 
-          console.log("🔄 Transformed students:", transformedStudents);
+          console.log('🔄 Transformed students:', transformedStudents);
           setMyChildren(transformedStudents);
         } catch (error) {
-          console.error("Error processing children data:", error);
-          setError("Không thể xử lý thông tin con em");
+          console.error('Error processing children data:', error);
+          setError('Không thể xử lý thông tin con em');
         } finally {
           setLoading(false);
         }
@@ -74,13 +74,13 @@ function ManageHealthRecords() {
   }, [studentsData, studentsLoading]);
 
   // Handle view health records for a child
-  const handleViewHealthRecords = (child) => {
-    console.log("🏥 Viewing health records for child:", child);
-    console.log("🔍 StudentId from card:", child.studentId);
-    console.log("📋 StudentCode from card:", child.studentCode);
-    console.log("👤 Student name:", child.fullName);
+  const handleViewHealthRecords = child => {
+    console.log('🏥 Viewing health records for child:', child);
+    console.log('🔍 StudentId from card:', child.studentId);
+    console.log('📋 StudentCode from card:', child.studentCode);
+    console.log('👤 Student name:', child.fullName);
     console.log(
-      "📋 Chuyển sang trang chi tiết hồ sơ sức khỏe với studentId:",
+      '📋 Chuyển sang trang chi tiết hồ sơ sức khỏe với studentId:',
       child.studentId
     );
 
@@ -150,32 +150,9 @@ function ManageHealthRecords() {
         </button>
       </div>
 
-      {/* Statistics */}
-      <div className="stats-row">
-        <div className="stat-card">
-          <div className="stat-icon">👶</div>
-          <div className="stat-content">
-            <h3>{myChildren.length}</h3>
-            <p>Tổng số con</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">🏥</div>
-          <div className="stat-content">
-            <h3>
-              {myChildren.reduce(
-                (sum, child) => sum + (child.healthRecords?.length || 0),
-                0
-              )}
-            </h3>
-            <p>Tổng hồ sơ y tế</p>
-          </div>
-        </div>
-      </div>
-
       {/* Children Cards */}
       <div className="children-grid">
-        {myChildren.map((child) => (
+        {myChildren.map(child => (
           <div key={child.studentId || child.id} className="child-card">
             <div className="card-header">
               <div className="child-avatar">{child.avatar}</div>
@@ -213,7 +190,8 @@ function ManageHealthRecords() {
                 className="health-records-btn"
                 onClick={() => handleViewHealthRecords(child)}
               >
-                🏥 Xem hồ sơ sức khỏe
+                <span className="material-icons">medical_services</span>
+                Xem hồ sơ sức khỏe
               </button>
             </div>
           </div>

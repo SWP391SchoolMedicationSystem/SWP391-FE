@@ -5,8 +5,8 @@
   padding: 20px;
   background: #f2f6f3;
   min-height: 100vh;
-  font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    'Roboto', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    sans-serif;
 }
 
 /* Header */
@@ -228,7 +228,7 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: modalSlideIn 0.3s ease-out;
   position: relative;
-  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+  font-family: 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
 }
 
 .modal-content.large {
@@ -520,10 +520,18 @@
     max-height: 400px;
   }
 
-    .blog-card-fb {
-    width: 800px;
-    max-width: 800px;
-    min-width: 800px;
+  .blog-card-fb {
+    width: 700px;
+    max-width: 700px;
+    min-width: 700px;
+  }
+}
+
+@media (max-width: 1300px) {
+  .blog-card-fb {
+    width: 900px;
+    max-width: 900px;
+    min-width: 900px;
   }
 }
 
@@ -531,7 +539,7 @@
   .blog-feed-container {
     padding: 0 10px;
   }
-  
+
   .blog-card-fb {
     width: 700px;
     max-width: 700px;
@@ -581,9 +589,9 @@
   color: #1c1e21;
   overflow: hidden;
   position: relative;
-  width: 900px;
-  max-width: 900px;
-  min-width: 900px;
+  width: 1200px;
+  max-width: 1200px;
+  min-width: 1200px;
   zoom: 1;
   transform-origin: center;
   flex-shrink: 0;

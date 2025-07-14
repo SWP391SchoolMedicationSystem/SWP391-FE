@@ -2,6 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../css/Nurse/StudentList.css';
 import { useNurseStudents } from '../../utils/hooks/useNurse';
+import PersonIcon from '@mui/icons-material/Person';
+import CakeIcon from '@mui/icons-material/Cake';
+import WcIcon from '@mui/icons-material/Wc';
+import ClassIcon from '@mui/icons-material/Class';
+import BloodtypeIcon from '@mui/icons-material/Bloodtype';
+import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
+import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
+import CloseIcon from '@mui/icons-material/Close';
+import InfoIcon from '@mui/icons-material/Info';
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 
 function StudentList() {
   const navigate = useNavigate();
@@ -347,100 +357,392 @@ function StudentList() {
 
       {/* Student Detail Modal */}
       {showModal && currentStudent && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Thông Tin Chi Tiết Học Sinh</h3>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px',
+          }}
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '20px',
+              width: '100%',
+              maxWidth: '900px',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              border: '1px solid #c1cbc2',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(20px)',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '25px',
+                borderBottom: '1px solid #e9ecef',
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  color: '#2f5148',
+                  fontFamily: 'Satoshi, sans-serif',
+                  fontSize: '1.5rem',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+              >
+                <InfoIcon sx={{ color: '#97a19b', fontSize: '1.5rem' }} />
+                Thông Tin Chi Tiết Học Sinh
+              </h3>
               <button
-                className="modal-close"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#97a19b',
+                  cursor: 'pointer',
+                  fontSize: '1.5rem',
+                  padding: '5px',
+                  borderRadius: '50%',
+                  transition: 'all 0.3s ease',
+                }}
                 onClick={() => setShowModal(false)}
               >
-                ×
+                <CloseIcon sx={{ fontSize: '1.5rem' }} />
               </button>
             </div>
 
-            <div className="modal-body">
-              <div className="student-details">
-                <div className="detail-grid">
-                  <div className="detail-item">
-                    <label>Mã học sinh:</label>
-                    <span>{currentStudent.studentId}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Họ và tên:</label>
-                    <span>{currentStudent.fullName}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Ngày sinh:</label>
-                    <span>{currentStudent.dateOfBirth}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Tuổi:</label>
-                    <span>{currentStudent.age} tuổi</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Giới tính:</label>
-                    <span>{currentStudent.gender}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Lớp:</label>
-                    <span>{currentStudent.className}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Nhóm máu:</label>
-                    <span>{currentStudent.bloodType}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Chiều cao:</label>
-                    <span>{currentStudent.height}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Cân nặng:</label>
-                    <span>{currentStudent.weight}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Tình trạng sức khỏe:</label>
-                    <span>{currentStudent.healthStatus}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Dị ứng:</label>
-                    <span>{currentStudent.allergies}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Phụ huynh:</label>
-                    <span>{currentStudent.parentName}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>SĐT phụ huynh:</label>
-                    <span>{currentStudent.parentPhone}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Liên hệ khẩn cấp:</label>
-                    <span>{currentStudent.emergencyContact}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Ngày nhập học:</label>
-                    <span>{currentStudent.enrollmentDate}</span>
-                  </div>
-                  <div className="detail-item full-width">
-                    <label>Ghi chú:</label>
-                    <span>{currentStudent.notes}</span>
-                  </div>
+            {/* Student Name Header */}
+            <div
+              style={{
+                background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+                padding: '20px',
+                borderRadius: '15px',
+                margin: '25px 25px 0 25px',
+                textAlign: 'center',
+                border: '1px solid #e9ecef',
+              }}
+            >
+              <h4
+                style={{
+                  margin: 0,
+                  color: '#2f5148',
+                  fontFamily: 'Satoshi, sans-serif',
+                  fontSize: '1.8rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px',
+                }}
+              >
+                <PersonIcon sx={{ color: '#97a19b', fontSize: '1.8rem' }} />
+                {currentStudent.fullName}
+              </h4>
+              <p
+                style={{
+                  margin: '8px 0 0 0',
+                  color: '#97a19b',
+                  fontFamily: 'Satoshi, sans-serif',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                }}
+              >
+                Mã học sinh: {currentStudent.studentId}
+              </p>
+            </div>
+
+            {/* Modal Body */}
+            <div style={{ padding: '25px' }}>
+              {/* Basic Information Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                  gap: '15px',
+                }}
+              >
+                {/* Basic Information Cards */}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '12px 15px',
+                    background: '#f8f9fa',
+                    borderRadius: '10px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <span
+                    style={{
+                      color: '#97a19b',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <CakeIcon sx={{ fontSize: '1rem' }} />
+                    Ngày sinh:
+                  </span>
+                  <span
+                    style={{
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {currentStudent.dateOfBirth}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '12px 15px',
+                    background: '#f8f9fa',
+                    borderRadius: '10px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <span
+                    style={{
+                      color: '#97a19b',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <WcIcon sx={{ fontSize: '1rem' }} />
+                    Giới tính:
+                  </span>
+                  <span
+                    style={{
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {currentStudent.gender}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '12px 15px',
+                    background: '#f8f9fa',
+                    borderRadius: '10px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <span
+                    style={{
+                      color: '#97a19b',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <ClassIcon sx={{ fontSize: '1rem' }} />
+                    Lớp:
+                  </span>
+                  <span
+                    style={{
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {currentStudent.className}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '12px 15px',
+                    background: '#f8f9fa',
+                    borderRadius: '10px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <span
+                    style={{
+                      color: '#97a19b',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <BloodtypeIcon sx={{ fontSize: '1rem' }} />
+                    Nhóm máu:
+                  </span>
+                  <span
+                    style={{
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {currentStudent.bloodType}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '12px 15px',
+                    background: '#f8f9fa',
+                    borderRadius: '10px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <span
+                    style={{
+                      color: '#97a19b',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <HealthAndSafetyIcon sx={{ fontSize: '1rem' }} />
+                    Tình trạng sức khỏe:
+                  </span>
+                  <span
+                    style={{
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {currentStudent.healthStatus}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '12px 15px',
+                    background: '#f8f9fa',
+                    borderRadius: '10px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <span
+                    style={{
+                      color: '#97a19b',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <FamilyRestroomIcon sx={{ fontSize: '1rem' }} />
+                    Phụ huynh:
+                  </span>
+                  <span
+                    style={{
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {currentStudent.parentName}
+                  </span>
                 </div>
               </div>
             </div>
 
-            <div className="modal-footer">
+            {/* Modal Footer */}
+            <div
+              style={{
+                padding: '20px 25px',
+                borderTop: '1px solid #e9ecef',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '15px',
+              }}
+            >
               <button
-                className="btn-health"
                 onClick={() => {
                   setShowModal(false);
                   handleViewHealthRecords(currentStudent);
                 }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: '#2f5148',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 20px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  fontFamily: 'Satoshi, sans-serif',
+                  transition: 'all 0.3s ease',
+                }}
               >
-                🏥 Xem Hồ Sơ Sức Khỏe
+                <LocalHospitalIcon sx={{ fontSize: '1.2rem' }} />
+                Xem Hồ Sơ Sức Khỏe
               </button>
-              <button className="btn-close" onClick={() => setShowModal(false)}>
+              <button
+                onClick={() => setShowModal(false)}
+                style={{
+                  background: '#bfefa1',
+                  color: '#1a3a2e',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  fontFamily: 'Satoshi, sans-serif',
+                  transition: 'all 0.3s ease',
+                }}
+              >
                 Đóng
               </button>
             </div>

@@ -187,18 +187,34 @@ export const nurseBlogService = {
     try {
       const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
 
-      // API mới yêu cầu blogID trong body
-      const payload = {
-        blogID: blogData.blogID || blogId,
-        title: blogData.title,
-        content: blogData.content,
-        updatedBy: blogData.updatedBy || userInfo.userId || 0,
-        status: blogData.status || 'Draft',
-        isDeleted:
-          typeof blogData.isDeleted === 'boolean' ? blogData.isDeleted : false,
-      };
+      // Create FormData for multipart/form-data request
+      const formData = new FormData();
 
-      const response = await apiClient.put(API_ENDPOINTS.BLOG.UPDATE, payload);
+      // Add required fields according to API spec
+      formData.append('BlogID', blogData.blogID || blogId);
+      formData.append('Title', blogData.title || '');
+      formData.append('Content', blogData.content || '');
+      formData.append('UpdatedBy', blogData.updatedBy || userInfo.userId || 0);
+      formData.append('Status', blogData.status || 'Draft');
+      formData.append(
+        'IsDeleted',
+        typeof blogData.isDeleted === 'boolean' ? blogData.isDeleted : false
+      );
+
+      // Add ImageFile if provided
+      if (blogData.imageFile) {
+        formData.append('ImageFile', blogData.imageFile);
+      }
+
+      const response = await apiClient.put(
+        API_ENDPOINTS.BLOG.UPDATE,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
       return response;
     } catch (error) {
       console.error('Error updating blog:', error);

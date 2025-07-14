@@ -76,15 +76,14 @@
   border-color: #73ad67; /* $secondary-color */
   box-shadow: 0 0 0 3px rgba(115, 173, 103, 0.1);
 }
-
+/* 
 .search-box::before {
-  content: '🔍';
   position: absolute;
   left: 15px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 1.1rem;
-}
+} */
 
 .filter-controls select {
   padding: 10px 15px;

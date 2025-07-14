@@ -5,6 +5,10 @@ import {
   useManagerActions,
 } from '../../utils/hooks/useManager';
 import { managerBlogService } from '../../services/managerService';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 function BlogManagement() {
   // Use API hooks
@@ -198,6 +202,38 @@ function BlogManagement() {
     setShowModal(true);
   };
 
+  // Quick approve function
+  const handleQuickApprove = async post => {
+    try {
+      const blogId = post.blogId || post.id;
+      const approvalData = {}; // Additional data if needed
+
+      await managerBlogService.approveBlog(blogId, approvalData);
+      console.log('✅ Blog approved successfully');
+      refetch(); // Refresh data
+    } catch (error) {
+      console.error('❌ Error approving blog:', error);
+      alert('Có lỗi khi phê duyệt blog. Vui lòng thử lại!');
+    }
+  };
+
+  // Quick reject function
+  const handleQuickReject = async post => {
+    const reason = prompt('Lý do từ chối:');
+    if (!reason) return;
+
+    try {
+      const blogId = post.blogId || post.id;
+
+      await managerBlogService.rejectBlog(blogId, reason);
+      console.log('❌ Blog rejected successfully');
+      refetch(); // Refresh data
+    } catch (error) {
+      console.error('❌ Error rejecting blog:', error);
+      alert('Có lỗi khi từ chối blog. Vui lòng thử lại!');
+    }
+  };
+
   const handleSubmit = async e => {
     e.preventDefault();
     try {
@@ -222,14 +258,16 @@ function BlogManagement() {
         // Update existing post via API (fallback các field id khác)
         const blogId =
           currentPost?.id ?? currentPost?.blogid ?? currentPost?.blogId;
-        await updateBlog(blogId, formData);
+
+        // Include imageFile in the update data
+        const updateData = {
+          ...formData,
+          imageFile: selectedImage, // Add imageFile to update data
+        };
+
+        await updateBlog(blogId, updateData);
         createdBlogId = blogId;
         alert('Cập nhật bài viết thành công!');
-
-        // Upload image if selected for update
-        if (selectedImage && createdBlogId) {
-          await handleImageUpload(createdBlogId);
-        }
       }
 
       // Clear image data
@@ -515,13 +553,163 @@ function BlogManagement() {
                     {post.createdAt
                       ? new Date(post.createdAt).toLocaleDateString()
                       : ''}{' '}
-                    · 👁️ {post.readCount || 0}
+                    · 👁️ {post.readCount || 0}·{' '}
+                    <span
+                      className={`status-badge ${
+                        post.status === 'Published'
+                          ? 'status-published'
+                          : post.status === 'Rejected'
+                          ? 'status-rejected'
+                          : post.status === 'Pending'
+                          ? 'status-pending'
+                          : 'status-draft'
+                      }`}
+                    >
+                      {post.status || 'Draft'}
+                    </span>
                   </div>
                   <div className="blog-body-fb">
                     {post.content?.length > 120
                       ? post.content.substring(0, 120) + '...'
                       : post.content}
                   </div>
+                </div>
+
+                {/* Action buttons */}
+                <div className="blog-actions-fb">
+                  {(post.status === 'Pending' || post.status === 'Draft') && (
+                    <>
+                      <button
+                        className="action-btn-fb approve"
+                        onClick={() => handleQuickApprove(post)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '10px 16px',
+                          backgroundColor: '#e8f5e8',
+                          color: '#2e7d32',
+                          border: 'none',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          transition: 'all 0.3s ease',
+                        }}
+                        onMouseEnter={e => {
+                          e.target.style.backgroundColor = '#c8e6c9';
+                          e.target.style.transform = 'translateY(-1px)';
+                        }}
+                        onMouseLeave={e => {
+                          e.target.style.backgroundColor = '#e8f5e8';
+                          e.target.style.transform = 'translateY(0)';
+                        }}
+                      >
+                        <CheckCircleIcon
+                          sx={{ fontSize: '1.2rem', color: '#97a19b' }}
+                        />
+                        Phê duyệt
+                      </button>
+                      <button
+                        className="action-btn-fb reject"
+                        onClick={() => handleQuickReject(post)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '10px 16px',
+                          backgroundColor: '#ffebee',
+                          color: '#c62828',
+                          border: 'none',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          transition: 'all 0.3s ease',
+                        }}
+                        onMouseEnter={e => {
+                          e.target.style.backgroundColor = '#ffcdd2';
+                          e.target.style.transform = 'translateY(-1px)';
+                        }}
+                        onMouseLeave={e => {
+                          e.target.style.backgroundColor = '#ffebee';
+                          e.target.style.transform = 'translateY(0)';
+                        }}
+                      >
+                        <CancelIcon
+                          sx={{ fontSize: '1.2rem', color: '#97a19b' }}
+                        />
+                        Từ chối
+                      </button>
+                    </>
+                  )}
+
+                  {(post.status === 'Published' ||
+                    post.status === 'Rejected') && (
+                    <button
+                      className="action-btn-fb"
+                      onClick={() => handleDeletePost(post.blogId || post.id)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '10px 16px',
+                        backgroundColor: '#ffebee',
+                        color: '#c62828',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        transition: 'all 0.3s ease',
+                      }}
+                      onMouseEnter={e => {
+                        e.target.style.backgroundColor = '#ffcdd2';
+                        e.target.style.transform = 'translateY(-1px)';
+                      }}
+                      onMouseLeave={e => {
+                        e.target.style.backgroundColor = '#ffebee';
+                        e.target.style.transform = 'translateY(0)';
+                      }}
+                    >
+                      <DeleteIcon
+                        sx={{ fontSize: '1.2rem', color: '#97a19b' }}
+                      />
+                      Xóa
+                    </button>
+                  )}
+
+                  <button
+                    className="action-btn-fb"
+                    onClick={() => handleViewPost(post)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px 16px',
+                      backgroundColor: '#e3f2fd',
+                      color: '#1976d2',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      transition: 'all 0.3s ease',
+                    }}
+                    onMouseEnter={e => {
+                      e.target.style.backgroundColor = '#bbdefb';
+                      e.target.style.transform = 'translateY(-1px)';
+                    }}
+                    onMouseLeave={e => {
+                      e.target.style.backgroundColor = '#e3f2fd';
+                      e.target.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    <VisibilityIcon
+                      sx={{ fontSize: '1.2rem', color: '#97a19b' }}
+                    />
+                    Xem chi tiết
+                  </button>
                 </div>
               </div>
             ))}

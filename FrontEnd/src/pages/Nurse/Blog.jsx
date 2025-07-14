@@ -2,6 +2,9 @@ import React, { useState, useRef } from 'react';
 import '../../css/Nurse/NurseBlog.css';
 import { useNurseBlogs, useNurseActions } from '../../utils/hooks/useNurse';
 import { nurseBlogService } from '../../services/nurseService';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 function Blog() {
   // Use API hooks
@@ -172,16 +175,12 @@ function Blog() {
           updatedBy: userId,
           status: 'Draft',
           isDeleted: false,
+          imageFile: selectedImage, // Add imageFile to update data
         };
 
         await updateBlog(blogId, updateData);
         createdBlogId = blogId;
         alert('Đã cập nhật blog thành công!');
-
-        // Upload image if selected for update
-        if (selectedImage && createdBlogId) {
-          await handleImageUpload(createdBlogId);
-        }
       } else {
         // Create new blog with image included
         const result = await createBlog(blogData, selectedImage);
@@ -464,6 +463,97 @@ function Blog() {
                   ? blog.content.substring(0, 120) + '...'
                   : blog.content}
               </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="blog-actions-fb">
+              <button
+                className="action-btn-fb edit"
+                onClick={() => handleEditBlog(blog)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 16px',
+                  backgroundColor: '#e3f2fd',
+                  color: '#1976d2',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={e => {
+                  e.target.style.backgroundColor = '#bbdefb';
+                  e.target.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={e => {
+                  e.target.style.backgroundColor = '#e3f2fd';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                <EditIcon sx={{ fontSize: '1.2rem', color: '#97a19b' }} />
+                Chỉnh sửa
+              </button>
+              <button
+                className="action-btn-fb reject"
+                onClick={() => handleDeleteBlog(blog)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 16px',
+                  backgroundColor: '#ffebee',
+                  color: '#c62828',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={e => {
+                  e.target.style.backgroundColor = '#ffcdd2';
+                  e.target.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={e => {
+                  e.target.style.backgroundColor = '#ffebee';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                <DeleteIcon sx={{ fontSize: '1.2rem', color: '#97a19b' }} />
+                Xóa
+              </button>
+              <button
+                className="action-btn-fb"
+                onClick={() => handleViewBlog(blog)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 16px',
+                  backgroundColor: '#f0f2f5',
+                  color: '#65676b',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={e => {
+                  e.target.style.backgroundColor = '#e4e6ea';
+                  e.target.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={e => {
+                  e.target.style.backgroundColor = '#f0f2f5';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                <VisibilityIcon sx={{ fontSize: '1.2rem', color: '#97a19b' }} />
+                Xem chi tiết
+              </button>
             </div>
           </div>
         ))}
