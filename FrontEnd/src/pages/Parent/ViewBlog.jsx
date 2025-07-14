@@ -9,6 +9,9 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import VaccinesIcon from '@mui/icons-material/Vaccines';
 import EventIcon from '@mui/icons-material/Event';
 import CloseIcon from '@mui/icons-material/Close';
+import SearchIcon from '@mui/icons-material/Search';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 function ViewBlog() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -98,8 +101,32 @@ function ViewBlog() {
   if (loading) {
     return (
       <div style={containerStyle}>
-        <div className="loading-state">
-          <p>⏳ Đang tải danh sách blog...</p>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '400px',
+            flexDirection: 'column',
+            gap: '20px',
+            background: 'rgba(255, 255, 255, 0.9)',
+            borderRadius: '24px',
+            margin: '40px',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+          }}
+        >
+          <LocalHospitalIcon sx={{ color: '#97a19b', fontSize: '3rem' }} />
+          <p
+            style={{
+              color: '#2f5148',
+              fontSize: '1.1rem',
+              fontWeight: 500,
+              margin: 0,
+            }}
+          >
+            Đang tải danh sách blog...
+          </p>
         </div>
       </div>
     );
@@ -109,10 +136,54 @@ function ViewBlog() {
   if (error) {
     return (
       <div style={containerStyle}>
-        <div className="error-state">
-          <p>❌ Lỗi khi tải blog: {error}</p>
-          <button onClick={refetch} className="retry-btn">
-            🔄 Thử lại
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '400px',
+            flexDirection: 'column',
+            gap: '20px',
+            background: 'rgba(255, 255, 255, 0.9)',
+            borderRadius: '24px',
+            margin: '40px',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+          }}
+        >
+          <LocalHospitalIcon sx={{ color: '#dc3545', fontSize: '3rem' }} />
+          <p
+            style={{
+              color: '#dc3545',
+              fontSize: '1.1rem',
+              fontWeight: 500,
+              margin: 0,
+              textAlign: 'center',
+            }}
+          >
+            Lỗi khi tải blog: {error}
+          </p>
+          <button
+            onClick={refetch}
+            style={{
+              background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+              color: 'white',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontSize: '1rem',
+              fontWeight: 500,
+              fontFamily:
+                'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <RefreshIcon sx={{ fontSize: '1.2rem' }} />
+            Thử lại
           </button>
         </div>
       </div>
@@ -122,61 +193,385 @@ function ViewBlog() {
   return (
     <div style={containerStyle}>
       {/* Header */}
-      <div className="blog-header">
-        <h1>📝 Blog Sức Khỏe</h1>
-        <p>Những thông tin hữu ích về sức khỏe và dinh dưỡng cho con em</p>
+      <div
+        style={{
+          background:
+            'linear-gradient(135deg, #2f5148 0%, #4a7065 25%, #73ad67 75%, #85b373 100%)',
+          borderRadius: '24px',
+          padding: '40px 35px',
+          boxShadow:
+            '0 20px 40px rgba(47, 81, 72, 0.2), 0 8px 16px rgba(47, 81, 72, 0.15)',
+          textAlign: 'center',
+          color: 'white',
+          marginBottom: '30px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            content: '',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background:
+              'radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%)',
+            pointerEvents: 'none',
+          }}
+        ></div>
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <h1
+            style={{
+              fontSize: '2.8rem',
+              fontWeight: 800,
+              marginBottom: '12px',
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              letterSpacing: '-0.02em',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '15px',
+            }}
+          >
+            <LocalHospitalIcon sx={{ fontSize: '3rem', color: 'white' }} />
+            Blog Sức Khỏe
+          </h1>
+          <p
+            style={{
+              fontSize: '1.2rem',
+              opacity: 0.95,
+              fontWeight: 500,
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+              margin: 0,
+            }}
+          >
+            Những thông tin hữu ích về sức khỏe và dinh dưỡng cho con em
+          </p>
+        </div>
       </div>
 
       {/* Statistics */}
-      <div className="stats-container">
-        <div className="stat-card total">
-          <div className="stat-icon">📚</div>
-          <div className="stat-content">
-            <h3>{stats.total}</h3>
-            <p>Tổng bài viết</p>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '25px',
+          marginBottom: '30px',
+        }}
+      >
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            padding: '25px',
+            borderRadius: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          }}
+        >
+          <div
+            style={{
+              padding: '15px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(191, 239, 161, 0.3)',
+            }}
+          >
+            <LocalHospitalIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: '2rem',
+                margin: 0,
+                color: '#2f5148',
+                fontWeight: 700,
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              {stats.total}
+            </h3>
+            <p
+              style={{
+                margin: '5px 0 0 0',
+                color: '#97a19b',
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              Tổng bài viết
+            </p>
           </div>
         </div>
-        <div className="stat-card published">
-          <div className="stat-icon">✅</div>
-          <div className="stat-content">
-            <h3>{stats.published}</h3>
-            <p>Đã đăng</p>
+
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            padding: '25px',
+            borderRadius: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          }}
+        >
+          <div
+            style={{
+              padding: '15px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(191, 239, 161, 0.3)',
+            }}
+          >
+            <EventIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: '2rem',
+                margin: 0,
+                color: '#2f5148',
+                fontWeight: 700,
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              {stats.published}
+            </h3>
+            <p
+              style={{
+                margin: '5px 0 0 0',
+                color: '#97a19b',
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              Đã đăng
+            </p>
           </div>
         </div>
-        <div className="stat-card draft">
-          <div className="stat-icon">📝</div>
-          <div className="stat-content">
-            <h3>{stats.draft}</h3>
-            <p>Bản nháp</p>
+
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            padding: '25px',
+            borderRadius: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          }}
+        >
+          <div
+            style={{
+              padding: '15px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(191, 239, 161, 0.3)',
+            }}
+          >
+            <VaccinesIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: '2rem',
+                margin: 0,
+                color: '#2f5148',
+                fontWeight: 700,
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              {stats.draft}
+            </h3>
+            <p
+              style={{
+                margin: '5px 0 0 0',
+                color: '#97a19b',
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              Bản nháp
+            </p>
           </div>
         </div>
-        <div className="stat-card reads">
-          <div className="stat-icon">👁️</div>
-          <div className="stat-content">
-            <h3>{stats.totalReads}</h3>
-            <p>Lượt đọc</p>
+
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            padding: '25px',
+            borderRadius: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          }}
+        >
+          <div
+            style={{
+              padding: '15px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(191, 239, 161, 0.3)',
+            }}
+          >
+            <RestaurantIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: '2rem',
+                margin: 0,
+                color: '#2f5148',
+                fontWeight: 700,
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              {stats.totalReads}
+            </h3>
+            <p
+              style={{
+                margin: '5px 0 0 0',
+                color: '#97a19b',
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              Lượt đọc
+            </p>
           </div>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="controls-container">
-        <div className="search-filter-controls">
-          <div className="search-controls">
+      <div
+        style={{
+          background: 'rgba(255, 255, 255, 0.95)',
+          padding: '25px',
+          borderRadius: '18px',
+          boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+          border: '1px solid rgba(193, 203, 194, 0.3)',
+          marginBottom: '30px',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            gap: '20px',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
+          <div
+            style={{
+              position: 'relative',
+              flex: '1',
+              minWidth: '300px',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                left: '15px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 1,
+              }}
+            >
+              <SearchIcon sx={{ color: '#97a19b', fontSize: '1.5rem' }} />
+            </div>
             <input
               type="text"
               placeholder="Tìm kiếm blog..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="search-input"
+              style={{
+                width: '100%',
+                padding: '15px 15px 15px 55px',
+                border: '1px solid #c1cbc2',
+                borderRadius: '12px',
+                fontSize: '1rem',
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+                transition: 'all 0.3s ease',
+                outline: 'none',
+                background: 'white',
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = '#2f5148';
+                e.target.style.boxShadow = '0 0 0 3px rgba(47, 81, 72, 0.1)';
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = '#c1cbc2';
+                e.target.style.boxShadow = 'none';
+              }}
             />
           </div>
 
-          <div className="filter-controls">
+          <div
+            style={{
+              position: 'relative',
+              minWidth: '200px',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                left: '15px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 1,
+              }}
+            >
+              <FilterListIcon sx={{ color: '#97a19b', fontSize: '1.5rem' }} />
+            </div>
             <select
               value={filterCategory}
               onChange={e => setFilterCategory(e.target.value)}
-              className="filter-select"
+              style={{
+                width: '100%',
+                padding: '15px 15px 15px 55px',
+                border: '1px solid #c1cbc2',
+                borderRadius: '12px',
+                fontSize: '1rem',
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+                transition: 'all 0.3s ease',
+                outline: 'none',
+                background: 'white',
+                cursor: 'pointer',
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = '#2f5148';
+                e.target.style.boxShadow = '0 0 0 3px rgba(47, 81, 72, 0.1)';
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = '#c1cbc2';
+                e.target.style.boxShadow = 'none';
+              }}
             >
               <option value="">Tất cả danh mục</option>
               {categories.map(category => (
@@ -191,10 +586,54 @@ function ViewBlog() {
 
       {/* Empty State */}
       {!loading && !error && (!blogs || blogs.length === 0) && (
-        <div className="empty-state">
-          <p>📭 Chưa có blog nào được đăng tải</p>
-          <button onClick={refetch} className="retry-btn">
-            🔄 Tải lại
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '400px',
+            flexDirection: 'column',
+            gap: '20px',
+            background: 'rgba(255, 255, 255, 0.9)',
+            borderRadius: '24px',
+            margin: '40px',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+          }}
+        >
+          <LocalHospitalIcon sx={{ color: '#97a19b', fontSize: '3rem' }} />
+          <p
+            style={{
+              color: '#2f5148',
+              fontSize: '1.1rem',
+              fontWeight: 500,
+              margin: 0,
+              textAlign: 'center',
+            }}
+          >
+            Chưa có blog nào được đăng tải
+          </p>
+          <button
+            onClick={refetch}
+            style={{
+              background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+              color: 'white',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontSize: '1rem',
+              fontWeight: 500,
+              fontFamily:
+                'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <RefreshIcon sx={{ fontSize: '1.2rem' }} />
+            Tải lại
           </button>
         </div>
       )}
@@ -242,16 +681,58 @@ function ViewBlog() {
             </div>
           ))}
           {filteredBlogs.length === 0 && (
-            <div className="no-data">
-              <p>Không tìm thấy blog phù hợp với bộ lọc</p>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '200px',
+                flexDirection: 'column',
+                gap: '15px',
+                background: 'rgba(255, 255, 255, 0.9)',
+                borderRadius: '18px',
+                margin: '20px 0',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(193, 203, 194, 0.3)',
+              }}
+            >
+              <SearchIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
+              <p
+                style={{
+                  color: '#2f5148',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  margin: 0,
+                  textAlign: 'center',
+                }}
+              >
+                Không tìm thấy blog phù hợp với bộ lọc
+              </p>
               <button
                 onClick={() => {
                   setSearchTerm('');
                   setFilterCategory('');
                 }}
-                className="retry-btn"
+                style={{
+                  background:
+                    'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  fontWeight: 500,
+                  fontFamily:
+                    'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
               >
-                🔄 Đặt lại bộ lọc
+                <RefreshIcon sx={{ fontSize: '1rem' }} />
+                Đặt lại bộ lọc
               </button>
             </div>
           )}

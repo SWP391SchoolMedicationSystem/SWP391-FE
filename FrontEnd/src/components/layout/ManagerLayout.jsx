@@ -504,6 +504,7 @@ export default function ManagerLayout() {
             </Box>
 
             <IconButton
+              onClick={() => navigate('/manager/notifications')}
               sx={{
                 width: 40,
                 height: 40,
