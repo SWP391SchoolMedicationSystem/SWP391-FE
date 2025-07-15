@@ -77,13 +77,7 @@ function StudentList() {
     navigate(`/manager/student-health-record/${student.id}`);
   };
 
-  // Handle file import
-  const handleFileImport = () => {
-    // Reset previous messages
-    setImportError('');
-    setImportSuccess('');
-    fileInputRef.current?.click();
-  };
+
 
   // Validate file type and size
   const validateFile = file => {

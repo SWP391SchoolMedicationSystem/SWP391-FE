@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef } from 'react';
 import '../../css/Nurse/NurseBlog.css';
 import { useNurseBlogs, useNurseActions } from '../../utils/hooks/useNurse';

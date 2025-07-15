@@ -8,7 +8,7 @@ import "../../css/Manager/Dashboard.css";
 
 function Dashboard() {
   const navigate = useNavigate();
-  const [dashboardStats, setDashboardStats] = useState([]);
+  const [ setDashboardStats] = useState([]);
 
   // Get real data from APIs
   const { data: students, loading: studentsLoading } = useManagerStudents();

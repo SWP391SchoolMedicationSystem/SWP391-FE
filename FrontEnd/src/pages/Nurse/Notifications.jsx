@@ -186,11 +186,7 @@ const Notifications = () => {
       ? processedNotifications
       : processNotificationData(mockNotifications);
 
-  // Thống kê
-  const stats = {
-    total: displayNotifications.length,
-    urgent: displayNotifications.filter(n => n.type === 'Khẩn cấp').length,
-  };
+
 
   const getTypeBadge = type => {
     const typeMap = {
