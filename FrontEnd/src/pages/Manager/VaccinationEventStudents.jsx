@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import "../../css/Manager/VaccinationEventStudents.css";
-import { vaccinationEventService } from "../../services/vaccinationService";
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import '../../css/Manager/VaccinationEventStudents.css';
+import { vaccinationEventService } from '../../services/vaccinationService';
 
 function VaccinationEventStudents() {
   const { eventId } = useParams();
@@ -13,7 +13,7 @@ function VaccinationEventStudents() {
   const [parentResponses, setParentResponses] = useState([]);
   const [combinedData, setCombinedData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
 
@@ -21,21 +21,21 @@ function VaccinationEventStudents() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailFormData, setEmailFormData] = useState({
     emailTemplateId: 5,
-    customMessage: "",
+    customMessage: '',
   });
 
   // Email template options (same as in VaccinationEvents.jsx)
   const emailTemplateOptions = [
-    { id: 1, name: "Template Thông Báo Cơ Bản" },
-    { id: 2, name: "Template Nhắc Nhở" },
-    { id: 3, name: "Template Khẩn Cấp" },
-    { id: 4, name: "Template Thông Tin Chi Tiết" },
-    { id: 5, name: "Template Mặc Định" },
+    { id: 1, name: 'Template Thông Báo Cơ Bản' },
+    { id: 2, name: 'Template Nhắc Nhở' },
+    { id: 3, name: 'Template Khẩn Cấp' },
+    { id: 4, name: 'Template Thông Tin Chi Tiết' },
+    { id: 5, name: 'Template Mặc Định' },
   ];
 
   // Filter states
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [classFilter, setClassFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [classFilter, setClassFilter] = useState('all');
 
   // Fetch data on component mount
   useEffect(() => {
@@ -49,9 +49,9 @@ function VaccinationEventStudents() {
   // Combine student and parent response data
   useEffect(() => {
     if (students.length > 0 && parentResponses.length > 0) {
-      const combined = students.map((student) => {
+      const combined = students.map(student => {
         const parentResponse = parentResponses.find(
-          (response) => response.studentId === student.studentId
+          response => response.studentId === student.studentId
         );
 
         return {
@@ -59,10 +59,10 @@ function VaccinationEventStudents() {
           // Use parentId from parent response if available, otherwise use from student data
           parentId: parentResponse?.parentId || student.parentId,
           willAttend: parentResponse?.willAttend ?? null,
-          reasonForDecline: parentResponse?.reasonForDecline || "",
+          reasonForDecline: parentResponse?.reasonForDecline || '',
           parentConsent: parentResponse?.parentConsent ?? false,
-          status: parentResponse?.status || "Chưa phản hồi",
-          statusClass: parentResponse?.statusClass || "pending",
+          status: parentResponse?.status || 'Chưa phản hồi',
+          statusClass: parentResponse?.statusClass || 'pending',
         };
       });
       setCombinedData(combined);
@@ -77,8 +77,8 @@ function VaccinationEventStudents() {
       const eventData = await vaccinationEventService.getEventById(eventId);
       setEvent(eventData);
     } catch (error) {
-      console.error("Error fetching event data:", error);
-      setError("Không thể tải thông tin sự kiện");
+      console.error('Error fetching event data:', error);
+      setError('Không thể tải thông tin sự kiện');
     }
   };
 
@@ -86,14 +86,14 @@ function VaccinationEventStudents() {
   const fetchStudentResponses = async () => {
     try {
       setLoading(true);
-      setError("");
+      setError('');
       const responses = await vaccinationEventService.getEventResponses(
         eventId
       );
       setStudents(responses);
     } catch (error) {
-      console.error("Error fetching student responses:", error);
-      setError("Không thể tải danh sách học sinh");
+      console.error('Error fetching student responses:', error);
+      setError('Không thể tải danh sách học sinh');
     } finally {
       setLoading(false);
     }
@@ -107,95 +107,95 @@ function VaccinationEventStudents() {
       );
       setParentResponses(responses);
     } catch (error) {
-      console.error("Error fetching parent responses:", error);
+      console.error('Error fetching parent responses:', error);
       // Don't set error for parent responses as it's supplementary data
     }
   };
 
   // Handle view student detail
-  const handleViewDetail = (student) => {
+  const handleViewDetail = student => {
     setSelectedStudent(student);
     setShowDetailModal(true);
   };
 
   // Handle send email to specific parent
-  const handleSendEmailToParent = (student) => {
+  const handleSendEmailToParent = student => {
     setSelectedStudent(student);
     setEmailFormData({
       emailTemplateId: 5,
-      customMessage: "",
+      customMessage: '',
     });
     setShowEmailModal(true);
   };
 
   // Handle email form input changes
-  const handleEmailInputChange = (e) => {
+  const handleEmailInputChange = e => {
     const { name, value } = e.target;
-    setEmailFormData((prev) => ({
+    setEmailFormData(prev => ({
       ...prev,
       [name]: value,
     }));
   };
 
   // Submit send email form
-  const handleSubmitSendEmail = async (e) => {
+  const handleSubmitSendEmail = async e => {
     e.preventDefault();
 
     if (!selectedStudent || !event) return;
 
-    // Validate parentId
-    if (!selectedStudent.parentId) {
-      alert("Không tìm thấy thông tin phụ huynh để gửi email!");
+    // Validate studentId
+    if (!selectedStudent.studentId) {
+      alert('Không tìm thấy thông tin học sinh để gửi email!');
       return;
     }
 
     try {
-      // Updated structure for the new API
+      // Updated structure for the new API - send email to specific students
       const emailData = {
         vaccinationEventId: parseInt(eventId),
         emailTemplateId: parseInt(emailFormData.emailTemplateId),
-        customMessage: emailFormData.customMessage.trim() || "string",
+        customMessage: emailFormData.customMessage.trim() || 'string',
       };
 
-      // Send parentId as array to the new API structure
-      await vaccinationEventService.sendEmailToSpecific(
-        [selectedStudent.parentId], // Pass as array
+      // Send studentId as array to the new API structure
+      await vaccinationEventService.sendEmailToSpecificStudents(
+        [selectedStudent.studentId], // Pass student ID as array
         emailData
       );
 
       setShowEmailModal(false);
       alert(
-        `Gửi email thành công tới phụ huynh ${selectedStudent.parentName}!`
+        `Gửi email thành công tới phụ huynh của học sinh ${selectedStudent.studentName}!`
       );
     } catch (error) {
-      console.error("Error sending email:", error);
-      alert("Có lỗi xảy ra khi gửi email!");
+      console.error('Error sending email:', error);
+      alert('Có lỗi xảy ra khi gửi email!');
     }
   };
 
   // Filter students based on status and class
-  const filteredStudents = combinedData.filter((student) => {
+  const filteredStudents = combinedData.filter(student => {
     const statusMatch =
-      statusFilter === "all" ||
-      (statusFilter === "pending" && student.willAttend === null) ||
-      (statusFilter === "confirmed" && student.willAttend === true) ||
-      (statusFilter === "declined" && student.willAttend === false);
+      statusFilter === 'all' ||
+      (statusFilter === 'pending' && student.willAttend === null) ||
+      (statusFilter === 'confirmed' && student.willAttend === true) ||
+      (statusFilter === 'declined' && student.willAttend === false);
     const classMatch =
-      classFilter === "all" || student.className === classFilter;
+      classFilter === 'all' || student.className === classFilter;
     return statusMatch && classMatch;
   });
 
   // Get unique classes for filter
   const uniqueClasses = [
-    ...new Set(combinedData.map((student) => student.className)),
+    ...new Set(combinedData.map(student => student.className)),
   ];
 
   // Get status statistics
   const getStatusStats = () => {
     const total = combinedData.length;
-    const confirmed = combinedData.filter((s) => s.willAttend === true).length;
-    const declined = combinedData.filter((s) => s.willAttend === false).length;
-    const pending = combinedData.filter((s) => s.willAttend === null).length;
+    const confirmed = combinedData.filter(s => s.willAttend === true).length;
+    const declined = combinedData.filter(s => s.willAttend === false).length;
+    const pending = combinedData.filter(s => s.willAttend === null).length;
 
     return { total, confirmed, declined, pending };
   };
@@ -203,17 +203,17 @@ function VaccinationEventStudents() {
   const stats = getStatusStats();
 
   // Get status badge class
-  const getStatusBadge = (student) => {
-    if (student.willAttend === true) return "status-confirmed";
-    if (student.willAttend === false) return "status-declined";
-    return "status-pending";
+  const getStatusBadge = student => {
+    if (student.willAttend === true) return 'status-confirmed';
+    if (student.willAttend === false) return 'status-declined';
+    return 'status-pending';
   };
 
   // Get status text
-  const getStatusText = (student) => {
-    if (student.willAttend === true) return "Đồng ý";
-    if (student.willAttend === false) return "Từ chối";
-    return "Chưa phản hồi";
+  const getStatusText = student => {
+    if (student.willAttend === true) return 'Đồng ý';
+    if (student.willAttend === false) return 'Từ chối';
+    return 'Chưa phản hồi';
   };
 
   if (loading) {
@@ -267,6 +267,15 @@ function VaccinationEventStudents() {
         </div>
         <div className="header-actions">
           <button
+            onClick={() =>
+              navigate(`/manager/vaccination-event-parents/${eventId}`)
+            }
+            className="parents-btn"
+            title="Xem danh sách phụ huynh để gửi email cho tất cả con"
+          >
+            👨‍👩‍👧‍👦 Danh sách phụ huynh
+          </button>
+          <button
             onClick={() => {
               fetchStudentResponses();
               fetchParentResponses();
@@ -316,7 +325,7 @@ function VaccinationEventStudents() {
           <label>Trạng thái:</label>
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={e => setStatusFilter(e.target.value)}
             className="filter-select"
           >
             <option value="all">Tất cả</option>
@@ -329,11 +338,11 @@ function VaccinationEventStudents() {
           <label>Lớp học:</label>
           <select
             value={classFilter}
-            onChange={(e) => setClassFilter(e.target.value)}
+            onChange={e => setClassFilter(e.target.value)}
             className="filter-select"
           >
             <option value="all">Tất cả lớp</option>
-            {uniqueClasses.map((className) => (
+            {uniqueClasses.map(className => (
               <option key={className} value={className}>
                 {className}
               </option>
@@ -376,7 +385,7 @@ function VaccinationEventStudents() {
                         {getStatusText(student)}
                       </span>
                     </td>
-                    <td>{student.responseDate || "Chưa có"}</td>
+                    <td>{student.responseDate || 'Chưa có'}</td>
                     <td>
                       <div className="action-buttons">
                         <button
@@ -412,7 +421,7 @@ function VaccinationEventStudents() {
           className="modal-overlay"
           onClick={() => setShowDetailModal(false)}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>👁️ Chi Tiết Phản Hồi</h3>
               <button
@@ -454,7 +463,7 @@ function VaccinationEventStudents() {
                 <div className="detail-row">
                   <span className="label">📅 Ngày phản hồi:</span>
                   <span className="value">
-                    {selectedStudent.responseDate || "Chưa có"}
+                    {selectedStudent.responseDate || 'Chưa có'}
                   </span>
                 </div>
 
@@ -463,13 +472,13 @@ function VaccinationEventStudents() {
                   <span
                     className={`value status-badge ${
                       selectedStudent.parentConsent
-                        ? "status-confirmed"
-                        : "status-declined"
+                        ? 'status-confirmed'
+                        : 'status-declined'
                     }`}
                   >
                     {selectedStudent.parentConsent
-                      ? "Đã đồng ý"
-                      : "Chưa đồng ý"}
+                      ? 'Đã đồng ý'
+                      : 'Chưa đồng ý'}
                   </span>
                 </div>
 
@@ -510,7 +519,7 @@ function VaccinationEventStudents() {
       {/* Send Email Modal */}
       {showEmailModal && selectedStudent && (
         <div className="modal-overlay" onClick={() => setShowEmailModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>📧 Gửi Email Thông Báo</h3>
               <button
@@ -547,7 +556,7 @@ function VaccinationEventStudents() {
                   required
                   className="template-select"
                 >
-                  {emailTemplateOptions.map((template) => (
+                  {emailTemplateOptions.map(template => (
                     <option key={template.id} value={template.id}>
                       {template.name} (ID: {template.id})
                     </option>
@@ -580,7 +589,7 @@ function VaccinationEventStudents() {
                   <strong>Template:</strong> ID {emailFormData.emailTemplateId}
                 </p>
                 <p>
-                  <strong>Về học sinh:</strong> {selectedStudent.studentName} -{" "}
+                  <strong>Về học sinh:</strong> {selectedStudent.studentName} -{' '}
                   {selectedStudent.className}
                 </p>
               </div>

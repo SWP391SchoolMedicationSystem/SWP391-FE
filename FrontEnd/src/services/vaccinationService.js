@@ -1,87 +1,87 @@
-import apiClient, { API_ENDPOINTS, buildApiUrl } from "./config.js";
+import apiClient, { API_ENDPOINTS, buildApiUrl } from './config.js';
 
 // Vaccination Event Services
 export const vaccinationEventService = {
   // Get all vaccination events (All roles can view)
   getAllEvents: async () => {
     try {
-      console.log("🌐 Getting all vaccination events");
+      console.log('🌐 Getting all vaccination events');
       const response = await apiClient.get(
         API_ENDPOINTS.VACCINATION_EVENT.GET_ALL
       );
-      console.log("📥 Vaccination events response:", response);
+      console.log('📥 Vaccination events response:', response);
 
       const events = Array.isArray(response) ? response : [];
       return events.map(vaccinationEventService.mapEventData);
     } catch (error) {
-      console.error("❌ Error getting vaccination events:", error);
+      console.error('❌ Error getting vaccination events:', error);
       throw error;
     }
   },
 
   // Get vaccination event by ID
-  getEventById: async (eventId) => {
+  getEventById: async eventId => {
     try {
-      console.log("🌐 Getting vaccination event by ID:", eventId);
+      console.log('🌐 Getting vaccination event by ID:', eventId);
       const url = buildApiUrl(
         API_ENDPOINTS.VACCINATION_EVENT.GET_BY_ID,
         eventId
       );
       const response = await apiClient.get(url);
-      console.log("📥 Vaccination event details:", response);
+      console.log('📥 Vaccination event details:', response);
 
       return vaccinationEventService.mapEventData(response);
     } catch (error) {
-      console.error("❌ Error getting vaccination event by ID:", error);
+      console.error('❌ Error getting vaccination event by ID:', error);
       throw error;
     }
   },
 
   // Create new vaccination event (Manager only)
-  createEvent: async (eventData) => {
+  createEvent: async eventData => {
     try {
-      console.log("🌐 Creating vaccination event:", eventData);
+      console.log('🌐 Creating vaccination event:', eventData);
       const response = await apiClient.post(
         API_ENDPOINTS.VACCINATION_EVENT.CREATE,
         eventData
       );
-      console.log("✅ Vaccination event created:", response);
+      console.log('✅ Vaccination event created:', response);
 
       return vaccinationEventService.mapEventData(response);
     } catch (error) {
-      console.error("❌ Error creating vaccination event:", error);
+      console.error('❌ Error creating vaccination event:', error);
       throw error;
     }
   },
 
   // Update vaccination event (Manager only)
-  updateEvent: async (eventData) => {
+  updateEvent: async eventData => {
     try {
-      console.log("🌐 Updating vaccination event:", eventData);
+      console.log('🌐 Updating vaccination event:', eventData);
       const response = await apiClient.put(
         API_ENDPOINTS.VACCINATION_EVENT.UPDATE,
         eventData
       );
-      console.log("✅ Vaccination event updated:", response);
+      console.log('✅ Vaccination event updated:', response);
 
       return response;
     } catch (error) {
-      console.error("❌ Error updating vaccination event:", error);
+      console.error('❌ Error updating vaccination event:', error);
       throw error;
     }
   },
 
   // Delete vaccination event (Manager only)
-  deleteEvent: async (eventId) => {
+  deleteEvent: async eventId => {
     try {
-      console.log("🌐 Deleting vaccination event:", eventId);
+      console.log('🌐 Deleting vaccination event:', eventId);
       const url = buildApiUrl(API_ENDPOINTS.VACCINATION_EVENT.DELETE, eventId);
       const response = await apiClient.delete(url);
-      console.log("✅ Vaccination event deleted:", response);
+      console.log('✅ Vaccination event deleted:', response);
 
       return response;
     } catch (error) {
-      console.error("❌ Error deleting vaccination event:", error);
+      console.error('❌ Error deleting vaccination event:', error);
       throw error;
     }
   },
@@ -89,16 +89,16 @@ export const vaccinationEventService = {
   // Get upcoming vaccination events
   getUpcomingEvents: async () => {
     try {
-      console.log("🌐 Getting upcoming vaccination events");
+      console.log('🌐 Getting upcoming vaccination events');
       const response = await apiClient.get(
         API_ENDPOINTS.VACCINATION_EVENT.GET_UPCOMING
       );
-      console.log("📥 Upcoming vaccination events:", response);
+      console.log('📥 Upcoming vaccination events:', response);
 
       const events = Array.isArray(response) ? response : [];
       return events.map(vaccinationEventService.mapEventData);
     } catch (error) {
-      console.error("❌ Error getting upcoming vaccination events:", error);
+      console.error('❌ Error getting upcoming vaccination events:', error);
       throw error;
     }
   },
@@ -107,19 +107,19 @@ export const vaccinationEventService = {
   getEventsByDateRange: async (startDate, endDate) => {
     try {
       console.log(
-        "🌐 Getting vaccination events by date range:",
+        '🌐 Getting vaccination events by date range:',
         startDate,
         endDate
       );
       const url = `${API_ENDPOINTS.VACCINATION_EVENT.GET_BY_DATE_RANGE}?startDate=${startDate}&endDate=${endDate}`;
       const response = await apiClient.get(url);
-      console.log("📥 Vaccination events by date range:", response);
+      console.log('📥 Vaccination events by date range:', response);
 
       const events = Array.isArray(response) ? response : [];
       return events.map(vaccinationEventService.mapEventData);
     } catch (error) {
       console.error(
-        "❌ Error getting vaccination events by date range:",
+        '❌ Error getting vaccination events by date range:',
         error
       );
       throw error;
@@ -127,58 +127,58 @@ export const vaccinationEventService = {
   },
 
   // Get vaccination event summary with student list
-  getEventSummary: async (eventId) => {
+  getEventSummary: async eventId => {
     try {
-      console.log("🌐 Getting vaccination event summary:", eventId);
+      console.log('🌐 Getting vaccination event summary:', eventId);
       const url = buildApiUrl(
         API_ENDPOINTS.VACCINATION_EVENT.GET_SUMMARY,
         eventId
       );
       const response = await apiClient.get(url);
-      console.log("📥 Vaccination event summary:", response);
+      console.log('📥 Vaccination event summary:', response);
 
       return response;
     } catch (error) {
-      console.error("❌ Error getting vaccination event summary:", error);
+      console.error('❌ Error getting vaccination event summary:', error);
       throw error;
     }
   },
 
   // Get student responses for vaccination event (will attend status)
-  getEventResponses: async (eventId) => {
+  getEventResponses: async eventId => {
     try {
-      console.log("🌐 Getting vaccination event responses:", eventId);
+      console.log('🌐 Getting vaccination event responses:', eventId);
       const url = buildApiUrl(
         API_ENDPOINTS.VACCINATION_EVENT.GET_RESPONSES,
         eventId
       );
       const response = await apiClient.get(url);
-      console.log("📥 Vaccination event responses:", response);
+      console.log('📥 Vaccination event responses:', response);
 
       const responses = Array.isArray(response) ? response : [];
       return responses.map(vaccinationEventService.mapStudentResponseData);
     } catch (error) {
-      console.error("❌ Error getting vaccination event responses:", error);
+      console.error('❌ Error getting vaccination event responses:', error);
       throw error;
     }
   },
 
   // Get parent responses for vaccination event (with updated mapping)
-  getParentResponses: async (eventId) => {
+  getParentResponses: async eventId => {
     try {
-      console.log("🌐 Getting vaccination event parent responses:", eventId);
+      console.log('🌐 Getting vaccination event parent responses:', eventId);
       const url = buildApiUrl(
         API_ENDPOINTS.VACCINATION_EVENT.GET_PARENT_RESPONSES,
         eventId
       );
       const response = await apiClient.get(url);
-      console.log("📥 Vaccination event parent responses:", response);
+      console.log('📥 Vaccination event parent responses:', response);
 
       const responses = Array.isArray(response) ? response : [];
 
       // Flatten the responses since each parent can have multiple students
       const flattenedResponses = [];
-      responses.forEach((parentResponse) => {
+      responses.forEach(parentResponse => {
         const mappedResponses =
           vaccinationEventService.mapParentResponseData(parentResponse);
         flattenedResponses.push(...mappedResponses);
@@ -187,7 +187,7 @@ export const vaccinationEventService = {
       return flattenedResponses;
     } catch (error) {
       console.error(
-        "❌ Error getting vaccination event parent responses:",
+        '❌ Error getting vaccination event parent responses:',
         error
       );
       throw error;
@@ -195,18 +195,18 @@ export const vaccinationEventService = {
   },
 
   // Send email to all parents (Manager only)
-  sendEmailToAll: async (emailData) => {
+  sendEmailToAll: async emailData => {
     try {
-      console.log("🌐 Sending email to all parents:", emailData);
+      console.log('🌐 Sending email to all parents:', emailData);
       const response = await apiClient.post(
         API_ENDPOINTS.VACCINATION_EVENT.SEND_EMAIL_ALL,
         emailData
       );
-      console.log("✅ Email sent to all parents:", response);
+      console.log('✅ Email sent to all parents:', response);
 
       return response;
     } catch (error) {
-      console.error("❌ Error sending email to all parents:", error);
+      console.error('❌ Error sending email to all parents:', error);
       throw error;
     }
   },
@@ -214,7 +214,7 @@ export const vaccinationEventService = {
   // Send email to specific parents (Manager only)
   sendEmailToSpecific: async (parentIds, emailData) => {
     try {
-      console.log("🌐 Sending email to specific parents:", {
+      console.log('🌐 Sending email to specific parents:', {
         parentIds,
         emailData,
       });
@@ -223,7 +223,7 @@ export const vaccinationEventService = {
       const parentIdsArray = Array.isArray(parentIds) ? parentIds : [parentIds];
 
       const requestBody = {
-        parentIds: parentIdsArray,
+        ids: parentIdsArray,
         sendVaccinationEmailDTO: emailData,
       };
 
@@ -231,11 +231,42 @@ export const vaccinationEventService = {
         API_ENDPOINTS.VACCINATION_EVENT.SEND_EMAIL_SPECIFIC,
         requestBody
       );
-      console.log("✅ Email sent to specific parents:", response);
+      console.log('✅ Email sent to specific parents:', response);
 
       return response;
     } catch (error) {
-      console.error("❌ Error sending email to specific parents:", error);
+      console.error('❌ Error sending email to specific parents:', error);
+      throw error;
+    }
+  },
+
+  // Send email to specific students (Manager only)
+  sendEmailToSpecificStudents: async (studentIds, emailData) => {
+    try {
+      console.log('🌐 Sending email to specific students:', {
+        studentIds,
+        emailData,
+      });
+
+      // Ensure studentIds is an array
+      const studentIdsArray = Array.isArray(studentIds)
+        ? studentIds
+        : [studentIds];
+
+      const requestBody = {
+        ids: studentIdsArray,
+        sendVaccinationEmailDTO: emailData,
+      };
+
+      const response = await apiClient.post(
+        API_ENDPOINTS.VACCINATION_EVENT.SEND_EMAIL_TO_SPECIFIC_STUDENTS,
+        requestBody
+      );
+      console.log('✅ Email sent to specific students:', response);
+
+      return response;
+    } catch (error) {
+      console.error('❌ Error sending email to specific students:', error);
       throw error;
     }
   },
@@ -246,16 +277,16 @@ export const vaccinationEventService = {
       console.log("🌐 Getting parent's vaccination responses");
 
       // Get user info to get parent ID
-      const userInfo = localStorage.getItem("userInfo");
+      const userInfo = localStorage.getItem('userInfo');
       if (!userInfo) {
-        throw new Error("User info not found");
+        throw new Error('User info not found');
       }
 
       const parsedUserInfo = JSON.parse(userInfo);
       const parentId = parsedUserInfo.userId || parsedUserInfo.id;
 
       if (!parentId) {
-        throw new Error("Parent ID not found");
+        throw new Error('Parent ID not found');
       }
 
       // Get all events first
@@ -263,14 +294,14 @@ export const vaccinationEventService = {
 
       // Get responses for each event
       const eventsWithResponses = await Promise.all(
-        allEvents.map(async (event) => {
+        allEvents.map(async event => {
           try {
             const parentResponses =
               await vaccinationEventService.getParentResponses(event.id);
 
             // Find all responses for this parent (can have multiple children)
             const myResponses = parentResponses.filter(
-              (response) => response.parentId === parentId
+              response => response.parentId === parentId
             );
 
             // Group responses by student for better display
@@ -283,24 +314,24 @@ export const vaccinationEventService = {
             }, {});
 
             // Determine overall response status for the event
-            let overallStatus = "Chưa phản hồi";
+            let overallStatus = 'Chưa phản hồi';
             if (myResponses.length > 0) {
               const confirmedCount = myResponses.filter(
-                (r) => r.willAttend === true
+                r => r.willAttend === true
               ).length;
               const declinedCount = myResponses.filter(
-                (r) => r.willAttend === false
+                r => r.willAttend === false
               ).length;
               const pendingCount = myResponses.filter(
-                (r) => r.willAttend === null
+                r => r.willAttend === null
               ).length;
 
               if (pendingCount === myResponses.length) {
-                overallStatus = "Chưa phản hồi";
+                overallStatus = 'Chưa phản hồi';
               } else if (confirmedCount === myResponses.length) {
-                overallStatus = "Đã đồng ý (tất cả)";
+                overallStatus = 'Đã đồng ý (tất cả)';
               } else if (declinedCount === myResponses.length) {
-                overallStatus = "Đã từ chối (tất cả)";
+                overallStatus = 'Đã từ chối (tất cả)';
               } else {
                 overallStatus = `Đã phản hồi (${confirmedCount} đồng ý, ${declinedCount} từ chối, ${pendingCount} chưa phản hồi)`;
               }
@@ -312,13 +343,11 @@ export const vaccinationEventService = {
               responsesByStudent,
               responseStatus: overallStatus,
               totalChildren: myResponses.length,
-              confirmedChildren: myResponses.filter(
-                (r) => r.willAttend === true
-              ).length,
-              declinedChildren: myResponses.filter(
-                (r) => r.willAttend === false
-              ).length,
-              pendingChildren: myResponses.filter((r) => r.willAttend === null)
+              confirmedChildren: myResponses.filter(r => r.willAttend === true)
+                .length,
+              declinedChildren: myResponses.filter(r => r.willAttend === false)
+                .length,
+              pendingChildren: myResponses.filter(r => r.willAttend === null)
                 .length,
             };
           } catch (error) {
@@ -330,7 +359,7 @@ export const vaccinationEventService = {
               ...event,
               myResponses: [],
               responsesByStudent: {},
-              responseStatus: "Chưa phản hồi",
+              responseStatus: 'Chưa phản hồi',
               totalChildren: 0,
               confirmedChildren: 0,
               declinedChildren: 0,
@@ -348,26 +377,26 @@ export const vaccinationEventService = {
   },
 
   // Map vaccination event data for display
-  mapEventData: (apiEvent) => {
+  mapEventData: apiEvent => {
     return {
       id: apiEvent.vaccinationEventId || apiEvent.id,
       title:
-        apiEvent.vaccinationEventName || apiEvent.title || "Chưa có tiêu đề",
-      description: apiEvent.description || "Chưa có mô tả",
+        apiEvent.vaccinationEventName || apiEvent.title || 'Chưa có tiêu đề',
+      description: apiEvent.description || 'Chưa có mô tả',
       eventDate: apiEvent.eventDate
-        ? new Date(apiEvent.eventDate).toLocaleDateString("vi-VN")
-        : "Chưa có ngày",
-      location: apiEvent.location || "Chưa có địa điểm",
-      organizedBy: apiEvent.organizedBy || "string",
-      status: apiEvent.status || "Active",
+        ? new Date(apiEvent.eventDate).toLocaleDateString('vi-VN')
+        : 'Chưa có ngày',
+      location: apiEvent.location || 'Chưa có địa điểm',
+      organizedBy: apiEvent.organizedBy || 'string',
+      status: apiEvent.status || 'Active',
       isActive: apiEvent.isActive !== false,
-      createdBy: apiEvent.createdBy || "System",
+      createdBy: apiEvent.createdBy || 'System',
       createdDate: apiEvent.createdDate
-        ? new Date(apiEvent.createdDate).toLocaleDateString("vi-VN")
+        ? new Date(apiEvent.createdDate).toLocaleDateString('vi-VN')
         : null,
-      modifiedBy: apiEvent.modifiedBy || "System",
+      modifiedBy: apiEvent.modifiedBy || 'System',
       modifiedDate: apiEvent.modifiedDate
-        ? new Date(apiEvent.modifiedDate).toLocaleDateString("vi-VN")
+        ? new Date(apiEvent.modifiedDate).toLocaleDateString('vi-VN')
         : null,
       isDeleted: apiEvent.isDeleted || false,
       // Additional fields from API response
@@ -379,49 +408,49 @@ export const vaccinationEventService = {
   },
 
   // Map student vaccination response data
-  mapStudentResponseData: (apiResponse) => {
+  mapStudentResponseData: apiResponse => {
     return {
       id: apiResponse.id || apiResponse.responseId,
       studentId: apiResponse.studentId,
       parentId: apiResponse.parentId,
-      studentName: apiResponse.studentName || "Chưa có tên",
-      parentName: apiResponse.parentName || "Chưa có thông tin phụ huynh",
-      parentEmail: apiResponse.parentEmail || "Chưa có email",
-      className: apiResponse.className || "Chưa có lớp",
+      studentName: apiResponse.studentName || 'Chưa có tên',
+      parentName: apiResponse.parentName || 'Chưa có thông tin phụ huynh',
+      parentEmail: apiResponse.parentEmail || 'Chưa có email',
+      className: apiResponse.className || 'Chưa có lớp',
       willAttend: apiResponse.willAttend,
-      reasonForDecline: apiResponse.reasonForDecline || "",
+      reasonForDecline: apiResponse.reasonForDecline || '',
       responseDate: apiResponse.responseDate
-        ? new Date(apiResponse.responseDate).toLocaleDateString("vi-VN")
+        ? new Date(apiResponse.responseDate).toLocaleDateString('vi-VN')
         : null,
-      status: apiResponse.status || "Pending",
+      status: apiResponse.status || 'Pending',
     };
   },
 
   // Map parent vaccination response data (updated for multiple students per parent)
-  mapParentResponseData: (apiResponse) => {
+  mapParentResponseData: apiResponse => {
     // Handle both old single-student format and new multiple-students format
     if (apiResponse.responses && Array.isArray(apiResponse.responses)) {
       // New format: multiple students per parent
-      return apiResponse.responses.map((studentResponse) => ({
+      return apiResponse.responses.map(studentResponse => ({
         parentId: apiResponse.parentId,
         studentId: studentResponse.studentId,
         vaccinationEventId: apiResponse.vaccinationEventId,
         willAttend: studentResponse.willAttend,
-        reasonForDecline: studentResponse.reasonForDecline || "",
+        reasonForDecline: studentResponse.reasonForDecline || '',
         parentConsent: apiResponse.parentConsent,
         // Add status based on willAttend value
         status:
           studentResponse.willAttend === true
-            ? "Đồng ý"
+            ? 'Đồng ý'
             : studentResponse.willAttend === false
-            ? "Từ chối"
-            : "Chưa phản hồi",
+            ? 'Từ chối'
+            : 'Chưa phản hồi',
         statusClass:
           studentResponse.willAttend === true
-            ? "confirmed"
+            ? 'confirmed'
             : studentResponse.willAttend === false
-            ? "declined"
-            : "pending",
+            ? 'declined'
+            : 'pending',
       }));
     } else {
       // Old format: single student
@@ -431,20 +460,20 @@ export const vaccinationEventService = {
           studentId: apiResponse.studentId,
           vaccinationEventId: apiResponse.vaccinationEventId,
           willAttend: apiResponse.willAttend,
-          reasonForDecline: apiResponse.reasonForDecline || "",
+          reasonForDecline: apiResponse.reasonForDecline || '',
           parentConsent: apiResponse.parentConsent,
           status:
             apiResponse.willAttend === true
-              ? "Đồng ý"
+              ? 'Đồng ý'
               : apiResponse.willAttend === false
-              ? "Từ chối"
-              : "Chưa phản hồi",
+              ? 'Từ chối'
+              : 'Chưa phản hồi',
           statusClass:
             apiResponse.willAttend === true
-              ? "confirmed"
+              ? 'confirmed'
               : apiResponse.willAttend === false
-              ? "declined"
-              : "pending",
+              ? 'declined'
+              : 'pending',
         },
       ];
     }
