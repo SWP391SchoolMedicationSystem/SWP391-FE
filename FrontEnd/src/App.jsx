@@ -46,7 +46,7 @@ import NurseBlog from './pages/Nurse/Blog';
 import ChatWithParents from './pages/Nurse/ChatWithParents';
 import NurseStudentHealthRecordDetail from './pages/Nurse/StudentHealthRecordDetail';
 import NurseNotifications from './pages/Nurse/Notifications';
-import ViewStudentMedicine from './pages/Nurse/ViewStudentMedicine';
+import NursePersonalMedicine from './pages/Nurse/PersonalMedicine';
 
 // Parent pages
 import ParentDashboard from './pages/Parent/Dashboard';
@@ -59,7 +59,7 @@ import ChatWithNurse from './pages/Parent/ChatWithNurse';
 import ManageHealthRecords from './pages/Parent/ManageHealthRecords';
 import ParentStudentHealthRecordDetail from './pages/Parent/StudentHealthRecordDetail';
 import UpdateProfile from './pages/Parent/UpdateProfile';
-import PersonalMedicine from './pages/Parent/PersonalMedicine';
+
 
 function App() {
   return (
@@ -142,8 +142,8 @@ function App() {
           <Route path="handle-medicine" element={<HandleMedicine />} />
           <Route path="medicine-management" element={<MedicineManagement />} />
           <Route
-            path="view-student-medicine"
-            element={<ViewStudentMedicine />}
+            path="personal-medicine"
+            element={<NursePersonalMedicine />}
           />
           <Route path="student-list" element={<NurseStudentList />} />
           <Route path="blog" element={<NurseBlog />} />
@@ -185,7 +185,7 @@ function App() {
             element={<ManageHealthRecords />}
           />
           <Route path="update-profile" element={<UpdateProfile />} />
-          <Route path="personal-medicine" element={<PersonalMedicine />} />
+
         </Route>
       </Routes>
     </div>
