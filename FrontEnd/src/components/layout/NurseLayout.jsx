@@ -60,10 +60,10 @@ const navItems = [
     key: 'medicine-management',
   },
   {
-    to: '/nurse/view-student-medicine',
+    to: '/nurse/personal-medicine',
     label: 'Đơn thuốc từ phụ huynh',
     icon: <Medication />,
-    key: 'student-medicine',
+    key: 'personal-medicine',
   },
   { to: '/nurse/blog', label: 'Blog', icon: <Article />, key: 'blog' },
   { to: '/nurse/chat', label: 'Chat Phụ Huynh', icon: <Chat />, key: 'chat' },

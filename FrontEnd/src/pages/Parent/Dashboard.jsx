@@ -151,9 +151,7 @@ function ParentDashboard() {
     navigate("/parent/chat");
   };
 
-  const handlePersonalMedicine = () => {
-    navigate("/parent/personal-medicine");
-  };
+
 
   return (
     <div
@@ -659,43 +657,7 @@ function ParentDashboard() {
               </small>
             </div>
           </button>
-          <button
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              padding: "15px 20px",
-              border: "none",
-              borderRadius: "14px",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-              fontSize: "1.1rem",
-              fontWeight: 500,
-              fontFamily: "Satoshi, sans-serif",
-              background: theme
-                ? isDarkMode
-                  ? "#2d4739"
-                  : "#2f5148"
-                : "#2f5148",
-              color: "white",
-            }}
-            onClick={handlePersonalMedicine}
-          >
-            <LocalPharmacyIcon sx={{ color: "#97a19b", fontSize: "1.5rem" }} />
-            <div style={{ textAlign: "left" }}>
-              <span style={{ display: "block", fontWeight: 600 }}>
-                Thuốc Cá Nhân
-              </span>
-              <small
-                style={{
-                  color: "rgba(255, 255, 255, 0.9)",
-                  fontSize: "0.8rem",
-                }}
-              >
-                Quản lý thông tin thuốc và đơn thuốc
-              </small>
-            </div>
-          </button>
+
         </div>
       </div>
     </div>

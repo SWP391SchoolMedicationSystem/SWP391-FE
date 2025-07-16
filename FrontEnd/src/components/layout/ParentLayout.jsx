@@ -79,12 +79,7 @@ const navItems = [
     icon: <FolderShared />,
     key: 'records',
   },
-  {
-    to: '/parent/personal-medicine',
-    label: 'Quản Lý Thuốc Cá Nhân',
-    icon: <LocalPharmacy />,
-    key: 'medicine',
-  },
+
 ];
 
 export default function ParentLayout() {
