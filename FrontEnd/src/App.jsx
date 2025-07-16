@@ -22,6 +22,7 @@ import AccountManagement from './pages/Manager/AccountManagement';
 import BlogManagement from './pages/Manager/BlogManagement';
 import ManagerVaccinationEvents from './pages/Manager/VaccinationEvents';
 import VaccinationEventStudents from './pages/Manager/VaccinationEventStudents';
+import VaccinationEventParents from './pages/Manager/VaccinationEventParents';
 import ManagerNotifications from './pages/Manager/Notifications';
 import StudentList from './pages/Manager/StudentList';
 import ManagerStudentHealthRecordDetail from './pages/Manager/StudentHealthRecordDetail';
@@ -106,6 +107,10 @@ function App() {
           <Route
             path="vaccination-events/:eventId/students"
             element={<VaccinationEventStudents />}
+          />
+          <Route
+            path="vaccination-event-parents/:eventId"
+            element={<VaccinationEventParents />}
           />
           <Route path="StudentList" element={<StudentList />} />
           <Route

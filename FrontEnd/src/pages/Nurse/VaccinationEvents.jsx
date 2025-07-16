@@ -1,7 +1,15 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import "../../css/Nurse/VaccinationEvents.css";
-import { vaccinationEventService } from "../../services/vaccinationService";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../../css/Nurse/VaccinationEvents.css';
+import { vaccinationEventService } from '../../services/vaccinationService';
+import InfoIcon from '@mui/icons-material/Info';
+import VaccinesIcon from '@mui/icons-material/Vaccines';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import DescriptionIcon from '@mui/icons-material/Description';
+import NotesIcon from '@mui/icons-material/Notes';
+import CloseIcon from '@mui/icons-material/Close';
 
 function VaccinationEvents() {
   const navigate = useNavigate();
@@ -9,7 +17,7 @@ function VaccinationEvents() {
   // States for events management
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
@@ -22,44 +30,44 @@ function VaccinationEvents() {
   const fetchVaccinationEvents = async () => {
     try {
       setLoading(true);
-      setError("");
+      setError('');
       const response = await vaccinationEventService.getAllEvents();
       setEvents(response);
     } catch (error) {
-      console.error("Error fetching vaccination events:", error);
-      setError("Không thể tải danh sách sự kiện tiêm chủng");
+      console.error('Error fetching vaccination events:', error);
+      setError('Không thể tải danh sách sự kiện tiêm chủng');
     } finally {
       setLoading(false);
     }
   };
 
   // Handle view event details
-  const handleViewDetails = (event) => {
+  const handleViewDetails = event => {
     setSelectedEvent(event);
     setShowDetailModal(true);
   };
 
   // Handle view student list
-  const handleViewStudents = (eventId) => {
+  const handleViewStudents = eventId => {
     navigate(`/nurse/vaccination-events/${eventId}/students`);
   };
 
   // Get status badge class
-  const getStatusBadgeClass = (event) => {
+  const getStatusBadgeClass = event => {
     const eventDate = new Date(event.eventDate);
     const today = new Date();
 
-    if (eventDate < today) return "status-completed";
-    return "status-upcoming";
+    if (eventDate < today) return 'status-completed';
+    return 'status-upcoming';
   };
 
   // Get status text
-  const getStatusText = (event) => {
+  const getStatusText = event => {
     const eventDate = new Date(event.eventDate);
     const today = new Date();
 
-    if (eventDate < today) return "Đã hoàn thành";
-    return "Sắp diễn ra";
+    if (eventDate < today) return 'Đã hoàn thành';
+    return 'Sắp diễn ra';
   };
 
   if (loading) {
@@ -113,7 +121,7 @@ function VaccinationEvents() {
           <div className="stat-icon">🟡</div>
           <div className="stat-content">
             <h3>
-              {events.filter((e) => getStatusText(e) === "Sắp diễn ra").length}
+              {events.filter(e => getStatusText(e) === 'Sắp diễn ra').length}
             </h3>
             <p>Sắp diễn ra</p>
           </div>
@@ -122,10 +130,7 @@ function VaccinationEvents() {
           <div className="stat-icon">✅</div>
           <div className="stat-content">
             <h3>
-              {
-                events.filter((e) => getStatusText(e) === "Đã hoàn thành")
-                  .length
-              }
+              {events.filter(e => getStatusText(e) === 'Đã hoàn thành').length}
             </h3>
             <p>Đã hoàn thành</p>
           </div>
@@ -138,7 +143,7 @@ function VaccinationEvents() {
 
         {events.length > 0 ? (
           <div className="events-grid">
-            {events.map((event) => (
+            {events.map(event => (
               <div key={event.id} className="event-card">
                 <div className="card-header">
                   <div className="event-title">
@@ -164,7 +169,7 @@ function VaccinationEvents() {
                     <div className="info-row">
                       <span className="label">⏰ Giờ tiêm:</span>
                       <span className="value">
-                        {event.eventTime || "Chưa có"}
+                        {event.eventTime || 'Chưa có'}
                       </span>
                     </div>
                     <div className="info-row">
@@ -185,7 +190,7 @@ function VaccinationEvents() {
                     className="view-btn"
                     onClick={() => handleViewDetails(event)}
                   >
-                     Xem chi tiết
+                    Xem chi tiết
                   </button>
                   <button
                     className="students-btn"
@@ -209,88 +214,409 @@ function VaccinationEvents() {
       {/* Detail Modal */}
       {showDetailModal && selectedEvent && (
         <div
-          className="modal-overlay"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px',
+            backdropFilter: 'blur(4px)',
+          }}
           onClick={() => setShowDetailModal(false)}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>🔍 Chi Tiết Sự Kiện Tiêm Chủng</h3>
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '20px',
+              width: '100%',
+              maxWidth: '700px',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              border: '1px solid #c1cbc2',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(20px)',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '25px',
+                borderBottom: '1px solid #e9ecef',
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  color: '#2f5148',
+                  fontFamily: 'Satoshi, sans-serif',
+                  fontSize: '1.5rem',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+              >
+                <InfoIcon sx={{ color: '#97a19b', fontSize: '1.5rem' }} />
+                Chi Tiết Sự Kiện Tiêm Chủng
+              </h3>
               <button
-                className="modal-close"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#97a19b',
+                  cursor: 'pointer',
+                  fontSize: '1.5rem',
+                  padding: '5px',
+                  borderRadius: '50%',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
                 onClick={() => setShowDetailModal(false)}
               >
-                ×
+                <CloseIcon sx={{ fontSize: '1.5rem' }} />
               </button>
             </div>
 
-            <div className="modal-body">
-              <div className="detail-section">
-                <h4>📋 Thông tin cơ bản</h4>
-                <div className="detail-grid">
-                  <div className="detail-item">
-                    <span className="detail-label">Tiêu đề:</span>
-                    <span className="detail-value">{selectedEvent.title}</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Vaccine:</span>
-                    <span className="detail-value">
-                      {selectedEvent.vaccineName}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Ngày tiêm:</span>
-                    <span className="detail-value">
-                      {selectedEvent.eventDate}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Giờ tiêm:</span>
-                    <span className="detail-value">
-                      {selectedEvent.eventTime || "Chưa có"}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Địa điểm:</span>
-                    <span className="detail-value">
-                      {selectedEvent.location}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Trạng thái:</span>
+            {/* Modal Body */}
+            <div style={{ padding: '25px' }}>
+              {/* Basic Information Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                  gap: '15px',
+                  marginBottom: '20px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '12px 15px',
+                    background: '#f8f9fa',
+                    borderRadius: '10px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <VaccinesIcon
+                      sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                    />
                     <span
-                      className={`status-badge ${getStatusBadgeClass(
-                        selectedEvent
-                      )}`}
+                      style={{
+                        color: '#97a19b',
+                        fontFamily: 'Satoshi, sans-serif',
+                        fontSize: '0.9rem',
+                        fontWeight: 500,
+                      }}
                     >
-                      {getStatusText(selectedEvent)}
+                      Vaccine:
                     </span>
                   </div>
+                  <span
+                    style={{
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {selectedEvent.vaccineName}
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '12px 15px',
+                    background: '#f8f9fa',
+                    borderRadius: '10px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <CalendarTodayIcon
+                      sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                    />
+                    <span
+                      style={{
+                        color: '#97a19b',
+                        fontFamily: 'Satoshi, sans-serif',
+                        fontSize: '0.9rem',
+                        fontWeight: 500,
+                      }}
+                    >
+                      Ngày tiêm:
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {selectedEvent.eventDate}
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '12px 15px',
+                    background: '#f8f9fa',
+                    borderRadius: '10px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <AccessTimeIcon
+                      sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                    />
+                    <span
+                      style={{
+                        color: '#97a19b',
+                        fontFamily: 'Satoshi, sans-serif',
+                        fontSize: '0.9rem',
+                        fontWeight: 500,
+                      }}
+                    >
+                      Giờ tiêm:
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {selectedEvent.eventTime || 'Chưa có'}
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '12px 15px',
+                    background: '#f8f9fa',
+                    borderRadius: '10px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <LocationOnIcon
+                      sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                    />
+                    <span
+                      style={{
+                        color: '#97a19b',
+                        fontFamily: 'Satoshi, sans-serif',
+                        fontSize: '0.9rem',
+                        fontWeight: 500,
+                      }}
+                    >
+                      Địa điểm:
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {selectedEvent.location}
+                  </span>
                 </div>
               </div>
 
+              {/* Event Title */}
+              <div
+                style={{
+                  background: '#f8f9fa',
+                  padding: '15px',
+                  borderRadius: '12px',
+                  border: '1px solid #e9ecef',
+                  marginBottom: '20px',
+                }}
+              >
+                <h4
+                  style={{
+                    margin: '0 0 10px 0',
+                    color: '#2f5148',
+                    fontFamily: 'Satoshi, sans-serif',
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                  }}
+                >
+                  Tiêu đề sự kiện:
+                </h4>
+                <p
+                  style={{
+                    margin: 0,
+                    color: '#97a19b',
+                    fontSize: '0.9rem',
+                    fontFamily: 'Satoshi, sans-serif',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {selectedEvent.title}
+                </p>
+              </div>
+
+              {/* Description Section */}
               {selectedEvent.description && (
-                <div className="detail-section">
-                  <h4>📝 Mô tả</h4>
-                  <div className="description-content">
-                    <p>{selectedEvent.description}</p>
-                  </div>
+                <div
+                  style={{
+                    background: '#f8f9fa',
+                    padding: '15px',
+                    borderRadius: '12px',
+                    border: '1px solid #e9ecef',
+                    marginBottom: '20px',
+                  }}
+                >
+                  <h4
+                    style={{
+                      margin: '0 0 10px 0',
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <DescriptionIcon
+                      sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                    />
+                    Mô tả:
+                  </h4>
+                  <p
+                    style={{
+                      margin: 0,
+                      color: '#97a19b',
+                      fontSize: '0.9rem',
+                      fontFamily: 'Satoshi, sans-serif',
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {selectedEvent.description}
+                  </p>
                 </div>
               )}
 
+              {/* Notes Section */}
               {selectedEvent.notes && (
-                <div className="detail-section">
-                  <h4>📌 Ghi chú</h4>
-                  <div className="notes-content">
-                    <p>{selectedEvent.notes}</p>
-                  </div>
+                <div
+                  style={{
+                    background: '#f8f9fa',
+                    padding: '15px',
+                    borderRadius: '12px',
+                    border: '1px solid #e9ecef',
+                    marginBottom: '20px',
+                  }}
+                >
+                  <h4
+                    style={{
+                      margin: '0 0 10px 0',
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <NotesIcon sx={{ color: '#97a19b', fontSize: '1.2rem' }} />
+                    Ghi chú:
+                  </h4>
+                  <p
+                    style={{
+                      margin: 0,
+                      color: '#97a19b',
+                      fontSize: '0.9rem',
+                      fontFamily: 'Satoshi, sans-serif',
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {selectedEvent.notes}
+                  </p>
                 </div>
               )}
             </div>
 
-            <div className="modal-footer">
+            {/* Modal Footer */}
+            <div
+              style={{
+                padding: '20px 25px',
+                borderTop: '1px solid #e9ecef',
+                display: 'flex',
+                justifyContent: 'flex-end',
+              }}
+            >
               <button
+                style={{
+                  background: '#bfefa1',
+                  color: '#1a3a2e',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  fontFamily: 'Satoshi, sans-serif',
+                  transition: 'all 0.3s ease',
+                }}
                 onClick={() => setShowDetailModal(false)}
-                className="close-btn"
               >
                 Đóng
               </button>

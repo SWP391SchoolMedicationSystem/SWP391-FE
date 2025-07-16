@@ -49,30 +49,30 @@ const navItems = [
     icon: <Vaccines />,
     key: 'vaccination',
   },
-  {
-    to: '/parent/health-history',
-    label: 'Lịch Sử Khám Sức Khỏe',
-    icon: <MedicalServices />,
-    key: 'health-history',
-  },
+  // {
+  //   to: '/parent/health-history',
+  //   label: 'Lịch Sử Khám Sức Khỏe',
+  //   icon: <MedicalServices />,
+  //   key: 'health-history',
+  // },
   {
     to: '/parent/notifications',
     label: 'Thông Báo',
     icon: <Notifications />,
     key: 'notifications',
   },
-  {
-    to: '/parent/consultation',
-    label: 'Tư Vấn Y Tế',
-    icon: <PersonalVideo />,
-    key: 'consultation',
-  },
-  {
-    to: '/parent/chat-nurse',
-    label: 'Chat Với Y Tá',
-    icon: <Chat />,
-    key: 'chat',
-  },
+  // {
+  //   to: '/parent/consultation',
+  //   label: 'Tư Vấn Y Tế',
+  //   icon: <PersonalVideo />,
+  //   key: 'consultation',
+  // },
+  // {
+  //   to: '/parent/chat-nurse',
+  //   label: 'Chat Với Y Tá',
+  //   icon: <Chat />,
+  //   key: 'chat',
+  // },
   {
     to: '/parent/health-records',
     label: 'Hồ Sơ Sức Khỏe',
@@ -549,6 +549,7 @@ export default function ParentLayout() {
             </Box>
 
             <IconButton
+              onClick={() => navigate('/parent/notifications')}
               sx={{
                 width: 40,
                 height: 40,

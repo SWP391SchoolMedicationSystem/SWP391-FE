@@ -125,8 +125,8 @@ export const useManagerActions = () => {
     return execute(() => managerStaffService.deleteStaff(staffId));
   };
 
-  const createBlog = async blogData => {
-    return execute(() => managerBlogService.createBlog(blogData));
+  const createBlog = async (blogData, imageFile = null) => {
+    return execute(() => managerBlogService.createBlog(blogData, imageFile));
   };
 
   const updateBlog = async (blogId, blogData) => {

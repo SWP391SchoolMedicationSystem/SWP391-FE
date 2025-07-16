@@ -41,21 +41,21 @@ const navItems = [
     icon: <VaccinesOutlined />,
     key: 'vaccination',
   },
-  {
-    to: '/nurse/medication-schedule',
-    label: 'Lịch Uống Thuốc',
-    icon: <Medication />,
-    key: 'medication',
-  },
-  {
-    to: '/nurse/handle-medicine',
-    label: 'Xử Lý Thuốc',
-    icon: <MedicalServices />,
-    key: 'handle-medicine',
-  },
+  // {
+  //   to: '/nurse/medication-schedule',
+  //   label: 'Lịch Uống Thuốc',
+  //   icon: <Medication />,
+  //   key: 'medication',
+  // },
+  // {
+  //   to: '/nurse/handle-medicine',
+  //   label: 'Xử Lý Thuốc',
+  //   icon: <MedicalServices />,
+  //   key: 'handle-medicine',
+  // },
   {
     to: '/nurse/medicine-management',
-    label: 'Đưa thuốc cho học sinh',
+    label: 'Quản lý thuốc',
     icon: <Medication />,
     key: 'medicine-management',
   },
@@ -66,7 +66,7 @@ const navItems = [
     key: 'personal-medicine',
   },
   { to: '/nurse/blog', label: 'Blog', icon: <Article />, key: 'blog' },
-  { to: '/nurse/chat', label: 'Chat Phụ Huynh', icon: <Chat />, key: 'chat' },
+  // { to: '/nurse/chat', label: 'Chat Phụ Huynh', icon: <Chat />, key: 'chat' },
   {
     to: '/nurse/student-list',
     label: 'Danh Sách Học Sinh',
@@ -514,6 +514,7 @@ export default function NurseLayout() {
             </Box>
 
             <IconButton
+              onClick={() => navigate('/nurse/notifications')}
               sx={{
                 width: 40,
                 height: 40,

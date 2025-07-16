@@ -1,17 +1,16 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef } from 'react';
 import '../../css/Nurse/NurseBlog.css';
 import { useNurseBlogs, useNurseActions } from '../../utils/hooks/useNurse';
 import { nurseBlogService } from '../../services/nurseService';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 function Blog() {
   // Use API hooks
   const { data: blogs, loading, error, refetch } = useNurseBlogs();
-  const {
-    createBlog,
-    updateBlog,
-    deleteBlog,
-    loading: actionLoading,
-  } = useNurseActions();
+  const { createBlog, updateBlog, deleteBlog } = useNurseActions();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
@@ -160,10 +159,7 @@ function Blog() {
       const blogData = {
         title: formData.title,
         content: formData.content,
-        status: 'Draft',
-        isDeleted: false,
-        createdBy: userId,
-        createdAt: new Date().toISOString(),
+        createdBy: parseInt(userId), // Ensure it's an integer
       };
 
       let createdBlogId = null;
@@ -180,20 +176,24 @@ function Blog() {
           updatedBy: userId,
           status: 'Draft',
           isDeleted: false,
+          imageFile: selectedImage, // Add imageFile to update data
         };
 
         await updateBlog(blogId, updateData);
         createdBlogId = blogId;
         alert('Đã cập nhật blog thành công!');
       } else {
-        const result = await createBlog(blogData);
+        // Create new blog with image included
+        const result = await createBlog(blogData, selectedImage);
         createdBlogId = result?.blogId || result?.id || result?.blogid;
         alert('Đã tạo blog mới thành công!');
       }
 
-      // Upload image if selected
-      if (selectedImage && createdBlogId) {
-        await handleImageUpload(createdBlogId);
+      // Clear image data
+      setSelectedImage(null);
+      setImagePreview(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
       }
 
       setShowCreateModal(false);
@@ -432,396 +432,128 @@ function Blog() {
       {/* Blog Feed - Facebook Style */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {filteredBlogs.map(blog => (
-          <div
-            key={blog.id}
-            style={{
-              backgroundColor: 'white',
-              borderRadius: '16px',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-              border: '1px solid #e4e6ea',
-              overflow: 'hidden',
-              transition: 'all 0.3s ease',
-              opacity: blog.isDeleted ? 0.7 : 1,
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.boxShadow =
-                '0 4px 16px rgba(0, 0, 0, 0.15)';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            {/* Post Header */}
-            <div
-              style={{
-                padding: '16px 20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                borderBottom: '1px solid #f0f2f5',
-              }}
-            >
-              <div
-                style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
-              >
-                {/* Author Avatar */}
-                <div
-                  style={{
-                    width: '44px',
-                    height: '44px',
-                    backgroundColor: '#42b883',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white',
-                    fontWeight: '600',
-                    fontSize: '16px',
-                    boxShadow: '0 2px 6px rgba(66, 184, 131, 0.3)',
+          <div key={blog.id} className="blog-card-fb">
+            {blog.image && (
+              <div className="blog-image" onClick={() => handleViewBlog(blog)}>
+                <img
+                  src={blog.image}
+                  alt={blog.title}
+                  className="blog-image-img"
+                  onError={e => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
                   }}
-                >
-                  {(blog.createdByName || blog.author || 'Y')
-                    .charAt(0)
-                    .toUpperCase()}
-                </div>
-
-                <div>
-                  <div
-                    style={{
-                      fontWeight: '600',
-                      color: '#1c1e21',
-                      fontSize: '15px',
-                      marginBottom: '2px',
-                    }}
-                  >
-                    {blog.createdByName || blog.author || 'Y tá'}
-                  </div>
-                  <div
-                    style={{
-                      color: '#65676b',
-                      fontSize: '13px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                    }}
-                  >
-                    <span>
-                      {new Date(
-                        blog.createdAt || blog.createdDate
-                      ).toLocaleDateString('vi-VN')}
-                    </span>
-                    {blog.updatedAt && blog.updatedAt !== blog.createdDate && (
-                      <>
-                        <span>•</span>
-                        <span>Đã chỉnh sửa</span>
-                      </>
-                    )}
-                    {blog.isDeleted && (
-                      <>
-                        <span>•</span>
-                        <span style={{ color: '#e41e3f', fontWeight: '500' }}>
-                          Đã xóa
-                        </span>
-                      </>
-                    )}
-                  </div>
+                />
+                <div className="blog-image-fallback">
+                  <span>🖼️</span>
+                  <span>Không thể tải hình ảnh</span>
                 </div>
               </div>
-
-              {/* Status & Category */}
-              <div
-                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-              >
-                {blog.category && (
-                  <span
-                    style={{
-                      padding: '4px 10px',
-                      borderRadius: '16px',
-                      fontSize: '12px',
-                      fontWeight: '500',
-                      backgroundColor: '#e7f3ff',
-                      color: '#1877f2',
-                    }}
-                  >
-                    {blog.category}
-                  </span>
-                )}
-
-                <span
-                  style={{
-                    padding: '4px 10px',
-                    borderRadius: '16px',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    backgroundColor:
-                      blog.status === 'Published'
-                        ? '#d4edda'
-                        : blog.status === 'Draft'
-                        ? '#fff3cd'
-                        : blog.status === 'Rejected'
-                        ? '#f8d7da'
-                        : '#f0f2f5',
-                    color:
-                      blog.status === 'Published'
-                        ? '#155724'
-                        : blog.status === 'Draft'
-                        ? '#856404'
-                        : blog.status === 'Rejected'
-                        ? '#721c24'
-                        : '#65676b',
-                  }}
-                >
-                  {blog.status}
-                </span>
+            )}
+            <div className="blog-content-fb">
+              <div className="blog-title-fb">{blog.title}</div>
+              <div className="blog-meta-fb">
+                {blog.author} ·{' '}
+                {blog.createdAt
+                  ? new Date(blog.createdAt).toLocaleDateString()
+                  : ''}{' '}
+                · 👁️ {blog.readCount || 0}
               </div>
-            </div>
-
-            {/* Post Content */}
-            <div style={{ padding: '0 20px 16px' }}>
-              <h3
-                style={{
-                  margin: '12px 0 8px',
-                  color: '#1c1e21',
-                  fontSize: '18px',
-                  fontWeight: '600',
-                  lineHeight: '1.4',
-                  cursor: 'pointer',
-                }}
-                onClick={() => handleViewBlog(blog)}
-              >
-                {blog.title}
-              </h3>
-
-              <p
-                style={{
-                  color: '#65676b',
-                  fontSize: '15px',
-                  lineHeight: '1.5',
-                  margin: '0 0 12px',
-                }}
-              >
+              <div className="blog-body-fb">
                 {blog.content?.length > 120
                   ? blog.content.substring(0, 120) + '...'
                   : blog.content}
-              </p>
-
-              {/* Tags */}
-              {blog.tags &&
-                Array.isArray(blog.tags) &&
-                blog.tags.length > 0 && (
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: '6px',
-                      marginBottom: '12px',
-                    }}
-                  >
-                    {blog.tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        style={{
-                          padding: '2px 8px',
-                          backgroundColor: '#f0f2f5',
-                          color: '#65676b',
-                          borderRadius: '12px',
-                          fontSize: '12px',
-                          fontWeight: '500',
-                        }}
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-              {/* Rejection Notice */}
-              {blog.status === 'Rejected' && blog.rejectionReason && (
-                <div
-                  style={{
-                    backgroundColor: '#fef2f2',
-                    border: '1px solid #fecaca',
-                    borderRadius: '8px',
-                    padding: '12px',
-                    margin: '12px 0',
-                    fontSize: '14px',
-                  }}
-                >
-                  <div
-                    style={{
-                      color: '#dc2626',
-                      fontWeight: '600',
-                      marginBottom: '4px',
-                    }}
-                  >
-                    ❌ Lý do từ chối:
-                  </div>
-                  <div style={{ color: '#7f1d1d', lineHeight: '1.4' }}>
-                    {blog.rejectionReason}
-                  </div>
-                </div>
-              )}
-
-              {/* Post Image */}
-              {blog.image && (
-                <div
-                  style={{
-                    marginTop: '16px',
-                    borderRadius: '16px',
-                    overflow: 'hidden',
-                    backgroundColor: '#f0f2f5',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.3s ease',
-                  }}
-                  onClick={() => handleViewBlog(blog)}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.transform = 'scale(1.02)';
-                    e.currentTarget.style.boxShadow =
-                      '0 8px 24px rgba(0, 0, 0, 0.15)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.transform = 'scale(1)';
-                    e.currentTarget.style.boxShadow =
-                      '0 4px 16px rgba(0, 0, 0, 0.1)';
-                  }}
-                >
-                  <img
-                    src={blog.image}
-                    alt={blog.title}
-                    style={{
-                      width: '100%',
-                      height: 'auto',
-                      minHeight: '380px',
-                      maxHeight: '650px',
-                      objectFit: 'cover',
-                      display: 'block',
-                    }}
-                    onError={e => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                    }}
-                  />
-                  <div
-                    style={{
-                      display: 'none',
-                      width: '100%',
-                      height: '380px',
-                      backgroundColor: '#f0f2f5',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexDirection: 'column',
-                      gap: '12px',
-                      color: '#65676b',
-                    }}
-                  >
-                    <span style={{ fontSize: '48px' }}>🖼️</span>
-                    <span style={{ fontSize: '16px', fontWeight: '500' }}>
-                      Không thể tải hình ảnh
-                    </span>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
 
-            {/* Engagement Bar */}
-            {(blog.readCount || 0) > 0 && (
-              <div
-                style={{
-                  padding: '8px 20px',
-                  borderTop: '1px solid #f0f2f5',
-                  borderBottom: '1px solid #f0f2f5',
-                  backgroundColor: '#f8f9fa',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  fontSize: '13px',
-                  color: '#65676b',
-                }}
-              >
-                <span
-                  style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
-                >
-                  👁️ {blog.readCount} lượt xem
-                </span>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div
-              style={{
-                padding: '12px 20px',
-                display: 'flex',
-                gap: '8px',
-                flexWrap: 'wrap',
-              }}
-            >
+            {/* Action buttons */}
+            <div className="blog-actions-fb">
               <button
-                onClick={() => handleViewBlog(blog)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '8px 16px',
-                  backgroundColor: '#f0f2f5',
-                  border: 'none',
-                  borderRadius: '8px',
-                  color: '#65676b',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                }}
-                onMouseEnter={e => (e.target.style.backgroundColor = '#e4e6ea')}
-                onMouseLeave={e => (e.target.style.backgroundColor = '#f0f2f5')}
-              >
-                👁️ Xem chi tiết
-              </button>
-
-              <button
+                className="action-btn-fb edit"
                 onClick={() => handleEditBlog(blog)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  padding: '8px 16px',
-                  backgroundColor: '#e7f3ff',
+                  gap: '8px',
+                  padding: '10px 16px',
+                  backgroundColor: '#e3f2fd',
+                  color: '#1976d2',
                   border: 'none',
                   borderRadius: '8px',
-                  color: '#1877f2',
+                  cursor: 'pointer',
                   fontSize: '14px',
                   fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.3s ease',
                 }}
-                onMouseEnter={e => (e.target.style.backgroundColor = '#d0e8ff')}
-                onMouseLeave={e => (e.target.style.backgroundColor = '#e7f3ff')}
+                onMouseEnter={e => {
+                  e.target.style.backgroundColor = '#bbdefb';
+                  e.target.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={e => {
+                  e.target.style.backgroundColor = '#e3f2fd';
+                  e.target.style.transform = 'translateY(0)';
+                }}
               >
-                ✏️ Chỉnh sửa
+                <EditIcon sx={{ fontSize: '1.2rem', color: '#97a19b' }} />
+                Chỉnh sửa
               </button>
-
               <button
+                className="action-btn-fb reject"
                 onClick={() => handleDeleteBlog(blog)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  padding: '8px 16px',
+                  gap: '8px',
+                  padding: '10px 16px',
                   backgroundColor: '#ffebee',
+                  color: '#c62828',
                   border: 'none',
                   borderRadius: '8px',
-                  color: '#c62828',
+                  cursor: 'pointer',
                   fontSize: '14px',
                   fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.3s ease',
                 }}
-                onMouseEnter={e => (e.target.style.backgroundColor = '#ffcdd2')}
-                onMouseLeave={e => (e.target.style.backgroundColor = '#ffebee')}
+                onMouseEnter={e => {
+                  e.target.style.backgroundColor = '#ffcdd2';
+                  e.target.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={e => {
+                  e.target.style.backgroundColor = '#ffebee';
+                  e.target.style.transform = 'translateY(0)';
+                }}
               >
-                🗑️ Xóa
+                <DeleteIcon sx={{ fontSize: '1.2rem', color: '#97a19b' }} />
+                Xóa
+              </button>
+              <button
+                className="action-btn-fb"
+                onClick={() => handleViewBlog(blog)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 16px',
+                  backgroundColor: '#f0f2f5',
+                  color: '#65676b',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={e => {
+                  e.target.style.backgroundColor = '#e4e6ea';
+                  e.target.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={e => {
+                  e.target.style.backgroundColor = '#f0f2f5';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                <VisibilityIcon sx={{ fontSize: '1.2rem', color: '#97a19b' }} />
+                Xem chi tiết
               </button>
             </div>
           </div>
@@ -854,47 +586,19 @@ function Blog() {
             <div className="modal-body">
               {/* Hiển thị hình ảnh nếu có */}
               {selectedBlog.image && (
-                <div className="blog-detail-image">
+                <div className="blog-image blog-detail-image">
                   <img
                     src={selectedBlog.image}
                     alt={selectedBlog.title}
-                    style={{
-                      width: '100%',
-                      height: 'auto',
-                      minHeight: '450px',
-                      maxHeight: '600px',
-                      objectFit: 'cover',
-                      borderRadius: '16px',
-                      marginBottom: '24px',
-                      border: 'none',
-                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
-                    }}
+                    className="blog-image-img"
                     onError={e => {
                       e.target.style.display = 'none';
                       e.target.nextSibling.style.display = 'flex';
                     }}
                   />
-                  <div
-                    style={{
-                      display: 'none',
-                      width: '100%',
-                      height: '450px',
-                      backgroundColor: '#f8f9fa',
-                      borderRadius: '16px',
-                      border: 'none',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexDirection: 'column',
-                      gap: '16px',
-                      color: '#65676b',
-                      marginBottom: '24px',
-                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
-                    }}
-                  >
-                    <span style={{ fontSize: '4rem' }}>🖼️</span>
-                    <span style={{ fontSize: '1.1rem', fontWeight: '500' }}>
-                      Không thể tải hình ảnh
-                    </span>
+                  <div className="blog-image-fallback">
+                    <span>🖼️</span>
+                    <span>Không thể tải hình ảnh</span>
                   </div>
                 </div>
               )}

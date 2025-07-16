@@ -8,7 +8,7 @@ import "../../css/Manager/Dashboard.css";
 
 function Dashboard() {
   const navigate = useNavigate();
-  const [dashboardStats, setDashboardStats] = useState([]);
+  const [ setDashboardStats] = useState([]);
 
   // Get real data from APIs
   const { data: students, loading: studentsLoading } = useManagerStudents();
@@ -192,8 +192,8 @@ function Dashboard() {
           </div>
         </div>
       </div>
-
-      {/* Statistics Cards */}
+{/* 
+      Statistics Cards
       <div className="stats-section">
         <h2 className="section-title">Thống Kê Tổng Quan</h2>
         <div className="stats-grid">
@@ -217,7 +217,7 @@ function Dashboard() {
             ))
           )}
         </div>
-      </div>
+      </div> */}
 
       {/* Quick Actions */}
       <div className="quick-actions-section">

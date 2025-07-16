@@ -474,6 +474,7 @@ export default function AdminLayout() {
             </IconButton>
 
             <IconButton
+              onClick={() => navigate('/admin/system-logs')}
               sx={{
                 width: 40,
                 height: 40,

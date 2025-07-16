@@ -322,14 +322,14 @@
   outline: none;
 }
 
-.search-box::before {
+/* .search-box::before {
   content: '🔍';
   position: absolute;
   left: 15px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 1.1rem;
-}
+} */
 
 .filter-group {
   display: flex;

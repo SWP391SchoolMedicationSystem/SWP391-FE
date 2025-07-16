@@ -138,10 +138,31 @@ export const managerBlogService = {
   },
 
   // Create blog post
-  createBlog: async blogData => {
+  createBlog: async (blogData, imageFile = null) => {
     try {
-      const response = await apiClient.post(API_ENDPOINTS.BLOG.ADD, blogData);
-      return response;
+      if (imageFile) {
+        // Use FormData for multipart/form-data when image is included
+        const formData = new FormData();
+        formData.append('Title', blogData.title);
+        formData.append('Content', blogData.content);
+        formData.append('CreatedBy', blogData.createdBy);
+        formData.append('ImageFile', imageFile);
+
+        const response = await apiClient.post(
+          API_ENDPOINTS.BLOG.ADD,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+        return response;
+      } else {
+        // Use regular JSON for text-only blog posts
+        const response = await apiClient.post(API_ENDPOINTS.BLOG.ADD, blogData);
+        return response;
+      }
     } catch (error) {
       console.error('Error creating blog:', error);
       throw error;
@@ -153,18 +174,34 @@ export const managerBlogService = {
     try {
       const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
 
-      // API mới yêu cầu blogID trong body
-      const payload = {
-        blogID: blogId,
-        title: blogData.title,
-        content: blogData.content,
-        updatedBy: userInfo.userId || 0,
-        status: blogData.status || 'Draft',
-        isDeleted:
-          typeof blogData.isDeleted === 'boolean' ? blogData.isDeleted : false,
-      };
+      // Create FormData for multipart/form-data request
+      const formData = new FormData();
 
-      const response = await apiClient.put(API_ENDPOINTS.BLOG.UPDATE, payload);
+      // Add required fields according to API spec
+      formData.append('BlogID', blogId);
+      formData.append('Title', blogData.title || '');
+      formData.append('Content', blogData.content || '');
+      formData.append('UpdatedBy', userInfo.userId || 0);
+      formData.append('Status', blogData.status || 'Draft');
+      formData.append(
+        'IsDeleted',
+        typeof blogData.isDeleted === 'boolean' ? blogData.isDeleted : false
+      );
+
+      // Add ImageFile if provided
+      if (blogData.imageFile) {
+        formData.append('ImageFile', blogData.imageFile);
+      }
+
+      const response = await apiClient.put(
+        API_ENDPOINTS.BLOG.UPDATE,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
       return response;
     } catch (error) {
       console.error('Error updating blog:', error);

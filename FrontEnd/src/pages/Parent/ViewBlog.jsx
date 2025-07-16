@@ -1,16 +1,21 @@
-import React, { useState } from "react";
-import { useOutletContext } from "react-router-dom";
-import { useParentBlogs } from "../../utils/hooks/useParent";
+import React, { useState } from 'react';
+import '../../css/Parent/ViewBlog.css';
+import { useOutletContext } from 'react-router-dom';
+import { useParentBlogs } from '../../utils/hooks/useParent';
 
 // Material-UI Icons
-import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
-import RestaurantIcon from "@mui/icons-material/Restaurant";
-import VaccinesIcon from "@mui/icons-material/Vaccines";
-import EventIcon from "@mui/icons-material/Event";
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+import VaccinesIcon from '@mui/icons-material/Vaccines';
+import EventIcon from '@mui/icons-material/Event';
+import CloseIcon from '@mui/icons-material/Close';
+import SearchIcon from '@mui/icons-material/Search';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 function ViewBlog() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterCategory, setFilterCategory] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState(null);
 
@@ -23,29 +28,29 @@ function ViewBlog() {
 
   const categories = [
     {
-      id: "health",
-      name: "Sức khỏe",
-      icon: <LocalHospitalIcon sx={{ color: "#97a19b", fontSize: "1.2rem" }} />,
+      id: 'health',
+      name: 'Sức khỏe',
+      icon: <LocalHospitalIcon sx={{ color: '#97a19b', fontSize: '1.2rem' }} />,
     },
     {
-      id: "nutrition",
-      name: "Dinh dưỡng",
-      icon: <RestaurantIcon sx={{ color: "#97a19b", fontSize: "1.2rem" }} />,
+      id: 'nutrition',
+      name: 'Dinh dưỡng',
+      icon: <RestaurantIcon sx={{ color: '#97a19b', fontSize: '1.2rem' }} />,
     },
     {
-      id: "vaccination",
-      name: "Tiêm chủng",
-      icon: <VaccinesIcon sx={{ color: "#97a19b", fontSize: "1.2rem" }} />,
+      id: 'vaccination',
+      name: 'Tiêm chủng',
+      icon: <VaccinesIcon sx={{ color: '#97a19b', fontSize: '1.2rem' }} />,
     },
     {
-      id: "event",
-      name: "Sự kiện",
-      icon: <EventIcon sx={{ color: "#97a19b", fontSize: "1.2rem" }} />,
+      id: 'event',
+      name: 'Sự kiện',
+      icon: <EventIcon sx={{ color: '#97a19b', fontSize: '1.2rem' }} />,
     },
   ];
 
   // Filter blogs
-  const filteredBlogs = (blogs || []).filter((blog) => {
+  const filteredBlogs = (blogs || []).filter(blog => {
     const matchesSearch =
       (blog.title &&
         blog.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -53,29 +58,29 @@ function ViewBlog() {
         blog.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (blog.tags &&
         Array.isArray(blog.tags) &&
-        blog.tags.some((tag) =>
+        blog.tags.some(tag =>
           tag.toLowerCase().includes(searchTerm.toLowerCase())
         ));
     const matchesCategory =
-      filterCategory === "" || blog.category === filterCategory;
+      filterCategory === '' || blog.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const handleViewBlog = (blog) => {
+  const handleViewBlog = blog => {
     setSelectedBlog(blog);
     setShowModal(true);
   };
 
-  const getCategoryName = (category) => {
-    const cat = categories.find((c) => c.id === category);
+  const getCategoryName = category => {
+    const cat = categories.find(c => c.id === category);
     return cat ? cat.name : category;
   };
 
   // Statistics
   const stats = {
     total: filteredBlogs.length,
-    published: filteredBlogs.filter((b) => b.status === "Published").length,
-    draft: filteredBlogs.filter((b) => b.status === "Draft").length,
+    published: filteredBlogs.filter(b => b.status === 'Published').length,
+    draft: filteredBlogs.filter(b => b.status === 'Draft').length,
     totalReads: filteredBlogs.reduce(
       (sum, blog) => sum + (blog.readCount || 0),
       0
@@ -84,20 +89,44 @@ function ViewBlog() {
 
   // Common styles
   const containerStyle = {
-    padding: "20px",
-    background: theme ? theme.background : "#f2f6f3",
-    minHeight: "100vh",
+    padding: '20px',
+    background: theme ? theme.background : '#f2f6f3',
+    minHeight: '100vh',
     fontFamily:
-      "Satoshi, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
-    transition: "all 0.3s ease",
+      "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+    transition: 'all 0.3s ease',
   };
 
   // Show loading state
   if (loading) {
     return (
       <div style={containerStyle}>
-        <div className="loading-state">
-          <p>⏳ Đang tải danh sách blog...</p>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '400px',
+            flexDirection: 'column',
+            gap: '20px',
+            background: 'rgba(255, 255, 255, 0.9)',
+            borderRadius: '24px',
+            margin: '40px',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+          }}
+        >
+          <LocalHospitalIcon sx={{ color: '#97a19b', fontSize: '3rem' }} />
+          <p
+            style={{
+              color: '#2f5148',
+              fontSize: '1.1rem',
+              fontWeight: 500,
+              margin: 0,
+            }}
+          >
+            Đang tải danh sách blog...
+          </p>
         </div>
       </div>
     );
@@ -107,10 +136,54 @@ function ViewBlog() {
   if (error) {
     return (
       <div style={containerStyle}>
-        <div className="error-state">
-          <p>❌ Lỗi khi tải blog: {error}</p>
-          <button onClick={refetch} className="retry-btn">
-            🔄 Thử lại
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '400px',
+            flexDirection: 'column',
+            gap: '20px',
+            background: 'rgba(255, 255, 255, 0.9)',
+            borderRadius: '24px',
+            margin: '40px',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+          }}
+        >
+          <LocalHospitalIcon sx={{ color: '#dc3545', fontSize: '3rem' }} />
+          <p
+            style={{
+              color: '#dc3545',
+              fontSize: '1.1rem',
+              fontWeight: 500,
+              margin: 0,
+              textAlign: 'center',
+            }}
+          >
+            Lỗi khi tải blog: {error}
+          </p>
+          <button
+            onClick={refetch}
+            style={{
+              background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+              color: 'white',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontSize: '1rem',
+              fontWeight: 500,
+              fontFamily:
+                'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <RefreshIcon sx={{ fontSize: '1.2rem' }} />
+            Thử lại
           </button>
         </div>
       </div>
@@ -120,64 +193,388 @@ function ViewBlog() {
   return (
     <div style={containerStyle}>
       {/* Header */}
-      <div className="blog-header">
-        <h1>📝 Blog Sức Khỏe</h1>
-        <p>Những thông tin hữu ích về sức khỏe và dinh dưỡng cho con em</p>
+      <div
+        style={{
+          background:
+            'linear-gradient(135deg, #2f5148 0%, #4a7065 25%, #73ad67 75%, #85b373 100%)',
+          borderRadius: '24px',
+          padding: '40px 35px',
+          boxShadow:
+            '0 20px 40px rgba(47, 81, 72, 0.2), 0 8px 16px rgba(47, 81, 72, 0.15)',
+          textAlign: 'center',
+          color: 'white',
+          marginBottom: '30px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            content: '',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background:
+              'radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%)',
+            pointerEvents: 'none',
+          }}
+        ></div>
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <h1
+            style={{
+              fontSize: '2.8rem',
+              fontWeight: 800,
+              marginBottom: '12px',
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              letterSpacing: '-0.02em',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '15px',
+            }}
+          >
+            <LocalHospitalIcon sx={{ fontSize: '3rem', color: 'white' }} />
+            Blog Sức Khỏe
+          </h1>
+          <p
+            style={{
+              fontSize: '1.2rem',
+              opacity: 0.95,
+              fontWeight: 500,
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+              margin: 0,
+            }}
+          >
+            Những thông tin hữu ích về sức khỏe và dinh dưỡng cho con em
+          </p>
+        </div>
       </div>
 
       {/* Statistics */}
-      <div className="stats-container">
-        <div className="stat-card total">
-          <div className="stat-icon">📚</div>
-          <div className="stat-content">
-            <h3>{stats.total}</h3>
-            <p>Tổng bài viết</p>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '25px',
+          marginBottom: '30px',
+        }}
+      >
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            padding: '25px',
+            borderRadius: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          }}
+        >
+          <div
+            style={{
+              padding: '15px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(191, 239, 161, 0.3)',
+            }}
+          >
+            <LocalHospitalIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: '2rem',
+                margin: 0,
+                color: '#2f5148',
+                fontWeight: 700,
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              {stats.total}
+            </h3>
+            <p
+              style={{
+                margin: '5px 0 0 0',
+                color: '#97a19b',
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              Tổng bài viết
+            </p>
           </div>
         </div>
-        <div className="stat-card published">
-          <div className="stat-icon">✅</div>
-          <div className="stat-content">
-            <h3>{stats.published}</h3>
-            <p>Đã đăng</p>
+
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            padding: '25px',
+            borderRadius: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          }}
+        >
+          <div
+            style={{
+              padding: '15px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(191, 239, 161, 0.3)',
+            }}
+          >
+            <EventIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: '2rem',
+                margin: 0,
+                color: '#2f5148',
+                fontWeight: 700,
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              {stats.published}
+            </h3>
+            <p
+              style={{
+                margin: '5px 0 0 0',
+                color: '#97a19b',
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              Đã đăng
+            </p>
           </div>
         </div>
-        <div className="stat-card draft">
-          <div className="stat-icon">📝</div>
-          <div className="stat-content">
-            <h3>{stats.draft}</h3>
-            <p>Bản nháp</p>
+
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            padding: '25px',
+            borderRadius: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          }}
+        >
+          <div
+            style={{
+              padding: '15px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(191, 239, 161, 0.3)',
+            }}
+          >
+            <VaccinesIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: '2rem',
+                margin: 0,
+                color: '#2f5148',
+                fontWeight: 700,
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              {stats.draft}
+            </h3>
+            <p
+              style={{
+                margin: '5px 0 0 0',
+                color: '#97a19b',
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              Bản nháp
+            </p>
           </div>
         </div>
-        <div className="stat-card reads">
-          <div className="stat-icon">👁️</div>
-          <div className="stat-content">
-            <h3>{stats.totalReads}</h3>
-            <p>Lượt đọc</p>
+
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            padding: '25px',
+            borderRadius: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          }}
+        >
+          <div
+            style={{
+              padding: '15px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(191, 239, 161, 0.3)',
+            }}
+          >
+            <RestaurantIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: '2rem',
+                margin: 0,
+                color: '#2f5148',
+                fontWeight: 700,
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              {stats.totalReads}
+            </h3>
+            <p
+              style={{
+                margin: '5px 0 0 0',
+                color: '#97a19b',
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              }}
+            >
+              Lượt đọc
+            </p>
           </div>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="controls-container">
-        <div className="search-filter-controls">
-          <div className="search-controls">
+      <div
+        style={{
+          background: 'rgba(255, 255, 255, 0.95)',
+          padding: '25px',
+          borderRadius: '18px',
+          boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+          border: '1px solid rgba(193, 203, 194, 0.3)',
+          marginBottom: '30px',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            gap: '20px',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
+          <div
+            style={{
+              position: 'relative',
+              flex: '1',
+              minWidth: '300px',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                left: '15px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 1,
+              }}
+            >
+              <SearchIcon sx={{ color: '#97a19b', fontSize: '1.5rem' }} />
+            </div>
             <input
               type="text"
               placeholder="Tìm kiếm blog..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
+              onChange={e => setSearchTerm(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '15px 15px 15px 55px',
+                border: '1px solid #c1cbc2',
+                borderRadius: '12px',
+                fontSize: '1rem',
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+                transition: 'all 0.3s ease',
+                outline: 'none',
+                background: 'white',
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = '#2f5148';
+                e.target.style.boxShadow = '0 0 0 3px rgba(47, 81, 72, 0.1)';
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = '#c1cbc2';
+                e.target.style.boxShadow = 'none';
+              }}
             />
           </div>
 
-          <div className="filter-controls">
+          <div
+            style={{
+              position: 'relative',
+              minWidth: '200px',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                left: '15px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 1,
+              }}
+            >
+              <FilterListIcon sx={{ color: '#97a19b', fontSize: '1.5rem' }} />
+            </div>
             <select
               value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="filter-select"
+              onChange={e => setFilterCategory(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '15px 15px 15px 55px',
+                border: '1px solid #c1cbc2',
+                borderRadius: '12px',
+                fontSize: '1rem',
+                fontFamily:
+                  'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+                transition: 'all 0.3s ease',
+                outline: 'none',
+                background: 'white',
+                cursor: 'pointer',
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = '#2f5148';
+                e.target.style.boxShadow = '0 0 0 3px rgba(47, 81, 72, 0.1)';
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = '#c1cbc2';
+                e.target.style.boxShadow = 'none';
+              }}
             >
               <option value="">Tất cả danh mục</option>
-              {categories.map((category) => (
+              {categories.map(category => (
                 <option key={category.id} value={category.id}>
                   {category.name}
                 </option>
@@ -189,318 +586,153 @@ function ViewBlog() {
 
       {/* Empty State */}
       {!loading && !error && (!blogs || blogs.length === 0) && (
-        <div className="empty-state">
-          <p>📭 Chưa có blog nào được đăng tải</p>
-          <button onClick={refetch} className="retry-btn">
-            🔄 Tải lại
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '400px',
+            flexDirection: 'column',
+            gap: '20px',
+            background: 'rgba(255, 255, 255, 0.9)',
+            borderRadius: '24px',
+            margin: '40px',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+          }}
+        >
+          <LocalHospitalIcon sx={{ color: '#97a19b', fontSize: '3rem' }} />
+          <p
+            style={{
+              color: '#2f5148',
+              fontSize: '1.1rem',
+              fontWeight: 500,
+              margin: 0,
+              textAlign: 'center',
+            }}
+          >
+            Chưa có blog nào được đăng tải
+          </p>
+          <button
+            onClick={refetch}
+            style={{
+              background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+              color: 'white',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontSize: '1rem',
+              fontWeight: 500,
+              fontFamily:
+                'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <RefreshIcon sx={{ fontSize: '1.2rem' }} />
+            Tải lại
           </button>
         </div>
       )}
 
       {/* Blog Feed - Facebook Style */}
       {!loading && !error && blogs && blogs.length > 0 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          {filteredBlogs.map((blog) => (
-            <div
-              key={blog.id}
-              style={{
-                backgroundColor: "white",
-                borderRadius: "16px",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                border: "1px solid #e4e6ea",
-                overflow: "hidden",
-                transition: "all 0.3s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow =
-                  "0 4px 16px rgba(0, 0, 0, 0.15)";
-                e.currentTarget.style.transform = "translateY(-2px)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow =
-                  "0 2px 8px rgba(0, 0, 0, 0.1)";
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
-            >
-              {/* Post Header */}
-              <div
-                style={{
-                  padding: "16px 20px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  borderBottom: "1px solid #f0f2f5",
-                }}
-              >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {filteredBlogs.map(blog => (
+            <div key={blog.id} className="blog-card-fb">
+              {blog.image && (
                 <div
-                  style={{ display: "flex", alignItems: "center", gap: "12px" }}
-                >
-                  {/* Author Avatar */}
-                  <div
-                    style={{
-                      width: "44px",
-                      height: "44px",
-                      backgroundColor: "#73ad67",
-                      borderRadius: "50%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "white",
-                      fontWeight: "600",
-                      fontSize: "16px",
-                      boxShadow: "0 2px 6px rgba(115, 173, 103, 0.3)",
-                    }}
-                  >
-                    {(blog.createdByName || blog.author || "P")
-                      .charAt(0)
-                      .toUpperCase()}
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        fontWeight: "600",
-                        color: "#1c1e21",
-                        fontSize: "15px",
-                        marginBottom: "2px",
-                      }}
-                    >
-                      {blog.createdByName || blog.author || "Phụ huynh"}
-                    </div>
-                    <div
-                      style={{
-                        color: "#65676b",
-                        fontSize: "13px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "6px",
-                      }}
-                    >
-                      <span>
-                        {new Date(
-                          blog.createdAt || blog.createdDate
-                        ).toLocaleDateString("vi-VN")}
-                      </span>
-                      {blog.updatedAt &&
-                        blog.updatedAt !== blog.createdDate && (
-                          <>
-                            <span>•</span>
-                            <span>Đã chỉnh sửa</span>
-                          </>
-                        )}
-                    </div>
-                  </div>
-                </div>
-                {/* Category */}
-                <div
-                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
-                >
-                  {blog.category && (
-                    <span
-                      style={{
-                        padding: "4px 10px",
-                        borderRadius: "16px",
-                        fontSize: "12px",
-                        fontWeight: "500",
-                        backgroundColor: "#e7f3ff",
-                        color: "#1877f2",
-                      }}
-                    >
-                      {getCategoryName(blog.category)}
-                    </span>
-                  )}
-                </div>
-              </div>
-              {/* Post Content */}
-              <div style={{ padding: "0 20px 16px" }}>
-                <h3
-                  style={{
-                    margin: "12px 0 8px",
-                    color: "#1c1e21",
-                    fontSize: "18px",
-                    fontWeight: "600",
-                    lineHeight: "1.4",
-                    cursor: "pointer",
-                  }}
+                  className="blog-image"
                   onClick={() => handleViewBlog(blog)}
                 >
-                  {blog.title}
-                </h3>
-                <p
-                  style={{
-                    color: "#65676b",
-                    fontSize: "15px",
-                    lineHeight: "1.5",
-                    margin: "0 0 12px",
-                  }}
-                >
-                  {blog.content?.length > 120
-                    ? blog.content.substring(0, 120) + "..."
-                    : blog.content}
-                </p>
-                {/* Tags */}
-                {blog.tags &&
-                  Array.isArray(blog.tags) &&
-                  blog.tags.length > 0 && (
-                    <div
-                      style={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: "6px",
-                        marginBottom: "12px",
-                      }}
-                    >
-                      {blog.tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          style={{
-                            padding: "2px 8px",
-                            backgroundColor: "#f0f2f5",
-                            color: "#65676b",
-                            borderRadius: "12px",
-                            fontSize: "12px",
-                            fontWeight: "500",
-                          }}
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                {/* Post Image */}
-                {blog.image && (
-                  <div
-                    style={{
-                      marginTop: "16px",
-                      borderRadius: "16px",
-                      overflow: "hidden",
-                      backgroundColor: "#f0f2f5",
-                      cursor: "pointer",
-                      boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
-                      transition: "all 0.3s ease",
+                  <img
+                    src={blog.image}
+                    alt={blog.title}
+                    className="blog-image-img"
+                    onError={e => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
                     }}
-                    onClick={() => handleViewBlog(blog)}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "scale(1.02)";
-                      e.currentTarget.style.boxShadow =
-                        "0 8px 24px rgba(0, 0, 0, 0.15)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "scale(1)";
-                      e.currentTarget.style.boxShadow =
-                        "0 4px 16px rgba(0, 0, 0, 0.1)";
-                    }}
-                  >
-                    <img
-                      src={blog.image}
-                      alt={blog.title}
-                      style={{
-                        width: "100%",
-                        height: "auto",
-                        minHeight: "380px",
-                        maxHeight: "650px",
-                        objectFit: "cover",
-                        display: "block",
-                      }}
-                      onError={(e) => {
-                        e.target.style.display = "none";
-                        e.target.nextSibling.style.display = "flex";
-                      }}
-                    />
-                    <div
-                      style={{
-                        display: "none",
-                        width: "100%",
-                        height: "380px",
-                        backgroundColor: "#f0f2f5",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexDirection: "column",
-                        gap: "12px",
-                        color: "#65676b",
-                      }}
-                    >
-                      <span style={{ fontSize: "48px" }}>🖼️</span>
-                      <span style={{ fontSize: "16px", fontWeight: "500" }}>
-                        Không thể tải hình ảnh
-                      </span>
-                    </div>
+                  />
+                  <div className="blog-image-fallback">
+                    <span>🖼️</span>
+                    <span>Không thể tải hình ảnh</span>
                   </div>
-                )}
-              </div>
-              {/* Engagement Bar */}
-              {(blog.readCount || 0) > 0 && (
-                <div
-                  style={{
-                    padding: "8px 20px",
-                    borderTop: "1px solid #f0f2f5",
-                    borderBottom: "1px solid #f0f2f5",
-                    backgroundColor: "#f8f9fa",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    fontSize: "13px",
-                    color: "#65676b",
-                  }}
-                >
-                  <span
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "4px",
-                    }}
-                  >
-                    👁️ {blog.readCount} lượt xem
-                  </span>
                 </div>
               )}
-              {/* Action Buttons */}
-              <div
-                style={{
-                  padding: "12px 20px",
-                  display: "flex",
-                  gap: "8px",
-                  flexWrap: "wrap",
-                }}
-              >
-                <button
-                  onClick={() => handleViewBlog(blog)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    padding: "8px 16px",
-                    backgroundColor: "#f0f2f5",
-                    border: "none",
-                    borderRadius: "8px",
-                    color: "#65676b",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.target.style.backgroundColor = "#e4e6ea")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.target.style.backgroundColor = "#f0f2f5")
-                  }
-                >
-                  👁️ Xem chi tiết
-                </button>
+              <div className="blog-content-fb">
+                <div className="blog-title-fb">{blog.title}</div>
+                <div className="blog-meta-fb">
+                  {blog.author} ·{' '}
+                  {blog.createdAt
+                    ? new Date(blog.createdAt).toLocaleDateString()
+                    : ''}{' '}
+                  · 👁️ {blog.readCount || 0}
+                </div>
+                <div className="blog-body-fb">
+                  {blog.content?.length > 120
+                    ? blog.content.substring(0, 120) + '...'
+                    : blog.content}
+                </div>
               </div>
             </div>
           ))}
           {filteredBlogs.length === 0 && (
-            <div className="no-data">
-              <p>Không tìm thấy blog phù hợp với bộ lọc</p>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '200px',
+                flexDirection: 'column',
+                gap: '15px',
+                background: 'rgba(255, 255, 255, 0.9)',
+                borderRadius: '18px',
+                margin: '20px 0',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(193, 203, 194, 0.3)',
+              }}
+            >
+              <SearchIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
+              <p
+                style={{
+                  color: '#2f5148',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  margin: 0,
+                  textAlign: 'center',
+                }}
+              >
+                Không tìm thấy blog phù hợp với bộ lọc
+              </p>
               <button
                 onClick={() => {
-                  setSearchTerm("");
-                  setFilterCategory("");
+                  setSearchTerm('');
+                  setFilterCategory('');
                 }}
-                className="retry-btn"
+                style={{
+                  background:
+                    'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  fontWeight: 500,
+                  fontFamily:
+                    'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
               >
-                🔄 Đặt lại bộ lọc
+                <RefreshIcon sx={{ fontSize: '1rem' }} />
+                Đặt lại bộ lọc
               </button>
             </div>
           )}
@@ -509,72 +741,343 @@ function ViewBlog() {
 
       {/* View Blog Modal */}
       {showModal && selectedBlog && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px',
+          }}
+          onClick={() => setShowModal(false)}
+        >
           <div
-            className="modal-content large"
-            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'white',
+              borderRadius: '20px',
+              width: '100%',
+              maxWidth: '900px',
+              maxHeight: '90vh',
+              overflow: 'hidden',
+              border: '1px solid #c1cbc2',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(20px)',
+              fontFamily:
+                'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+            }}
+            onClick={e => e.stopPropagation()}
           >
-            <div className="modal-header">
-              <h3>{selectedBlog.title}</h3>
+            {/* Modal Header */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '25px',
+                borderBottom: '1px solid #e9ecef',
+                background:
+                  'linear-gradient(135deg, #2f5148 0%, #4a7065 25%, #73ad67 75%, #85b373 100%)',
+                color: 'white',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  content: '',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background:
+                    'radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%)',
+                  pointerEvents: 'none',
+                }}
+              ></div>
+              <h3
+                style={{
+                  margin: 0,
+                  fontSize: '1.5rem',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  position: 'relative',
+                  zIndex: 1,
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                }}
+              >
+                <EventIcon sx={{ color: 'white', fontSize: '1.5rem' }} />
+                {selectedBlog.title}
+              </h3>
               <button
-                className="modal-close"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  border: 'none',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: '1.5rem',
+                  padding: '8px',
+                  borderRadius: '50%',
+                  transition: 'all 0.3s ease',
+                  position: 'relative',
+                  zIndex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '40px',
+                  height: '40px',
+                }}
                 onClick={() => setShowModal(false)}
               >
-                ×
+                <CloseIcon sx={{ fontSize: '1.5rem' }} />
               </button>
             </div>
 
-            <div className="modal-body">
-              {/* Hiển thị hình ảnh nếu có */}
+            {/* Modal Body */}
+            <div
+              style={{
+                maxHeight: 'calc(90vh - 100px)',
+                overflowY: 'auto',
+                padding: '0',
+              }}
+            >
+              {/* Blog Image */}
               {selectedBlog.image && (
-                <div className="blog-detail-image">
+                <div
+                  style={{
+                    width: '100%',
+                    minHeight: '200px',
+                    maxHeight: '60vh',
+                    background: '#f8f9fa',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    position: 'relative',
+                  }}
+                >
                   <img
                     src={selectedBlog.image}
                     alt={selectedBlog.title}
                     style={{
-                      width: "100%",
-                      height: "auto",
-                      minHeight: "450px",
-                      maxHeight: "600px",
-                      objectFit: "cover",
-                      borderRadius: "16px",
-                      marginBottom: "24px",
-                      border: "none",
-                      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
                     }}
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                      e.target.nextSibling.style.display = "flex";
+                    onError={e => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
                     }}
                   />
                   <div
                     style={{
-                      display: "none",
-                      width: "100%",
-                      height: "450px",
-                      backgroundColor: "#f8f9fa",
-                      borderRadius: "16px",
-                      border: "none",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexDirection: "column",
-                      gap: "16px",
-                      color: "#65676b",
-                      marginBottom: "24px",
-                      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      display: 'none',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexDirection: 'column',
+                      gap: '16px',
+                      color: '#97a19b',
+                      background: '#f8f9fa',
                     }}
                   >
-                    <span style={{ fontSize: "4rem" }}>🖼️</span>
-                    <span style={{ fontSize: "1.1rem", fontWeight: "500" }}>
+                    <span style={{ fontSize: '4rem' }}>🖼️</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: 500 }}>
                       Không thể tải hình ảnh
                     </span>
                   </div>
                 </div>
               )}
 
-              <div className="blog-content">
-                <p>{selectedBlog.content}</p>
+              {/* Blog Metadata */}
+              <div
+                style={{
+                  padding: '25px',
+                  borderBottom: '1px solid #e9ecef',
+                  background: '#f8f9fa',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: '15px',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: '#2f5148',
+                    }}
+                  >
+                    <LocalHospitalIcon
+                      sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                    />
+                    <span style={{ fontWeight: 500, fontSize: '0.9rem' }}>
+                      Tác giả:
+                    </span>
+                    <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                      {selectedBlog.author || selectedBlog.createdByName}
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: '#2f5148',
+                    }}
+                  >
+                    <EventIcon sx={{ color: '#97a19b', fontSize: '1.2rem' }} />
+                    <span style={{ fontWeight: 500, fontSize: '0.9rem' }}>
+                      Ngày đăng:
+                    </span>
+                    <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                      {selectedBlog.createdAt
+                        ? new Date(selectedBlog.createdAt).toLocaleDateString(
+                            'vi-VN'
+                          )
+                        : 'Không có'}
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: '#2f5148',
+                    }}
+                  >
+                    <VaccinesIcon
+                      sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                    />
+                    <span style={{ fontWeight: 500, fontSize: '0.9rem' }}>
+                      Danh mục:
+                    </span>
+                    <span
+                      style={{
+                        fontWeight: 600,
+                        fontSize: '0.9rem',
+                        padding: '4px 12px',
+                        background: 'rgba(115, 173, 103, 0.1)',
+                        color: '#2f5148',
+                        borderRadius: '12px',
+                      }}
+                    >
+                      {getCategoryName(selectedBlog.category)}
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: '#2f5148',
+                    }}
+                  >
+                    <RestaurantIcon
+                      sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                    />
+                    <span style={{ fontWeight: 500, fontSize: '0.9rem' }}>
+                      Lượt xem:
+                    </span>
+                    <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                      {selectedBlog.readCount || 0}
+                    </span>
+                  </div>
+                </div>
               </div>
+
+              {/* Blog Content */}
+              <div
+                style={{
+                  padding: '25px',
+                  fontSize: '1rem',
+                  lineHeight: '1.7',
+                  color: '#2f5148',
+                }}
+              >
+                <div
+                  style={{
+                    background: '#f8f9fa',
+                    padding: '20px',
+                    borderRadius: '12px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: 0,
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word',
+                    }}
+                  >
+                    {selectedBlog.content}
+                  </p>
+                </div>
+              </div>
+
+              {/* Tags Section */}
+              {selectedBlog.tags && selectedBlog.tags.length > 0 && (
+                <div
+                  style={{
+                    padding: '20px 25px',
+                    borderTop: '1px solid #e9ecef',
+                    background: '#f8f9fa',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontWeight: 600,
+                        color: '#2f5148',
+                        fontSize: '0.9rem',
+                      }}
+                    >
+                      Tags:
+                    </span>
+                    {selectedBlog.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        style={{
+                          padding: '4px 12px',
+                          background: 'rgba(115, 173, 103, 0.1)',
+                          color: '#2f5148',
+                          borderRadius: '16px',
+                          fontSize: '0.8rem',
+                          fontWeight: 500,
+                        }}
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -295,7 +295,7 @@
   box-shadow: 0 0 0 3px rgba(115, 173, 103, 0.1);
 }
 
-.search-box::before {
+/* .search-box::before {
   content: '🔍';
   position: absolute;
   left: 15px;
@@ -303,7 +303,7 @@
   transform: translateY(-50%);
   font-size: 1.1rem;
   z-index: 1;
-}
+} */
 
 .filter-group {
   display: flex;

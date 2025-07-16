@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNurseNotifications } from '../../utils/hooks/useNurse';
 import '../../css/Nurse/Notifications.css';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import TitleIcon from '@mui/icons-material/Title';
+import CategoryIcon from '@mui/icons-material/Category';
+import DateRangeIcon from '@mui/icons-material/DateRange';
+import MessageIcon from '@mui/icons-material/Message';
+import CloseIcon from '@mui/icons-material/Close';
+import InfoIcon from '@mui/icons-material/Info';
 
 const Notifications = () => {
   const [selectedNotification, setSelectedNotification] = useState(null);
@@ -179,11 +186,7 @@ const Notifications = () => {
       ? processedNotifications
       : processNotificationData(mockNotifications);
 
-  // Thống kê
-  const stats = {
-    total: displayNotifications.length,
-    urgent: displayNotifications.filter(n => n.type === 'Khẩn cấp').length,
-  };
+
 
   const getTypeBadge = type => {
     const typeMap = {
@@ -246,28 +249,10 @@ const Notifications = () => {
           <h1>📢 Quản Lý Thông Báo</h1>
           <p>Xem và quản lý thông báo từ nhà trường</p>
         </div>
-        <button onClick={refetch} className="refresh-btn">
-          🔄 Làm mới
-        </button>
+       
       </div>
 
-      {/* Thống kê */}
-      <div className="stats-section">
-        <div className="stat-card">
-          <div className="stat-icon">📨</div>
-          <div className="stat-content">
-            <div className="stat-value">{stats.total}</div>
-            <div className="stat-title">Tổng Thông Báo</div>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">🚨</div>
-          <div className="stat-content">
-            <div className="stat-value">{stats.urgent}</div>
-            <div className="stat-title">Khẩn Cấp</div>
-          </div>
-        </div>
-      </div>
+     
 
       {/* Danh sách thông báo */}
       <div className="notifications-section">
@@ -352,50 +337,265 @@ const Notifications = () => {
 
       {/* Modal xem chi tiết */}
       {showDetailModal && selectedNotification && (
-        <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>📋 Chi Tiết Thông Báo</h3>
-              <button onClick={handleCloseModal} className="close-btn">
-                ✕
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px',
+          }}
+          onClick={handleCloseModal}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '20px',
+              width: '100%',
+              maxWidth: '700px',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              border: '1px solid #c1cbc2',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(20px)',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '25px',
+                borderBottom: '1px solid #e9ecef',
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  color: '#2f5148',
+                  fontFamily: 'Satoshi, sans-serif',
+                  fontSize: '1.5rem',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+              >
+                <InfoIcon sx={{ color: '#97a19b', fontSize: '1.5rem' }} />
+                Chi Tiết Thông Báo
+              </h3>
+              <button
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#97a19b',
+                  cursor: 'pointer',
+                  fontSize: '1.5rem',
+                  padding: '5px',
+                  borderRadius: '50%',
+                  transition: 'all 0.3s ease',
+                }}
+                onClick={handleCloseModal}
+              >
+                <CloseIcon sx={{ fontSize: '1.5rem' }} />
               </button>
             </div>
-            <div className="modal-body">
-              <div className="detail-section">
-                <h4>Thông tin chung</h4>
-                <div className="detail-row">
-                  <strong>Tiêu đề:</strong> {selectedNotification.title}
+
+            {/* Modal Body */}
+            <div style={{ padding: '25px' }}>
+              {/* Basic Information */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                  gap: '15px',
+                  marginBottom: '25px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '10px 12px',
+                    background: '#f8f9fa',
+                    borderRadius: '8px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <span
+                    style={{
+                      color: '#97a19b',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.8rem',
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    <TitleIcon sx={{ fontSize: '0.9rem' }} />
+                    Tiêu đề:
+                  </span>
+                  <span
+                    style={{
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      textAlign: 'right',
+                      maxWidth: '60%',
+                    }}
+                  >
+                    {selectedNotification.title}
+                  </span>
                 </div>
-                <div className="detail-row">
-                  <strong>Loại:</strong>{' '}
-                  {getTypeBadge(selectedNotification.type)}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '10px 12px',
+                    background: '#f8f9fa',
+                    borderRadius: '8px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <span
+                    style={{
+                      color: '#97a19b',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.8rem',
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    <CategoryIcon sx={{ fontSize: '0.9rem' }} />
+                    Loại:
+                  </span>
+                  <span
+                    style={{
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {getTypeBadge(selectedNotification.type)}
+                  </span>
                 </div>
-                <div className="detail-row">
-                  <strong>Ngày tạo:</strong>{' '}
-                  {new Date(selectedNotification.createdAt).toLocaleString(
-                    'vi-VN'
-                  )}
-                </div>
-                <div className="detail-row">
-                  <strong>Người tạo:</strong> {selectedNotification.createdBy}
-                </div>
-                <div className="detail-row">
-                  <strong>Đối tượng:</strong>{' '}
-                  {selectedNotification.targetType === 'parent'
-                    ? 'Phụ Huynh'
-                    : 'Nhân Viên'}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '10px 12px',
+                    background: '#f8f9fa',
+                    borderRadius: '8px',
+                    border: '1px solid #e9ecef',
+                    gridColumn: '1 / -1',
+                  }}
+                >
+                  <span
+                    style={{
+                      color: '#97a19b',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.8rem',
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    <DateRangeIcon sx={{ fontSize: '0.9rem' }} />
+                    Ngày nhận:
+                  </span>
+                  <span
+                    style={{
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {new Date(selectedNotification.createdAt).toLocaleString(
+                      'vi-VN'
+                    )}
+                  </span>
                 </div>
               </div>
 
-              <div className="detail-section">
-                <h4>Nội dung chi tiết</h4>
-                <div className="message-detail">
+              {/* Message Content */}
+              <div
+                style={{
+                  background: '#f8f9fa',
+                  padding: '20px',
+                  borderRadius: '12px',
+                  border: '1px solid #e9ecef',
+                }}
+              >
+                <h4
+                  style={{
+                    margin: '0 0 15px 0',
+                    color: '#2f5148',
+                    fontFamily: 'Satoshi, sans-serif',
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <MessageIcon sx={{ color: '#97a19b', fontSize: '1.2rem' }} />
+                  Nội dung thông báo
+                </h4>
+                <div
+                  style={{
+                    color: '#2f5148',
+                    fontSize: '1rem',
+                    fontFamily: 'Satoshi, sans-serif',
+                    lineHeight: 1.6,
+                    fontWeight: 500,
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                  }}
+                >
                   {selectedNotification.message}
                 </div>
               </div>
             </div>
-            <div className="modal-footer">
-              <button onClick={handleCloseModal} className="close-modal-btn">
+
+            {/* Modal Footer */}
+            <div
+              style={{
+                padding: '20px 25px',
+                borderTop: '1px solid #e9ecef',
+                display: 'flex',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <button
+                onClick={handleCloseModal}
+                style={{
+                  background: '#bfefa1',
+                  color: '#1a3a2e',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  fontFamily: 'Satoshi, sans-serif',
+                  transition: 'all 0.3s ease',
+                }}
+              >
                 Đóng
               </button>
             </div>
