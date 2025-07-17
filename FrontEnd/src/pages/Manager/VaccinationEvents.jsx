@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import "../../css/Manager/VaccinationEvents.css";
-import { vaccinationEventService } from "../../services/vaccinationService";
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../../css/Manager/VaccinationEvents.css';
+import { vaccinationEventService } from '../../services/vaccinationService';
 
 function VaccinationEvents() {
   const navigate = useNavigate();
@@ -9,7 +9,7 @@ function VaccinationEvents() {
   // States for events management
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -21,25 +21,30 @@ function VaccinationEvents() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailFormData, setEmailFormData] = useState({
     emailTemplateId: 5,
-    customMessage: "",
+    customMessage: '',
   });
 
   // Email template options (you can expand this list as needed)
   const emailTemplateOptions = [
-    { id: 1, name: "Template Thông Báo Cơ Bản" },
-    { id: 2, name: "Template Nhắc Nhở" },
-    { id: 3, name: "Template Khẩn Cấp" },
-    { id: 4, name: "Template Thông Tin Chi Tiết" },
-    { id: 5, name: "Template Mặc Định" },
+    { id: 1, name: 'Template Thông Báo Cơ Bản' },
+    { id: 2, name: 'Template Nhắc Nhở' },
+    { id: 3, name: 'Template Khẩn Cấp' },
+    { id: 4, name: 'Template Thông Tin Chi Tiết' },
+    { id: 5, name: 'Template Mặc Định' },
   ];
 
   // Form data
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    eventDate: "",
-    location: "",
+    title: '',
+    description: '',
+    eventDate: '',
+    location: '',
   });
+
+  // File upload states
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+  const fileInputRef = useRef(null);
 
   // Fetch vaccination events on component mount
   useEffect(() => {
@@ -50,21 +55,21 @@ function VaccinationEvents() {
   const fetchVaccinationEvents = async () => {
     try {
       setLoading(true);
-      setError("");
+      setError('');
       const response = await vaccinationEventService.getAllEvents();
       setEvents(response);
     } catch (error) {
-      console.error("Error fetching vaccination events:", error);
-      setError("Không thể tải danh sách sự kiện tiêm chủng");
+      console.error('Error fetching vaccination events:', error);
+      setError('Không thể tải danh sách sự kiện tiêm chủng');
     } finally {
       setLoading(false);
     }
   };
 
   // Handle form input changes
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
@@ -73,71 +78,125 @@ function VaccinationEvents() {
   // Handle create new event
   const handleCreateEvent = () => {
     setFormData({
-      title: "",
-      description: "",
-      eventDate: "",
-      location: "",
+      title: '',
+      description: '',
+      eventDate: '',
+      location: '',
     });
+    clearFileData();
     setShowCreateModal(true);
   };
 
   // Handle edit event
-  const handleEditEvent = (event) => {
+  const handleEditEvent = event => {
     setSelectedEvent(event);
     // Convert date back to YYYY-MM-DD format for date input
-    let dateValue = "";
+    let dateValue = '';
     if (event.eventDate) {
       // If it's already in DD/MM/YYYY format, convert it
-      const parts = event.eventDate.split("/");
+      const parts = event.eventDate.split('/');
       if (parts.length === 3) {
         dateValue = `${parts[2]}-${parts[1].padStart(
           2,
-          "0"
-        )}-${parts[0].padStart(2, "0")}`;
+          '0'
+        )}-${parts[0].padStart(2, '0')}`;
       }
     }
 
     setFormData({
-      title: event.title || "",
-      description: event.description || "",
+      title: event.title || '',
+      description: event.description || '',
       eventDate: dateValue,
-      location: event.location || "",
+      location: event.location || '',
     });
     setShowEditModal(true);
   };
 
   // Handle delete event
-  const handleDeleteEvent = (event) => {
+  const handleDeleteEvent = event => {
     setSelectedEvent(event);
     setShowDeleteModal(true);
   };
 
   // Handle view students for event
-  const handleViewStudents = (event) => {
+  const handleViewStudents = event => {
     navigate(`/manager/vaccination-events/${event.id}/students`);
   };
 
   // Handle send email to all parents
-  const handleSendEmailAll = (event) => {
+  const handleSendEmailAll = event => {
     setSelectedEvent(event);
     setEmailFormData({
       emailTemplateId: 5,
-      customMessage: "",
+      customMessage: '',
     });
     setShowEmailModal(true);
   };
 
   // Handle email form input changes
-  const handleEmailInputChange = (e) => {
+  const handleEmailInputChange = e => {
     const { name, value } = e.target;
-    setEmailFormData((prev) => ({
+    setEmailFormData(prev => ({
       ...prev,
       [name]: value,
     }));
   };
 
+  // Handle file selection
+  const handleFileSelect = e => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (
+        !file.type.startsWith('image/') &&
+        !file.type.includes('pdf') &&
+        !file.type.includes('document')
+      ) {
+        alert('Vui lòng chọn file hình ảnh, PDF hoặc tài liệu!');
+        return;
+      }
+
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('File không được lớn hơn 10MB!');
+        return;
+      }
+
+      setSelectedFile(file);
+
+      // Create preview for images
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          setFilePreview(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setFilePreview(null);
+      }
+    }
+  };
+
+  // Remove selected file
+  const removeSelectedFile = () => {
+    setSelectedFile(null);
+    setFilePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Clear file data when modal closes
+  const clearFileData = () => {
+    setSelectedFile(null);
+    setFilePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   // Submit send email form
-  const handleSubmitSendEmail = async (e) => {
+  const handleSubmitSendEmail = async e => {
     e.preventDefault();
 
     if (!selectedEvent) return;
@@ -146,56 +205,72 @@ function VaccinationEvents() {
       const emailData = {
         vaccinationEventId: selectedEvent.id,
         emailTemplateId: parseInt(emailFormData.emailTemplateId),
-        customMessage: emailFormData.customMessage.trim() || "string",
+        customMessage: emailFormData.customMessage.trim() || 'string',
       };
 
-      console.log("🚀 Sending email to all parents:", emailData);
+      console.log('🚀 Sending email to all parents:', emailData);
       await vaccinationEventService.sendEmailToAll(emailData);
       setShowEmailModal(false);
-      alert("Gửi email thành công tới tất cả phụ huynh!");
+      alert('Gửi email thành công tới tất cả phụ huynh!');
     } catch (error) {
-      console.error("Error sending email:", error);
-      alert("Có lỗi xảy ra khi gửi email!");
+      console.error('Error sending email:', error);
+      alert('Có lỗi xảy ra khi gửi email!');
     }
   };
 
   // Submit create form
-  const handleSubmitCreate = async (e) => {
+  const handleSubmitCreate = async e => {
     e.preventDefault();
 
     // Validation
     if (!formData.title.trim()) {
-      alert("Vui lòng nhập tiêu đề sự kiện!");
+      alert('Vui lòng nhập tiêu đề sự kiện!');
       return;
     }
     if (!formData.eventDate) {
-      alert("Vui lòng chọn ngày tiêm!");
+      alert('Vui lòng chọn ngày tiêm!');
       return;
     }
 
     try {
-      // Format data according to API requirements
-      const eventData = {
-        vaccinationEventName: formData.title.trim(),
-        location: formData.location.trim() || "string",
-        organizedBy: "string", // As per API structure
-        eventDate: formData.eventDate + "T00:00:00.000Z", // Convert to ISO format
-        description: formData.description.trim() || "string",
-      };
+      // Create FormData for file upload
+      const formDataToSend = new FormData();
+      formDataToSend.append('VaccinationEventName', formData.title.trim());
+      formDataToSend.append('Location', formData.location.trim() || 'string');
+      formDataToSend.append('OrganizedBy', 'string');
+      formDataToSend.append('EventDate', formData.eventDate + 'T00:00:00.000Z');
+      formDataToSend.append(
+        'Description',
+        formData.description.trim() || 'string'
+      );
 
-      console.log("🚀 Sending event data:", eventData);
-      await vaccinationEventService.createEvent(eventData);
+      // Add file if selected
+      if (selectedFile) {
+        formDataToSend.append('DocumentFile', selectedFile);
+      }
+
+      console.log('🚀 Sending event data with file:', {
+        title: formData.title.trim(),
+        location: formData.location.trim() || 'string',
+        eventDate: formData.eventDate,
+        description: formData.description.trim() || 'string',
+        hasFile: !!selectedFile,
+        fileName: selectedFile?.name,
+      });
+
+      await vaccinationEventService.createEventWithFile(formDataToSend);
       await fetchVaccinationEvents();
       setShowCreateModal(false);
-      alert("Tạo sự kiện tiêm chủng thành công!");
+      clearFileData();
+      alert('Tạo sự kiện tiêm chủng thành công!');
     } catch (error) {
-      console.error("Error creating vaccination event:", error);
-      alert("Có lỗi xảy ra khi tạo sự kiện tiêm chủng!");
+      console.error('Error creating vaccination event:', error);
+      alert('Có lỗi xảy ra khi tạo sự kiện tiêm chủng!');
     }
   };
 
   // Submit edit form
-  const handleSubmitEdit = async (e) => {
+  const handleSubmitEdit = async e => {
     e.preventDefault();
 
     if (!selectedEvent) return;
@@ -205,20 +280,20 @@ function VaccinationEvents() {
       const eventData = {
         vaccinationEventId: selectedEvent.id,
         vaccinationEventName: formData.title.trim(),
-        location: formData.location.trim() || "string",
-        organizedBy: "string", // As per API structure
-        eventDate: formData.eventDate + "T00:00:00.000Z", // Convert to ISO format
-        description: formData.description.trim() || "string",
+        location: formData.location.trim() || 'string',
+        organizedBy: 'string', // As per API structure
+        eventDate: formData.eventDate + 'T00:00:00.000Z', // Convert to ISO format
+        description: formData.description.trim() || 'string',
       };
 
-      console.log("🚀 Sending updated event data:", eventData);
+      console.log('🚀 Sending updated event data:', eventData);
       await vaccinationEventService.updateEvent(eventData);
       await fetchVaccinationEvents();
       setShowEditModal(false);
-      alert("Cập nhật sự kiện tiêm chủng thành công!");
+      alert('Cập nhật sự kiện tiêm chủng thành công!');
     } catch (error) {
-      console.error("Error updating vaccination event:", error);
-      alert("Có lỗi xảy ra khi cập nhật sự kiện tiêm chủng!");
+      console.error('Error updating vaccination event:', error);
+      alert('Có lỗi xảy ra khi cập nhật sự kiện tiêm chủng!');
     }
   };
 
@@ -230,10 +305,10 @@ function VaccinationEvents() {
       await vaccinationEventService.deleteEvent(selectedEvent.id);
       await fetchVaccinationEvents();
       setShowDeleteModal(false);
-      alert("Xóa sự kiện tiêm chủng thành công!");
+      alert('Xóa sự kiện tiêm chủng thành công!');
     } catch (error) {
-      console.error("Error deleting vaccination event:", error);
-      alert("Có lỗi xảy ra khi xóa sự kiện tiêm chủng!");
+      console.error('Error deleting vaccination event:', error);
+      alert('Có lỗi xảy ra khi xóa sự kiện tiêm chủng!');
     }
   };
 
@@ -295,7 +370,7 @@ function VaccinationEvents() {
 
         {events.length > 0 ? (
           <div className="events-grid">
-            {events.map((event) => (
+            {events.map(event => (
               <div key={event.id} className="event-card">
                 <div
                   className="card-header"
@@ -314,13 +389,13 @@ function VaccinationEvents() {
                     <div className="info-row">
                       <span className="label">📍 Địa điểm:</span>
                       <span className="value">
-                        {event.location || "Chưa có"}
+                        {event.location || 'Chưa có'}
                       </span>
                     </div>
                     <div className="info-row">
                       <span className="label">👨‍💼 Tổ chức:</span>
                       <span className="value">
-                        {event.organizedBy || "admin"}
+                        {event.organizedBy || 'admin'}
                       </span>
                     </div>
                   </div>
@@ -337,19 +412,19 @@ function VaccinationEvents() {
                     className="edit-btn"
                     onClick={() => handleEditEvent(event)}
                   >
-                     Chỉnh sửa
+                    Chỉnh sửa
                   </button>
                   <button
                     className="email-btn"
                     onClick={() => handleSendEmailAll(event)}
                   >
-                     Gửi email
+                    Gửi email
                   </button>
                   <button
                     className="delete-btn"
                     onClick={() => handleDeleteEvent(event)}
                   >
-                     Xóa
+                    Xóa
                   </button>
                 </div>
               </div>
@@ -370,14 +445,20 @@ function VaccinationEvents() {
       {showCreateModal && (
         <div
           className="modal-overlay"
-          onClick={() => setShowCreateModal(false)}
+          onClick={() => {
+            setShowCreateModal(false);
+            clearFileData();
+          }}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>➕ Tạo Sự Kiện Tiêm Chủng Mới</h3>
               <button
                 className="modal-close"
-                onClick={() => setShowCreateModal(false)}
+                onClick={() => {
+                  setShowCreateModal(false);
+                  clearFileData();
+                }}
               >
                 ×
               </button>
@@ -430,10 +511,61 @@ function VaccinationEvents() {
                 </div>
               </div>
 
+              {/* File Upload Section */}
+              <div className="form-group">
+                <label>Tài liệu đính kèm (tùy chọn)</label>
+                <div className="file-upload-section">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*,.pdf,.doc,.docx,.txt"
+                    onChange={handleFileSelect}
+                    style={{ display: 'none' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="file-select-btn"
+                  >
+                    📁 Chọn tài liệu
+                  </button>
+                  {selectedFile && (
+                    <div className="file-preview">
+                      <div className="file-info">
+                        <span className="file-name">
+                          📄 {selectedFile.name}
+                        </span>
+                        <span className="file-size">
+                          ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                        </span>
+                        <button
+                          type="button"
+                          onClick={removeSelectedFile}
+                          className="remove-file-btn"
+                        >
+                          ❌
+                        </button>
+                      </div>
+                      {filePreview && (
+                        <div className="image-preview">
+                          <img src={filePreview} alt="Preview" />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <small className="file-help">
+                  Hỗ trợ: Hình ảnh, PDF, Word, Text. Tối đa 10MB
+                </small>
+              </div>
+
               <div className="modal-footer">
                 <button
                   type="button"
-                  onClick={() => setShowCreateModal(false)}
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    clearFileData();
+                  }}
                   className="cancel-btn"
                 >
                   Hủy
@@ -450,7 +582,7 @@ function VaccinationEvents() {
       {/* Edit Modal */}
       {showEditModal && selectedEvent && (
         <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>✏️ Chỉnh Sửa Sự Kiện Tiêm Chủng</h3>
               <button
@@ -514,7 +646,7 @@ function VaccinationEvents() {
                   Hủy
                 </button>
                 <button type="submit" className="submit-btn">
-                   Cập nhật
+                  Cập nhật
                 </button>
               </div>
             </form>
@@ -530,7 +662,7 @@ function VaccinationEvents() {
         >
           <div
             className="modal-content delete-modal"
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <div className="modal-header">
               <h3>🗑️ Xác Nhận Xóa</h3>
@@ -575,7 +707,7 @@ function VaccinationEvents() {
       {/* Send Email Modal */}
       {showEmailModal && selectedEvent && (
         <div className="modal-overlay" onClick={() => setShowEmailModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>📧 Gửi Email Thông Báo</h3>
               <button
@@ -590,7 +722,7 @@ function VaccinationEvents() {
               <div className="email-info">
                 <h4>Sự kiện: {selectedEvent.title}</h4>
                 <p>
-                  📅 Ngày: {selectedEvent.eventDate} | 📍 Địa điểm:{" "}
+                  📅 Ngày: {selectedEvent.eventDate} | 📍 Địa điểm:{' '}
                   {selectedEvent.location}
                 </p>
               </div>
@@ -604,7 +736,7 @@ function VaccinationEvents() {
                   required
                   className="template-select"
                 >
-                  {emailTemplateOptions.map((template) => (
+                  {emailTemplateOptions.map(template => (
                     <option key={template.id} value={template.id}>
                       {template.name} (ID: {template.id})
                     </option>
