@@ -13,7 +13,6 @@ const MedicineRequest = () => {
   const getCurrentParentInfo = () => {
     try {
       const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-      console.log('🔍 Raw userInfo from localStorage:', userInfo);
       
       // Try multiple possible parent ID fields from the JWT token or userInfo
       const parentId = userInfo.parentId || 
@@ -27,8 +26,6 @@ const MedicineRequest = () => {
                         userInfo.name || 
                         userInfo.Name ||
                         'Phụ huynh';
-      
-      console.log('🔍 Extracted parent info:', { id: parentId, name: parentName });
       
       return {
         id: parentId,
@@ -82,7 +79,6 @@ const MedicineRequest = () => {
     setLoading(true);
     try {
       const parentInfo = getCurrentParentInfo();
-      console.log('🔍 Parent info from localStorage:', parentInfo);
       
       if (!parentInfo.id) {
         console.error('❌ No parent ID found in localStorage');
@@ -91,18 +87,13 @@ const MedicineRequest = () => {
         return;
       }
 
-      console.log('📡 Calling API to get students for parent ID:', parentInfo.id);
-      
       // PRIMARY: Use path parameter endpoint as requested by user
       const pathEndpoint = `/Student/GetStudentByParentId/${parentInfo.id}`;
-      console.log('🌐 Primary API URL (path param):', `${apiClient.defaults.baseURL}${pathEndpoint}`);
       
       try {
         const res = await apiClient.get(pathEndpoint);
-        console.log('📥 API Response (path param):', res);
         
         const studentsArray = Array.isArray(res) ? res : (Array.isArray(res.data) ? res.data : []);
-        console.log('📚 Students from API (path param):', studentsArray.length, 'students');
         
         if (studentsArray.length > 0) {
           // Map students to ensure consistent data structure
@@ -120,13 +111,11 @@ const MedicineRequest = () => {
             parentid: student.parentId || student.parentid || parentInfo.id
           }));
           
-          console.log('✅ Mapped students (path param):', mappedStudents);
           setStudents(mappedStudents);
 
           // Auto-select if only one student
           if (mappedStudents.length === 1) {
             const studentId = String(mappedStudents[0].studentId);
-            console.log('🎯 Auto-selecting single student:', studentId);
             setMedicineFormData(prev => ({
               ...prev,
               studentId: studentId
@@ -148,18 +137,14 @@ const MedicineRequest = () => {
           return;
         }
       } catch (error1) {
-        console.log('📋 Path parameter method failed, status:', error1.response?.status);
-        console.log('📋 Error details:', error1.response?.data);
+        // Path parameter method failed, try query parameter
       }
       
       // FALLBACK: Try query parameter endpoint
-      console.log('🔄 Trying fallback: query parameter...');
       const queryEndpoint = `/Student/GetStudentByParentId?parentId=${parentInfo.id}`;
-      console.log('🌐 Fallback API URL (query param):', `${apiClient.defaults.baseURL}${queryEndpoint}`);
       
       try {
         const fallbackRes = await apiClient.get(queryEndpoint);
-        console.log('📥 Fallback API Response (query param):', fallbackRes);
         
         const fallbackStudents = Array.isArray(fallbackRes) ? fallbackRes : (Array.isArray(fallbackRes.data) ? fallbackRes.data : []);
         
@@ -178,7 +163,6 @@ const MedicineRequest = () => {
             parentid: student.parentId || student.parentid || parentInfo.id
           }));
           
-          console.log('✅ Fallback successful, mapped students (query param):', mappedStudents);
           setStudents(mappedStudents);
           
           if (mappedStudents.length === 1) {
@@ -411,8 +395,6 @@ Vui lòng:
         apiUrl = 'https://api-schoolhealth.purintech.id.vn/api/Form/form/otherrequest';
       }
 
-      console.log(`📤 Sending ${activeTab} request...`);
-      
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -428,7 +410,6 @@ Vui lòng:
       }
 
       const responseData = await response.json();
-      console.log('✅ Request created:', responseData);
 
       setMessage({ 
         type: 'success', 

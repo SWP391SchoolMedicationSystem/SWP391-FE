@@ -5,11 +5,9 @@ export const vaccinationEventService = {
   // Get all vaccination events (All roles can view)
   getAllEvents: async () => {
     try {
-      console.log('🌐 Getting all vaccination events');
       const response = await apiClient.get(
         API_ENDPOINTS.VACCINATION_EVENT.GET_ALL
       );
-      console.log('📥 Vaccination events response:', response);
 
       const events = Array.isArray(response) ? response : [];
       return events.map(vaccinationEventService.mapEventData);
@@ -22,13 +20,12 @@ export const vaccinationEventService = {
   // Get vaccination event by ID
   getEventById: async eventId => {
     try {
-      console.log('🌐 Getting vaccination event by ID:', eventId);
       const url = buildApiUrl(
         API_ENDPOINTS.VACCINATION_EVENT.GET_BY_ID,
         eventId
       );
       const response = await apiClient.get(url);
-      console.log('📥 Vaccination event details:', response);
+
 
       return vaccinationEventService.mapEventData(response);
     } catch (error) {

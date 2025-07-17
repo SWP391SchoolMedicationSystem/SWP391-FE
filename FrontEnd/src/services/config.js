@@ -19,11 +19,9 @@ apiClient.interceptors.request.use(
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('Request: Token added to headers');
     } else {
       console.warn('Request: No token found in localStorage');
     }
-    console.log('Request:', config.method?.toUpperCase(), config.url);
     return config;
   },
   error => {
@@ -34,7 +32,6 @@ apiClient.interceptors.request.use(
 // Response interceptor for error handling
 apiClient.interceptors.response.use(
   response => {
-    console.log('Response: Success', response.status, response.config.url);
     return response.data;
   },
   error => {

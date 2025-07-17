@@ -84,9 +84,7 @@ export const useParentStudents = () => {
         throw new Error('Không tìm thấy thông tin phụ huynh');
       }
 
-      console.log('🔍 Fetching students for parent ID:', parentId);
-      const data = await parentService.getMyChildren(parentId);
-      console.log('📥 Raw students data:', data);
+          const data = await parentService.getMyChildren(parentId);
 
       setStudents(Array.isArray(data) ? data : []);
     } catch (err) {

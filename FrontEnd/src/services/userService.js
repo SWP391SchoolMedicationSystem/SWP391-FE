@@ -41,13 +41,7 @@ const userService = {
           // For Parent role, set parentId to be the same as userId
           if (decodedToken.Role === "Parent" || decodedToken.role === "Parent") {
             loginData.parentId = loginData.userId;
-            console.log('🔧 Parent login: Setting parentId =', loginData.parentId);
           }
-
-          console.log('✅ Login data prepared:', {
-            ...loginData,
-            decodedToken: '[JWT Token Data]' // Don't log sensitive token
-          });
 
           // Handle Remember Me functionality
           if (rememberMe) {
@@ -354,13 +348,7 @@ const userService = {
           // For Parent role, set parentId to be the same as userId
           if (decodedToken.Role === "Parent" || decodedToken.role === "Parent") {
             loginData.parentId = loginData.userId;
-            console.log('🔧 Google Parent login: Setting parentId =', loginData.parentId);
           }
-
-          console.log('✅ Google login data prepared:', {
-            ...loginData,
-            decodedToken: '[JWT Token Data]' // Don't log sensitive token
-          });
 
           return loginData;
         } catch (error) {
