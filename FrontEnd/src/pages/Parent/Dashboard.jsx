@@ -138,6 +138,10 @@ function ParentDashboard() {
     navigate("/parent/chat");
   };
 
+  const handleMedicineRequest = () => {
+    navigate("/parent/medicine-request");
+  };
+
 
 
   return (
@@ -600,6 +604,47 @@ function ParentDashboard() {
                 }}
               >
                 Liên hệ trực tiếp với y tá trường
+              </small>
+            </div>
+          </button>
+          <button
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              padding: "15px 20px",
+              border: "none",
+              borderRadius: "14px",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              fontSize: "1.1rem",
+              fontWeight: 500,
+              fontFamily: "Satoshi, sans-serif",
+              background: theme
+                ? isDarkMode
+                  ? "#3a3a3a"
+                  : "#bfefa1"
+                : "#bfefa1",
+              color: theme ? (isDarkMode ? "#ffffff" : "#1a3a2e") : "#1a3a2e",
+            }}
+            onClick={handleMedicineRequest}
+          >
+            <LocalPharmacyIcon sx={{ color: "#97a19b", fontSize: "1.5rem" }} />
+            <div style={{ textAlign: "left" }}>
+              <span style={{ display: "block", fontWeight: 600 }}>
+                                  Gửi đơn yêu cầu
+              </span>
+              <small
+                style={{
+                  color: theme
+                    ? isDarkMode
+                      ? "rgba(255, 255, 255, 0.7)"
+                      : "#1a3a2e"
+                    : "#1a3a2e",
+                  fontSize: "0.8rem",
+                }}
+              >
+                Gửi yêu cầu thuốc cho con em
               </small>
             </div>
           </button>
