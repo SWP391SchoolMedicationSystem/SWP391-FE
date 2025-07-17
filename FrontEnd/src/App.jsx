@@ -29,6 +29,7 @@ import ManagerStudentHealthRecordDetail from './pages/Manager/StudentHealthRecor
 
 // Admin pages
 import AdminDashboard from './pages/Admin/Dashboard';
+import AdminAccountManagement from './pages/Admin/AccountManagement';
 import ManageManagers from './pages/Admin/ManageManagers';
 import SystemLogs from './pages/Admin/SystemLogs';
 import FormCategories from './pages/Admin/FormCategories';
@@ -61,7 +62,6 @@ import ParentStudentHealthRecordDetail from './pages/Parent/StudentHealthRecordD
 import UpdateProfile from './pages/Parent/UpdateProfile';
 import MedicineRequest from './pages/Parent/MedicineRequest';
 
-
 function App() {
   return (
     <div className="App">
@@ -82,6 +82,10 @@ function App() {
           }
         >
           <Route index element={<AdminDashboard />} />
+          <Route
+            path="account-management"
+            element={<AdminAccountManagement />}
+          />
           <Route path="manage-managers" element={<ManageManagers />} />
           <Route path="system-logs" element={<SystemLogs />} />
           <Route path="form-categories" element={<FormCategories />} />
@@ -142,10 +146,7 @@ function App() {
           <Route path="medication-schedule" element={<MedicationSchedule />} />
           <Route path="handle-medicine" element={<HandleMedicine />} />
           <Route path="medicine-management" element={<MedicineManagement />} />
-          <Route
-            path="personal-medicine"
-            element={<NursePersonalMedicine />}
-          />
+          <Route path="personal-medicine" element={<NursePersonalMedicine />} />
           <Route path="student-list" element={<NurseStudentList />} />
           <Route path="blog" element={<NurseBlog />} />
           <Route path="chat" element={<ChatWithParents />} />
@@ -187,7 +188,6 @@ function App() {
             element={<ManageHealthRecords />}
           />
           <Route path="update-profile" element={<UpdateProfile />} />
-
         </Route>
       </Routes>
     </div>

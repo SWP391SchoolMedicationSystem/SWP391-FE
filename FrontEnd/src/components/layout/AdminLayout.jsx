@@ -27,6 +27,12 @@ const navItems = [
     key: 'dashboard',
   },
   {
+    to: '/admin/account-management',
+    label: 'Quản Lý Tài Khoản',
+    icon: <SupervisorAccount />,
+    key: 'account-management',
+  },
+  {
     to: '/admin/manage-managers',
     label: 'Quản Lý Manager',
     icon: <SupervisorAccount />,
