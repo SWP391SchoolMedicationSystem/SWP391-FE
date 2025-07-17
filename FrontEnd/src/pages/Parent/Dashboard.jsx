@@ -30,20 +30,7 @@ function ParentDashboard() {
     useParentNotifications();
   const { data: blogs, loading: blogsLoading } = useParentBlogs();
 
-  // Mock data for features not yet available via API
-  const studentInfo = {
-    name: "Nguyễn Minh Khôi",
-    class: "5A",
-    studentId: "HS001",
-    school: "Trường Tiểu học Nguyễn Du",
-  };
 
-  const healthSummary = {
-    lastCheckup: "2024-03-10",
-    nextCheckup: "2024-06-10",
-    vaccinationStatus: "Đầy đủ",
-    healthStatus: "Khỏe mạnh",
-  };
 
   // Calculate real statistics
   useEffect(() => {

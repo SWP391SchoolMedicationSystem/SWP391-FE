@@ -1,10 +1,10 @@
-import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import {
   useManagerStudents,
   useManagerBlogs,
-} from "../../utils/hooks/useManager";
-import "../../css/Manager/Dashboard.css";
+} from '../../utils/hooks/useManager';
+import '../../css/Manager/Dashboard.css';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -19,61 +19,61 @@ function Dashboard() {
     const calculateStats = () => {
       const totalStudents = students ? students.length : 0;
       const maleStudents = students
-        ? students.filter((s) => s.gender === "Nam").length
+        ? students.filter(s => s.gender === 'Nam').length
         : 0;
       const femaleStudents = students
-        ? students.filter((s) => s.gender === "Nữ").length
+        ? students.filter(s => s.gender === 'Nữ').length
         : 0;
       const totalBlogs = blogs ? blogs.length : 0;
       const pendingBlogs = blogs
-        ? blogs.filter((b) => b.status === "pending").length
+        ? blogs.filter(b => b.status === 'pending').length
         : 0;
 
       const stats = [
         {
-          title: "Tổng Học Sinh",
+          title: 'Tổng Học Sinh',
           value: totalStudents.toString(),
-          change: "+8.2%", // Mock percentage
-          changeType: "positive",
-          icon: "🎓",
-          color: "blue",
-          description: "Số học sinh trong hệ thống",
+          change: '+8.2%', // Mock percentage
+          changeType: 'positive',
+          icon: '🎓',
+          color: 'blue',
+          description: 'Số học sinh trong hệ thống',
         },
         {
-          title: "Học Sinh Nam",
+          title: 'Học Sinh Nam',
           value: maleStudents.toString(),
           change: `${
             totalStudents > 0
               ? ((maleStudents / totalStudents) * 100).toFixed(1)
               : 0
           }%`,
-          changeType: "neutral",
-          icon: "👦",
-          color: "green",
-          description: "Tỷ lệ học sinh nam",
+          changeType: 'neutral',
+          icon: '👦',
+          color: 'green',
+          description: 'Tỷ lệ học sinh nam',
         },
         {
-          title: "Học Sinh Nữ",
+          title: 'Học Sinh Nữ',
           value: femaleStudents.toString(),
           change: `${
             totalStudents > 0
               ? ((femaleStudents / totalStudents) * 100).toFixed(1)
               : 0
           }%`,
-          changeType: "neutral",
-          icon: "👧",
-          color: "purple",
-          description: "Tỷ lệ học sinh nữ",
+          changeType: 'neutral',
+          icon: '👧',
+          color: 'purple',
+          description: 'Tỷ lệ học sinh nữ',
         },
         {
-          title: "Tổng Bài Viết",
+          title: 'Tổng Bài Viết',
           value: totalBlogs.toString(),
           change:
-            pendingBlogs > 0 ? `${pendingBlogs} chờ duyệt` : "Đã duyệt hết",
-          changeType: pendingBlogs > 0 ? "warning" : "positive",
-          icon: "📝",
-          color: "orange",
-          description: "Bài viết trong hệ thống",
+            pendingBlogs > 0 ? `${pendingBlogs} chờ duyệt` : 'Đã duyệt hết',
+          changeType: pendingBlogs > 0 ? 'warning' : 'positive',
+          icon: '📝',
+          color: 'orange',
+          description: 'Bài viết trong hệ thống',
         },
       ];
 
@@ -88,26 +88,26 @@ function Dashboard() {
   // Quick actions for easy navigation
   const quickActions = [
     {
-      title: "Quản Lý Tài Khoản",
-      description: "Thêm, sửa, xóa tài khoản người dùng",
-      icon: "👤",
-      color: "blue",
-      path: "/manager/accounts",
+      title: 'Quản Lý Tài Khoản',
+      description: 'Thêm, sửa, xóa tài khoản người dùng',
+      icon: '👤',
+      color: 'blue',
+      path: '/manager/accounts',
     },
     {
-      title: "Quản Lý Blog",
-      description: "Tạo và quản lý bài viết blog",
-      icon: "📝",
-      color: "green",
-      path: "/manager/blogs",
+      title: 'Quản Lý Blog',
+      description: 'Tạo và quản lý bài viết blog',
+      icon: '📝',
+      color: 'green',
+      path: '/manager/blogs',
     },
 
     {
-      title: "Danh Sách Học Sinh",
-      description: "Quản lý thông tin học sinh",
-      icon: "🎓",
-      color: "orange",
-      path: "/manager/StudentList",
+      title: 'Danh Sách Học Sinh',
+      description: 'Quản lý thông tin học sinh',
+      icon: '🎓',
+      color: 'orange',
+      path: '/manager/StudentList',
     },
   ];
 
@@ -121,12 +121,12 @@ function Dashboard() {
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, 2);
 
-      recentBlogs.forEach((blog) => {
+      recentBlogs.forEach(blog => {
         activities.push({
-          type: "blog",
+          type: 'blog',
           message: `Bài viết mới: "${blog.title}"`,
-          time: new Date(blog.createdAt).toLocaleDateString("vi-VN"),
-          icon: "📝",
+          time: new Date(blog.createdAt).toLocaleDateString('vi-VN'),
+          icon: '📝',
         });
       });
     }
@@ -135,17 +135,17 @@ function Dashboard() {
     if (students && students.length > 0) {
       const recentStudents = students
         .filter(
-          (s) => s.enrollmentDate && s.enrollmentDate !== "Chưa có thông tin"
+          s => s.enrollmentDate && s.enrollmentDate !== 'Chưa có thông tin'
         )
         .sort((a, b) => new Date(b.enrollmentDate) - new Date(a.enrollmentDate))
         .slice(0, 1);
 
-      recentStudents.forEach((student) => {
+      recentStudents.forEach(student => {
         activities.push({
-          type: "student",
+          type: 'student',
           message: `Học sinh mới: ${student.fullName} (${student.className})`,
-          time: new Date(student.enrollmentDate).toLocaleDateString("vi-VN"),
-          icon: "🎓",
+          time: new Date(student.enrollmentDate).toLocaleDateString('vi-VN'),
+          icon: '🎓',
         });
       });
     }
@@ -153,23 +153,23 @@ function Dashboard() {
     // Add mock activities for features not yet available
     activities.push(
       {
-        type: "vaccination",
-        message: "Lịch tiêm chủng mới được thêm cho lớp 6A",
-        time: "3 giờ trước",
-        icon: "💉",
+        type: 'vaccination',
+        message: 'Lịch tiêm chủng mới được thêm cho lớp 6A',
+        time: '3 giờ trước',
+        icon: '💉',
       },
       {
-        type: "system",
-        message: "Sao lưu dữ liệu hoàn tất thành công",
-        time: "6 giờ trước",
-        icon: "💾",
+        type: 'system',
+        message: 'Sao lưu dữ liệu hoàn tất thành công',
+        time: '6 giờ trước',
+        icon: '💾',
       }
     );
 
     return activities.slice(0, 4); // Return max 4 activities
   };
 
-  const handleQuickAction = (path) => {
+  const handleQuickAction = path => {
     navigate(path);
   };
 
@@ -183,16 +183,16 @@ function Dashboard() {
         </div>
         <div className="welcome-date">
           <div className="current-date">
-            {new Date().toLocaleDateString("vi-VN", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
+            {new Date().toLocaleDateString('vi-VN', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
             })}
           </div>
         </div>
       </div>
-{/* 
+      {/* 
       Statistics Cards
       <div className="stats-section">
         <h2 className="section-title">Thống Kê Tổng Quan</h2>
