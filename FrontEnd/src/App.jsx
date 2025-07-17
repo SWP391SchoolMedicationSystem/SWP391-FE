@@ -59,6 +59,7 @@ import ChatWithNurse from './pages/Parent/ChatWithNurse';
 import ManageHealthRecords from './pages/Parent/ManageHealthRecords';
 import ParentStudentHealthRecordDetail from './pages/Parent/StudentHealthRecordDetail';
 import UpdateProfile from './pages/Parent/UpdateProfile';
+import MedicineRequest from './pages/Parent/MedicineRequest';
 
 
 function App() {
@@ -175,6 +176,7 @@ function App() {
           <Route path="notifications" element={<ParentNotifications />} />
           <Route path="consultation" element={<Consultation />} />
           <Route path="chat-nurse" element={<ChatWithNurse />} />
+          <Route path="medicine-request" element={<MedicineRequest />} />
           <Route path="health-records" element={<ManageHealthRecords />} />
           <Route
             path="health-records/:studentId"

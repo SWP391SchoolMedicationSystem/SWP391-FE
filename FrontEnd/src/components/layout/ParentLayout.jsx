@@ -74,6 +74,12 @@ const navItems = [
   //   key: 'chat',
   // },
   {
+    to: '/parent/medicine-request',
+            label: 'Gửi đơn yêu cầu',
+    icon: <LocalPharmacy />,
+    key: 'medicine-request',
+  },
+  {
     to: '/parent/health-records',
     label: 'Hồ Sơ Sức Khỏe',
     icon: <FolderShared />,

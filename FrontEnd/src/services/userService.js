@@ -38,6 +38,17 @@ const userService = {
             decodedToken: decodedToken,
           };
 
+          // For Parent role, set parentId to be the same as userId
+          if (decodedToken.Role === "Parent" || decodedToken.role === "Parent") {
+            loginData.parentId = loginData.userId;
+            console.log('🔧 Parent login: Setting parentId =', loginData.parentId);
+          }
+
+          console.log('✅ Login data prepared:', {
+            ...loginData,
+            decodedToken: '[JWT Token Data]' // Don't log sensitive token
+          });
+
           // Handle Remember Me functionality
           if (rememberMe) {
             this.saveRememberedAccount(email, password, loginData);
@@ -311,11 +322,12 @@ const userService = {
   googleLogin: async (credential) => {
     try {
       const response = await apiClient.post(API_ENDPOINTS.USER.GOOGLE_LOGIN, {
-        credential,
+        credential: credential,
       });
 
-      const data = response;
+      const data = response; // apiClient already returns response.data
 
+      // If we get a token, decode it to get user info
       if (data.token || data.accessToken || data.access_token) {
         const token = data.token || data.accessToken || data.access_token;
 
@@ -339,9 +351,21 @@ const userService = {
             decodedToken: decodedToken,
           };
 
+          // For Parent role, set parentId to be the same as userId
+          if (decodedToken.Role === "Parent" || decodedToken.role === "Parent") {
+            loginData.parentId = loginData.userId;
+            console.log('🔧 Google Parent login: Setting parentId =', loginData.parentId);
+          }
+
+          console.log('✅ Google login data prepared:', {
+            ...loginData,
+            decodedToken: '[JWT Token Data]' // Don't log sensitive token
+          });
+
           return loginData;
         } catch (error) {
-          console.error("Error decoding JWT token:", error);
+          console.error("Error decoding Google JWT token:", error);
+          // Return raw response if token decode fails
           return {
             success: true,
             ...data,
@@ -349,19 +373,14 @@ const userService = {
         }
       }
 
+      // If no token but response is successful
       return {
         success: true,
         ...data,
       };
     } catch (error) {
       console.error("Google login error:", error);
-      if (error.response?.data?.message) {
-        throw new Error(error.response.data.message);
-      } else {
-        throw new Error(
-          "Không thể đăng nhập bằng Google. Vui lòng thử lại."
-        );
-      }
+      throw new Error("Google login failed. Please try again.");
     }
   },
 };
