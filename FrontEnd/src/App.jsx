@@ -47,6 +47,7 @@ import ChatWithParents from './pages/Nurse/ChatWithParents';
 import NurseStudentHealthRecordDetail from './pages/Nurse/StudentHealthRecordDetail';
 import NurseNotifications from './pages/Nurse/Notifications';
 import NursePersonalMedicine from './pages/Nurse/PersonalMedicine';
+import ReviewRequests from './pages/Nurse/ReviewRequests';
 
 // Parent pages
 import ParentDashboard from './pages/Parent/Dashboard';
@@ -154,6 +155,7 @@ function App() {
             element={<NurseStudentHealthRecordDetail />}
           />
           <Route path="notifications" element={<NurseNotifications />} />
+          <Route path="review-requests" element={<ReviewRequests />} />
         </Route>
 
         {/* Parent routes */}
