@@ -40,6 +40,8 @@ export const useNurseNotifications = () => {
       const data = await nurseNotificationService.getNotifications();
       const finalData = Array.isArray(data) ? data : [];
       setNotifications(finalData);
+
+      console.log('fetch noti', finalData);
     } catch (err) {
       console.error('Failed to fetch nurse notifications:', err);
       setError('Failed to load notifications');

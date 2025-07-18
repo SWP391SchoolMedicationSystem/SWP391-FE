@@ -9,7 +9,7 @@ import {
 const featureCards = [
   {
     icon: <PersonOutline sx={{ fontSize: 32, color: 'white' }} />,
-    title: '200+ Doctors',
+    title: '200+ Students',
     description: 'Medical Experts',
   },
   {

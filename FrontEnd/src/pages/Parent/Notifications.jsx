@@ -9,10 +9,18 @@ import PersonIcon from '@mui/icons-material/Person';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import DescriptionIcon from '@mui/icons-material/Description';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import WifiIcon from '@mui/icons-material/Wifi';
+import WifiOffIcon from '@mui/icons-material/WifiOff';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+
+import * as signalR from '@microsoft/signalr'; // Import SignalR client
 
 const ParentNotifications = () => {
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [signalRConnection, setSignalRConnection] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('Disconnected');
+  const [realTimeNotifications, setRealTimeNotifications] = useState([]);
 
   const {
     data: notifications,
@@ -21,6 +29,151 @@ const ParentNotifications = () => {
     refetch,
     fetchNotifications,
   } = useParentNotifications();
+
+  // SignalR Connection Setup
+  useEffect(() => {
+    if (!signalRConnection) {
+      const newConnection = new signalR.HubConnectionBuilder()
+        .withUrl(
+          'https://api-schoolhealth.purintech.id.vn/hubs/notifications',
+          {
+            skipNegotiation: true,
+            transport: signalR.HttpTransportType.WebSockets,
+            accessTokenFactory: () => {
+              // Lấy JWT token từ localStorage
+              const token = localStorage.getItem('token');
+              console.log(
+                '🔑 Sending JWT token to SignalR:',
+                token ? 'Token found' : 'No token'
+              );
+              return token;
+            },
+          }
+        )
+        .withAutomaticReconnect()
+        .build();
+
+      setSignalRConnection(newConnection);
+    }
+
+    // Cleanup function for connection
+    return () => {
+      if (
+        signalRConnection &&
+        signalRConnection.state === signalR.HubConnectionState.Connected
+      ) {
+        signalRConnection.stop();
+      }
+    };
+  }, [signalRConnection]);
+
+  // SignalR Event Handlers
+  useEffect(() => {
+    if (signalRConnection) {
+      signalRConnection
+        .start()
+        .then(() => {
+          console.log('🔗 SignalR connected for Parent notifications');
+          setConnectionStatus('Connected');
+
+          // Listen for new notifications
+          signalRConnection.on('ReceiveNotification', notification => {
+            console.log('📢 New real-time notification:', notification);
+
+            // Add to real-time notifications
+            const newNotification = {
+              id: Date.now(),
+              title:
+                notification.Title || notification.title || 'Thông báo mới',
+              message: notification.Message || notification.message || '',
+              type: notification.Type || 'general',
+              targetType: 'parent',
+              createdAt: new Date().toISOString(),
+              createdBy: 'Hệ thống',
+              isNew: true,
+            };
+
+            setRealTimeNotifications(prev => [newNotification, ...prev]);
+
+            // Show browser notification if supported
+            if (Notification.permission === 'granted') {
+              new Notification(newNotification.title, {
+                body: newNotification.message,
+                icon: '/favicon.ico',
+                tag: 'parent-notification',
+              });
+            }
+
+            // Refresh notifications after receiving new one
+            setTimeout(() => {
+              fetchNotifications();
+            }, 1000);
+          });
+
+          // Listen for parent-specific notifications
+          signalRConnection.on('ReceiveParentNotification', notification => {
+            console.log('👨‍👩‍👧‍👦 Parent notification:', notification);
+
+            const newNotification = {
+              id: Date.now(),
+              title:
+                notification.Title ||
+                notification.title ||
+                'Thông báo phụ huynh',
+              message: notification.Message || notification.message || '',
+              type: notification.Type || 'general',
+              targetType: 'parent',
+              createdAt: new Date().toISOString(),
+              createdBy: 'Hệ thống',
+              isNew: true,
+            };
+
+            setRealTimeNotifications(prev => [newNotification, ...prev]);
+
+            // Show browser notification
+            if (Notification.permission === 'granted') {
+              new Notification(newNotification.title, {
+                body: newNotification.message,
+                icon: '/favicon.ico',
+                tag: 'parent-notification',
+              });
+            }
+
+            // Refresh notifications
+            setTimeout(() => {
+              fetchNotifications();
+            }, 1000);
+          });
+
+          // Listen for errors
+          signalRConnection.on('ReceiveError', errorMsg => {
+            console.error('❌ SignalR Error:', errorMsg);
+            setConnectionStatus('Error');
+          });
+
+          // Request notification permission
+          if (
+            'Notification' in window &&
+            Notification.permission === 'default'
+          ) {
+            Notification.requestPermission();
+          }
+        })
+        .catch(e => {
+          console.error('❌ SignalR connection failed:', e);
+          setConnectionStatus('Failed');
+        });
+
+      // Cleanup event listeners
+      return () => {
+        if (signalRConnection) {
+          signalRConnection.off('ReceiveNotification');
+          signalRConnection.off('ReceiveParentNotification');
+          signalRConnection.off('ReceiveError');
+        }
+      };
+    }
+  }, [signalRConnection, fetchNotifications]);
 
   // Gọi API khi component mount
   useEffect(() => {
@@ -71,6 +224,14 @@ const ParentNotifications = () => {
   };
 
   const processedNotifications = processNotificationData(notifications);
+
+  // Combine API notifications with real-time notifications
+  const allNotifications = [...realTimeNotifications, ...processedNotifications]
+    .filter(
+      (notification, index, self) =>
+        index === self.findIndex(n => n.id === notification.id)
+    )
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   // Thống kê (removed unused stats variable)
 
@@ -135,6 +296,19 @@ const ParentNotifications = () => {
           <h1>📢 Thông Báo</h1>
           <p>Xem thông báo từ nhà trường</p>
         </div>
+        <div className="connection-status">
+          {connectionStatus === 'Connected' ? (
+            <div className="connection-indicator connected">
+              <WifiIcon sx={{ fontSize: '1.2rem', color: '#4CAF50' }} />
+              <span>Kết nối trực tiếp</span>
+            </div>
+          ) : (
+            <div className="connection-indicator disconnected">
+              <WifiOffIcon sx={{ fontSize: '1.2rem', color: '#f44336' }} />
+              <span>Mất kết nối</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Danh sách thông báo */}
@@ -143,7 +317,7 @@ const ParentNotifications = () => {
           <h2>Thông Báo Gần Đây</h2>
         </div>
 
-        {processedNotifications.length === 0 ? (
+        {allNotifications.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">📭</div>
             <h3>Chưa có thông báo nào</h3>
@@ -163,13 +337,26 @@ const ParentNotifications = () => {
                 </tr>
               </thead>
               <tbody>
-                {processedNotifications.map((notification, index) => (
+                {allNotifications.map((notification, index) => (
                   <tr
                     key={notification.id || index}
-                    className="notification-row"
+                    className={`notification-row ${
+                      notification.isNew ? 'new-notification' : ''
+                    }`}
                   >
                     <td className="title-cell">
-                      <div className="title-content">{notification.title}</div>
+                      <div className="title-content">
+                        {notification.isNew && (
+                          <NotificationsActiveIcon
+                            sx={{
+                              fontSize: '1rem',
+                              color: '#4CAF50',
+                              marginRight: '5px',
+                            }}
+                          />
+                        )}
+                        {notification.title}
+                      </div>
                     </td>
                     <td className="type-cell">
                       {getTypeBadge(notification.type)}
