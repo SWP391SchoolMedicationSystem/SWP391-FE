@@ -268,9 +268,9 @@ const Notifications = () => {
             }
 
             // Refresh notifications after receiving new one
-            setTimeout(() => {
-              fetchNotifications();
-            }, 1000);
+            // setTimeout(() => {
+            //   fetchNotifications();
+            // }, 1000);
           });
 
           // Listen for staff-specific notifications
