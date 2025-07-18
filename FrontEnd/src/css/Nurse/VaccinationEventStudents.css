@@ -3,7 +3,7 @@
   padding: 20px;
   min-height: 100vh;
   background-color: #f2f6f3; /* $bg-main */
-  font-family: "Satoshi", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Satoshi', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Page Header */
@@ -124,14 +124,14 @@
   font-size: 2rem;
   font-weight: 700;
   color: #2f5148; /* $text-primary */
-  font-family: "Satoshi", sans-serif;
+  font-family: 'Satoshi', sans-serif;
 }
 
 .stat-content p {
   margin: 5px 0 0 0;
   font-weight: 500;
   color: #97a19b; /* $text-secondary */
-  font-family: "Satoshi", sans-serif;
+  font-family: 'Satoshi', sans-serif;
 }
 
 /* Filters Section */
@@ -221,6 +221,46 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.status-badge.status-confirmed {
+  background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.status-badge.status-declined {
+  background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+}
+
+.status-badge.status-pending {
+  background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+.status-badge.status-confirmed:hover {
+  background: linear-gradient(135deg, #388e3c 0%, #4caf50 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.status-badge.status-declined:hover {
+  background: linear-gradient(135deg, #d32f2f 0%, #f44336 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+}
+
+.status-badge.status-pending:hover {
+  background: linear-gradient(135deg, #f57c00 0%, #ff9800 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
 }
 
 /* Action Buttons */

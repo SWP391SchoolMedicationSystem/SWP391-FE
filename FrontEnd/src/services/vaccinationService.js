@@ -51,6 +51,40 @@ export const vaccinationEventService = {
     }
   },
 
+  // Create new vaccination event with file upload (Manager only)
+  createEventWithFile: async formData => {
+    try {
+      console.log('🌐 Creating vaccination event with file...');
+      
+      // Get token for authorization
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(
+        `${apiClient.defaults.baseURL}${API_ENDPOINTS.VACCINATION_EVENT.CREATE}`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            // Don't set Content-Type for FormData - browser will set it with boundary
+          },
+          body: formData
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ Vaccination event with file created:', result);
+
+      return vaccinationEventService.mapEventData(result);
+    } catch (error) {
+      console.error('❌ Error creating vaccination event with file:', error);
+      throw error;
+    }
+  },
+
   // Update vaccination event (Manager only)
   updateEvent: async eventData => {
     try {

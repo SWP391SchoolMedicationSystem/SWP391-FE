@@ -3,6 +3,18 @@ import { useParams, useNavigate } from 'react-router-dom';
 import '../../css/Manager/VaccinationEventStudents.css';
 import { vaccinationEventService } from '../../services/vaccinationService';
 
+// Material-UI Icons
+import InfoIcon from '@mui/icons-material/Info';
+import CloseIcon from '@mui/icons-material/Close';
+import PersonIcon from '@mui/icons-material/Person';
+import SchoolIcon from '@mui/icons-material/School';
+import EmailIcon from '@mui/icons-material/Email';
+import DateRangeIcon from '@mui/icons-material/DateRange';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import WarningIcon from '@mui/icons-material/Warning';
+import DescriptionIcon from '@mui/icons-material/Description';
+
 function VaccinationEventStudents() {
   const { eventId } = useParams();
   const navigate = useNavigate();
@@ -418,96 +430,440 @@ function VaccinationEventStudents() {
       {/* Student Detail Modal */}
       {showDetailModal && selectedStudent && (
         <div
-          className="modal-overlay"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px',
+          }}
           onClick={() => setShowDetailModal(false)}
         >
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>👁️ Chi Tiết Phản Hồi</h3>
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '20px',
+              width: '100%',
+              maxWidth: '700px',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              border: '1px solid #c1cbc2',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(20px)',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '25px',
+                borderBottom: '1px solid #e9ecef',
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  color: '#2f5148',
+                  fontFamily: 'Satoshi, sans-serif',
+                  fontSize: '1.5rem',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+              >
+                <InfoIcon sx={{ color: '#97a19b', fontSize: '1.5rem' }} />
+                Chi Tiết Phản Hồi
+              </h3>
               <button
-                className="modal-close"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#97a19b',
+                  cursor: 'pointer',
+                  fontSize: '1.5rem',
+                  padding: '5px',
+                  borderRadius: '50%',
+                  transition: 'all 0.3s ease',
+                }}
                 onClick={() => setShowDetailModal(false)}
               >
-                ×
+                <CloseIcon sx={{ fontSize: '1.5rem' }} />
               </button>
             </div>
 
-            <div className="modal-body">
-              <div className="student-detail">
-                <div className="detail-row">
-                  <span className="label">👤 Tên học sinh:</span>
-                  <span className="value">{selectedStudent.studentName}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="label">🏫 Lớp học:</span>
-                  <span className="value">{selectedStudent.className}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="label">👨‍👩‍👧‍👦 Phụ huynh:</span>
-                  <span className="value">{selectedStudent.parentName}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="label">📧 Email:</span>
-                  <span className="value">{selectedStudent.parentEmail}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="label">📊 Trạng thái:</span>
-                  <span
-                    className={`value status-badge ${getStatusBadge(
-                      selectedStudent
-                    )}`}
+            {/* Modal Body */}
+            <div style={{ padding: '25px' }}>
+              {/* Basic Information */}
+              <div
+                style={{
+                  marginBottom: '20px',
+                  background: '#f8f9fa',
+                  padding: '15px',
+                  borderRadius: '12px',
+                  border: '1px solid #e9ecef',
+                }}
+              >
+                <h4
+                  style={{
+                    margin: '0 0 15px 0',
+                    color: '#2f5148',
+                    fontFamily: 'Satoshi, sans-serif',
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <PersonIcon sx={{ color: '#97a19b', fontSize: '1.2rem' }} />
+                  Thông tin học sinh
+                </h4>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                    gap: '15px',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      padding: '12px 15px',
+                      background: 'white',
+                      borderRadius: '10px',
+                      border: '1px solid #e9ecef',
+                    }}
                   >
-                    {getStatusText(selectedStudent)}
-                  </span>
-                </div>
-                <div className="detail-row">
-                  <span className="label">📅 Ngày phản hồi:</span>
-                  <span className="value">
-                    {selectedStudent.responseDate || 'Chưa có'}
-                  </span>
-                </div>
+                    <span
+                      style={{
+                        color: '#97a19b',
+                        fontFamily: 'Satoshi, sans-serif',
+                        fontSize: '0.9rem',
+                        fontWeight: 500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                      }}
+                    >
+                      <PersonIcon sx={{ color: '#97a19b', fontSize: '1rem' }} />
+                      Tên học sinh:
+                    </span>
+                    <span
+                      style={{
+                        color: '#2f5148',
+                        fontFamily: 'Satoshi, sans-serif',
+                        fontSize: '0.9rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {selectedStudent.studentName}
+                    </span>
+                  </div>
 
-                <div className="detail-row">
-                  <span className="label">✅ Đồng ý của phụ huynh:</span>
-                  <span
-                    className={`value status-badge ${
-                      selectedStudent.parentConsent
-                        ? 'status-confirmed'
-                        : 'status-declined'
-                    }`}
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      padding: '12px 15px',
+                      background: 'white',
+                      borderRadius: '10px',
+                      border: '1px solid #e9ecef',
+                    }}
                   >
-                    {selectedStudent.parentConsent
-                      ? 'Đã đồng ý'
-                      : 'Chưa đồng ý'}
-                  </span>
+                    <span
+                      style={{
+                        color: '#97a19b',
+                        fontFamily: 'Satoshi, sans-serif',
+                        fontSize: '0.9rem',
+                        fontWeight: 500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                      }}
+                    >
+                      <SchoolIcon sx={{ color: '#97a19b', fontSize: '1rem' }} />
+                      Lớp học:
+                    </span>
+                    <span
+                      style={{
+                        color: '#2f5148',
+                        fontFamily: 'Satoshi, sans-serif',
+                        fontSize: '0.9rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {selectedStudent.className}
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      padding: '12px 15px',
+                      background: 'white',
+                      borderRadius: '10px',
+                      border: '1px solid #e9ecef',
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: '#97a19b',
+                        fontFamily: 'Satoshi, sans-serif',
+                        fontSize: '0.9rem',
+                        fontWeight: 500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                      }}
+                    >
+                      <PersonIcon sx={{ color: '#97a19b', fontSize: '1rem' }} />
+                      Phụ huynh:
+                    </span>
+                    <span
+                      style={{
+                        color: '#2f5148',
+                        fontFamily: 'Satoshi, sans-serif',
+                        fontSize: '0.9rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {selectedStudent.parentName}
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      padding: '12px 15px',
+                      background: 'white',
+                      borderRadius: '10px',
+                      border: '1px solid #e9ecef',
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: '#97a19b',
+                        fontFamily: 'Satoshi, sans-serif',
+                        fontSize: '0.9rem',
+                        fontWeight: 500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                      }}
+                    >
+                      <EmailIcon sx={{ color: '#97a19b', fontSize: '1rem' }} />
+                      Email:
+                    </span>
+                    <span
+                      style={{
+                        color: '#2f5148',
+                        fontFamily: 'Satoshi, sans-serif',
+                        fontSize: '0.9rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {selectedStudent.parentEmail}
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      padding: '12px 15px',
+                      background: 'white',
+                      borderRadius: '10px',
+                      border: '1px solid #e9ecef',
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: '#97a19b',
+                        fontFamily: 'Satoshi, sans-serif',
+                        fontSize: '0.9rem',
+                        fontWeight: 500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                      }}
+                    >
+                      <DateRangeIcon
+                        sx={{ color: '#97a19b', fontSize: '1rem' }}
+                      />
+                      Ngày phản hồi:
+                    </span>
+                    <span
+                      style={{
+                        color: '#2f5148',
+                        fontFamily: 'Satoshi, sans-serif',
+                        fontSize: '0.9rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {selectedStudent.responseDate || 'Chưa có'}
+                    </span>
+                  </div>
                 </div>
-
-                {selectedStudent.willAttend === false &&
-                  selectedStudent.reasonForDecline && (
-                    <div className="detail-row decline-reason">
-                      <span className="label">❌ Lý do từ chối:</span>
-                      <div className="reason-content">
-                        {selectedStudent.reasonForDecline}
-                      </div>
-                    </div>
-                  )}
-
-                {selectedStudent.willAttend === false &&
-                  !selectedStudent.reasonForDecline && (
-                    <div className="detail-row decline-reason">
-                      <span className="label">❌ Lý do từ chối:</span>
-                      <div className="reason-content">
-                        Phụ huynh chưa cung cấp lý do cụ thể
-                      </div>
-                    </div>
-                  )}
               </div>
+
+              {/* Response Status */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '15px',
+                  background:
+                    selectedStudent.willAttend === true
+                      ? '#e8f5e8'
+                      : selectedStudent.willAttend === false
+                      ? '#ffebee'
+                      : '#f8f9fa',
+                  borderRadius: '12px',
+                  border: '1px solid #e9ecef',
+                  marginBottom: '20px',
+                }}
+              >
+                <div
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
+                  {selectedStudent.willAttend === true ? (
+                    <CheckCircleIcon
+                      sx={{ color: '#2e7d32', fontSize: '1.2rem' }}
+                    />
+                  ) : selectedStudent.willAttend === false ? (
+                    <CancelIcon sx={{ color: '#c62828', fontSize: '1.2rem' }} />
+                  ) : (
+                    <WarningIcon
+                      sx={{ color: '#ed6c02', fontSize: '1.2rem' }}
+                    />
+                  )}
+                  <span
+                    style={{
+                      color: '#97a19b',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                    }}
+                  >
+                    Trạng thái phản hồi:
+                  </span>
+                </div>
+                <span
+                  style={{
+                    color:
+                      selectedStudent.willAttend === true
+                        ? '#2e7d32'
+                        : selectedStudent.willAttend === false
+                        ? '#c62828'
+                        : '#ed6c02',
+                    fontFamily: 'Satoshi, sans-serif',
+                    fontSize: '1rem',
+                    fontWeight: 600,
+                    padding: '4px 12px',
+                    borderRadius: '16px',
+                    backgroundColor:
+                      selectedStudent.willAttend === true
+                        ? '#c8e6c9'
+                        : selectedStudent.willAttend === false
+                        ? '#ffcdd2'
+                        : '#fff3cd',
+                  }}
+                >
+                  {getStatusText(selectedStudent)}
+                </span>
+              </div>
+
+              {/* Decline Reason */}
+              {selectedStudent.willAttend === false && (
+                <div
+                  style={{
+                    marginBottom: '20px',
+                    background: '#f8f9fa',
+                    padding: '15px',
+                    borderRadius: '12px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <h4
+                    style={{
+                      margin: '0 0 15px 0',
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <DescriptionIcon
+                      sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                    />
+                    Lý do từ chối
+                  </h4>
+                  <div
+                    style={{
+                      background: 'rgba(195, 85, 92, 0.1)',
+                      padding: '15px',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(195, 85, 92, 0.3)',
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: 0,
+                        color: '#c3555c',
+                        fontSize: '0.9rem',
+                        fontFamily: 'Satoshi, sans-serif',
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {selectedStudent.reasonForDecline ||
+                        'Phụ huynh chưa cung cấp lý do cụ thể'}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="modal-footer">
+            {/* Modal Footer */}
+            <div
+              style={{
+                padding: '20px 25px',
+                borderTop: '1px solid #e9ecef',
+                display: 'flex',
+                justifyContent: 'flex-end',
+              }}
+            >
               <button
+                style={{
+                  background: '#bfefa1',
+                  color: '#1a3a2e',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  fontFamily: 'Satoshi, sans-serif',
+                  transition: 'all 0.3s ease',
+                }}
                 onClick={() => setShowDetailModal(false)}
-                className="close-btn"
               >
                 Đóng
               </button>
