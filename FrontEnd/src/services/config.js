@@ -152,6 +152,17 @@ export const API_ENDPOINTS = {
     SEARCH_BY_NAME: '/Medicine/SearchMedicinesByName', // GET search medicines by name
   },
 
+  // Form (Parent requests - Nurse review)
+  FORM: {
+    GET_ALL: '/Form', // GET all form requests from parents
+    GET_BY_ID: '/Form/{id}', // GET specific form request by ID
+    UPDATE: '/Form', // PUT update form (approve/decline)
+    DELETE: '/Form/{id}', // DELETE form by ID
+    GET_BY_PARENT: '/Form/parent/{parentId}', // GET forms by parent ID
+    GET_BY_CATEGORY: '/Form/category/{categoryId}', // GET forms by category ID
+    GET_BY_STATUS: '/Form/status/{status}', // GET forms by status
+  },
+
   // Vaccination Event (Core feature - All endpoints)
   VACCINATION_EVENT: {
     GET_ALL: '/VaccinationEvent', // Get all vaccination events
@@ -181,6 +192,12 @@ export const buildApiUrl = (endpoint, id = null) => {
   }
   if (id && endpoint.includes('{studentId}')) {
     return endpoint.replace('{studentId}', id);
+  }
+  if (id && endpoint.includes('{categoryId}')) {
+    return endpoint.replace('{categoryId}', id);
+  }
+  if (id && endpoint.includes('{status}')) {
+    return endpoint.replace('{status}', id);
   }
   return id ? `${endpoint}/${id}` : endpoint;
 };

@@ -7,6 +7,7 @@ import {
   nurseNotificationService,
   nurseMedicationService,
   nurseChatService,
+  nurseFormService,
 } from '../../services/nurseService';
 
 // Hook for nurse health records
@@ -85,6 +86,11 @@ export const useNurseChat = () => {
   return useApi(nurseChatService.getChatMessages);
 };
 
+// Hook for nurse forms (parent requests)
+export const useNurseForms = () => {
+  return useApi(nurseFormService.getAllForms);
+};
+
 // Hook for nurse actions
 export const useNurseActions = () => {
   const { execute, loading, error } = useApiCall();
@@ -151,6 +157,30 @@ export const useNurseActions = () => {
     return execute(() => nurseChatService.sendMessage(messageData));
   };
 
+  const approveForm = async (formId, staffId) => {
+    return execute(() => nurseFormService.approveForm(formId, staffId));
+  };
+
+  const declineForm = async (formId, reason, staffId) => {
+    return execute(() => nurseFormService.declineForm(formId, reason, staffId));
+  };
+
+  const getFormById = async formId => {
+    return execute(() => nurseFormService.getFormById(formId));
+  };
+
+  const getFormsByParent = async parentId => {
+    return execute(() => nurseFormService.getFormsByParent(parentId));
+  };
+
+  const getFormsByCategory = async categoryId => {
+    return execute(() => nurseFormService.getFormsByCategory(categoryId));
+  };
+
+  const deleteForm = async formId => {
+    return execute(() => nurseFormService.deleteForm(formId));
+  };
+
   return {
     createHealthRecord,
     updateHealthRecord,
@@ -166,6 +196,12 @@ export const useNurseActions = () => {
     deleteMedication,
 
     sendChatMessage,
+    approveForm,
+    declineForm,
+    getFormById,
+    getFormsByParent,
+    getFormsByCategory,
+    deleteForm,
     loading,
     error,
   };
@@ -179,5 +215,6 @@ export default {
   useMedications,
 
   useNurseChat,
+  useNurseForms,
   useNurseActions,
 };
