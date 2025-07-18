@@ -92,14 +92,11 @@ const PersonalMedicine = () => {
       const studentsArray = Array.isArray(res) ? res : (Array.isArray(res.data) ? res.data : []);
       
       const mappedStudents = studentsArray.map(stu => ({
-        id: stu.studentId || stu.studentid || stu.id,
-        name: stu.fullname || stu.fullName || stu.name || 'Không có tên',
-        class: stu.classname || stu.classId || stu.className || '---',
-        parentName: stu.parentName || stu.parent?.fullname || stu.parent?.fullName || 'Chưa có thông tin',
-        parentId: stu.parentId || stu.parentid || stu.parent?.parentid || stu.parent?.parentId || stu.parent?.id,
-        // Debug info
-        _raw_parentId: stu.parentId,
-        _raw_student: stu
+        id: stu.studentId,
+        name: stu.fullname,
+        class: stu.classname,
+        parentName: stu.parent?.fullname,
+        parentId: stu.parentid || stu.parent?.parentid,
       }));
       
       // Remove duplicates based on student ID
@@ -234,11 +231,11 @@ const PersonalMedicine = () => {
       
       console.log('✅ Active personal medicines after filtering:', activeMedicines.length);
       console.log('🔍 Personal medicines structure:', activeMedicines.slice(0, 2).map(m => ({
-        id: m.id || m.personalmedicineid,
-        medicineId: m.medicineid || m.medicineId,
-        parentId: m.parentid || m.parentId,
-        studentId: m.studentid || m.studentId,
-        isDeleted: m.isDeleted || m.isdeleted,
+        id: m.personalmedicineid,
+        medicineId: m.medicineid,
+        parentId: m.parentid,
+        studentId: m.studentid,
+        isDeleted: m.isDeleted,
         status: m.status
       })));
       
@@ -312,16 +309,10 @@ const PersonalMedicine = () => {
       let medicineName = 'Thuốc không xác định';
       
       if (medicineDetail) {
-        medicineName = medicineDetail.medicinename || 
-                      medicineDetail.medicineName || 
-                      medicineDetail.name ||
-                      `Thuốc ID: ${medicineId}`;
+        medicineName = medicineDetail.medicineName || `Thuốc ID: ${medicineId}`;
       } else {
         // If not found in medicines list, check if medicine info is directly in personal medicine record
-        medicineName = medicine.medicinename || 
-                      medicine.medicineName || 
-                      medicine.name ||
-                      `Thuốc ID: ${medicineId}`;
+        medicineName = medicine.medicineName || `Thuốc ID: ${medicineId}`;
       }
       
             console.log(`✅ Final medicine name: ${medicineName}`);
@@ -418,7 +409,7 @@ const PersonalMedicine = () => {
     console.log('🔧 Editing medicine:', medicine);
     
     const parentInfo = parents.find(p => String(p.id) === String(parentId));
-    const studentInfo = students.find(s => String(s.id) === String(medicine.studentid || medicine.studentId));
+    const studentInfo = students.find(s => String(s.id) === String(medicine.studentid));
     
     // Safe date handling
     const formatDateForInput = (dateValue) => {
@@ -459,9 +450,7 @@ const PersonalMedicine = () => {
     
     try {
       // Get the correct ID for the personal medicine record
-      const personalMedicineId = editingMedicine.id || 
-                                editingMedicine.personalmedicineid || 
-                                editingMedicine.personalMedicineId;
+      const personalMedicineId = editingMedicine.personalmedicineid;
       
       console.log('🔧 Updating medicine with ID:', personalMedicineId);
       console.log('🔧 Update data:', updatedData);
@@ -475,9 +464,9 @@ const PersonalMedicine = () => {
       
       const updateData = {
         personalMedicineId: personalMedicineId,
-        medicineid: parseInt(editingMedicine.medicineid || editingMedicine.medicineId),
-        parentid: parseInt(editingMedicine.parentid || editingMedicine.parentId),
-        studentid: parseInt(editingMedicine.studentid || editingMedicine.studentId),
+        medicineid: parseInt(editingMedicine.medicineid),
+        parentid: parseInt(editingMedicine.parentid),
+        studentid: parseInt(editingMedicine.studentid),
         quantity: parseInt(updatedData.quantity),
         createdby: getCurrentNurseName(),
         receiveddate: new Date(updatedData.receivedDate).toISOString(),
@@ -547,9 +536,7 @@ const PersonalMedicine = () => {
   const confirmDeleteMedicine = async () => {
     setSubmitting(true);
     try {
-      const personalMedicineId = medicineToDelete.id || 
-                                medicineToDelete.personalmedicineid || 
-                                medicineToDelete.personalMedicineId;
+      const personalMedicineId = medicineToDelete.personalmedicineid;
       
       console.log('🗑️ Deleting medicine with ID:', personalMedicineId);
       console.log('🗑️ Medicine to delete:', medicineToDelete);
@@ -858,7 +845,7 @@ const PersonalMedicine = () => {
                   <div className="medicines-list">
                     {group.medicines.map((medicine, medIndex) => (
                       <div 
-                        key={`medicine_${group.parentId}_${medicine.id || medicine.personalmedicineid || medicine.personalMedicineId || medIndex}_${medicine.medicineid || medicine.medicineId}_${medIndex}`} 
+                        key={`medicine_${group.parentId}_${medicine.personalmedicineid || medIndex}_${medicine.medicineid}_${medIndex}`} 
                         className="medicine-item"
                       >
                                                  <div className="medicine-info">
