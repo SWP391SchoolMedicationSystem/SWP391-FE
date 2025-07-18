@@ -75,7 +75,7 @@ const navItems = [
   // },
   {
     to: '/parent/medicine-request',
-            label: 'Gửi đơn yêu cầu',
+    label: 'Gửi đơn yêu cầu',
     icon: <LocalPharmacy />,
     key: 'medicine-request',
   },
@@ -85,7 +85,6 @@ const navItems = [
     icon: <FolderShared />,
     key: 'records',
   },
-
 ];
 
 export default function ParentLayout() {
@@ -173,11 +172,6 @@ export default function ParentLayout() {
     const displayName = getUserDisplayName();
     return displayName.charAt(0).toUpperCase();
   };
-
-  const handleUpdateProfile = useCallback(() => {
-    setShowProfile(false);
-    navigate('/parent/update-profile');
-  }, [navigate]);
 
   // Theme colors
   const theme = {
@@ -702,9 +696,9 @@ export default function ParentLayout() {
             borderRadius: 3,
             width: '100%',
             maxWidth: 450,
-            background: currentTheme.cardBg,
+            background: 'rgba(240, 253, 244, 0.95)',
             backdropFilter: 'blur(20px)',
-            border: `1px solid ${currentTheme.border}`,
+            border: '1px solid rgba(47, 81, 72, 0.2)',
           },
         }}
       >
@@ -712,13 +706,13 @@ export default function ParentLayout() {
           sx={{
             textAlign: 'center',
             pb: 1,
-            background: currentTheme.logoGradient,
+            background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
             color: 'white',
             fontWeight: 'bold',
             fontSize: '1.3rem',
           }}
         >
-          👨‍👩‍👧‍👦 Thông Tin Phụ Huynh
+           Thông Tin Phụ Huynh
         </DialogTitle>
         <DialogContent sx={{ p: 0 }}>
           {userInfo ? (
@@ -730,10 +724,11 @@ export default function ParentLayout() {
                     width: 80,
                     height: 80,
                     margin: '0 auto',
-                    background: currentTheme.logoGradient,
+                    background:
+                      'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
                     fontSize: '2rem',
                     fontWeight: 'bold',
-                    boxShadow: '0 4px 20px rgba(34, 197, 94, 0.3)',
+                    boxShadow: '0 4px 20px rgba(47, 81, 72, 0.4)',
                     color: 'white',
                   }}
                 >
@@ -760,17 +755,17 @@ export default function ParentLayout() {
                 </Typography>
               </Box>
 
-              {/* Info Cards */}
+              {/* Info Cards - Only Email and Phone */}
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Box
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
                     p: 2,
-                    background: currentTheme.iconButton,
+                    background: 'rgba(47, 81, 72, 0.05)',
                     borderRadius: 2,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                    border: `1px solid ${currentTheme.border}`,
+                    boxShadow: '0 2px 8px rgba(47, 81, 72, 0.1)',
+                    border: '1px solid rgba(47, 81, 72, 0.2)',
                   }}
                 >
                   <Box
@@ -778,55 +773,7 @@ export default function ParentLayout() {
                       width: 40,
                       height: 40,
                       borderRadius: '50%',
-                      background: currentTheme.cardBgInactive,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mr: 2,
-                    }}
-                  >
-                    🆔
-                  </Box>
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: currentTheme.textSecondary,
-                        fontSize: '0.75rem',
-                        fontWeight: 500,
-                      }}
-                    >
-                      User ID
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        color: currentTheme.textPrimary,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {userInfo.userId || 'N/A'}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    p: 2,
-                    background: currentTheme.iconButton,
-                    borderRadius: 2,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                    border: `1px solid ${currentTheme.border}`,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: '50%',
-                      background: currentTheme.cardBgInactive,
+                      background: 'rgba(47, 81, 72, 0.1)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -863,10 +810,10 @@ export default function ParentLayout() {
                     display: 'flex',
                     alignItems: 'center',
                     p: 2,
-                    background: currentTheme.iconButton,
+                    background: 'rgba(47, 81, 72, 0.05)',
                     borderRadius: 2,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                    border: `1px solid ${currentTheme.border}`,
+                    boxShadow: '0 2px 8px rgba(47, 81, 72, 0.1)',
+                    border: '1px solid rgba(47, 81, 72, 0.2)',
                   }}
                 >
                   <Box
@@ -874,14 +821,14 @@ export default function ParentLayout() {
                       width: 40,
                       height: 40,
                       borderRadius: '50%',
-                      background: currentTheme.cardBgInactive,
+                      background: 'rgba(47, 81, 72, 0.1)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       mr: 2,
                     }}
                   >
-                    👤
+                    📱
                   </Box>
                   <Box>
                     <Typography
@@ -892,7 +839,7 @@ export default function ParentLayout() {
                         fontWeight: 500,
                       }}
                     >
-                      Username
+                      Số điện thoại
                     </Typography>
                     <Typography
                       variant="body1"
@@ -901,7 +848,7 @@ export default function ParentLayout() {
                         fontWeight: 600,
                       }}
                     >
-                      {userInfo.userName || 'N/A'}
+                      {userInfo.phone || 'Chưa cập nhật'}
                     </Typography>
                   </Box>
                 </Box>
@@ -915,37 +862,20 @@ export default function ParentLayout() {
             </Box>
           )}
         </DialogContent>
-        <DialogActions sx={{ p: 2, justifyContent: 'center', gap: 2 }}>
-          <Button
-            onClick={handleUpdateProfile}
-            sx={{
-              background: currentTheme.iconButton,
-              color: currentTheme.textPrimary,
-              borderRadius: 2,
-              px: 3,
-              fontWeight: 600,
-              border: `1px solid ${currentTheme.border}`,
-              '&:hover': {
-                background: currentTheme.iconButtonHover,
-                transform: 'translateY(-1px)',
-                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-              },
-            }}
-          >
-            Cập Nhật
-          </Button>
+        <DialogActions sx={{ p: 2, justifyContent: 'center' }}>
           <Button
             onClick={() => setShowProfile(false)}
             sx={{
-              background: currentTheme.logoGradient,
+              background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
               color: 'white',
               borderRadius: 2,
-              px: 3,
+              px: 4,
+              py: 1,
               fontWeight: 600,
               '&:hover': {
-                background: currentTheme.logoGradient,
+                background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
                 transform: 'translateY(-1px)',
-                boxShadow: '0 4px 15px rgba(34, 197, 94, 0.3)',
+                boxShadow: '0 4px 15px rgba(47, 81, 72, 0.4)',
               },
             }}
           >

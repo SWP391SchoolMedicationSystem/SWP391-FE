@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { useApi, useApiCall } from './useApi';
 import { useState, useCallback } from 'react';
 import {
