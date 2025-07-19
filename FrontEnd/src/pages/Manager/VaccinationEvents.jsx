@@ -20,17 +20,15 @@ function VaccinationEvents() {
   // Email modal states
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailFormData, setEmailFormData] = useState({
-    emailTemplateId: 5,
+    emailTemplateId: 3,
     customMessage: '',
   });
 
-  // Email template options (you can expand this list as needed)
+  // Email template options
   const emailTemplateOptions = [
-    { id: 1, name: 'Template Thông Báo Cơ Bản' },
-    { id: 2, name: 'Template Nhắc Nhở' },
-    { id: 3, name: 'Template Khẩn Cấp' },
-    { id: 4, name: 'Template Thông Tin Chi Tiết' },
-    { id: 5, name: 'Template Mặc Định' },
+    { id: 1, name: 'YÊU CẦU ĐẶT LẠI MẬT KHẨU' },
+    { id: 2, name: 'THÔNG BÁO BẢO MẬT' },
+    { id: 3, name: 'THÔNG BÁO SỰ KIỆN TIÊM CHỦNG' },
   ];
 
   // Form data
@@ -127,7 +125,7 @@ function VaccinationEvents() {
   const handleSendEmailAll = event => {
     setSelectedEvent(event);
     setEmailFormData({
-      emailTemplateId: 5,
+      emailTemplateId: 3,
       customMessage: '',
     });
     setShowEmailModal(true);
@@ -344,9 +342,7 @@ function VaccinationEvents() {
           <p>Tạo và quản lý các đợt tiêm vaccine cho học sinh</p>
         </div>
         <div className="header-actions">
-          <button onClick={fetchVaccinationEvents} className="refresh-btn">
-            🔄 Tải lại
-          </button>
+        
           <button onClick={handleCreateEvent} className="create-btn">
             ➕ Tạo sự kiện mới
           </button>

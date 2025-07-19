@@ -275,9 +275,7 @@ function StudentList() {
       {!loading && !error && (!studentData || studentData.length === 0) && (
         <div className="empty-state">
           <p>📭 Chưa có học sinh nào trong hệ thống</p>
-          <button onClick={refetch} className="retry-btn">
-            🔄 Tải lại
-          </button>
+         
         </div>
       )}
 

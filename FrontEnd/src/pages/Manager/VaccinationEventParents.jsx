@@ -11,6 +11,7 @@ function VaccinationEventParents() {
   // States
   const [event, setEvent] = useState(null);
   const [parents, setParents] = useState([]);
+  const [parentResponses, setParentResponses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedParent, setSelectedParent] = useState(null);
@@ -18,17 +19,15 @@ function VaccinationEventParents() {
 
   // Email modal states
   const [emailFormData, setEmailFormData] = useState({
-    emailTemplateId: 5,
+    emailTemplateId: 3,
     customMessage: '',
   });
 
   // Email template options
   const emailTemplateOptions = [
-    { id: 1, name: 'Template Thông Báo Cơ Bản' },
-    { id: 2, name: 'Template Nhắc Nhở' },
-    { id: 3, name: 'Template Khẩn Cấp' },
-    { id: 4, name: 'Template Thông Tin Chi Tiết' },
-    { id: 5, name: 'Template Mặc Định' },
+    { id: 1, name: 'YÊU CẦU ĐẶT LẠI MẬT KHẨU' },
+    { id: 2, name: 'THÔNG BÁO BẢO MẬT' },
+    { id: 3, name: 'THÔNG BÁO SỰ KIỆN TIÊM CHỦNG' },
   ];
 
   // Fetch data on component mount
@@ -36,6 +35,7 @@ function VaccinationEventParents() {
     if (eventId) {
       fetchEventData();
       fetchParentsData();
+      fetchParentResponses();
     }
   }, [eventId]);
 
@@ -76,11 +76,24 @@ function VaccinationEventParents() {
     }
   };
 
+  // Fetch parent responses
+  const fetchParentResponses = async () => {
+    try {
+      const responses = await vaccinationEventService.getParentResponses(
+        eventId
+      );
+      setParentResponses(responses);
+    } catch (error) {
+      console.error('Error fetching parent responses:', error);
+      // Don't set error for parent responses as it's supplementary data
+    }
+  };
+
   // Handle send email to specific parent
   const handleSendEmailToParent = parent => {
     setSelectedParent(parent);
     setEmailFormData({
-      emailTemplateId: 5,
+      emailTemplateId: 3,
       customMessage: '',
     });
     setShowEmailModal(true);
@@ -93,6 +106,27 @@ function VaccinationEventParents() {
       ...prev,
       [name]: value,
     }));
+  };
+
+  // Get parent response status
+  const getParentResponseStatus = parentId => {
+    const parentResponse = parentResponses.find(
+      response => response.parentId === parentId
+    );
+
+    if (!parentResponse) return { status: 'pending', text: 'Chưa phản hồi' };
+
+    return { status: 'confirmed', text: 'Đã phản hồi' };
+  };
+
+  // Get status badge class
+  const getStatusBadgeClass = status => {
+    switch (status) {
+      case 'confirmed':
+        return 'status-confirmed';
+      default:
+        return 'status-pending';
+    }
   };
 
   // Submit send email form
@@ -200,6 +234,7 @@ function VaccinationEventParents() {
                 <th>Tên Phụ Huynh</th>
                 <th>Email</th>
                 <th>Số Điện Thoại</th>
+                <th>Trạng Thái Phản Hồi</th>
                 <th>Thao Tác</th>
               </tr>
             </thead>
@@ -215,9 +250,25 @@ function VaccinationEventParents() {
                   <td>{parent.parentEmail || 'Chưa có'}</td>
                   <td>{parent.parentPhone || 'Chưa có'}</td>
                   <td>
+                    {(() => {
+                      const responseStatus = getParentResponseStatus(
+                        parent.parentId
+                      );
+                      return (
+                        <span
+                          className={`status-badge ${getStatusBadgeClass(
+                            responseStatus.status
+                          )}`}
+                        >
+                          {responseStatus.text}
+                        </span>
+                      );
+                    })()}
+                  </td>
+                  <td>
                     <div className="action-buttons">
                       <button
-                        className="btn-email"
+                        className="action-btn email-btn"
                         onClick={() => handleSendEmailToParent(parent)}
                         title="Gửi email thông báo tiêm chủng"
                       >

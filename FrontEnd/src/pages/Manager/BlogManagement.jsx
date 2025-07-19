@@ -656,9 +656,7 @@ function BlogManagement() {
       {!loading && !error && (!blogs || blogs.length === 0) && (
         <div className="empty-state">
           <p>📭 Chưa có blog nào trong hệ thống</p>
-          <button onClick={refetch} className="retry-btn">
-            🔄 Tải lại
-          </button>
+          
         </div>
       )}
 

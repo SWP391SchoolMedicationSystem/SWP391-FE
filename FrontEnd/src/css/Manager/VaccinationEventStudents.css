@@ -418,20 +418,19 @@
   justify-content: center;
 }
 
-.detail-btn,
-.email-btn {
-  padding: 8px 12px;
+.action-btn {
+  width: 40px;
+  height: 40px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
-  height: 36px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .detail-btn {
@@ -446,12 +445,12 @@
 }
 
 .email-btn {
-  background: #97a19b !important; /* $text-secondary */
+  background: #2f5148 !important; /* $primary-color */
   color: #ffffff !important;
 }
 
 .email-btn:hover {
-  background: #2f5148 !important; /* $text-primary */
+  background: #1a3a2e !important; /* darker primary */
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(47, 81, 72, 0.3);
 }
@@ -825,11 +824,10 @@
     gap: 4px;
   }
 
-  .detail-btn,
-  .email-btn {
-    padding: 6px 8px;
-    min-width: 35px;
-    height: 32px;
+  .action-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
   }
 
   .modal-content {
@@ -870,8 +868,7 @@
     gap: 4px;
   }
 
-  .detail-btn,
-  .email-btn {
+  .action-btn {
     width: 100%;
   }
 }
@@ -972,7 +969,7 @@
     gap: 6px;
   }
 
-  .email-btn {
+  .action-btn {
     width: 100%;
     min-width: auto;
   }
@@ -1002,8 +999,9 @@
     font-size: 0.85rem;
   }
 
-  .email-btn {
-    padding: 6px 10px;
+  .action-btn {
+    width: 35px;
+    height: 35px;
     font-size: 0.8rem;
   }
 }
