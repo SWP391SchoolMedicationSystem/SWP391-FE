@@ -66,8 +66,8 @@ function VaccinationEvents() {
     const eventDate = new Date(event.eventDate);
     const today = new Date();
 
-    if (eventDate < today) return 'Đã hoàn thành';
-    return 'Sắp diễn ra';
+    if (eventDate < today) return 'Đã phản hồi';
+    return 'Chưa phản hồi';
   };
 
   if (loading) {
@@ -341,7 +341,7 @@ function VaccinationEvents() {
                 fontFamily: 'Satoshi, sans-serif',
               }}
             >
-              {events.filter(e => getStatusText(e) === 'Sắp diễn ra').length}
+              {events.filter(e => getStatusText(e) === 'Chưa phản hồi').length}
             </h3>
             <p
               style={{
@@ -350,7 +350,7 @@ function VaccinationEvents() {
                 fontFamily: 'Satoshi, sans-serif',
               }}
             >
-              Sắp diễn ra
+              Chưa phản hồi
             </p>
           </div>
         </div>
@@ -390,7 +390,7 @@ function VaccinationEvents() {
                 fontFamily: 'Satoshi, sans-serif',
               }}
             >
-              {events.filter(e => getStatusText(e) === 'Đã hoàn thành').length}
+              {events.filter(e => getStatusText(e) === 'Đã phản hồi').length}
             </h3>
             <p
               style={{
@@ -399,7 +399,7 @@ function VaccinationEvents() {
                 fontFamily: 'Satoshi, sans-serif',
               }}
             >
-              Đã hoàn thành
+              Đã phản hồi
             </p>
           </div>
         </div>
@@ -483,11 +483,11 @@ function VaccinationEvents() {
                     <span
                       style={{
                         background:
-                          getStatusText(event) === 'Đã hoàn thành'
+                          getStatusText(event) === 'Đã phản hồi'
                             ? '#85b06d'
                             : '#bfefa1',
                         color:
-                          getStatusText(event) === 'Đã hoàn thành'
+                          getStatusText(event) === 'Đã phản hồi'
                             ? 'white'
                             : '#1a3a2e',
                         padding: '4px 12px',

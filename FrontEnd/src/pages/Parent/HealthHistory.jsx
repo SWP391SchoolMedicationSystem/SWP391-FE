@@ -122,9 +122,7 @@ function HealthHistory() {
       {!loading && !error && (!healthRecords || healthRecords.length === 0) && (
         <div className="empty-state">
           <p>📭 Chưa có lịch sử khám sức khỏe nào</p>
-          <button onClick={refetch} className="retry-btn">
-            🔄 Tải lại
-          </button>
+         
         </div>
       )}
 

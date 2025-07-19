@@ -32,17 +32,15 @@ function VaccinationEventStudents() {
   // Email modal states
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailFormData, setEmailFormData] = useState({
-    emailTemplateId: 5,
+    emailTemplateId: 3,
     customMessage: '',
   });
 
-  // Email template options (same as in VaccinationEvents.jsx)
+  // Email template options
   const emailTemplateOptions = [
-    { id: 1, name: 'Template Thông Báo Cơ Bản' },
-    { id: 2, name: 'Template Nhắc Nhở' },
-    { id: 3, name: 'Template Khẩn Cấp' },
-    { id: 4, name: 'Template Thông Tin Chi Tiết' },
-    { id: 5, name: 'Template Mặc Định' },
+    { id: 1, name: 'YÊU CẦU ĐẶT LẠI MẬT KHẨU' },
+    { id: 2, name: 'THÔNG BÁO BẢO MẬT' },
+    { id: 3, name: 'THÔNG BÁO SỰ KIỆN TIÊM CHỦNG' },
   ];
 
   // Filter states
@@ -134,7 +132,7 @@ function VaccinationEventStudents() {
   const handleSendEmailToParent = student => {
     setSelectedStudent(student);
     setEmailFormData({
-      emailTemplateId: 5,
+      emailTemplateId: 3,
       customMessage: '',
     });
     setShowEmailModal(true);
@@ -401,16 +399,18 @@ function VaccinationEventStudents() {
                     <td>
                       <div className="action-buttons">
                         <button
-                          className="detail-btn"
+                          className="action-btn detail-btn"
                           onClick={() => handleViewDetail(student)}
+                          title="Xem chi tiết"
                         >
-                          👁️ Chi tiết
+                          👁️
                         </button>
                         <button
-                          className="email-btn"
+                          className="action-btn email-btn"
                           onClick={() => handleSendEmailToParent(student)}
+                          title="Gửi email"
                         >
-                          📧 Gửi email
+                          📧
                         </button>
                       </div>
                     </td>
