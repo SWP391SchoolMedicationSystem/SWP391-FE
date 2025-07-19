@@ -65,6 +65,12 @@ const navItems = [
     icon: <Medication />,
     key: 'personal-medicine',
   },
+  {
+    to: '/nurse/review-requests',
+    label: 'Kiểm Duyệt Yêu Cầu',
+    icon: <Assignment />,
+    key: 'review-requests',
+  },
   { to: '/nurse/blog', label: 'Blog', icon: <Article />, key: 'blog' },
   // { to: '/nurse/chat', label: 'Chat Phụ Huynh', icon: <Chat />, key: 'chat' },
   {

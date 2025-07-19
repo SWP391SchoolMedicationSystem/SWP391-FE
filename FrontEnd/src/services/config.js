@@ -19,11 +19,9 @@ apiClient.interceptors.request.use(
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('Request: Token added to headers');
     } else {
       console.warn('Request: No token found in localStorage');
     }
-    console.log('Request:', config.method?.toUpperCase(), config.url);
     return config;
   },
   error => {
@@ -34,7 +32,6 @@ apiClient.interceptors.request.use(
 // Response interceptor for error handling
 apiClient.interceptors.response.use(
   response => {
-    console.log('Response: Success', response.status, response.config.url);
     return response.data;
   },
   error => {
@@ -46,12 +43,16 @@ apiClient.interceptors.response.use(
     console.error('Request Method:', error.config?.method);
     console.error('Request Data:', error.config?.data);
 
-    // Handle common errors
-    if (error.response?.status === 401) {
-      // Unauthorized - redirect to login
+    // Handle common errors - but NOT for login endpoints
+    const isLoginRequest =
+      error.config?.url?.includes('/User/user') ||
+      error.config?.url?.includes('/User/google');
+
+    if (error.response?.status === 401 && !isLoginRequest) {
+      // Unauthorized - redirect to login (but not during login process)
       console.error('Unauthorized access - redirecting to login');
       localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      localStorage.removeItem('userInfo');
       window.location.href = '/login';
     } else if (error.response?.status === 403) {
       // Forbidden
@@ -155,6 +156,17 @@ export const API_ENDPOINTS = {
     SEARCH_BY_NAME: '/Medicine/SearchMedicinesByName', // GET search medicines by name
   },
 
+  // Form (Parent requests - Nurse review)
+  FORM: {
+    GET_ALL: '/Form', // GET all form requests from parents
+    GET_BY_ID: '/Form/{id}', // GET specific form request by ID
+    UPDATE: '/Form', // PUT update form (approve/decline)
+    DELETE: '/Form/{id}', // DELETE form by ID
+    GET_BY_PARENT: '/Form/parent/{parentId}', // GET forms by parent ID
+    GET_BY_CATEGORY: '/Form/category/{categoryId}', // GET forms by category ID
+    GET_BY_STATUS: '/Form/status/{status}', // GET forms by status
+  },
+
   // Vaccination Event (Core feature - All endpoints)
   VACCINATION_EVENT: {
     GET_ALL: '/VaccinationEvent', // Get all vaccination events
@@ -184,6 +196,12 @@ export const buildApiUrl = (endpoint, id = null) => {
   }
   if (id && endpoint.includes('{studentId}')) {
     return endpoint.replace('{studentId}', id);
+  }
+  if (id && endpoint.includes('{categoryId}')) {
+    return endpoint.replace('{categoryId}', id);
+  }
+  if (id && endpoint.includes('{status}')) {
+    return endpoint.replace('{status}', id);
   }
   return id ? `${endpoint}/${id}` : endpoint;
 };

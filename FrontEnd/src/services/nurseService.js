@@ -598,6 +598,191 @@ export const nurseChatService = {
   },
 };
 
+// Form Service for Parent Requests
+export const nurseFormService = {
+  // Get all form requests from parents (excluding soft deleted)
+  getAllForms: async () => {
+    try {
+      const response = await apiClient.get(API_ENDPOINTS.FORM.GET_ALL);
+      if (!Array.isArray(response)) return [];
+      
+      // Filter out soft deleted forms
+      const activeForms = response.filter(form => !form.isDeleted);
+      return activeForms.map(nurseFormService.mapFormData);
+    } catch (error) {
+      console.error('Error getting all forms:', error);
+      throw error;
+    }
+  },
+
+  // Get form by ID
+  getFormById: async (formId) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.FORM.GET_BY_ID, formId);
+      const response = await apiClient.get(url);
+      return nurseFormService.mapFormData(response);
+    } catch (error) {
+      console.error('Error getting form by ID:', error);
+      throw error;
+    }
+  },
+
+  // Get forms by status
+  getFormsByStatus: async (status) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.FORM.GET_BY_STATUS, status);
+      const response = await apiClient.get(url);
+      if (!Array.isArray(response)) return [];
+      return response.map(nurseFormService.mapFormData);
+    } catch (error) {
+      console.error('Error getting forms by status:', error);
+      throw error;
+    }
+  },
+
+  // Get forms by parent ID (excluding soft deleted)
+  getFormsByParent: async (parentId) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.FORM.GET_BY_PARENT, parentId);
+      const response = await apiClient.get(url);
+      if (!Array.isArray(response)) return [];
+      
+      // Filter out soft deleted forms
+      const activeForms = response.filter(form => !form.isDeleted);
+      return activeForms.map(nurseFormService.mapFormData);
+    } catch (error) {
+      console.error('Error getting forms by parent:', error);
+      throw error;
+    }
+  },
+
+  // Get forms by category ID (excluding soft deleted)
+  getFormsByCategory: async (categoryId) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.FORM.GET_BY_CATEGORY, categoryId);
+      const response = await apiClient.get(url);
+      if (!Array.isArray(response)) return [];
+      
+      // Filter out soft deleted forms
+      const activeForms = response.filter(form => !form.isDeleted);
+      return activeForms.map(nurseFormService.mapFormData);
+    } catch (error) {
+      console.error('Error getting forms by category:', error);
+      throw error;
+    }
+  },
+
+  // Soft delete form by ID
+  deleteForm: async (formId) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.FORM.DELETE, formId);
+      const response = await apiClient.delete(url);
+      return response;
+    } catch (error) {
+      console.error('Error soft deleting form:', error);
+      throw error;
+    }
+  },
+
+  // Approve form request (POST /Form/accept)
+  approveForm: async (formId, staffId) => {
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+      const payload = {
+        formId: formId,
+        staffid: staffId || userInfo.userId || 0,
+        reasonfordecline: null,
+        modifiedby: userInfo.fullName || 'System'
+      };
+      const response = await apiClient.post('/Form/accept', payload);
+      return response;
+    } catch (error) {
+      console.error('Error approving form:', error);
+      throw error;
+    }
+  },
+
+  // Decline form request (POST /Form/decline)
+  declineForm: async (formId, reason, staffId) => {
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+      const payload = {
+        formId: formId,
+        staffid: staffId || userInfo.userId || 0,
+        reasonfordecline: reason || 'Không được phê duyệt',
+        modifiedby: userInfo.fullName || 'System'
+      };
+      const response = await apiClient.post('/Form/decline', payload);
+      return response;
+    } catch (error) {
+      console.error('Error declining form:', error);
+      throw error;
+    }
+  },
+
+  // Map form data for display
+  mapFormData: (apiForm) => {
+    const getFormCategoryName = (categoryId) => {
+      const categories = {
+        1: 'Đơn xin nghỉ phép',
+        2: 'Đơn xin thuốc', 
+        3: 'Đơn xin tư vấn',
+        4: 'Đơn khác'
+      };
+      return categories[categoryId] || `Danh mục ${categoryId}`;
+    };
+
+    const getStatusInfo = (isAccepted) => {
+      if (isAccepted === true) return { text: 'Đã phê duyệt', class: 'approved' };
+      if (isAccepted === false) return { text: 'Đã từ chối', class: 'declined' };
+      return { text: 'Chờ xử lý', class: 'pending' };
+    };
+
+    const statusInfo = getStatusInfo(apiForm.isaccepted);
+
+    return {
+      formId: apiForm.formId || apiForm.id,
+      parentId: apiForm.parentId,
+      parentName: apiForm.parentName || `Phụ huynh #${apiForm.parentId || 'N/A'}`,
+      studentId: apiForm.studentid,
+      studentName: apiForm.studentName || `Học sinh #${apiForm.studentid || 'N/A'}`,
+      formCategoryId: apiForm.formCategoryId,
+      formCategoryName: apiForm.formCategoryName || getFormCategoryName(apiForm.formCategoryId),
+      title: apiForm.title || 'Chưa có tiêu đề',
+      reason: (apiForm.reason && apiForm.reason !== 'string') ? apiForm.reason : 'Chưa có lý do chi tiết',
+      originalFilename: apiForm.originalfilename,
+      storedPath: apiForm.storedpath,
+      staffId: apiForm.staffid,
+      staffName: apiForm.staffName || '',
+      isAccepted: apiForm.isaccepted,
+      reasonForDecline: apiForm.reasonfordecline,
+      isDeleted: apiForm.isDeleted || false,
+      status: statusInfo.text,
+      statusClass: statusInfo.class,
+      createdDate: apiForm.createdDate
+        ? new Date(apiForm.createdDate).toLocaleDateString('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        : 'Chưa có ngày',
+      modifiedDate: apiForm.modifiedDate
+        ? new Date(apiForm.modifiedDate).toLocaleDateString('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        : null,
+      createdBy: apiForm.createdBy || 'Hệ thống',
+      modifiedBy: apiForm.modifiedBy || 'Hệ thống'
+    };
+  }
+};
+
 export default {
   nurseHealthService,
   nurseBlogService,

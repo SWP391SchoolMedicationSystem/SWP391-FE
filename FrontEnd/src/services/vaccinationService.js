@@ -5,11 +5,9 @@ export const vaccinationEventService = {
   // Get all vaccination events (All roles can view)
   getAllEvents: async () => {
     try {
-      console.log('🌐 Getting all vaccination events');
       const response = await apiClient.get(
         API_ENDPOINTS.VACCINATION_EVENT.GET_ALL
       );
-      console.log('📥 Vaccination events response:', response);
 
       const events = Array.isArray(response) ? response : [];
       return events.map(vaccinationEventService.mapEventData);
@@ -22,13 +20,12 @@ export const vaccinationEventService = {
   // Get vaccination event by ID
   getEventById: async eventId => {
     try {
-      console.log('🌐 Getting vaccination event by ID:', eventId);
       const url = buildApiUrl(
         API_ENDPOINTS.VACCINATION_EVENT.GET_BY_ID,
         eventId
       );
       const response = await apiClient.get(url);
-      console.log('📥 Vaccination event details:', response);
+
 
       return vaccinationEventService.mapEventData(response);
     } catch (error) {
@@ -50,6 +47,40 @@ export const vaccinationEventService = {
       return vaccinationEventService.mapEventData(response);
     } catch (error) {
       console.error('❌ Error creating vaccination event:', error);
+      throw error;
+    }
+  },
+
+  // Create new vaccination event with file upload (Manager only)
+  createEventWithFile: async formData => {
+    try {
+      console.log('🌐 Creating vaccination event with file...');
+      
+      // Get token for authorization
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(
+        `${apiClient.defaults.baseURL}${API_ENDPOINTS.VACCINATION_EVENT.CREATE}`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            // Don't set Content-Type for FormData - browser will set it with boundary
+          },
+          body: formData
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ Vaccination event with file created:', result);
+
+      return vaccinationEventService.mapEventData(result);
+    } catch (error) {
+      console.error('❌ Error creating vaccination event with file:', error);
       throw error;
     }
   },

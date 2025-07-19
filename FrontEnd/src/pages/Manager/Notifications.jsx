@@ -18,8 +18,11 @@ import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
 import CloseIcon from '@mui/icons-material/Close';
 import InfoIcon from '@mui/icons-material/Info';
 
+import * as signalR from '@microsoft/signalr'; // Import thư viện SignalR client
 const Notifications = () => {
   const [notificationType, setNotificationType] = useState('staff'); // "staff" hoặc "parent"
+
+  const [signalRConnection, setSignalRConnection] = useState(null);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -38,6 +41,76 @@ const Notifications = () => {
     refetch,
     fetchNotifications,
   } = useManagerNotifications(notificationType);
+
+  useEffect(() => {
+    if (!signalRConnection) {
+      const newConnection = new signalR.HubConnectionBuilder()
+        .withUrl(
+          `https://api-schoolhealth.purintech.id.vn/hubs/notifications`,
+          {
+            skipNegotiation: true,
+            transport: signalR.HttpTransportType.WebSockets,
+          }
+        )
+        .withAutomaticReconnect()
+        .build();
+
+      setSignalRConnection(newConnection);
+    }
+
+    console.log('signalRConnection', signalRConnection);
+    // Cleanup function for connection
+    return () => {
+      if (
+        signalRConnection &&
+        signalRConnection.state === signalR.HubConnectionState.Connected
+      ) {
+        signalRConnection.stop();
+      }
+    };
+  }, [signalRConnection]); // Dependency on 'connection' to prevent re-creation if already exists
+
+  // --- SignalR Event Handlers ---
+  useEffect(() => {
+    if (signalRConnection) {
+      signalRConnection
+        .start()
+        .then(() => {
+          console.log('Kết nối SignalR đã được thiết lập và xác thực!');
+
+          // Đăng ký sự kiện nhận tin nhắn riêng tư
+          signalRConnection.on(
+            'ReceivePrivateMessage',
+            (
+              senderId,
+              receiverId,
+              content,
+              senderUsername,
+              receiverUsername,
+              timestamp
+            ) => {
+              // task to do when receive notification
+            }
+          );
+
+          // Đăng ký sự kiện nhận lỗi từ Hub
+          signalRConnection.on('ReceiveError', errorMsg => {
+            console.error('Lỗi từ SignalR Hub:', errorMsg);
+            alert(`Lỗi: ${errorMsg}`); // Sử dụng alert tạm thời, nên thay bằng modal
+          });
+        })
+        .catch(e => {
+          console.error('Lỗi khi thiết lập kết nối SignalR:', e);
+          // Có thể hiển thị thông báo lỗi cho người dùng
+        });
+
+      // Cleanup for event listeners
+      return () => {
+        signalRConnection.off('ReceivePrivateMessage');
+        signalRConnection.off('ReceiveError');
+      };
+    }
+  }, [signalRConnection]); // selectedUser đã được loại bỏ khỏi dependency array vì chúng ta dùng ref
 
   // Fetch staff list to map IDs to names
   useEffect(() => {

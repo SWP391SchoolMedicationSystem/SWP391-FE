@@ -1,11 +1,16 @@
-import { jwtDecode } from "jwt-decode";
-import apiClient, { API_ENDPOINTS } from "./config";
-import { parentService } from "./parentService";
+import { jwtDecode } from 'jwt-decode';
+import apiClient, { API_ENDPOINTS } from './config';
+import { parentService } from './parentService';
 
 const userService = {
   // Login user
   login: async (email, password, rememberMe = false) => {
     try {
+      console.log('🔐 Attempting login with:', {
+        email,
+        endpoint: API_ENDPOINTS.USER.LOGIN,
+      });
+
       // Call real login API
       const response = await apiClient.post(API_ENDPOINTS.USER.LOGIN, {
         email,
@@ -13,66 +18,116 @@ const userService = {
       });
 
       const data = response; // apiClient already returns response.data
+      console.log('📡 API Response:', data);
 
-      // If we get a token, decode it to get user info
-      if (data.token || data.accessToken || data.access_token) {
-        const token = data.token || data.accessToken || data.access_token;
+      // CRITICAL: Check if login was successful by validating JWT token
+      const token = data.token || data.accessToken || data.access_token;
 
-        try {
-          const decodedToken = jwtDecode(token);
-
-          const loginData = {
-            success: true,
-            token: token,
-            userId: decodedToken.Id || decodedToken.id || decodedToken.userId,
-            email: decodedToken.Email || decodedToken.email || email,
-            role: decodedToken.Role || decodedToken.role,
-            fullname:
-              decodedToken.Fullname ||
-              decodedToken.fullname ||
-              decodedToken.name,
-            phone: decodedToken.Phone || decodedToken.phone,
-            status: decodedToken.Status || decodedToken.status,
-            isStaff: decodedToken.Role !== "Parent",
-            userData: decodedToken,
-            decodedToken: decodedToken,
-          };
-
-          // Handle Remember Me functionality
-          if (rememberMe) {
-            this.saveRememberedAccount(email, password, loginData);
-          }
-
-          return loginData;
-        } catch (error) {
-          console.error("Error decoding JWT token:", error);
-          // Return raw response if token decode fails
-          return {
-            success: true,
-            ...data,
-            email: email,
-          };
-        }
+      if (!token) {
+        console.error('❌ No JWT token in response - login failed');
+        throw new Error('Đăng nhập thất bại - không nhận được token xác thực');
       }
 
-      // If no token but response is successful
-      return {
-        success: true,
-        ...data,
-        email: email,
-      };
-    } catch (error) {
-      console.error("Login error:", error);
+      // Validate JWT token
+      try {
+        const decodedToken = jwtDecode(token);
+        console.log('🔓 JWT decoded successfully:', decodedToken);
 
-      // If API call fails, throw appropriate error
-      if (error.response?.status === 401) {
-        throw new Error("Email hoặc mật khẩu không đúng");
-      } else if (error.response?.status === 404) {
-        throw new Error("Endpoint login không tìm thấy");
-      } else if (error.response?.data?.message) {
-        throw new Error(error.response.data.message);
+        // Check token expiration
+        const currentTime = Date.now() / 1000;
+        if (decodedToken.exp && decodedToken.exp < currentTime) {
+          console.error('❌ JWT token expired');
+          throw new Error('Token đã hết hạn');
+        }
+
+        // Validate required fields in token
+        const role = decodedToken.Role || decodedToken.role;
+        const userId =
+          decodedToken.Id || decodedToken.id || decodedToken.userId;
+        const userEmail = decodedToken.Email || decodedToken.email;
+
+        if (!role || !userId) {
+          console.error('❌ Missing required fields in JWT token:', {
+            role,
+            userId,
+          });
+          throw new Error('Token không hợp lệ - thiếu thông tin người dùng');
+        }
+
+        // Verify email matches
+        if (userEmail && userEmail.toLowerCase() !== email.toLowerCase()) {
+          console.error('❌ Email mismatch in token:', {
+            tokenEmail: userEmail,
+            inputEmail: email,
+          });
+          throw new Error('Thông tin đăng nhập không khớp');
+        }
+
+        console.log('✅ JWT validation successful');
+
+        const loginData = {
+          success: true,
+          token: token,
+          userId: userId,
+          email: userEmail || email,
+          role: role,
+          fullname:
+            decodedToken.Fullname || decodedToken.fullname || decodedToken.name,
+          phone: decodedToken.Phone || decodedToken.phone,
+          status: decodedToken.Status || decodedToken.status,
+          isStaff: role !== 'Parent',
+          userData: decodedToken,
+          decodedToken: decodedToken,
+        };
+
+        // For Parent role, set parentId to be the same as userId
+        if (role === 'Parent') {
+          loginData.parentId = loginData.userId;
+        }
+
+        // Handle Remember Me functionality
+        if (rememberMe) {
+          this.saveRememberedAccount(email, password, loginData);
+        }
+
+        console.log('🎉 Login successful for user:', { userId, email, role });
+        return loginData;
+      } catch (jwtError) {
+        console.error('❌ JWT validation failed:', jwtError);
+        throw new Error('Token không hợp lệ - vui lòng thử lại');
+      }
+    } catch (error) {
+      console.error('❌ Login error:', error);
+
+      // Handle API errors
+      if (error.response) {
+        const status = error.response.status;
+        const responseData = error.response.data;
+
+        console.error('API Error Details:', { status, responseData });
+
+        if (status === 401) {
+          // Unauthorized - wrong credentials
+          throw error; // Re-throw to be handled by LoginForm
+        } else if (status === 404) {
+          throw new Error('Email không tồn tại trong hệ thống');
+        } else if (status === 400) {
+          // Bad request - invalid data
+          const message =
+            responseData?.message || 'Thông tin đăng nhập không hợp lệ';
+          throw new Error(message);
+        } else if (status >= 500) {
+          throw new Error('Lỗi server - vui lòng thử lại sau');
+        } else {
+          const message = responseData?.message || 'Đăng nhập thất bại';
+          throw new Error(message);
+        }
+      } else if (error.request) {
+        // Network error
+        throw new Error('Không thể kết nối đến server');
       } else {
-        throw new Error("Không thể kết nối đến server. Vui lòng thử lại.");
+        // Other error (including JWT validation errors)
+        throw error;
       }
     }
   },
@@ -85,8 +140,8 @@ const userService = {
 
   // Helper function to get role from stored token
   getCurrentUserRole: () => {
-    const token = localStorage.getItem("token");
-    const userInfo = localStorage.getItem("userInfo");
+    const token = localStorage.getItem('token');
+    const userInfo = localStorage.getItem('userInfo');
 
     if (token) {
       try {
@@ -96,8 +151,8 @@ const userService = {
         // Kiểm tra token có hết hạn không
         if (decodedToken.exp <= currentTime) {
           // Token hết hạn, xóa dữ liệu
-          localStorage.removeItem("token");
-          localStorage.removeItem("userInfo");
+          localStorage.removeItem('token');
+          localStorage.removeItem('userInfo');
           return null;
         }
 
@@ -105,15 +160,15 @@ const userService = {
           decodedToken.role ||
           decodedToken.Role ||
           decodedToken[
-            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+            'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
           ] ||
           null
         );
       } catch (error) {
-        console.error("Error decoding stored token:", error);
+        console.error('Error decoding stored token:', error);
         // Token không hợp lệ, xóa dữ liệu
-        localStorage.removeItem("token");
-        localStorage.removeItem("userInfo");
+        localStorage.removeItem('token');
+        localStorage.removeItem('userInfo');
         return null;
       }
     }
@@ -124,8 +179,8 @@ const userService = {
         const user = JSON.parse(userInfo);
         return user.role || null;
       } catch (error) {
-        console.error("Error parsing stored user info:", error);
-        localStorage.removeItem("userInfo");
+        console.error('Error parsing stored user info:', error);
+        localStorage.removeItem('userInfo');
         return null;
       }
     }
@@ -135,8 +190,8 @@ const userService = {
 
   // Helper function to check if user is authenticated
   isAuthenticated: () => {
-    const token = localStorage.getItem("token");
-    const userInfo = localStorage.getItem("userInfo");
+    const token = localStorage.getItem('token');
+    const userInfo = localStorage.getItem('userInfo');
 
     if (token) {
       try {
@@ -146,17 +201,17 @@ const userService = {
         // Kiểm tra token có hết hạn không
         if (decodedToken.exp <= currentTime) {
           // Token hết hạn, xóa dữ liệu
-          localStorage.removeItem("token");
-          localStorage.removeItem("userInfo");
+          localStorage.removeItem('token');
+          localStorage.removeItem('userInfo');
           return false;
         }
 
         return true;
       } catch (error) {
-        console.error("Error decoding token:", error);
+        console.error('Error decoding token:', error);
         // Token không hợp lệ, xóa dữ liệu
-        localStorage.removeItem("token");
-        localStorage.removeItem("userInfo");
+        localStorage.removeItem('token');
+        localStorage.removeItem('userInfo');
         return false;
       }
     }
@@ -168,8 +223,8 @@ const userService = {
         // Kiểm tra xem có đủ thông tin cần thiết không
         return !!(user && (user.role || user.email));
       } catch (error) {
-        console.error("Error parsing user info:", error);
-        localStorage.removeItem("userInfo");
+        console.error('Error parsing user info:', error);
+        localStorage.removeItem('userInfo');
         return false;
       }
     }
@@ -184,7 +239,7 @@ const userService = {
 
       // Remove existing account if exists
       const filteredAccounts = rememberedAccounts.filter(
-        (acc) => acc.email !== email
+        acc => acc.email !== email
       );
 
       // Add new account info
@@ -207,36 +262,36 @@ const userService = {
       const accountsToSave = filteredAccounts.slice(0, 5);
 
       localStorage.setItem(
-        "rememberedAccounts",
+        'rememberedAccounts',
         JSON.stringify(accountsToSave)
       );
     } catch (error) {
-      console.error("Error saving remembered account:", error);
+      console.error('Error saving remembered account:', error);
     }
   },
 
   getRememberedAccounts: () => {
     try {
-      const accounts = localStorage.getItem("rememberedAccounts");
+      const accounts = localStorage.getItem('rememberedAccounts');
       return accounts ? JSON.parse(accounts) : [];
     } catch (error) {
-      console.error("Error getting remembered accounts:", error);
+      console.error('Error getting remembered accounts:', error);
       return [];
     }
   },
 
-  removeRememberedAccount: (email) => {
+  removeRememberedAccount: email => {
     try {
       const rememberedAccounts = userService.getRememberedAccounts();
       const filteredAccounts = rememberedAccounts.filter(
-        (acc) => acc.email !== email
+        acc => acc.email !== email
       );
       localStorage.setItem(
-        "rememberedAccounts",
+        'rememberedAccounts',
         JSON.stringify(filteredAccounts)
       );
     } catch (error) {
-      console.error("Error removing remembered account:", error);
+      console.error('Error removing remembered account:', error);
     }
   },
 
@@ -246,15 +301,15 @@ const userService = {
   },
 
   clearAllRememberedAccounts: () => {
-    localStorage.removeItem("rememberedAccounts");
+    localStorage.removeItem('rememberedAccounts');
   },
 
   // Send reset password email
-  sendResetPasswordEmail: async (email) => {
+  sendResetPasswordEmail: async email => {
     const response = await apiClient.post(API_ENDPOINTS.EMAIL.SEND, {
       to: email,
-      subject: "Đặt lại mật khẩu - Medlearn",
-      body: "demo",
+      subject: 'Đặt lại mật khẩu - Medlearn',
+      body: 'demo',
     });
     return response; // apiClient already returns response.data
   },
@@ -262,60 +317,63 @@ const userService = {
   // Verify reset code (mock function - replace with real API when available)
   verifyResetCode: async (email, code) => {
     // Mock verification - replace with real API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
     if (code.length !== 6) {
-      throw new Error("Mã xác nhận không hợp lệ");
+      throw new Error('Mã xác nhận không hợp lệ');
     }
 
-    return { success: true, message: "Mã xác nhận hợp lệ" };
+    return { success: true, message: 'Mã xác nhận hợp lệ' };
   },
 
   // Reset password (mock function - replace with real API when available)
   resetPassword: async (/* email, verificationCode, newPassword */) => {
     // Mock reset - replace with real API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
-    return { success: true, message: "Đặt lại mật khẩu thành công" };
+    return { success: true, message: 'Đặt lại mật khẩu thành công' };
   },
 
   // Logout function
   logout: () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userInfo");
+    localStorage.removeItem('token');
+    localStorage.removeItem('userInfo');
     // Note: We don't remove remembered accounts on logout
   },
 
   // Update user profile
-  updateProfile: async (userData) => {
+  updateProfile: async userData => {
     try {
       const userRole = userService.getCurrentUserRole();
-      
-      if (userRole === "Parent") {
+
+      if (userRole === 'Parent') {
         const response = await parentService.updateProfile(userData);
-        
+
         // Update local storage with new data
-        const currentUserInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+        const currentUserInfo = JSON.parse(
+          localStorage.getItem('userInfo') || '{}'
+        );
         const updatedUserInfo = { ...currentUserInfo, ...userData };
-        localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
-        
+        localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
+
         return response;
       }
-      
-      throw new Error("Chức năng này chỉ dành cho phụ huynh");
+
+      throw new Error('Chức năng này chỉ dành cho phụ huynh');
     } catch (error) {
-      console.error("Error updating profile:", error);
+      console.error('Error updating profile:', error);
       throw error;
     }
   },
-  googleLogin: async (credential) => {
+  googleLogin: async credential => {
     try {
       const response = await apiClient.post(API_ENDPOINTS.USER.GOOGLE_LOGIN, {
-        credential,
+        credential: credential,
       });
 
-      const data = response;
+      const data = response; // apiClient already returns response.data
 
+      // If we get a token, decode it to get user info
       if (data.token || data.accessToken || data.access_token) {
         const token = data.token || data.accessToken || data.access_token;
 
@@ -334,14 +392,23 @@ const userService = {
               decodedToken.name,
             phone: decodedToken.Phone || decodedToken.phone,
             status: decodedToken.Status || decodedToken.status,
-            isStaff: decodedToken.Role !== "Parent",
+            isStaff: decodedToken.Role !== 'Parent',
             userData: decodedToken,
             decodedToken: decodedToken,
           };
 
+          // For Parent role, set parentId to be the same as userId
+          if (
+            decodedToken.Role === 'Parent' ||
+            decodedToken.role === 'Parent'
+          ) {
+            loginData.parentId = loginData.userId;
+          }
+
           return loginData;
         } catch (error) {
-          console.error("Error decoding JWT token:", error);
+          console.error('Error decoding Google JWT token:', error);
+          // Return raw response if token decode fails
           return {
             success: true,
             ...data,
@@ -349,19 +416,14 @@ const userService = {
         }
       }
 
+      // If no token but response is successful
       return {
         success: true,
         ...data,
       };
     } catch (error) {
-      console.error("Google login error:", error);
-      if (error.response?.data?.message) {
-        throw new Error(error.response.data.message);
-      } else {
-        throw new Error(
-          "Không thể đăng nhập bằng Google. Vui lòng thử lại."
-        );
-      }
+      console.error('Google login error:', error);
+      throw new Error('Google login failed. Please try again.');
     }
   },
 };

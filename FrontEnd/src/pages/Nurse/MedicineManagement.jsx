@@ -158,13 +158,6 @@ function MedicineManagement() {
     setShowEditModal(true);
   };
 
-  // Get quantity status
-  const getQuantityStatus = quantity => {
-    if (quantity === 0) return 'out-of-stock';
-    if (quantity < 100) return 'low-stock';
-    return 'in-stock';
-  };
-
   // Statistics (currently not displayed)
   // const stats = {
   //   total: medicines.length,
@@ -320,77 +313,448 @@ function MedicineManagement() {
       {/* Error message */}
       {error && <div className="error-message">{error}</div>}
 
-      {/* Table */}
-      <div className="table-container">
-        <table className="medicine-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Tên thuốc</th>
-              <th>Danh mục</th>
-              <th>Loại</th>
-              <th>Số lượng</th>
-              <th>Trạng thái</th>
-              <th>Ngày tạo</th>
-              <th>Người tạo</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {medicines.map(medicine => (
-              <tr key={medicine.id}>
-                <td className="medicine-id">{medicine.id}</td>
-                <td>
-                  <div className="medicine-name">
-                    <strong>{medicine.medicineName}</strong>
-                  </div>
-                </td>
-                <td>{medicineCategories[medicine.categoryId] || 'Khác'}</td>
-                <td className="medicine-type">{medicine.type}</td>
-                <td>
-                  <span className="quantity">{medicine.quantity}</span>
-                </td>
-                <td>
-                  <span
-                    className={`status-badge ${getQuantityStatus(
-                      medicine.quantity
-                    )}`}
-                  >
-                    {medicine.quantity === 0
-                      ? 'Hết hàng'
-                      : medicine.quantity < 100
-                      ? 'Sắp hết'
-                      : 'Còn hàng'}
-                  </span>
-                </td>
-                <td>{medicine.createdAt}</td>
-                <td>{medicine.createdBy}</td>
-                <td>
-                  <div className="action-buttons">
-                    <button
-                      className="btn-edit"
-                      onClick={() => openEditModal(medicine)}
-                      title="Chỉnh sửa"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      className="btn-delete"
-                      onClick={() => handleDeleteMedicine(medicine.id)}
-                      title="Xóa"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Enhanced Modern Table */}
+      <div
+        style={{
+          background: '#ffffff',
+          borderRadius: '20px',
+          boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+          border: '1px solid #c1cbc2',
+          overflow: 'hidden',
+          marginBottom: '30px',
+        }}
+      >
+        {/* Table Header */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+            color: 'white',
+            padding: '20px 25px',
+            borderBottom: '1px solid #e9ecef',
+          }}
+        >
+          <h3
+            style={{
+              margin: 0,
+              fontSize: '1.3rem',
+              fontWeight: 600,
+              fontFamily: 'Satoshi, sans-serif',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+            }}
+          >
+            <MedicationIcon sx={{ fontSize: '1.5rem' }} />
+            Danh sách thuốc ({medicines.length})
+          </h3>
+        </div>
 
+        {/* Table Content */}
+        <div style={{ overflowX: 'auto' }}>
+          <table
+            style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              fontFamily: 'Satoshi, sans-serif',
+            }}
+          >
+            <thead>
+              <tr
+                style={{
+                  background: '#f8f9fa',
+                  borderBottom: '2px solid #e9ecef',
+                }}
+              >
+                <th
+                  style={{
+                    padding: '15px 20px',
+                    textAlign: 'left',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    color: '#2f5148',
+                    borderRight: '1px solid #e9ecef',
+                  }}
+                >
+                  Tên thuốc
+                </th>
+                <th
+                  style={{
+                    padding: '15px 20px',
+                    textAlign: 'left',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    color: '#2f5148',
+                    borderRight: '1px solid #e9ecef',
+                  }}
+                >
+                  Danh mục
+                </th>
+                <th
+                  style={{
+                    padding: '15px 20px',
+                    textAlign: 'left',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    color: '#2f5148',
+                    borderRight: '1px solid #e9ecef',
+                  }}
+                >
+                  Loại
+                </th>
+                <th
+                  style={{
+                    padding: '15px 20px',
+                    textAlign: 'center',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    color: '#2f5148',
+                    borderRight: '1px solid #e9ecef',
+                  }}
+                >
+                  Số lượng
+                </th>
+                <th
+                  style={{
+                    padding: '15px 20px',
+                    textAlign: 'center',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    color: '#2f5148',
+                    borderRight: '1px solid #e9ecef',
+                  }}
+                >
+                  Trạng thái
+                </th>
+                <th
+                  style={{
+                    padding: '15px 20px',
+                    textAlign: 'left',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    color: '#2f5148',
+                    borderRight: '1px solid #e9ecef',
+                  }}
+                >
+                  Ngày tạo
+                </th>
+                <th
+                  style={{
+                    padding: '15px 20px',
+                    textAlign: 'left',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    color: '#2f5148',
+                    borderRight: '1px solid #e9ecef',
+                  }}
+                >
+                  Người tạo
+                </th>
+                <th
+                  style={{
+                    padding: '15px 20px',
+                    textAlign: 'center',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    color: '#2f5148',
+                  }}
+                >
+                  Thao tác
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {medicines.map((medicine, index) => (
+                <tr
+                  key={medicine.id}
+                  style={{
+                    borderBottom: '1px solid #e9ecef',
+                    transition: 'all 0.2s ease',
+                    backgroundColor: index % 2 === 0 ? '#ffffff' : '#f8f9fa',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.backgroundColor = '#f0f8ff';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.backgroundColor =
+                      index % 2 === 0 ? '#ffffff' : '#f8f9fa';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <td
+                    style={{
+                      padding: '15px 20px',
+                      borderRight: '1px solid #e9ecef',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '10px',
+                          height: '10px',
+                          borderRadius: '50%',
+                          backgroundColor: '#73ad67',
+                          flexShrink: 0,
+                        }}
+                      />
+                      <div>
+                        <div
+                          style={{
+                            fontSize: '0.95rem',
+                            fontWeight: 600,
+                            color: '#2f5148',
+                            marginBottom: '2px',
+                          }}
+                        >
+                          {medicine.medicineName}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td
+                    style={{
+                      padding: '15px 20px',
+                      borderRight: '1px solid #e9ecef',
+                      fontSize: '0.9rem',
+                      color: '#97a19b',
+                    }}
+                  >
+                    {medicineCategories[medicine.categoryId] || 'Khác'}
+                  </td>
+                  <td
+                    style={{
+                      padding: '15px 20px',
+                      borderRight: '1px solid #e9ecef',
+                      fontSize: '0.9rem',
+                      color: '#97a19b',
+                    }}
+                  >
+                    {medicine.type}
+                  </td>
+                  <td
+                    style={{
+                      padding: '15px 20px',
+                      borderRight: '1px solid #e9ecef',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: '1rem',
+                        fontWeight: 700,
+                        color:
+                          medicine.quantity === 0
+                            ? '#dc3545'
+                            : medicine.quantity < 100
+                            ? '#ffc107'
+                            : '#28a745',
+                        background:
+                          medicine.quantity === 0
+                            ? 'rgba(220, 53, 69, 0.1)'
+                            : medicine.quantity < 100
+                            ? 'rgba(255, 193, 7, 0.1)'
+                            : 'rgba(40, 167, 69, 0.1)',
+                        padding: '6px 12px',
+                        borderRadius: '20px',
+                        border: `1px solid ${
+                          medicine.quantity === 0
+                            ? '#dc3545'
+                            : medicine.quantity < 100
+                            ? '#ffc107'
+                            : '#28a745'
+                        }`,
+                      }}
+                    >
+                      {medicine.quantity}
+                    </span>
+                  </td>
+                  <td
+                    style={{
+                      padding: '15px 20px',
+                      borderRight: '1px solid #e9ecef',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <span
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: '15px',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        backgroundColor:
+                          medicine.quantity === 0
+                            ? 'rgba(220, 53, 69, 0.1)'
+                            : medicine.quantity < 100
+                            ? 'rgba(255, 193, 7, 0.1)'
+                            : 'rgba(40, 167, 69, 0.1)',
+                        color:
+                          medicine.quantity === 0
+                            ? '#dc3545'
+                            : medicine.quantity < 100
+                            ? '#ffc107'
+                            : '#28a745',
+                        border: `1px solid ${
+                          medicine.quantity === 0
+                            ? '#dc3545'
+                            : medicine.quantity < 100
+                            ? '#ffc107'
+                            : '#28a745'
+                        }`,
+                      }}
+                    >
+                      {medicine.quantity === 0
+                        ? 'Hết hàng'
+                        : medicine.quantity < 100
+                        ? 'Sắp hết'
+                        : 'Còn hàng'}
+                    </span>
+                  </td>
+                  <td
+                    style={{
+                      padding: '15px 20px',
+                      borderRight: '1px solid #e9ecef',
+                      fontSize: '0.9rem',
+                      color: '#97a19b',
+                    }}
+                  >
+                    {medicine.createdAt}
+                  </td>
+                  <td
+                    style={{
+                      padding: '15px 20px',
+                      borderRight: '1px solid #e9ecef',
+                      fontSize: '0.9rem',
+                      color: '#97a19b',
+                    }}
+                  >
+                    {medicine.createdBy}
+                  </td>
+                  <td
+                    style={{
+                      padding: '15px 20px',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '8px',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <button
+                        onClick={() => openEditModal(medicine)}
+                        title="Chỉnh sửa"
+                        style={{
+                          background:
+                            'linear-gradient(135deg, #73ad67 0%, #85b06d 100%)',
+                          color: 'white',
+                          border: 'none',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontSize: '0.9rem',
+                          fontWeight: 500,
+                          transition: 'all 0.2s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow =
+                            '0 4px 12px rgba(115, 173, 103, 0.3)';
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => handleDeleteMedicine(medicine.id)}
+                        title="Xóa"
+                        style={{
+                          background:
+                            'linear-gradient(135deg, #dc3545 0%, #e74c3c 100%)',
+                          color: 'white',
+                          border: 'none',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontSize: '0.9rem',
+                          fontWeight: 500,
+                          transition: 'all 0.2s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow =
+                            '0 4px 12px rgba(220, 53, 69, 0.3)';
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Empty State */}
         {medicines.length === 0 && !loading && (
-          <div className="no-data">
-            <p>Không tìm thấy thuốc nào</p>
+          <div
+            style={{
+              padding: '60px 20px',
+              textAlign: 'center',
+              color: '#97a19b',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '4rem',
+                marginBottom: '20px',
+                opacity: 0.5,
+              }}
+            >
+              💊
+            </div>
+            <h3
+              style={{
+                fontSize: '1.2rem',
+                fontWeight: 600,
+                color: '#2f5148',
+                margin: '0 0 10px 0',
+                fontFamily: 'Satoshi, sans-serif',
+              }}
+            >
+              Không tìm thấy thuốc nào
+            </h3>
+            <p
+              style={{
+                fontSize: '0.9rem',
+                color: '#97a19b',
+                margin: 0,
+                fontFamily: 'Satoshi, sans-serif',
+              }}
+            >
+              Hãy thêm thuốc mới hoặc thay đổi từ khóa tìm kiếm
+            </p>
           </div>
         )}
       </div>
@@ -469,16 +833,76 @@ function MedicineManagement() {
                   />
                 </div>
 
-                <div className="form-actions">
-                  <button type="submit" className="btn-submit">
-                    Thêm thuốc
-                  </button>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '15px',
+                    justifyContent: 'flex-end',
+                    marginTop: '25px',
+                    paddingTop: '20px',
+                    borderTop: '1px solid #e9ecef',
+                  }}
+                >
                   <button
                     type="button"
-                    className="btn-cancel"
                     onClick={() => setShowAddModal(false)}
+                    style={{
+                      background:
+                        'linear-gradient(135deg, #6c757d 0%, #5a6268 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '12px 24px',
+                      borderRadius: '10px',
+                      cursor: 'pointer',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      fontFamily: 'Satoshi, sans-serif',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow =
+                        '0 4px 12px rgba(108, 117, 125, 0.3)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   >
                     Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    style={{
+                      background:
+                        'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '12px 24px',
+                      borderRadius: '10px',
+                      cursor: 'pointer',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      fontFamily: 'Satoshi, sans-serif',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow =
+                        '0 4px 12px rgba(47, 81, 72, 0.3)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    💊 Thêm thuốc
                   </button>
                 </div>
               </form>
@@ -561,16 +985,76 @@ function MedicineManagement() {
                   />
                 </div>
 
-                <div className="form-actions">
-                  <button type="submit" className="btn-submit">
-                    Cập nhật thuốc
-                  </button>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '15px',
+                    justifyContent: 'flex-end',
+                    marginTop: '25px',
+                    paddingTop: '20px',
+                    borderTop: '1px solid #e9ecef',
+                  }}
+                >
                   <button
                     type="button"
-                    className="btn-cancel"
                     onClick={() => setShowEditModal(false)}
+                    style={{
+                      background:
+                        'linear-gradient(135deg, #6c757d 0%, #5a6268 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '12px 24px',
+                      borderRadius: '10px',
+                      cursor: 'pointer',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      fontFamily: 'Satoshi, sans-serif',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow =
+                        '0 4px 12px rgba(108, 117, 125, 0.3)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   >
                     Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    style={{
+                      background:
+                        'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '12px 24px',
+                      borderRadius: '10px',
+                      cursor: 'pointer',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      fontFamily: 'Satoshi, sans-serif',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow =
+                        '0 4px 12px rgba(47, 81, 72, 0.3)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    ✏️ Cập nhật thuốc
                   </button>
                 </div>
               </form>

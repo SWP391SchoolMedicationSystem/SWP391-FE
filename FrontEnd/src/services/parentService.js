@@ -50,13 +50,7 @@ export const parentService = {
   getMyChildren: async parentId => {
     try {
       const url = buildApiUrl(API_ENDPOINTS.STUDENT.GET_BY_PARENT, parentId);
-      console.log('🌐 Calling Parent API:', url);
-      console.log('👨‍👩‍👧‍👦 Parent ID:', parentId);
-
       const response = await apiClient.get(url);
-      console.log('📥 Raw API response - My Children:', response);
-      console.log('📊 Response is array?', Array.isArray(response));
-      console.log('📈 Children count:', response?.length);
 
       return response;
     } catch (error) {
@@ -209,17 +203,11 @@ export const parentHealthService = {
   getChildHealthRecords: async studentId => {
     try {
       const url = `${API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT}?studentId=${studentId}`;
-      console.log('🌐 Calling Health Records API:', url);
-      console.log('🆔 Student ID for health records:', studentId);
-
-      const response = await apiClient.get(url);
-      console.log('📥 Raw API response - Health Records:', response);
-      console.log('📊 Response is array?', Array.isArray(response));
-      console.log('📈 Records count:', response?.length);
+            const response = await apiClient.get(url);
 
       const records = Array.isArray(response) ? response : [];
       const mappedRecords = records.map(parentService.mapHealthRecordData);
-      console.log('✅ Mapped health records:', mappedRecords);
+      
 
       return mappedRecords;
     } catch (error) {
@@ -232,12 +220,7 @@ export const parentHealthService = {
   updateHealthRecord: async (recordId, recordData) => {
     try {
       const url = `${API_ENDPOINTS.HEALTH_RECORD.UPDATE}?id=${recordId}`;
-      console.log('🌐 Calling Update Health Record API:', url);
-      console.log('📝 Record ID:', recordId);
-      console.log('📊 Update data:', recordData);
-
-      const response = await apiClient.put(url, recordData);
-      console.log('✅ Health record updated successfully:', response);
+            const response = await apiClient.put(url, recordData);
 
       return response;
     } catch (error) {
