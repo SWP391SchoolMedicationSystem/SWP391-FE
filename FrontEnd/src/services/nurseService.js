@@ -687,7 +687,7 @@ export const nurseFormService = {
   // Soft delete form by ID
   deleteForm: async (formId) => {
     try {
-      const url = buildApiUrl(API_ENDPOINTS.FORM.DELETE, formId);
+      const url = `https://api-schoolhealth.purintech.id.vn/api/Form?id=${formId}`;
       const response = await apiClient.delete(url);
       return response;
     } catch (error) {
