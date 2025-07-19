@@ -77,8 +77,6 @@ function StudentList() {
     navigate(`/manager/student-health-record/${student.id}`);
   };
 
-
-
   // Validate file type and size
   const validateFile = file => {
     const allowedTypes = [
@@ -296,73 +294,412 @@ function StudentList() {
         </div>
       )}
 
-      {/* Student Table */}
+      {/* Modern Student Table */}
       {!loading && !error && students && students.length > 0 && (
-        <div className="table-container">
-          <table className="student-table">
-            <thead>
-              <tr>
-                <th>Mã HS</th>
-                <th>Họ tên</th>
-                <th>Lớp</th>
-                <th>Tuổi</th>
-                <th>Ngày sinh</th>
-                <th>Giới tính</th>
-                <th>Nhóm máu</th>
-                <th>Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredStudents.map(student => (
-                <tr key={student.id}>
-                  <td className="student-id">{student.studentId}</td>
-                  <td>
-                    <div className="student-info">
-                      <strong>{student.fullName}</strong>
-                      <small>ID: {student.id}</small>
-                    </div>
-                  </td>
-                  <td className="class-name">{student.className}</td>
-                  <td>{student.age} tuổi</td>
-                  <td>{student.dateOfBirth}</td>
-                  <td>{student.gender}</td>
-                  <td>
-                    <span className="blood-type">{student.bloodType}</span>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      <button
-                        className="btn-view"
-                        onClick={() => handleViewStudent(student)}
-                        title="Xem chi tiết"
-                      >
-                        👁️
-                      </button>
-                      <button
-                        className="btn-health"
-                        onClick={() => handleViewHealthRecords(student)}
-                        title="Xem hồ sơ sức khỏe"
-                      >
-                        🏥
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+            border: '1px solid #c1cbc2',
+            overflow: 'hidden',
+            marginBottom: '30px',
+          }}
+        >
+          {/* Table Header */}
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+              color: 'white',
+              padding: '20px 25px',
+              borderBottom: '1px solid #e9ecef',
+            }}
+          >
+            <h3
+              style={{
+                margin: 0,
+                fontSize: '1.3rem',
+                fontWeight: 600,
+                fontFamily: 'Satoshi, sans-serif',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+              }}
+            >
+              <SchoolIcon sx={{ fontSize: '1.5rem' }} />
+              Danh Sách Học Sinh ({filteredStudents.length} học sinh)
+            </h3>
+          </div>
 
+          {/* Table Content */}
+          <div style={{ overflowX: 'auto' }}>
+            <table
+              style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                fontFamily: 'Satoshi, sans-serif',
+              }}
+            >
+              <thead>
+                <tr style={{ background: '#f8f9fa' }}>
+                  <th
+                    style={{
+                      padding: '15px 20px',
+                      textAlign: 'left',
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      color: '#2f5148',
+                      borderRight: '1px solid #e9ecef',
+                    }}
+                  >
+                    Mã HS
+                  </th>
+                  <th
+                    style={{
+                      padding: '15px 20px',
+                      textAlign: 'left',
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      color: '#2f5148',
+                      borderRight: '1px solid #e9ecef',
+                    }}
+                  >
+                    Họ tên
+                  </th>
+                  <th
+                    style={{
+                      padding: '15px 20px',
+                      textAlign: 'left',
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      color: '#2f5148',
+                      borderRight: '1px solid #e9ecef',
+                    }}
+                  >
+                    Lớp
+                  </th>
+                  <th
+                    style={{
+                      padding: '15px 20px',
+                      textAlign: 'left',
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      color: '#2f5148',
+                      borderRight: '1px solid #e9ecef',
+                    }}
+                  >
+                    Tuổi
+                  </th>
+                  <th
+                    style={{
+                      padding: '15px 20px',
+                      textAlign: 'left',
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      color: '#2f5148',
+                      borderRight: '1px solid #e9ecef',
+                    }}
+                  >
+                    Ngày sinh
+                  </th>
+                  <th
+                    style={{
+                      padding: '15px 20px',
+                      textAlign: 'left',
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      color: '#2f5148',
+                      borderRight: '1px solid #e9ecef',
+                    }}
+                  >
+                    Giới tính
+                  </th>
+                  <th
+                    style={{
+                      padding: '15px 20px',
+                      textAlign: 'left',
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      color: '#2f5148',
+                      borderRight: '1px solid #e9ecef',
+                    }}
+                  >
+                    Nhóm máu
+                  </th>
+                  <th
+                    style={{
+                      padding: '15px 20px',
+                      textAlign: 'center',
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      color: '#2f5148',
+                    }}
+                  >
+                    Thao tác
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredStudents.map((student, index) => (
+                  <tr
+                    key={student.id}
+                    style={{
+                      background: index % 2 === 0 ? 'white' : '#f8f9fa',
+                      transition: 'all 0.3s ease',
+                      cursor: 'pointer',
+                    }}
+                    onMouseEnter={e => {
+                      e.target.closest('tr').style.background = '#e8f5e8';
+                      e.target.closest('tr').style.transform =
+                        'translateY(-2px)';
+                    }}
+                    onMouseLeave={e => {
+                      e.target.closest('tr').style.background =
+                        index % 2 === 0 ? 'white' : '#f8f9fa';
+                      e.target.closest('tr').style.transform = 'translateY(0)';
+                    }}
+                  >
+                    <td
+                      style={{
+                        padding: '15px 20px',
+                        borderRight: '1px solid #e9ecef',
+                        fontSize: '0.9rem',
+                        color: '#2f5148',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {student.studentId}
+                    </td>
+                    <td
+                      style={{
+                        padding: '15px 20px',
+                        borderRight: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div>
+                        <div
+                          style={{
+                            fontWeight: 600,
+                            color: '#2f5148',
+                            fontSize: '0.95rem',
+                            marginBottom: '2px',
+                          }}
+                        >
+                          {student.fullName}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: '0.8rem',
+                            color: '#97a19b',
+                          }}
+                        >
+                          ID: {student.id}
+                        </div>
+                      </div>
+                    </td>
+                    <td
+                      style={{
+                        padding: '15px 20px',
+                        borderRight: '1px solid #e9ecef',
+                        fontSize: '0.9rem',
+                        color: '#2f5148',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {student.className}
+                    </td>
+                    <td
+                      style={{
+                        padding: '15px 20px',
+                        borderRight: '1px solid #e9ecef',
+                        fontSize: '0.9rem',
+                        color: '#2f5148',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {student.age} tuổi
+                    </td>
+                    <td
+                      style={{
+                        padding: '15px 20px',
+                        borderRight: '1px solid #e9ecef',
+                        fontSize: '0.9rem',
+                        color: '#2f5148',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {student.dateOfBirth}
+                    </td>
+                    <td
+                      style={{
+                        padding: '15px 20px',
+                        borderRight: '1px solid #e9ecef',
+                        fontSize: '0.9rem',
+                        color: '#2f5148',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {student.gender}
+                    </td>
+                    <td
+                      style={{
+                        padding: '15px 20px',
+                        borderRight: '1px solid #e9ecef',
+                      }}
+                    >
+                      <span
+                        style={{
+                          background: '#fff3cd',
+                          color: '#856404',
+                          padding: '4px 12px',
+                          borderRadius: '12px',
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          border: '1px solid #ffeaa7',
+                        }}
+                      >
+                        {student.bloodType}
+                      </span>
+                    </td>
+                    <td
+                      style={{
+                        padding: '15px 20px',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: '8px',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <button
+                          onClick={() => handleViewStudent(student)}
+                          title="Xem chi tiết"
+                          style={{
+                            background:
+                              'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            padding: '8px 12px',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem',
+                            fontWeight: 500,
+                            transition: 'all 0.3s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            fontFamily: 'Satoshi, sans-serif',
+                          }}
+                          onMouseEnter={e => {
+                            e.target.style.transform = 'translateY(-2px)';
+                            e.target.style.boxShadow =
+                              '0 4px 12px rgba(47, 81, 72, 0.3)';
+                          }}
+                          onMouseLeave={e => {
+                            e.target.style.transform = 'translateY(0)';
+                            e.target.style.boxShadow = 'none';
+                          }}
+                        >
+                          <PersonIcon sx={{ fontSize: '1rem' }} />
+                          Chi tiết
+                        </button>
+                        <button
+                          onClick={() => handleViewHealthRecords(student)}
+                          title="Xem hồ sơ sức khỏe"
+                          style={{
+                            background:
+                              'linear-gradient(135deg, #17a2b8 0%, #138496 100%)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            padding: '8px 12px',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem',
+                            fontWeight: 500,
+                            transition: 'all 0.3s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            fontFamily: 'Satoshi, sans-serif',
+                          }}
+                          onMouseEnter={e => {
+                            e.target.style.transform = 'translateY(-2px)';
+                            e.target.style.boxShadow =
+                              '0 4px 12px rgba(23, 162, 184, 0.3)';
+                          }}
+                          onMouseLeave={e => {
+                            e.target.style.transform = 'translateY(0)';
+                            e.target.style.boxShadow = 'none';
+                          }}
+                        >
+                          <LocalHospitalIcon sx={{ fontSize: '1rem' }} />
+                          Sức khỏe
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Empty Filter Results */}
           {filteredStudents.length === 0 && (
-            <div className="no-data">
-              <p>Không tìm thấy dữ liệu phù hợp với bộ lọc</p>
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '60px 20px',
+                color: '#97a19b',
+              }}
+            >
+              <SchoolIcon sx={{ fontSize: '4rem', marginBottom: '20px' }} />
+              <p
+                style={{
+                  fontSize: '1.1rem',
+                  fontWeight: 500,
+                  margin: '0 0 20px 0',
+                  fontFamily: 'Satoshi, sans-serif',
+                }}
+              >
+                Không tìm thấy học sinh phù hợp với bộ lọc
+              </p>
               <button
                 onClick={() => {
                   setSearchTerm('');
                   setFilterClass('');
                 }}
-                className="retry-btn"
+                style={{
+                  background:
+                    'linear-gradient(135deg, #97a19b 0%, #7a8580 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '12px 24px',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  fontFamily: 'Satoshi, sans-serif',
+                  transition: 'all 0.3s ease',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+                onMouseEnter={e => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow =
+                    '0 4px 12px rgba(151, 161, 155, 0.3)';
+                }}
+                onMouseLeave={e => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = 'none';
+                }}
               >
-                🔄 Đặt lại bộ lọc
+                <CloseIcon sx={{ fontSize: '1.2rem' }} />
+                Đặt lại bộ lọc
               </button>
             </div>
           )}

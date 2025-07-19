@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useManagerAccounts } from "../../utils/hooks/useManager";
-import Modal from "../../components/common/Modal";
-import "../../css/Manager/AccountManagement.css";
+import React, { useState, useEffect } from 'react';
+import { useManagerAccounts } from '../../utils/hooks/useManager';
+import Modal from '../../components/common/Modal';
+import '../../css/Manager/AccountManagement.css';
 
 const AccountManagement = () => {
   const {
@@ -17,7 +17,7 @@ const AccountManagement = () => {
     refetch,
   } = useManagerAccounts();
 
-  const [activeTab, setActiveTab] = useState("parents");
+  const [activeTab, setActiveTab] = useState('parents');
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingAccount, setEditingAccount] = useState(null);
   const [editFormData, setEditFormData] = useState({});
@@ -30,8 +30,8 @@ const AccountManagement = () => {
 
   // Check if account can be edited (only Parents and Nurses can be edited by Manager)
   const canEditAccount = (account, accountType) => {
-    if (accountType === "parent") return true;
-    if (accountType === "staff") {
+    if (accountType === 'parent') return true;
+    if (accountType === 'staff') {
       // Manager can only edit Nurse accounts (roleid = 3), not Admin (1) or Manager (2)
       return account.roleid === 3;
     }
@@ -41,26 +41,26 @@ const AccountManagement = () => {
   // Handle edit account
   const handleEditAccount = (account, accountType) => {
     if (!canEditAccount(account, accountType)) {
-      alert("You do not have permission to edit this account.");
+      alert('Bạn không có quyền chỉnh sửa tài khoản này.');
       return;
     }
 
     setEditingAccount({ ...account, accountType });
 
-    if (accountType === "parent") {
+    if (accountType === 'parent') {
       setEditFormData({
         parentid: account.parentid,
-        fullname: account.fullname || "",
-        email: account.email || "",
-        phone: account.phone || "",
-        address: account.address || "",
+        fullname: account.fullname || '',
+        email: account.email || '',
+        phone: account.phone || '',
+        address: account.address || '',
       });
     } else {
       setEditFormData({
         staffid: account.staffid,
-        fullname: account.fullname || "",
-        email: account.email || "",
-        phone: account.phone || "",
+        fullname: account.fullname || '',
+        email: account.email || '',
+        phone: account.phone || '',
         roleid: account.roleid || 3,
       });
     }
@@ -69,21 +69,21 @@ const AccountManagement = () => {
   };
 
   // Handle form input change
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
-    setEditFormData((prev) => ({
+    setEditFormData(prev => ({
       ...prev,
       [name]: value,
     }));
   };
 
   // Handle form submit
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setSubmitLoading(true);
 
     try {
-      if (editingAccount.accountType === "parent") {
+      if (editingAccount.accountType === 'parent') {
         await updateParent(editFormData);
       } else {
         await updateStaff(editFormData);
@@ -94,31 +94,31 @@ const AccountManagement = () => {
       setEditFormData({});
 
       // Show success message
-      alert("Account updated successfully!");
+      alert('Cập nhật tài khoản thành công!');
     } catch (error) {
-      console.error("Update failed:", error);
-      alert("Failed to update account. Please try again.");
+      console.error('Update failed:', error);
+      alert('Không thể cập nhật tài khoản. Vui lòng thử lại.');
     } finally {
       setSubmitLoading(false);
     }
   };
 
   // Get account status display
-  const getAccountStatus = (account) => {
-    if (account.isDeleted) return "Inactive";
-    return "Active";
+  const getAccountStatus = account => {
+    if (account.isDeleted) return 'Không hoạt động';
+    return 'Hoạt động';
   };
 
   // Get status badge class
-  const getStatusBadgeClass = (account) => {
-    if (account.isDeleted) return "status-inactive";
-    return "status-active";
+  const getStatusBadgeClass = account => {
+    if (account.isDeleted) return 'status-inactive';
+    return 'status-active';
   };
 
   // Check if status can be toggled
   const canToggleStatus = (account, accountType) => {
-    if (accountType === "parent") return true;
-    if (accountType === "staff") {
+    if (accountType === 'parent') return true;
+    if (accountType === 'staff') {
       // Manager can toggle status for Nurse accounts only, not Admin/Manager
       return account.roleid === 3;
     }
@@ -128,28 +128,28 @@ const AccountManagement = () => {
   // Handle toggle status
   const handleToggleStatus = async (account, accountType) => {
     if (!canToggleStatus(account, accountType)) {
-      alert("You do not have permission to change the status of this account.");
+      alert('Bạn không có quyền thay đổi trạng thái tài khoản này.');
       return;
     }
 
-    const action = account.isDeleted ? "activate" : "deactivate";
-    const confirmMessage = `Are you sure you want to ${action} ${account.fullname}?`;
+    const action = account.isDeleted ? 'kích hoạt' : 'vô hiệu hóa';
+    const confirmMessage = `Bạn có chắc chắn muốn ${action} ${account.fullname}?`;
 
     if (!confirm(confirmMessage)) {
       return;
     }
 
     try {
-      if (accountType === "parent") {
+      if (accountType === 'parent') {
         await toggleParentStatus(account.parentid);
       } else {
         await toggleStaffStatus(account.staffid);
       }
 
-      alert(`Account ${action}d successfully!`);
+      alert(`Tài khoản đã được ${action} thành công!`);
     } catch (error) {
-      console.error("Toggle status failed:", error);
-      alert(`Failed to ${action} account. Please try again.`);
+      console.error('Toggle status failed:', error);
+      alert(`Không thể ${action} tài khoản. Vui lòng thử lại.`);
     }
   };
 
@@ -157,7 +157,7 @@ const AccountManagement = () => {
   const renderParentForm = () => (
     <>
       <div className="form-group">
-        <label htmlFor="fullname">Full Name:</label>
+        <label htmlFor="fullname">Họ và Tên:</label>
         <input
           type="text"
           id="fullname"
@@ -181,7 +181,7 @@ const AccountManagement = () => {
       </div>
 
       <div className="form-group">
-        <label htmlFor="phone">Phone:</label>
+        <label htmlFor="phone">Số Điện Thoại:</label>
         <input
           type="tel"
           id="phone"
@@ -193,7 +193,7 @@ const AccountManagement = () => {
       </div>
 
       <div className="form-group">
-        <label htmlFor="address">Address:</label>
+        <label htmlFor="address">Địa Chỉ:</label>
         <textarea
           id="address"
           name="address"
@@ -210,7 +210,7 @@ const AccountManagement = () => {
   const renderStaffForm = () => (
     <>
       <div className="form-group">
-        <label htmlFor="fullname">Full Name:</label>
+        <label htmlFor="fullname">Họ và Tên:</label>
         <input
           type="text"
           id="fullname"
@@ -234,7 +234,7 @@ const AccountManagement = () => {
       </div>
 
       <div className="form-group">
-        <label htmlFor="phone">Phone:</label>
+        <label htmlFor="phone">Số Điện Thoại:</label>
         <input
           type="tel"
           id="phone"
@@ -246,7 +246,7 @@ const AccountManagement = () => {
       </div>
 
       <div className="form-group">
-        <label htmlFor="roleid">Role:</label>
+        <label htmlFor="roleid">Vai Trò:</label>
         <select
           id="roleid"
           name="roleid"
@@ -261,9 +261,9 @@ const AccountManagement = () => {
         </select>
         {editFormData.roleid !== 3 && (
           <small
-            style={{ color: "#e74c3c", marginTop: "5px", display: "block" }}
+            style={{ color: '#e74c3c', marginTop: '5px', display: 'block' }}
           >
-            Role cannot be changed for Admin/Manager accounts
+            Không thể thay đổi vai trò cho tài khoản Admin/Manager
           </small>
         )}
       </div>
@@ -276,7 +276,7 @@ const AccountManagement = () => {
       <div className="account-management">
         <div className="loading-container">
           <div className="spinner"></div>
-          <p>⏳ Loading accounts...</p>
+          <p>⏳ Đang tải danh sách tài khoản...</p>
         </div>
       </div>
     );
@@ -289,7 +289,7 @@ const AccountManagement = () => {
         <div className="error-container">
           <p>❌ {error}</p>
           <button onClick={refetch} className="retry-btn">
-            🔄 Retry
+            🔄 Thử lại
           </button>
         </div>
       </div>
@@ -299,39 +299,39 @@ const AccountManagement = () => {
   return (
     <div className="account-management">
       <div className="page-header">
-        <h1>👥 Account Management</h1>
-        <p>Manage parent and staff accounts</p>
+        <h1>👥 Quản Lý Tài Khoản</h1>
+        <p>Quản lý tài khoản phụ huynh và nhân viên</p>
       </div>
 
       {/* Tab Navigation */}
       <div className="tab-navigation">
         <button
-          className={`tab-btn ${activeTab === "parents" ? "active" : ""}`}
-          onClick={() => setActiveTab("parents")}
+          className={`tab-btn ${activeTab === 'parents' ? 'active' : ''}`}
+          onClick={() => setActiveTab('parents')}
         >
-          👨‍👩‍👧‍👦 Parents ({parentsList.length})
+          👨‍👩‍👧‍👦 Phụ Huynh ({parentsList.length})
         </button>
         <button
-          className={`tab-btn ${activeTab === "staff" ? "active" : ""}`}
-          onClick={() => setActiveTab("staff")}
+          className={`tab-btn ${activeTab === 'staff' ? 'active' : ''}`}
+          onClick={() => setActiveTab('staff')}
         >
-          👩‍💼 Staff ({staffList.length})
+          👩‍💼 Nhân Viên ({staffList.length})
         </button>
       </div>
 
       {/* Parents Tab */}
-      {activeTab === "parents" && (
+      {activeTab === 'parents' && (
         <div className="tab-content">
           <div className="section-header">
-            <h2>Parent Accounts</h2>
+            <h2>Tài Khoản Phụ Huynh</h2>
             <button onClick={() => fetchAllAccounts()} className="refresh-btn">
-              🔄 Refresh
+              🔄 Làm mới
             </button>
           </div>
 
           {parentsList.length === 0 ? (
             <div className="empty-state">
-              <p>📭 No parent accounts found</p>
+              <p>📭 Không tìm thấy tài khoản phụ huynh nào</p>
             </div>
           ) : (
             <div className="accounts-table">
@@ -339,17 +339,17 @@ const AccountManagement = () => {
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Full Name</th>
+                    <th>Họ và Tên</th>
                     <th>Email</th>
-                    <th>Phone</th>
-                    <th>Address</th>
-                    <th>Status</th>
-                    <th>Created Date</th>
-                    <th>Actions</th>
+                    <th>Số Điện Thoại</th>
+                    <th>Địa Chỉ</th>
+                    <th>Trạng Thái</th>
+                    <th>Ngày Tạo</th>
+                    <th>Thao Tác</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {parentsList.map((parent) => (
+                  {parentsList.map(parent => (
                     <tr key={parent.parentid}>
                       <td>{parent.parentid}</td>
                       <td>{parent.fullname}</td>
@@ -361,10 +361,10 @@ const AccountManagement = () => {
                           className={`status-toggle ${getStatusBadgeClass(
                             parent
                           )}`}
-                          onClick={() => handleToggleStatus(parent, "parent")}
-                          title={`Click to ${
-                            parent.isDeleted ? "activate" : "deactivate"
-                          } account`}
+                          onClick={() => handleToggleStatus(parent, 'parent')}
+                          title={`Nhấp để ${
+                            parent.isDeleted ? 'kích hoạt' : 'vô hiệu hóa'
+                          } tài khoản`}
                         >
                           {getAccountStatus(parent)}
                         </button>
@@ -372,13 +372,13 @@ const AccountManagement = () => {
                       <td>
                         {parent.createdDate
                           ? new Date(parent.createdDate).toLocaleDateString()
-                          : "N/A"}
+                          : 'N/A'}
                       </td>
                       <td className="actions">
                         <button
-                          onClick={() => handleEditAccount(parent, "parent")}
+                          onClick={() => handleEditAccount(parent, 'parent')}
                           className="edit-btn"
-                          title="Edit Parent"
+                          title="Chỉnh sửa Phụ Huynh"
                         >
                           ✏️
                         </button>
@@ -393,18 +393,18 @@ const AccountManagement = () => {
       )}
 
       {/* Staff Tab */}
-      {activeTab === "staff" && (
+      {activeTab === 'staff' && (
         <div className="tab-content">
           <div className="section-header">
-            <h2>Staff Accounts</h2>
+            <h2>Tài Khoản Nhân Viên</h2>
             <button onClick={() => fetchAllAccounts()} className="refresh-btn">
-              🔄 Refresh
+              🔄 Làm mới
             </button>
           </div>
 
           {staffList.length === 0 ? (
             <div className="empty-state">
-              <p>📭 No staff accounts found</p>
+              <p>📭 Không tìm thấy tài khoản nhân viên nào</p>
             </div>
           ) : (
             <div className="accounts-table">
@@ -412,17 +412,17 @@ const AccountManagement = () => {
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Full Name</th>
+                    <th>Họ và Tên</th>
                     <th>Email</th>
-                    <th>Phone</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Created Date</th>
-                    <th>Actions</th>
+                    <th>Số Điện Thoại</th>
+                    <th>Vai Trò</th>
+                    <th>Trạng Thái</th>
+                    <th>Ngày Tạo</th>
+                    <th>Thao Tác</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {staffList.map((staff) => (
+                  {staffList.map(staff => (
                     <tr key={staff.staffid}>
                       <td>{staff.staffid}</td>
                       <td>{staff.fullname}</td>
@@ -431,22 +431,22 @@ const AccountManagement = () => {
                       <td>
                         <span className={`role-badge role-${staff.roleid}`}>
                           {staff.roleid === 1
-                            ? "Admin"
+                            ? 'Admin'
                             : staff.roleid === 2
-                            ? "Manager"
-                            : "Nurse"}
+                            ? 'Manager'
+                            : 'Nurse'}
                         </span>
                       </td>
                       <td>
-                        {canToggleStatus(staff, "staff") ? (
+                        {canToggleStatus(staff, 'staff') ? (
                           <button
                             className={`status-toggle ${getStatusBadgeClass(
                               staff
                             )}`}
-                            onClick={() => handleToggleStatus(staff, "staff")}
-                            title={`Click to ${
-                              staff.isDeleted ? "activate" : "deactivate"
-                            } account`}
+                            onClick={() => handleToggleStatus(staff, 'staff')}
+                            title={`Nhấp để ${
+                              staff.isDeleted ? 'kích hoạt' : 'vô hiệu hóa'
+                            } tài khoản`}
                           >
                             {getAccountStatus(staff)}
                           </button>
@@ -455,7 +455,7 @@ const AccountManagement = () => {
                             className={`status-badge ${getStatusBadgeClass(
                               staff
                             )}`}
-                            title="Status cannot be changed for Admin/Manager accounts"
+                            title="Không thể thay đổi trạng thái cho tài khoản Admin/Manager"
                           >
                             {getAccountStatus(staff)}
                           </span>
@@ -464,23 +464,23 @@ const AccountManagement = () => {
                       <td>
                         {staff.createdAt
                           ? new Date(staff.createdAt).toLocaleDateString()
-                          : "N/A"}
+                          : 'N/A'}
                       </td>
                       <td className="actions">
-                        {canEditAccount(staff, "staff") ? (
+                        {canEditAccount(staff, 'staff') ? (
                           <button
-                            onClick={() => handleEditAccount(staff, "staff")}
+                            onClick={() => handleEditAccount(staff, 'staff')}
                             className="edit-btn"
-                            title="Edit Staff"
+                            title="Chỉnh sửa Nhân Viên"
                           >
                             ✏️
                           </button>
                         ) : (
                           <span
                             className="view-only-badge"
-                            title="View Only - No Edit Permission"
+                            title="Chỉ Xem - Không Có Quyền Chỉnh Sửa"
                           >
-                            👁️ View Only
+                            👁️ Chỉ Xem
                           </span>
                         )}
                       </td>
@@ -502,12 +502,12 @@ const AccountManagement = () => {
             setEditingAccount(null);
             setEditFormData({});
           }}
-          title={`Edit ${
-            editingAccount?.accountType === "parent" ? "Parent" : "Staff"
-          } Account`}
+          title={`Chỉnh Sửa Tài Khoản ${
+            editingAccount?.accountType === 'parent' ? 'Phụ Huynh' : 'Nhân Viên'
+          }`}
         >
           <form onSubmit={handleSubmit} className="edit-form">
-            {editingAccount?.accountType === "parent"
+            {editingAccount?.accountType === 'parent'
               ? renderParentForm()
               : renderStaffForm()}
 
@@ -522,14 +522,14 @@ const AccountManagement = () => {
                 className="cancel-btn"
                 disabled={submitLoading}
               >
-                Cancel
+                Hủy
               </button>
               <button
                 type="submit"
                 className="save-btn"
                 disabled={submitLoading}
               >
-                {submitLoading ? "⏳ Saving..." : "💾 Save Changes"}
+                {submitLoading ? '⏳ Đang lưu...' : '💾 Lưu Thay Đổi'}
               </button>
             </div>
           </form>
