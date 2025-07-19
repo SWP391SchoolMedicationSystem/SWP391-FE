@@ -43,12 +43,16 @@ apiClient.interceptors.response.use(
     console.error('Request Method:', error.config?.method);
     console.error('Request Data:', error.config?.data);
 
-    // Handle common errors
-    if (error.response?.status === 401) {
-      // Unauthorized - redirect to login
+    // Handle common errors - but NOT for login endpoints
+    const isLoginRequest =
+      error.config?.url?.includes('/User/user') ||
+      error.config?.url?.includes('/User/google');
+
+    if (error.response?.status === 401 && !isLoginRequest) {
+      // Unauthorized - redirect to login (but not during login process)
       console.error('Unauthorized access - redirecting to login');
       localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      localStorage.removeItem('userInfo');
       window.location.href = '/login';
     } else if (error.response?.status === 403) {
       // Forbidden

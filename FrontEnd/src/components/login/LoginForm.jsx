@@ -48,29 +48,29 @@ export default function LoginForm() {
         const userData = JSON.parse(userInfo);
         const role = userData.role;
 
-              // Redirect based on role
-      switch (role) {
-        case 'Manager':
-          navigate('/manager');
-          break;
-        case 'Nurse':
-          navigate('/nurse');
-          break;
-        case 'Parent':
-          navigate('/home');
-          break;
-        case 'Admin':
-          navigate('/admin');
-          break;
-        default:
-          // Fallback logic
-          if (userData.isStaff) {
+        // Redirect based on role
+        switch (role) {
+          case 'Manager':
             navigate('/manager');
-          } else {
+            break;
+          case 'Nurse':
+            navigate('/nurse');
+            break;
+          case 'Parent':
             navigate('/home');
-          }
-          break;
-      }
+            break;
+          case 'Admin':
+            navigate('/admin');
+            break;
+          default:
+            // Fallback logic
+            if (userData.isStaff) {
+              navigate('/manager');
+            } else {
+              navigate('/home');
+            }
+            break;
+        }
       } catch {
         // If userInfo is corrupted, clear localStorage
         localStorage.removeItem('token');
@@ -116,13 +116,32 @@ export default function LoginForm() {
           break;
       }
     } catch (err) {
-      setError(err.message || 'Google login failed. Please try again.');
+      console.log('Google login error:', err);
+
+      if (err.response) {
+        if (err.response.status >= 500) {
+          alert('Không thể kết nối đến server. Vui lòng thử lại sau.');
+          setError('Lỗi server.');
+        } else {
+          const message =
+            err.response.data?.message || 'Đăng nhập Google thất bại.';
+          alert(message);
+          setError(message);
+        }
+      } else if (err.request) {
+        alert('Không thể kết nối đến server. Kiểm tra kết nối mạng.');
+        setError('Không thể kết nối đến server.');
+      } else {
+        alert('Đăng nhập Google thất bại. Vui lòng thử lại.');
+        setError('Đăng nhập Google thất bại.');
+      }
     }
   };
 
   const handleGoogleLoginFailure = error => {
     console.error('Google login failed:', error);
-    setError('Google login failed. Please try again.');
+    alert('Đăng nhập Google thất bại. Vui lòng thử lại.');
+    setError('Đăng nhập Google thất bại.');
   };
 
   const handleChange = e => {
@@ -174,17 +193,45 @@ export default function LoginForm() {
           break;
       }
     } catch (err) {
-      if (err.response) {
-        if (err.response.status === 401) {
-          setError('Email hoặc mật khẩu không đúng.');
-        } else if (err.response.data?.message) {
-          setError(err.response.data.message);
-        } else {
-          setError('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
-        }
+      console.log('🔥 Login error caught:', err);
+
+      // Get error message from userService or error object
+      const errorMessage = err.message || 'Có lỗi xảy ra khi đăng nhập';
+
+      // Handle specific error cases
+      if (err.response?.status === 401) {
+        // Wrong password/credentials
+        alert('Mật khẩu không đúng. Vui lòng kiểm tra lại.');
+        setError('Mật khẩu không đúng.');
+      } else if (
+        errorMessage.includes('Token') ||
+        errorMessage.includes('token')
+      ) {
+        // JWT/Token validation errors
+        alert('Có lỗi xác thực. Vui lòng thử lại.');
+        setError('Lỗi xác thực.');
+      } else if (
+        errorMessage.includes('server') ||
+        errorMessage.includes('Server')
+      ) {
+        // Server errors
+        alert('Không thể kết nối đến server. Vui lòng thử lại sau.');
+        setError('Lỗi kết nối server.');
+      } else if (errorMessage.includes('Email không tồn tại')) {
+        // Email not found
+        alert('Email không tồn tại trong hệ thống.');
+        setError('Email không tồn tại.');
       } else {
-        setError('Không thể kết nối đến server. Vui lòng thử lại.');
+        // Other errors - use the message from userService
+        alert(errorMessage);
+        setError(errorMessage);
       }
+
+      // Clear password field on error for security
+      setFormData(prev => ({
+        ...prev,
+        password: '',
+      }));
     }
   };
 

@@ -6,6 +6,9 @@ import { nurseBlogService } from '../../services/nurseService';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 function Blog() {
   // Use API hooks
@@ -286,39 +289,280 @@ function Blog() {
 
   return (
     <div className="nurse-blog-container">
-      <div className="blog-header">
-        <h1>📝 Quản Lý Blog Y Tế</h1>
-        <p>Tạo và quản lý các bài viết sức khỏe cho phụ huynh</p>
+      {/* Modern Header */}
+      <div
+        style={{
+          background:
+            'linear-gradient(135deg, #2f5148 0%, #4a7065 25%, #73ad67 75%, #85b373 100%)',
+          borderRadius: '24px',
+          padding: '40px 35px',
+          boxShadow:
+            '0 20px 40px rgba(47, 81, 72, 0.2), 0 8px 16px rgba(47, 81, 72, 0.15)',
+          textAlign: 'center',
+          color: 'white',
+          marginBottom: '30px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            content: '',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background:
+              'radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%)',
+            pointerEvents: 'none',
+          }}
+        ></div>
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <h1
+            style={{
+              fontSize: '2.8rem',
+              fontWeight: 800,
+              marginBottom: '12px',
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              letterSpacing: '-0.02em',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '15px',
+              fontFamily:
+                "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+            }}
+          >
+            <LocalHospitalIcon sx={{ fontSize: '3rem', color: 'white' }} />
+            Quản Lý Blog Y Tế
+          </h1>
+          <p
+            style={{
+              fontSize: '1.2rem',
+              opacity: 0.95,
+              fontWeight: 500,
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+              margin: 0,
+              fontFamily:
+                "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+            }}
+          >
+            Tạo và quản lý các bài viết sức khỏe cho phụ huynh
+          </p>
+        </div>
       </div>
 
-      {/* Statistics */}
-      <div className="stats-container">
-        <div className="stat-card total">
-          <div className="stat-icon">📚</div>
-          <div className="stat-content">
-            <h3>{stats.total}</h3>
-            <p>Tổng bài viết</p>
+      {/* Modern Statistics */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '25px',
+          marginBottom: '30px',
+        }}
+      >
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            padding: '25px',
+            borderRadius: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          }}
+        >
+          <div
+            style={{
+              padding: '15px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(191, 239, 161, 0.3)',
+            }}
+          >
+            <LocalHospitalIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: '2rem',
+                margin: 0,
+                color: '#2f5148',
+                fontWeight: 700,
+                fontFamily:
+                  "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+              }}
+            >
+              {stats.total}
+            </h3>
+            <p
+              style={{
+                margin: '5px 0 0 0',
+                color: '#97a19b',
+                fontFamily:
+                  "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+              }}
+            >
+              Tổng bài viết
+            </p>
           </div>
         </div>
-        <div className="stat-card published">
-          <div className="stat-icon">✅</div>
-          <div className="stat-content">
-            <h3>{stats.published}</h3>
-            <p>Đã đăng</p>
+
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            padding: '25px',
+            borderRadius: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          }}
+        >
+          <div
+            style={{
+              padding: '15px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(191, 239, 161, 0.3)',
+            }}
+          >
+            <CheckCircleIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: '2rem',
+                margin: 0,
+                color: '#2f5148',
+                fontWeight: 700,
+                fontFamily:
+                  "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+              }}
+            >
+              {stats.published}
+            </h3>
+            <p
+              style={{
+                margin: '5px 0 0 0',
+                color: '#97a19b',
+                fontFamily:
+                  "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+              }}
+            >
+              Đã đăng
+            </p>
           </div>
         </div>
-        <div className="stat-card draft">
-          <div className="stat-icon">📝</div>
-          <div className="stat-content">
-            <h3>{stats.draft}</h3>
-            <p>Bản nháp</p>
+
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            padding: '25px',
+            borderRadius: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          }}
+        >
+          <div
+            style={{
+              padding: '15px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(191, 239, 161, 0.3)',
+            }}
+          >
+            <CancelIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: '2rem',
+                margin: 0,
+                color: '#2f5148',
+                fontWeight: 700,
+                fontFamily:
+                  "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+              }}
+            >
+              {stats.draft}
+            </h3>
+            <p
+              style={{
+                margin: '5px 0 0 0',
+                color: '#97a19b',
+                fontFamily:
+                  "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+              }}
+            >
+              Bản nháp
+            </p>
           </div>
         </div>
-        <div className="stat-card reads">
-          <div className="stat-icon">👁️</div>
-          <div className="stat-content">
-            <h3>{stats.totalReads}</h3>
-            <p>Lượt đọc</p>
+
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            padding: '25px',
+            borderRadius: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+            border: '1px solid rgba(193, 203, 194, 0.3)',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          }}
+        >
+          <div
+            style={{
+              padding: '15px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(191, 239, 161, 0.3)',
+            }}
+          >
+            <VisibilityIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
+          </div>
+          <div>
+            <h3
+              style={{
+                fontSize: '2rem',
+                margin: 0,
+                color: '#2f5148',
+                fontWeight: 700,
+                fontFamily:
+                  "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+              }}
+            >
+              {stats.totalReads}
+            </h3>
+            <p
+              style={{
+                margin: '5px 0 0 0',
+                color: '#97a19b',
+                fontFamily:
+                  "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+              }}
+            >
+              Lượt đọc
+            </p>
           </div>
         </div>
       </div>
