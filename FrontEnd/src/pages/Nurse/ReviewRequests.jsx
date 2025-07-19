@@ -1,95 +1,173 @@
-import React, { useState, useEffect } from "react";
-import { nurseFormService } from "../../services/nurseService";
-import { useNurseActions } from "../../utils/hooks/useNurse";
-import "../../css/Nurse/ReviewRequests.css";
-import InfoIcon from "@mui/icons-material/Info";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
-import DeleteIcon from "@mui/icons-material/Delete";
-import PersonIcon from "@mui/icons-material/Person";
-import ChildCareIcon from "@mui/icons-material/ChildCare";
-import CategoryIcon from "@mui/icons-material/Category";
-import DateRangeIcon from "@mui/icons-material/DateRange";
-import DescriptionIcon from "@mui/icons-material/Description";
-import CloseIcon from "@mui/icons-material/Close";
+import React, { useState, useEffect } from 'react';
+import { nurseFormService } from '../../services/nurseService';
+import { useNurseActions } from '../../utils/hooks/useNurse';
+import '../../css/Nurse/ReviewRequests.css';
+import InfoIcon from '@mui/icons-material/Info';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import DeleteIcon from '@mui/icons-material/Delete';
+import PersonIcon from '@mui/icons-material/Person';
+import ChildCareIcon from '@mui/icons-material/ChildCare';
+import CategoryIcon from '@mui/icons-material/Category';
+import DateRangeIcon from '@mui/icons-material/DateRange';
+import DescriptionIcon from '@mui/icons-material/Description';
+import CloseIcon from '@mui/icons-material/Close';
 
 function ReviewRequests() {
-  const { 
-    approveForm, 
-    declineForm, 
-    deleteForm, 
-    getFormsByParent, 
-    getFormsByCategory 
+  const {
+    approveForm,
+    declineForm,
+    deleteForm,
+    getFormsByParent,
+    getFormsByCategory,
   } = useNurseActions();
-  
+
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
-  const [filterCategory, setFilterCategory] = useState("");
-  const [filterParent, setFilterParent] = useState("");
+  const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterParent, setFilterParent] = useState('');
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showActionModal, setShowActionModal] = useState(false);
-  const [actionType, setActionType] = useState(""); // 'approve', 'decline', or 'delete'
-  const [declineReason, setDeclineReason] = useState("");
+  const [actionType, setActionType] = useState(''); // 'approve', 'decline', or 'delete'
+  const [declineReason, setDeclineReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
   // Fetch requests on component mount
   useEffect(() => {
     const fetchData = async () => {
       const allForms = await nurseFormService.getAllForms();
-      setRequests(allForms.filter(form => !form.isDeleted));
+      const cleanForms = allForms
+        .filter(form => !form.isDeleted)
+        .map(form => ({
+          ...form,
+          isPending: form.isPending === true || form.isPending === 'true',
+          isaccepted: form.isaccepted === true || form.isaccepted === 'true'
+        }));
+      setRequests(cleanForms);
     };
     fetchData();
   }, []);
 
+  // Auto-refresh disabled - removed to avoid continuous refreshing
+
   const fetchRequests = async () => {
     try {
       setLoading(true);
-      setError("");
-      console.log("🔄 Fetching form requests from API...");
+      setError('');
+      console.log('🔄 Fetching form requests from API...');
       const response = await nurseFormService.getAllForms();
-      console.log("✅ API Response:", response);
+      console.log('✅ API Response:', response);
       const activeForms = response.filter(form => !form.isDeleted);
-      setRequests(activeForms);
+      
+      // Clean and normalize the data with detailed logging
+      const cleanForms = activeForms.map(form => {
+        const cleanedForm = {
+          ...form,
+          isPending: form.isPending === true || form.isPending === 'true',
+          isaccepted: form.isaccepted === true || form.isaccepted === 'true'
+        };
+        
+        // Debug each form's status
+        console.log(`🔍 Form ${form.formId}:`, {
+          original: { isPending: form.isPending, isaccepted: form.isaccepted },
+          cleaned: { isPending: cleanedForm.isPending, isaccepted: cleanedForm.isaccepted },
+          status: cleanedForm.isPending ? 'PENDING' : (cleanedForm.isaccepted ? 'APPROVED' : 'DECLINED')
+        });
+        
+        return cleanedForm;
+      });
+
+      // Debug: Log pending requests
+      const pendingRequests = cleanForms.filter(
+        form => form.isPending === true
+      );
+      console.log('🔍 Pending requests:', pendingRequests);
+      console.log('🔍 Total active forms:', cleanForms.length);
+      
+      setRequests(cleanForms);
     } catch (error) {
-      console.error("❌ Error fetching requests:", error);
+      console.error('❌ Error fetching requests:', error);
       setError(`Không thể tải danh sách yêu cầu: ${error.message || error}`);
     } finally {
       setLoading(false);
     }
   };
 
-  // Filter requests
-  const filteredRequests = requests.filter(request => !request.isDeleted);
+  // Filter requests based on search and filters
+  const filteredRequests = requests.filter(request => {
+    // Always exclude deleted requests
+    if (request.isDeleted) return false;
+
+    // Filter by search term
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch =
+        request.parentName?.toLowerCase().includes(searchLower) ||
+        request.studentName?.toLowerCase().includes(searchLower) ||
+        request.title?.toLowerCase().includes(searchLower);
+      if (!matchesSearch) return false;
+    }
+
+    // Filter by status
+    if (filterStatus) {
+      if (filterStatus === 'pending' && !request.isPending) return false;
+      if (
+        filterStatus === 'approved' &&
+        (request.isPending || !request.isaccepted)
+      )
+        return false;
+      if (
+        filterStatus === 'declined' &&
+        (request.isPending || request.isaccepted)
+      )
+        return false;
+    }
+
+    // Filter by category
+    if (
+      filterCategory &&
+      request.formCategoryId?.toString() !== filterCategory
+    ) {
+      return false;
+    }
+
+    // Filter by parent ID
+    if (filterParent && request.parentId?.toString() !== filterParent) {
+      return false;
+    }
+
+    return true;
+  });
 
   // Handle view request details
-  const handleViewDetails = (request) => {
+  const handleViewDetails = request => {
     setSelectedRequest(request);
     setShowDetailModal(true);
   };
 
   // Handle approve action
-  const handleApprove = (request) => {
+  const handleApprove = request => {
     setSelectedRequest(request);
-    setActionType("approve");
+    setActionType('approve');
     setShowActionModal(true);
   };
 
   // Handle decline action
-  const handleDecline = (request) => {
+  const handleDecline = request => {
     setSelectedRequest(request);
-    setActionType("decline");
-    setDeclineReason("");
+    setActionType('decline');
+    setDeclineReason('');
     setShowActionModal(true);
   };
 
   // Handle delete action
-  const handleDelete = (request) => {
+  const handleDelete = request => {
     setSelectedRequest(request);
-    setActionType("delete");
+    setActionType('delete');
     setShowActionModal(true);
   };
 
@@ -97,75 +175,103 @@ function ReviewRequests() {
   const handleSubmitAction = async () => {
     if (!selectedRequest) return;
 
-    if (actionType === "decline" && !declineReason.trim()) {
-      alert("Vui lòng nhập lý do từ chối!");
+    if (actionType === 'decline' && !declineReason.trim()) {
+      alert('Vui lòng nhập lý do từ chối!');
       return;
     }
 
     try {
       setActionLoading(true);
       console.log(`🔄 ${actionType} request:`, selectedRequest.formId);
-      
+
       let result;
-      if (actionType === "approve") {
+      if (actionType === 'approve') {
         result = await approveForm(selectedRequest.formId);
-        console.log("✅ Approve result:", result);
-      } else if (actionType === "decline") {
+        console.log('✅ Approve result:', result);
+      } else if (actionType === 'decline') {
         result = await declineForm(selectedRequest.formId, declineReason);
-        console.log("✅ Decline result:", result);
-      } else if (actionType === "delete") {
+        console.log('✅ Decline result:', result);
+      } else if (actionType === 'delete') {
         result = await deleteForm(selectedRequest.formId);
-        console.log("✅ Delete result:", result);
+        console.log('✅ Delete result:', result);
       }
 
       // Refresh the requests list
       await fetchRequests();
-      
+
       setShowActionModal(false);
       setSelectedRequest(null);
-      setDeclineReason("");
-      
+      setDeclineReason('');
+
       const messages = {
-        approve: "Đã phê duyệt yêu cầu thành công!",
-        decline: "Đã từ chối yêu cầu thành công!",
-        delete: "Đã xóa yêu cầu thành công!"
+        approve: 'Đã phê duyệt yêu cầu thành công!',
+        decline: 'Đã từ chối yêu cầu thành công!',
+        delete: 'Đã xóa yêu cầu thành công!',
       };
       alert(messages[actionType]);
     } catch (error) {
       console.error(`❌ Error ${actionType}ing request:`, error);
       const actionNames = {
-        approve: "phê duyệt",
-        decline: "từ chối", 
-        delete: "xóa"
+        approve: 'phê duyệt',
+        decline: 'từ chối',
+        delete: 'xóa',
       };
-      alert(`Có lỗi xảy ra khi ${actionNames[actionType]} yêu cầu: ${error.message || error}`);
+      alert(
+        `Có lỗi xảy ra khi ${actionNames[actionType]} yêu cầu: ${
+          error.message || error
+        }`
+      );
     } finally {
       setActionLoading(false);
     }
   };
 
-  // Get status badge class
-  const getStatusBadgeClass = (statusClass) => {
-    return `status-badge status-${statusClass}`;
+  // Get status badge class based on isPending and isaccepted
+
+  // Get status text based on isPending and isaccepted
+  const getStatusText = request => {
+    // Debug the status determination
+    const status = request.isPending === true ? 'PENDING' : 
+                   request.isaccepted === true ? 'APPROVED' : 'DECLINED';
+    
+    console.log(
+      `🎯 ID ${request.formId} | isPending: ${request.isPending} (${typeof request.isPending}), isaccepted: ${request.isaccepted} (${typeof request.isaccepted}) | Status: ${status}`
+    );
+
+    if (request.isPending === true) return 'Chờ xử lý';
+    if (request.isaccepted === true) return 'Đã phê duyệt';
+    return 'Đã từ chối';
+  };
+  
+  const getStatusBadgeClass = request => {
+    if (request.isPending === true) {
+      return 'status-badge status-pending';
+    }
+    if (request.isaccepted === true) {
+      return 'status-badge status-approved';
+    }
+    return 'status-badge status-declined';
   };
 
   // Get category badge class
-  const getCategoryBadgeClass = (categoryId) => {
+  const getCategoryBadgeClass = categoryId => {
     const categoryClasses = {
-      1: "category-leave",
-      2: "category-medicine", 
-      3: "category-consultation",
-      4: "category-other"
+      1: 'category-leave',
+      2: 'category-medicine',
+      3: 'category-consultation',
+      4: 'category-other',
     };
-    return `category-badge ${categoryClasses[categoryId] || "category-default"}`;
+    return `category-badge ${
+      categoryClasses[categoryId] || 'category-default'
+    }`;
   };
 
-  // Calculate statistics
+  // Calculate statistics based on isPending and isaccepted
   const stats = {
     total: requests.length,
-    pending: requests.filter(r => r.statusClass === "pending").length,
-    approved: requests.filter(r => r.statusClass === "approved").length,
-    declined: requests.filter(r => r.statusClass === "declined").length,
+    pending: requests.filter(r => r.isPending).length,
+    approved: requests.filter(r => !r.isPending && r.isaccepted).length,
+    declined: requests.filter(r => !r.isPending && !r.isaccepted).length,
   };
 
   if (loading) {
@@ -196,8 +302,19 @@ function ReviewRequests() {
     <div className="review-requests-container">
       {/* Header */}
       <div className="review-requests-header">
-        <h1>📋 Kiểm Duyệt Yêu Cầu</h1>
-        <p>Xem và phê duyệt các yêu cầu từ phụ huynh</p>
+        <div>
+          <h1>📋 Kiểm Duyệt Yêu Cầu</h1>
+          <p>Xem và phê duyệt các yêu cầu từ phụ huynh</p>
+        </div>
+        <div className="header-actions">
+          <button 
+            onClick={fetchRequests} 
+            className="refresh-button"
+            disabled={loading}
+          >
+            🔄 {loading ? 'Đang tải...' : 'Làm mới'}
+          </button>
+        </div>
       </div>
 
       {/* Statistics Cards */}
@@ -239,14 +356,14 @@ function ReviewRequests() {
             type="text"
             placeholder="🔍 Tìm kiếm theo tên phụ huynh, học sinh hoặc tiêu đề..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
             className="search-input"
           />
         </div>
         <div className="filter-group">
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={e => setFilterStatus(e.target.value)}
             className="filter-select"
           >
             <option value="">Tất cả trạng thái</option>
@@ -258,7 +375,7 @@ function ReviewRequests() {
         <div className="filter-group">
           <select
             value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
+            onChange={e => setFilterCategory(e.target.value)}
             className="filter-select"
           >
             <option value="">Tất cả loại đơn</option>
@@ -273,7 +390,7 @@ function ReviewRequests() {
             type="number"
             placeholder="🔍 Lọc theo ID phụ huynh..."
             value={filterParent}
-            onChange={(e) => setFilterParent(e.target.value)}
+            onChange={e => setFilterParent(e.target.value)}
             className="search-input"
           />
         </div>
@@ -294,70 +411,85 @@ function ReviewRequests() {
             </tr>
           </thead>
           <tbody>
-            {filteredRequests.map((request) => (
-              <tr key={request.formId}>
-                <td>
-                  <div className="parent-info">
-                    <div className="parent-name">{request.parentName}</div>
-                    <div className="parent-id">ID: {request.parentId}</div>
-                  </div>
-                </td>
-                <td>
-                  <div className="student-info">
-                    <div className="student-name">{request.studentName}</div>
-                    <div className="student-id">ID: {request.studentId}</div>
-                  </div>
-                </td>
-                <td>
-                  <span className={getCategoryBadgeClass(request.formCategoryId)}>
-                    {request.formCategoryName}
-                  </span>
-                </td>
-                <td className="request-title">{request.title}</td>
-                <td className="created-date">{request.createdDate}</td>
-                <td>
-                  <span className={getStatusBadgeClass(request.statusClass)}>
-                    {request.status}
-                  </span>
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    <button
-                      className="btn-view"
-                      onClick={() => handleViewDetails(request)}
-                      title="Xem chi tiết"
+            {filteredRequests.map(request => {
+              // Debug: Log each request's pending status
+              console.log(
+                `🔍 Request ${request.formId}: isPending = ${
+                  request.isPending
+                }, type = ${typeof request.isPending}`
+              );
+              
+              // Debug button visibility
+              const shouldShowActionButtons = request.isPending === true;
+              console.log(`🔘 Request ${request.formId}: Should show action buttons = ${shouldShowActionButtons}`);
+              
+              return (
+                <tr key={request.formId}>
+                  <td>
+                    <div className="parent-info">
+                      <div className="parent-name">{request.parentName}</div>
+                      <div className="parent-id">ID: {request.parentId}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="student-info">
+                      <div className="student-name">{request.studentName}</div>
+                      <div className="student-id">ID: {request.studentid}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <span
+                      className={getCategoryBadgeClass(request.formCategoryId)}
                     >
-                      <InfoIcon />
-                    </button>
-                    {request.statusClass === "pending" && (
-                      <>
-                        <button
-                          className="btn-approve"
-                          onClick={() => handleApprove(request)}
-                          title="Phê duyệt"
-                        >
-                          <CheckCircleIcon />
-                        </button>
-                        <button
-                          className="btn-decline"
-                          onClick={() => handleDecline(request)}
-                          title="Từ chối"
-                        >
-                          <CancelIcon />
-                        </button>
-                      </>
-                    )}
-                    <button
-                      className="btn-delete"
-                      onClick={() => handleDelete(request)}
-                      title="Xóa yêu cầu"
-                    >
-                      <DeleteIcon />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                      {request.formCategoryName}
+                    </span>
+                  </td>
+                  <td className="request-title">{request.title}</td>
+                  <td className="created-date">{request.createdDate}</td>
+                  <td>
+                    <span className={getStatusBadgeClass(request)}>
+                      {getStatusText(request)}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="action-buttons">
+                      <button
+                        className="btn-view"
+                        onClick={() => handleViewDetails(request)}
+                        title="Xem chi tiết"
+                      >
+                        <InfoIcon />
+                      </button>
+                      {shouldShowActionButtons && (
+                        <>
+                          <button
+                            className="btn-approve"
+                            onClick={() => handleApprove(request)}
+                            title="Phê duyệt"
+                          >
+                            <CheckCircleIcon />
+                          </button>
+                          <button
+                            className="btn-decline"
+                            onClick={() => handleDecline(request)}
+                            title="Từ chối"
+                          >
+                            <CancelIcon />
+                          </button>
+                        </>
+                      )}
+                      <button
+                        className="btn-delete"
+                        onClick={() => handleDelete(request)}
+                        title="Xóa yêu cầu"
+                      >
+                        <DeleteIcon />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
 
@@ -370,11 +502,14 @@ function ReviewRequests() {
 
       {/* Detail Modal */}
       {showDetailModal && selectedRequest && (
-        <div className="modal-overlay" onClick={() => setShowDetailModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-overlay"
+          onClick={() => setShowDetailModal(false)}
+        >
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>
-                <InfoIcon style={{ marginRight: "10px" }} />
+                <InfoIcon style={{ marginRight: '10px' }} />
                 Chi tiết yêu cầu
               </h3>
               <button
@@ -414,6 +549,15 @@ function ReviewRequests() {
                     <span>{selectedRequest.createdDate}</span>
                   </div>
                 </div>
+                {selectedRequest.staffName && (
+                  <div className="detail-item">
+                    <PersonIcon className="detail-icon" />
+                    <div>
+                      <label>Nhân viên xử lý:</label>
+                      <span>{selectedRequest.staffName}</span>
+                    </div>
+                  </div>
+                )}
                 <div className="detail-item full-width">
                   <DescriptionIcon className="detail-icon" />
                   <div>
@@ -425,18 +569,24 @@ function ReviewRequests() {
                   <DescriptionIcon className="detail-icon" />
                   <div>
                     <label>Lý do chi tiết:</label>
-                    <div className="reason-content">{selectedRequest.reason}</div>
-                  </div>
-                </div>
-                {selectedRequest.statusClass === "declined" && selectedRequest.reasonForDecline && (
-                  <div className="detail-item full-width">
-                    <CancelIcon className="detail-icon" />
-                    <div>
-                      <label>Lý do từ chối:</label>
-                      <div className="decline-reason">{selectedRequest.reasonForDecline}</div>
+                    <div className="reason-content">
+                      {selectedRequest.reason}
                     </div>
                   </div>
-                )}
+                </div>
+                {!selectedRequest.isPending &&
+                  !selectedRequest.isaccepted &&
+                  selectedRequest.reasonfordecline && (
+                    <div className="detail-item full-width">
+                      <CancelIcon className="detail-icon" />
+                      <div>
+                        <label>Lý do từ chối:</label>
+                        <div className="decline-reason">
+                          {selectedRequest.reasonfordecline}
+                        </div>
+                      </div>
+                    </div>
+                  )}
               </div>
             </div>
           </div>
@@ -445,25 +595,34 @@ function ReviewRequests() {
 
       {/* Action Modal (Approve/Decline) */}
       {showActionModal && selectedRequest && (
-        <div className="modal-overlay" onClick={() => setShowActionModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-overlay"
+          onClick={() => setShowActionModal(false)}
+        >
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>
-                {actionType === "approve" ? (
+                {actionType === 'approve' ? (
                   <>
-                    <CheckCircleIcon style={{ marginRight: "10px", color: "#4caf50" }} />
+                    <CheckCircleIcon
+                      style={{ marginRight: '10px', color: '#4caf50' }}
+                    />
                     Phê duyệt yêu cầu
                   </>
-                ) : actionType === "decline" ? (
+                ) : actionType === 'decline' ? (
                   <>
-                    <CancelIcon style={{ marginRight: "10px", color: "#f44336" }} />
+                    <CancelIcon
+                      style={{ marginRight: '10px', color: '#f44336' }}
+                    />
                     Từ chối yêu cầu
                   </>
                 ) : (
-                                     <>
-                     <DeleteIcon style={{ marginRight: "10px", color: "#f44336" }} />
-                     Xóa yêu cầu
-                   </>
+                  <>
+                    <DeleteIcon
+                      style={{ marginRight: '10px', color: '#f44336' }}
+                    />
+                    Xóa yêu cầu
+                  </>
                 )}
               </h3>
               <button
@@ -476,26 +635,32 @@ function ReviewRequests() {
             <div className="modal-body">
               <div className="action-confirmation">
                 <p>
-                  Bạn có chắc muốn{" "}
+                  Bạn có chắc muốn{' '}
                   <strong>
-                    {actionType === "approve" ? "phê duyệt" : 
-                     actionType === "decline" ? "từ chối" : "xóa"}
-                  </strong>{" "}
-                  yêu cầu "{selectedRequest.title}" của phụ huynh{" "}
+                    {actionType === 'approve'
+                      ? 'phê duyệt'
+                      : actionType === 'decline'
+                      ? 'từ chối'
+                      : 'xóa'}
+                  </strong>{' '}
+                  yêu cầu "{selectedRequest.title}" của phụ huynh{' '}
                   <strong>{selectedRequest.parentName}</strong>?
                 </p>
-                {actionType === "delete" && (
+                {actionType === 'delete' && (
                   <div className="delete-warning">
-                    <p>⚠️ <strong>Lưu ý:</strong> Yêu cầu sẽ được xóa khỏi danh sách nhưng vẫn được lưu trong hệ thống.</p>
+                    <p>
+                      ⚠️ <strong>Lưu ý:</strong> Yêu cầu sẽ được xóa khỏi danh
+                      sách nhưng vẫn được lưu trong hệ thống.
+                    </p>
                   </div>
                 )}
 
-                {actionType === "decline" && (
+                {actionType === 'decline' && (
                   <div className="decline-reason-input">
                     <label>Lý do từ chối: *</label>
                     <textarea
                       value={declineReason}
-                      onChange={(e) => setDeclineReason(e.target.value)}
+                      onChange={e => setDeclineReason(e.target.value)}
                       placeholder="Nhập lý do từ chối yêu cầu..."
                       rows={4}
                       required
@@ -513,15 +678,22 @@ function ReviewRequests() {
                 </button>
                 <button
                   className={`btn-confirm ${
-                    actionType === "approve" ? "btn-approve" : 
-                    actionType === "decline" ? "btn-decline" : "btn-delete"
+                    actionType === 'approve'
+                      ? 'btn-approve'
+                      : actionType === 'decline'
+                      ? 'btn-decline'
+                      : 'btn-delete'
                   }`}
                   onClick={handleSubmitAction}
                   disabled={actionLoading}
                 >
-                                     {actionLoading ? "Đang xử lý..." : 
-                    actionType === "approve" ? "Phê duyệt" : 
-                    actionType === "decline" ? "Từ chối" : "Xóa"}
+                  {actionLoading
+                    ? 'Đang xử lý...'
+                    : actionType === 'approve'
+                    ? 'Phê duyệt'
+                    : actionType === 'decline'
+                    ? 'Từ chối'
+                    : 'Xóa'}
                 </button>
               </div>
             </div>
@@ -532,4 +704,4 @@ function ReviewRequests() {
   );
 }
 
-export default ReviewRequests; 
+export default ReviewRequests;
