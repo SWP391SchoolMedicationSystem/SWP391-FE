@@ -184,6 +184,11 @@ export const API_ENDPOINTS = {
     SEND_EMAIL_TO_SPECIFIC_STUDENTS:
       '/VaccinationEvent/send-email-to-specific-students', // Send email to specific students
   },
+
+  // Dashboard Statistics
+  DASHBOARD: {
+    USERS_STATISTICS: '/Dashboard/UsersStastic', // Get user statistics for admin dashboard
+  },
 };
 
 // Helper function to build URL with ID or parameters

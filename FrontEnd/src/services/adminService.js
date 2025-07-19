@@ -1,5 +1,21 @@
 import apiClient, { API_ENDPOINTS, buildApiUrl } from "./config.js";
 
+// Admin Dashboard Statistics Service
+export const adminDashboardService = {
+  // Get dashboard statistics from API
+  getDashboardStatistics: async () => {
+    try {
+      console.log('🔄 adminDashboardService.getDashboardStatistics: Fetching from API...');
+      const response = await apiClient.get(API_ENDPOINTS.DASHBOARD.USERS_STATISTICS);
+      console.log('📊 Dashboard statistics response:', response);
+      return response;
+    } catch (error) {
+      console.error('❌ Error getting dashboard statistics:', error);
+      throw error;
+    }
+  },
+};
+
 // Admin Staff Management Services
 export const adminStaffService = {
   // Get all staff
