@@ -603,14 +603,26 @@ export const nurseFormService = {
   // Get all form requests from parents (excluding soft deleted)
   getAllForms: async () => {
     try {
+      console.log('🔄 nurseFormService.getAllForms: Fetching from API...');
       const response = await apiClient.get(API_ENDPOINTS.FORM.GET_ALL);
-      if (!Array.isArray(response)) return [];
+      console.log('📥 Raw API response:', response);
+      
+      if (!Array.isArray(response)) {
+        console.warn('⚠️ API response is not an array:', response);
+        return [];
+      }
       
       // Filter out soft deleted forms
       const activeForms = response.filter(form => !form.isDeleted);
-      return activeForms.map(nurseFormService.mapFormData);
+      console.log('✅ Active forms (not deleted):', activeForms.length);
+      
+      // Map the data
+      const mappedForms = activeForms.map(nurseFormService.mapFormData);
+      console.log('🎯 Mapped forms:', mappedForms);
+      
+      return mappedForms;
     } catch (error) {
-      console.error('Error getting all forms:', error);
+      console.error('❌ Error getting all forms:', error);
       throw error;
     }
   },
@@ -732,13 +744,13 @@ export const nurseFormService = {
       return categories[categoryId] || `Danh mục ${categoryId}`;
     };
 
-    const getStatusInfo = (isAccepted) => {
+    const getStatusInfo = (isPending, isAccepted) => {
+      if (isPending === true) return { text: 'Chờ xử lý', class: 'pending' };
       if (isAccepted === true) return { text: 'Đã phê duyệt', class: 'approved' };
-      if (isAccepted === false) return { text: 'Đã từ chối', class: 'declined' };
-      return { text: 'Chờ xử lý', class: 'pending' };
+      return { text: 'Đã từ chối', class: 'declined' };
     };
 
-    const statusInfo = getStatusInfo(apiForm.isaccepted);
+    const statusInfo = getStatusInfo(apiForm.isPending, apiForm.isaccepted);
 
     return {
       formId: apiForm.formId || apiForm.id,
@@ -754,7 +766,8 @@ export const nurseFormService = {
       storedPath: apiForm.storedpath,
       staffId: apiForm.staffid,
       staffName: apiForm.staffName || '',
-      isAccepted: apiForm.isaccepted,
+      isPending: apiForm.isPending === true || apiForm.isPending === 'true',
+      isaccepted: apiForm.isaccepted === true || apiForm.isaccepted === 'true',
       reasonForDecline: apiForm.reasonfordecline,
       isDeleted: apiForm.isDeleted || false,
       status: statusInfo.text,
