@@ -301,18 +301,25 @@ function ReviewRequests() {
   return (
     <div className="review-requests-container">
       {/* Header */}
-      <div className="review-requests-header">
+      <div className="review-requests-header" style={{
+        background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+        color: 'white',
+        boxShadow: '0 4px 20px rgba(47, 81, 72, 0.3)',
+        padding: '32px 40px',
+        borderRadius: '24px',
+      }}>
         <div>
-          <h1>📋 Kiểm Duyệt Yêu Cầu</h1>
-          <p>Xem và phê duyệt các yêu cầu từ phụ huynh</p>
+          <h1 style={{ color: 'white' }}>📋 Kiểm Duyệt Yêu Cầu</h1>
+          <p style={{ color: 'white', opacity: 0.95 }}>Xem và phê duyệt các yêu cầu từ phụ huynh</p>
         </div>
         <div className="header-actions">
           <button 
             onClick={fetchRequests} 
             className="refresh-button"
             disabled={loading}
+            style={{ color: 'white', background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 10, padding: '10px 18px', fontWeight: 600, fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px rgba(47,81,72,0.08)' }}
           >
-            🔄 {loading ? 'Đang tải...' : 'Làm mới'}
+            {loading ? 'Đang tải...' : 'Làm mới'}
           </button>
         </div>
       </div>
@@ -427,20 +434,43 @@ function ReviewRequests() {
                 <tr key={request.formId}>
                   <td>
                     <div className="parent-info">
-                      <div className="parent-name">{request.parentName}</div>
-                      <div className="parent-id">ID: {request.parentId}</div>
+                      <div className="parent-name" style={{
+                        color: '#2f5148',
+                        fontWeight: 700,
+                        fontSize: '1.08rem',
+                        background: 'rgba(47,81,72,0.06)',
+                        borderRadius: 8,
+                        padding: '2px 10px',
+                        display: 'inline-block',
+                      }}>{request.parentName}</div>
+                      {/* Bỏ ID phụ huynh */}
                     </div>
                   </td>
                   <td>
                     <div className="student-info">
                       <div className="student-name">{request.studentName}</div>
-                      <div className="student-id">ID: {request.studentid}</div>
+                      {/* Bỏ ID học sinh */}
                     </div>
                   </td>
                   <td>
-                    <span
-                      className={getCategoryBadgeClass(request.formCategoryId)}
-                    >
+                    {/* Chỉnh lại loại đơn */}
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '6px 18px',
+                      borderRadius: '16px',
+                      fontWeight: 600,
+                      fontSize: 14,
+                      background: request.formCategoryId === 2 ? 'rgba(115,173,103,0.12)' // thuốc
+                        : request.formCategoryId === 1 ? 'rgba(33,150,243,0.12)' // nghỉ phép
+                        : request.formCategoryId === 3 ? 'rgba(255,152,0,0.12)' // tư vấn
+                        : 'rgba(120,120,120,0.10)', // khác
+                      color: request.formCategoryId === 2 ? '#2f5148'
+                        : request.formCategoryId === 1 ? '#2196f3'
+                        : request.formCategoryId === 3 ? '#ff9800'
+                        : '#555',
+                      border: 'none',
+                      boxShadow: 'none',
+                    }}>
                       {request.formCategoryName}
                     </span>
                   </td>
@@ -519,71 +549,90 @@ function ReviewRequests() {
                 <CloseIcon />
               </button>
             </div>
+            {/* Hiển thị tên nhân viên xử lý (y tá) trên cùng nếu có */}
+            {selectedRequest.staffName && (
+              <div style={{
+                width: '100%',
+                textAlign: 'center',
+                fontWeight: 700,
+                color: '#2f5148',
+                fontSize: 17,
+                margin: '18px 0 8px 0',
+                letterSpacing: 0.5,
+              }}>
+                Nhân viên xử lý: {selectedRequest.staffName}
+              </div>
+            )}
             <div className="modal-body">
-              <div className="detail-grid">
-                <div className="detail-item">
-                  <PersonIcon className="detail-icon" />
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '20px',
+                marginBottom: 12,
+              }}>
+                {/* Dòng 1: Phụ huynh - Học sinh */}
+                <div style={{background:'#f8fafc',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'center',gap:12,minHeight:70}}>
+                  <PersonIcon style={{color:'#73ad67',fontSize:28}}/>
                   <div>
-                    <label>Phụ huynh:</label>
-                    <span>{selectedRequest.parentName}</span>
+                    <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>PHỤ HUYNH:</div>
+                    <div style={{fontWeight:700,color:'#2f5148',fontSize:16}}>{selectedRequest.parentName}</div>
                   </div>
                 </div>
-                <div className="detail-item">
-                  <ChildCareIcon className="detail-icon" />
+                <div style={{background:'#f8fafc',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'center',gap:12,minHeight:70}}>
+                  <ChildCareIcon style={{color:'#73ad67',fontSize:28}}/>
                   <div>
-                    <label>Học sinh:</label>
-                    <span>{selectedRequest.studentName}</span>
+                    <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>HỌC SINH:</div>
+                    <div style={{fontWeight:700,color:'#2f5148',fontSize:16}}>{selectedRequest.studentName}</div>
                   </div>
                 </div>
-                <div className="detail-item">
-                  <CategoryIcon className="detail-icon" />
+                {/* Dòng 2: Loại đơn - Ngày tạo */}
+                <div style={{background:'#f8fafc',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'center',gap:12,minHeight:70}}>
+                  <CategoryIcon style={{color:'#73ad67',fontSize:28}}/>
                   <div>
-                    <label>Loại đơn:</label>
-                    <span>{selectedRequest.formCategoryName}</span>
+                    <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>LOẠI ĐƠN:</div>
+                    <div style={{fontWeight:700,color:'#2196f3',fontSize:15}}>{selectedRequest.formCategoryName}</div>
                   </div>
                 </div>
-                <div className="detail-item">
-                  <DateRangeIcon className="detail-icon" />
+                <div style={{background:'#f8fafc',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'center',gap:12,minHeight:70}}>
+                  <DateRangeIcon style={{color:'#73ad67',fontSize:28}}/>
                   <div>
-                    <label>Ngày tạo:</label>
-                    <span>{selectedRequest.createdDate}</span>
+                    <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>NGÀY TẠO:</div>
+                    <div style={{fontWeight:700,color:'#2f5148',fontSize:15}}>{selectedRequest.createdDate}</div>
                   </div>
                 </div>
-                {selectedRequest.staffName && (
-                  <div className="detail-item">
-                    <PersonIcon className="detail-icon" />
-                    <div>
-                      <label>Nhân viên xử lý:</label>
-                      <span>{selectedRequest.staffName}</span>
+                {/* Dòng 3: Nhân viên xử lý (nếu có) - trống */}
+                <div></div><div></div>
+                {/* Dòng 4: Tiêu đề (full width) */}
+                <div style={{gridColumn:'1/3',background:'#f8fafc',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'center',gap:12,minHeight:70}}>
+                  <DescriptionIcon style={{color:'#73ad67',fontSize:28}}/>
+                  <div>
+                    <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>TIÊU ĐỀ:</div>
+                    <div style={{fontWeight:700,color:'#2f5148',fontSize:15}}>{selectedRequest.title}</div>
+                  </div>
+                </div>
+                {/* Dòng 5: Lý do chi tiết (full width) */}
+                <div style={{gridColumn:'1/3',background:'#f8fafc',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'flex-start',gap:12}}>
+                  <DescriptionIcon style={{color:'#73ad67',fontSize:28,marginTop:2}}/>
+                  <div>
+                    <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>LÝ DO CHI TIẾT:</div>
+                    <div style={{fontWeight:500,color:'#2f5148',fontSize:15,whiteSpace:'pre-line'}}>
+                      {selectedRequest.reason
+                        ? selectedRequest.reason.split(/(?=\b(?:Tên thuốc|Chi tiết thuốc|Lí do|Lý do)\b)/g).map((part, idx) => (
+                            <div key={idx}>{part.trim()}</div>
+                          ))
+                        : ''}
                     </div>
                   </div>
-                )}
-                <div className="detail-item full-width">
-                  <DescriptionIcon className="detail-icon" />
-                  <div>
-                    <label>Tiêu đề:</label>
-                    <span>{selectedRequest.title}</span>
-                  </div>
                 </div>
-                <div className="detail-item full-width">
-                  <DescriptionIcon className="detail-icon" />
-                  <div>
-                    <label>Lý do chi tiết:</label>
-                    <div className="reason-content">
-                      {selectedRequest.reason}
-                    </div>
-                  </div>
-                </div>
+                {/* Dòng 6: Lý do từ chối (nếu có, full width) */}
                 {!selectedRequest.isPending &&
                   !selectedRequest.isaccepted &&
                   selectedRequest.reasonfordecline && (
-                    <div className="detail-item full-width">
-                      <CancelIcon className="detail-icon" />
+                    <div style={{gridColumn:'1/3',background:'#fff3f3',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'flex-start',gap:12}}>
+                      <CancelIcon style={{color:'#f44336',fontSize:28,marginTop:2}}/>
                       <div>
-                        <label>Lý do từ chối:</label>
-                        <div className="decline-reason">
-                          {selectedRequest.reasonfordecline}
-                        </div>
+                        <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>LÝ DO TỪ CHỐI:</div>
+                        <div style={{fontWeight:500,color:'#d32f2f',fontSize:15}}>{selectedRequest.reasonfordecline}</div>
                       </div>
                     </div>
                   )}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../css/Nurse/PersonalMedicine.css';
 import apiClient, { API_ENDPOINTS } from '../../services/config';
+import { CircularProgress, Typography, Box } from '@mui/material';
 
 const PersonalMedicine = () => {
   const navigate = useNavigate();
@@ -1281,16 +1282,43 @@ const PersonalMedicine = () => {
 
       {/* Loading Overlay */}
       {submitting && (
-        <div className="loading-overlay" key="loading-overlay">
-          <div className="loading-spinner" key="loading-spinner">
-            <h4>Đang xử lý...</h4>
-            <p>
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            bgcolor: 'rgba(255,255,255,0.7)',
+            zIndex: 2000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Box
+            sx={{
+              p: 4,
+              bgcolor: 'white',
+              borderRadius: 3,
+              boxShadow: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              minWidth: 220,
+            }}
+          >
+            <CircularProgress sx={{ color: '#2f5148', mb: 2 }} />
+            <Typography variant="h6" sx={{ color: '#2f5148', fontWeight: 600, mb: 1 }}>
+              Đang xử lý...
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#2f5148', opacity: 0.8 }}>
               {showEditForm ? 'Đang cập nhật thông tin thuốc...' : 
                showDeleteConfirm ? 'Đang xóa thuốc...' : 
                'Vui lòng chờ trong giây lát'}
-            </p>
-          </div>
-        </div>
+            </Typography>
+          </Box>
+        </Box>
       )}
     </div>
   );

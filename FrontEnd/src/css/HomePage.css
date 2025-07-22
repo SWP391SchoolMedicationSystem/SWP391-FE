@@ -13,11 +13,7 @@
   --card-border-radius: 16px;
   --card-box-shadow: 0 8px 24px rgba(47, 81, 72, 0.1);
   --card-hover-box-shadow: 0 12px 32px rgba(47, 81, 72, 0.15);
-  --gradient-primary: linear-gradient(
-    135deg,
-    var(--secondary-color) 0%,
-    var(--primary-color) 100%
-  );
+  --gradient-primary: linear-gradient(135deg, #2f5148 0%, #73ad67 100%);
 }
 
 /* Base styles */
@@ -560,4 +556,20 @@ body,
   .about-us-section .section-title h2 {
     font-size: 2rem;
   }
+}
+
+/* Remove ::before for .section-title on homepage */
+.section-title::before {
+  display: none !important;
+}
+
+/* Make all statistics card icons use the login green gradient */
+.stat-card-custom .stat-icon,
+.stat-card-custom svg {
+  background: linear-gradient(135deg, #2f5148 0%, #73ad67 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important;
+  text-fill-color: transparent !important;
 }

@@ -684,3 +684,7 @@
 .btn:hover::before {
   left: 100%;
 }
+
+:root {
+  --gradient-primary: linear-gradient(135deg, #2f5148 0%, #73ad67 100%);
+}
