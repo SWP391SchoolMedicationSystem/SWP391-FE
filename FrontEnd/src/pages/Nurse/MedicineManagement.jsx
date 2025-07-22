@@ -4,6 +4,7 @@ import '../../css/Nurse/MedicineManagement.css';
 import MedicationIcon from '@mui/icons-material/Medication';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
+import { CircularProgress, Typography, Box } from '@mui/material';
 
 function MedicineManagement() {
   const [medicines, setMedicines] = useState([]);
@@ -168,16 +169,55 @@ function MedicineManagement() {
 
   if (loading) {
     return (
-      <div className="medicine-management-container">
-        <div className="loading">Đang tải...</div>
-      </div>
+      <Box
+        sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          bgcolor: 'rgba(255,255,255,0.7)',
+          zIndex: 2000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Box
+          sx={{
+            p: 4,
+            bgcolor: 'white',
+            borderRadius: 3,
+            boxShadow: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            minWidth: 220,
+          }}
+        >
+          <CircularProgress sx={{ color: '#2f5148', mb: 2 }} />
+          <Typography variant="h6" sx={{ color: '#2f5148', fontWeight: 600 }}>
+            Đang tải dữ liệu...
+          </Typography>
+        </Box>
+      </Box>
     );
   }
 
   return (
     <div className="medicine-management-container">
       {/* Modern Header with Design System */}
-      <div className="page-header">
+      <div className="page-header" style={{
+        background: 'var(--gradient-primary)',
+        color: 'white',
+        boxShadow: '0 4px 20px rgba(47, 81, 72, 0.3)',
+        borderRadius: '24px',
+        padding: '32px 40px',
+        marginBottom: 40,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}>
         <div className="header-content">
           <h1
             style={{

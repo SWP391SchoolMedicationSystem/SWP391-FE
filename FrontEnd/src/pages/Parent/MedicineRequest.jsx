@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../css/Parent/MedicineRequest.css';
 import apiClient from '../../services/config';
+import { CircularProgress, Typography, Box } from '@mui/material';
 
 const MedicineRequest = () => {
   const navigate = useNavigate();
@@ -497,7 +498,11 @@ Vui lòng:
   return (
     <div className="personal-medicine-container">
       {/* Header */}
-      <div className="medicine-header">
+      <div className="medicine-header" style={{
+        background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+        color: 'white',
+        boxShadow: '0 4px 20px rgba(47, 81, 72, 0.3)'
+      }}>
         <div>
           <h1>{activeTab === 'medicine' ? '💊 Gửi đơn yêu cầu' : activeTab === 'absent' ? '📋 Đơn Xin Nghỉ' : '📝 Đơn Xin Khác'}</h1>
           <p>{activeTab === 'medicine' ? 'Gửi yêu cầu thuốc cho con em đến nhà trường' : activeTab === 'absent' ? 'Gửi đơn xin nghỉ học cho con em đến nhà trường' : 'Gửi đơn xin khác cho con em đến nhà trường'}</p>
@@ -924,14 +929,41 @@ Vui lòng:
 
       {/* Loading Overlay */}
       {(loading || submitting) && (
-        <div className="loading-overlay">
-          <div className="loading-spinner">
-            <h4>
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            bgcolor: 'rgba(255,255,255,0.7)',
+            zIndex: 2000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Box
+            sx={{
+              p: 4,
+              bgcolor: 'white',
+              borderRadius: 3,
+              boxShadow: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              minWidth: 220,
+            }}
+          >
+            <CircularProgress color="success" sx={{ mb: 2 }} />
+            <Typography fontWeight={600} color="success.main" sx={{ mb: 1 }}>
               {loading ? 'Đang tải dữ liệu...' : `Đang gửi ${activeTab === 'medicine' ? 'yêu cầu thuốc' : activeTab === 'absent' ? 'đơn xin nghỉ' : 'đơn xin khác'}...`}
-            </h4>
-            <p>Vui lòng chờ trong giây lát</p>
-          </div>
-        </div>
+            </Typography>
+            <Typography color="text.secondary" fontSize={15}>
+              Vui lòng chờ trong giây lát
+            </Typography>
+          </Box>
+        </Box>
       )}
     </div>
   );

@@ -49,6 +49,7 @@ import {
   Twitter,
   LinkedIn,
 } from "@mui/icons-material";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -217,28 +218,28 @@ export default function Home() {
       title: "Tổng số học sinh",
       number: "1,245",
       note: "+15 trong tháng này",
-      icon: <People sx={{ color: "white", fontSize: 24 }} />,
+      icon: <People sx={{ fontSize: 24 }} />,
       noteColor: "#4CAF50",
     },
     {
       title: "Sự kiện y tế",
       number: "24",
       note: "+2 trong tuần này",
-      icon: <Info sx={{ color: "white", fontSize: 24 }} />,
+      icon: <Info sx={{ fontSize: 24 }} />,
       noteColor: "#FF9800",
     },
     {
       title: "Tiêm chủng",
       number: "85%",
       note: "Tỷ lệ hoàn thành",
-      icon: <Vaccines sx={{ color: "white", fontSize: 24 }} />,
+      icon: <Vaccines sx={{ fontSize: 24 }} />,
       noteColor: "#4CAF50",
     },
     {
       title: "Khám sức khỏe",
       number: "12",
       note: "Lịch hẹn hôm nay",
-      icon: <Assignment sx={{ color: "white", fontSize: 24 }} />,
+      icon: <Assignment sx={{ fontSize: 24 }} />,
       noteColor: "#2196F3",
     },
   ];
@@ -378,6 +379,15 @@ export default function Home() {
     }
   ];
 
+  // Add mock data for student statistics (total 120 students, random distribution)
+  const studentStatsData = [
+    { name: 'Khối 1', students: 19 },
+    { name: 'Khối 2', students: 27 },
+    { name: 'Khối 3', students: 22 },
+    { name: 'Khối 4', students: 26 },
+    { name: 'Khối 5', students: 26 },
+  ];
+
   return (
     <div className="home-page">
       <Header />
@@ -505,7 +515,7 @@ export default function Home() {
                         justifyContent: "center",
                         mb: 3,
                         mx: 'auto',
-                        background: 'linear-gradient(135deg, #2f5148 0%, #1e3a34 100%)',
+                        background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
                         boxShadow: '0 8px 24px rgba(47, 81, 72, 0.3)',
                         position: 'relative',
                         '&::after': {
@@ -532,7 +542,7 @@ export default function Home() {
                         },
                   }}
                 >
-                  {stat.icon}
+                  {React.cloneElement(stat.icon, { sx: { color: 'white', fontSize: 32 } })}
                 </Box>
 
                   <Typography
@@ -632,7 +642,7 @@ export default function Home() {
                     width: 48,
                     height: 48,
                     borderRadius: '12px',
-                    background: 'linear-gradient(135deg, #2f5148 0%, #1e3a34 100%)',
+                    background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -654,43 +664,40 @@ export default function Home() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  height: "350px",
+                  height: "320px",
                   backgroundColor: "rgba(47, 81, 72, 0.05)",
                   borderRadius: "16px",
                   border: "2px dashed rgba(47, 81, 72, 0.2)",
                   position: 'relative',
-                  '&::before': {
-                    content: '"📊"',
-                    fontSize: '4rem',
-                    position: 'absolute',
-                    top: '30%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    opacity: 0.3,
-                  }
                 }}
               >
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
-                      color: "#2f5148", 
-                      fontWeight: '600',
-                      mb: 2,
-                    }}
+                <ResponsiveContainer width="95%" height={320}>
+                  <BarChart
+                    data={studentStatsData}
+                    margin={{ top: 16, right: 32, left: 32, bottom: 8 }}
+                    barCategoryGap={"20%"}
                   >
-                    Biểu đồ sẽ được tích hợp
-                  </Typography>
-                  <Typography 
-                    variant="body2" 
-                    sx={{ 
-                      color: "#64748b",
-                      fontStyle: 'italic',
-                    }}
-                  >
-                    Thống kê chi tiết về sức khỏe học sinh
-                  </Typography>
-                </Box>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontWeight: 600, fill: '#2f5148' }} axisLine={false} tickLine={false} />
+                    <YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={{ fontWeight: 500, fill: '#64748b', fontSize: 13 }} />
+                    <Tooltip contentStyle={{ borderRadius: 12, fontWeight: 500 }} />
+                    {/* Hide legend for cleaner look */}
+                    <Bar
+                      dataKey="students"
+                      radius={[12, 12, 8, 8]}
+                      minPointSize={6}
+                      maxBarSize={28}
+                      fill="url(#studentBarGradient)"
+                      label={{ position: 'top', fill: '#2f5148', fontWeight: 700, fontSize: 14 }}
+                    />
+                    <defs>
+                      <linearGradient id="studentBarGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#73ad67" />
+                        <stop offset="100%" stopColor="#2f5148" />
+                      </linearGradient>
+                    </defs>
+                  </BarChart>
+                </ResponsiveContainer>
               </Box>
             </Card>
           </Grid>
@@ -724,7 +731,7 @@ export default function Home() {
                     width: 48,
                     height: 48,
                     borderRadius: '12px',
-                    background: 'linear-gradient(135deg, #2f5148 0%, #1e3a34 100%)',
+                    background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -768,7 +775,7 @@ export default function Home() {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            background: "linear-gradient(135deg, #2f5148 0%, #1e3a34 100%)",
+                            background: "linear-gradient(135deg, #2f5148 0%, #73ad67 100%)",
                             boxShadow: '0 4px 12px rgba(47, 81, 72, 0.3)',
                           }}
                         >
@@ -1140,7 +1147,19 @@ export default function Home() {
                   transition: "all 0.3s ease",
                 }}
               >
-                <Box sx={{ mb: 2 }}>{service.icon}</Box>
+                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
+                  <Box sx={{
+                    background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                    borderRadius: '12px',
+                    width: 48,
+                    height: 48,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    {React.cloneElement(service.icon, { sx: { color: 'white', fontSize: 32 } })}
+                  </Box>
+                </Box>
                 <Typography
                   variant="h6"
                   component="h3"
@@ -1164,10 +1183,10 @@ export default function Home() {
                   {service.description}
                 </Typography>
               </Paper>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
 
       {/* Service Categories Detail */}
       <Container maxWidth="lg" sx={{ py: 6 }}>
@@ -1215,7 +1234,17 @@ export default function Home() {
                           gap: 2,
                         }}
                       >
-                        {service.icon}
+                        <Box sx={{
+                          background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                          borderRadius: '10px',
+                          width: 40,
+                          height: 40,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                          {React.cloneElement(service.icon, { sx: { color: 'white', fontSize: 24 } })}
+                        </Box>
                         <Typography
                           variant="h6"
                           sx={{
@@ -1272,13 +1301,14 @@ export default function Home() {
                 <CardContent sx={{ p: 3 }}>
                     <Avatar
                       sx={{ 
-                      width: 80,
-                      height: 80,
-                      margin: "0 auto",
-                      mb: 2,
-                      bgcolor: "var(--primary-color)",
-                      fontSize: "2rem",
-                      fontWeight: "bold",
+                        width: 80,
+                        height: 80,
+                        margin: "0 auto",
+                        mb: 2,
+                        background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                        color: 'white',
+                        fontSize: "2rem",
+                        fontWeight: "bold",
                       }}
                     >
                       {nurse.initials}
