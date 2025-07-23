@@ -462,7 +462,7 @@ export default function ParentLayout() {
                 color: currentTheme.textSecondary,
               }}
             >
-              Profile
+              Tài khoản
             </Typography>
           </Box>
         </Box>
@@ -504,7 +504,7 @@ export default function ParentLayout() {
                 mb: 0.5,
               }}
             >
-              Welcome back, {getUserDisplayName()}! 👨‍👩‍👧‍👦
+              Chào mừng trở lại, {getUserDisplayName()}! 👨‍👩‍👧‍👦
             </Typography>
             <Typography
               sx={{
@@ -513,7 +513,7 @@ export default function ParentLayout() {
                 fontWeight: 500,
               }}
             >
-              Parent Dashboard
+              Hệ thống phụ huynh
             </Typography>
           </Box>
 
@@ -646,7 +646,7 @@ export default function ParentLayout() {
                     fontWeight: 500,
                   }}
                 >
-                  Parent
+                  Phụ huynh
                 </Typography>
               </Box>
               <IconButton
@@ -712,7 +712,7 @@ export default function ParentLayout() {
             fontSize: '1.3rem',
           }}
         >
-           Thông Tin Phụ Huynh
+          Thông Tin Phụ Huynh
         </DialogTitle>
         <DialogContent sx={{ p: 0 }}>
           {userInfo ? (
@@ -862,7 +862,28 @@ export default function ParentLayout() {
             </Box>
           )}
         </DialogContent>
-        <DialogActions sx={{ p: 2, justifyContent: 'center' }}>
+        <DialogActions sx={{ p: 2, justifyContent: 'center', gap: 2 }}>
+          <Button
+            onClick={() => {
+              setShowProfile(false);
+              navigate('/parent/update-profile');
+            }}
+            sx={{
+              background: 'linear-gradient(135deg, #73ad67 0%, #2f5148 100%)',
+              color: 'white',
+              borderRadius: 2,
+              px: 4,
+              py: 1,
+              fontWeight: 600,
+              '&:hover': {
+                background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                transform: 'translateY(-1px)',
+                boxShadow: '0 4px 15px rgba(47, 81, 72, 0.4)',
+              },
+            }}
+          >
+            ✏️ Chỉnh sửa thông tin
+          </Button>
           <Button
             onClick={() => setShowProfile(false)}
             sx={{
