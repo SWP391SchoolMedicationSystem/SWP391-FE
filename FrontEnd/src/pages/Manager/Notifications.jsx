@@ -258,7 +258,8 @@ const Notifications = () => {
           notificationstaffdetails: notification.notificationstaffdetails || [],
         };
       })
-      .filter(Boolean);
+      .filter(Boolean)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sắp xếp theo thời gian mới nhất trước
 
     return processed;
   };
@@ -408,7 +409,6 @@ const Notifications = () => {
                   <th>Nội dung</th>
                   <th>Đối tượng</th>
                   <th>Ngày tạo</th>
-                  <th>Người tạo</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
@@ -446,9 +446,6 @@ const Notifications = () => {
                       {new Date(notification.createdAt).toLocaleDateString(
                         'vi-VN'
                       )}
-                    </td>
-                    <td className="creator-cell">
-                      {notification.createdBy || 'Hệ thống'}
                     </td>
                     <td className="action-cell">
                       <button

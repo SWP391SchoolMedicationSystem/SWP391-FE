@@ -30,11 +30,8 @@ import ManagerStudentHealthRecordDetail from './pages/Manager/StudentHealthRecor
 // Admin pages
 import AdminDashboard from './pages/Admin/Dashboard';
 import AdminAccountManagement from './pages/Admin/AccountManagement';
-import ManageManagers from './pages/Admin/ManageManagers';
-import SystemLogs from './pages/Admin/SystemLogs';
-import FormCategories from './pages/Admin/FormCategories';
 import EmailTemplates from './pages/Admin/EmailTemplates';
-import AdminSettings from './pages/Admin/Settings';
+import StudentManagement from './pages/Admin/StudentManagement';
 
 // Nurse pages
 import NurseVaccinationEvents from './pages/Nurse/VaccinationEvents';
@@ -83,15 +80,12 @@ function App() {
           }
         >
           <Route index element={<AdminDashboard />} />
+          <Route path="student-management" element={<StudentManagement />} />
           <Route
             path="account-management"
             element={<AdminAccountManagement />}
           />
-          <Route path="manage-managers" element={<ManageManagers />} />
-          <Route path="system-logs" element={<SystemLogs />} />
-          <Route path="form-categories" element={<FormCategories />} />
           <Route path="email-templates" element={<EmailTemplates />} />
-          <Route path="settings" element={<AdminSettings />} />
         </Route>
 
         {/* Manager routes */}

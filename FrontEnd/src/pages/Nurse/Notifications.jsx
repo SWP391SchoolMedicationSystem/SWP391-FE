@@ -181,7 +181,8 @@ const Notifications = () => {
           staffDetails: notification.notificationstaffdetails || [],
         };
       })
-      .filter(Boolean); // Loại bỏ các item null
+      .filter(Boolean) // Loại bỏ các item null
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sắp xếp theo thời gian mới nhất trước
 
     return processed;
   };

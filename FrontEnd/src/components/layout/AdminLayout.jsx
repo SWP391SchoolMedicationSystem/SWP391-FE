@@ -4,15 +4,12 @@ import { Box, Typography, Avatar, IconButton } from '@mui/material';
 import {
   Dashboard,
   SupervisorAccount,
-  Assignment,
-  Category,
-  Settings,
   Logout,
   AdminPanelSettings,
   Search,
-  Notifications,
   DarkMode,
   LightMode,
+  School,
 } from '@mui/icons-material';
 import userService from '../../services/userService';
 import MedlearnLogo from '../../assets/images/Medlearn-logo.png';
@@ -27,40 +24,22 @@ const navItems = [
     key: 'dashboard',
   },
   {
+    to: '/admin/student-management',
+    label: 'Quản Lý Học Sinh',
+    icon: <School />,
+    key: 'student-management',
+  },
+  {
     to: '/admin/account-management',
     label: 'Quản Lý Tài Khoản',
     icon: <SupervisorAccount />,
     key: 'account-management',
   },
   {
-    to: '/admin/manage-managers',
-    label: 'Quản Lý Manager',
-    icon: <SupervisorAccount />,
-    key: 'squad',
-  },
-  {
-    to: '/admin/system-logs',
-    label: 'Nhật Ký Hệ Thống',
-    icon: <Assignment />,
-    key: 'messenger',
-  },
-  {
-    to: '/admin/form-categories',
-    label: 'Danh Mục Form',
-    icon: <Category />,
-    key: 'statistic',
-  },
-  {
     to: '/admin/email-templates',
     label: 'Mẫu Email',
     icon: <AdminPanelSettings />,
     key: 'calendar',
-  },
-  {
-    to: '/admin/settings',
-    label: 'Cài Đặt',
-    icon: <Settings />,
-    key: 'finance',
   },
 ];
 
@@ -313,100 +292,6 @@ export default function AdminLayout() {
             </NavLink>
           ))}
         </Box>
-
-        {/* Bottom section */}
-        <Box sx={{ p: 2 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              p: '12px 16px',
-              borderRadius: '15px',
-              background: currentTheme.cardBgInactive,
-              backdropFilter: 'blur(15px)',
-              border: `1px solid ${currentTheme.border}`,
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                background: currentTheme.cardBgHover,
-                transform: 'translateY(-1px)',
-                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-              },
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 24,
-                height: 24,
-                '& svg': {
-                  fontSize: '20px',
-                  color: currentTheme.textSecondary,
-                },
-              }}
-            >
-              <Assignment />
-            </Box>
-            <Typography
-              sx={{
-                fontSize: '14px',
-                fontWeight: 400,
-                color: currentTheme.textSecondary,
-              }}
-            >
-              Transfers
-            </Typography>
-          </Box>
-
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              p: '12px 16px',
-              mt: 1,
-              borderRadius: '15px',
-              background: currentTheme.cardBgInactive,
-              backdropFilter: 'blur(15px)',
-              border: `1px solid ${currentTheme.border}`,
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                background: currentTheme.cardBgHover,
-                transform: 'translateY(-1px)',
-                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-              },
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 24,
-                height: 24,
-                '& svg': {
-                  fontSize: '20px',
-                  color: currentTheme.textSecondary,
-                },
-              }}
-            >
-              <SupervisorAccount />
-            </Box>
-            <Typography
-              sx={{
-                fontSize: '14px',
-                fontWeight: 400,
-                color: currentTheme.textSecondary,
-              }}
-            >
-              Youth academy
-            </Typography>
-          </Box>
-        </Box>
       </Box>
 
       {/* Main content area */}
@@ -477,27 +362,6 @@ export default function AdminLayout() {
               }}
             >
               <Search />
-            </IconButton>
-
-            <IconButton
-              onClick={() => navigate('/admin/system-logs')}
-              sx={{
-                width: 40,
-                height: 40,
-                background: currentTheme.iconButton,
-                backdropFilter: 'blur(15px)',
-                border: `1px solid ${currentTheme.border}`,
-                color: currentTheme.textSecondary,
-                borderRadius: '12px',
-                '&:hover': {
-                  background: currentTheme.iconButtonHover,
-                  color: currentTheme.textPrimary,
-                  transform: 'translateY(-1px)',
-                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-                },
-              }}
-            >
-              <Notifications />
             </IconButton>
 
             {/* Dark Mode Toggle */}
