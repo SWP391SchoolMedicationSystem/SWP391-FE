@@ -10,8 +10,11 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { useNavigate } from 'react-router-dom';
 
 function BlogManagement() {
+  const navigate = useNavigate();
+
   // Use API hooks
   const { data: blogs, loading, error, refetch } = useManagerBlogs();
   const {
@@ -54,6 +57,13 @@ function BlogManagement() {
     approvalStatus: 'Approved',
     rejectionReason: '',
   });
+
+  // Loading states for different operations
+  const [isCreating, setIsCreating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
 
   // Filter blogs based on search and filters
   const filteredBlogs = (blogs || []).filter(blog => {
@@ -237,6 +247,13 @@ function BlogManagement() {
 
   const handleSubmit = async e => {
     e.preventDefault();
+
+    if (modalMode === 'add') {
+      setIsCreating(true);
+    } else if (modalMode === 'edit') {
+      setIsUpdating(true);
+    }
+
     try {
       let createdBlogId = null;
 
@@ -283,11 +300,21 @@ function BlogManagement() {
     } catch (error) {
       console.error('Error saving blog:', error);
       alert('Có lỗi xảy ra khi lưu bài viết. Vui lòng thử lại!');
+    } finally {
+      setIsCreating(false);
+      setIsUpdating(false);
     }
   };
 
   const handleApprovalSubmit = async e => {
     e.preventDefault();
+
+    if (approvalData.approvalStatus === 'Approved') {
+      setIsApproving(true);
+    } else if (approvalData.approvalStatus === 'Rejected') {
+      setIsRejecting(true);
+    }
+
     try {
       const blogId = currentPost.blogId || currentPost.id;
 
@@ -305,11 +332,15 @@ function BlogManagement() {
     } catch (error) {
       console.error('Error processing approval:', error);
       alert('Có lỗi xảy ra khi xử lý phê duyệt. Vui lòng thử lại!');
+    } finally {
+      setIsApproving(false);
+      setIsRejecting(false);
     }
   };
 
   const handleDeletePost = async postId => {
     if (window.confirm('Bạn có chắc chắn muốn xóa bài viết này?')) {
+      setIsDeleting(true);
       try {
         const idValue = postId ?? postId?.blogid ?? postId?.blogId;
         await deleteBlog(idValue);
@@ -318,6 +349,8 @@ function BlogManagement() {
       } catch (error) {
         console.error('Error deleting blog:', error);
         alert('Có lỗi xảy ra khi xóa bài viết. Vui lòng thử lại!');
+      } finally {
+        setIsDeleting(false);
       }
     }
   };
@@ -656,7 +689,6 @@ function BlogManagement() {
       {!loading && !error && (!blogs || blogs.length === 0) && (
         <div className="empty-state">
           <p>📭 Chưa có blog nào trong hệ thống</p>
-          
         </div>
       )}
 
@@ -1144,13 +1176,43 @@ function BlogManagement() {
                       type="button"
                       className="btn-cancel"
                       onClick={() => setShowModal(false)}
+                      disabled={isApproving || isRejecting}
                     >
                       Hủy
                     </button>
-                    <button type="submit" className="btn-save">
-                      {approvalData.approvalStatus === 'Approved'
-                        ? 'Phê duyệt'
-                        : 'Từ chối'}
+                    <button
+                      type="submit"
+                      className="btn-save"
+                      disabled={isApproving || isRejecting}
+                    >
+                      {isApproving ? (
+                        <>
+                          <span className="loading-spinner">⏳</span>
+                          Đang phê duyệt...
+                        </>
+                      ) : (
+                        '✅ Phê Duyệt'
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setApprovalData({
+                          ...approvalData,
+                          approvalStatus: 'Rejected',
+                        })
+                      }
+                      className="btn-reject"
+                      disabled={isApproving || isRejecting}
+                    >
+                      {isRejecting ? (
+                        <>
+                          <span className="loading-spinner">⏳</span>
+                          Đang từ chối...
+                        </>
+                      ) : (
+                        '❌ Từ Chối'
+                      )}
                     </button>
                   </div>
                 </form>
@@ -1248,19 +1310,28 @@ function BlogManagement() {
                       type="button"
                       className="btn-cancel"
                       onClick={() => setShowModal(false)}
+                      disabled={isCreating || isUpdating}
                     >
                       Hủy
                     </button>
                     <button
                       type="submit"
                       className="btn-save"
-                      disabled={uploadingImage}
+                      disabled={isCreating || isUpdating}
                     >
-                      {uploadingImage
-                        ? '⏳ Đang xử lý...'
-                        : modalMode === 'add'
-                        ? 'Tạo bài viết'
-                        : 'Cập nhật'}
+                      {isCreating ? (
+                        <>
+                          <span className="loading-spinner">⏳</span>
+                          Đang tạo...
+                        </>
+                      ) : isUpdating ? (
+                        <>
+                          <span className="loading-spinner">⏳</span>
+                          Đang cập nhật...
+                        </>
+                      ) : (
+                        'Lưu'
+                      )}
                     </button>
                   </div>
                 </form>

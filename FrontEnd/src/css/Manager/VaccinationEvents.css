@@ -188,19 +188,6 @@
   font-size: 12px;
 }
 
-/* Disabled button state */
-.vaccination-events-container button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-.vaccination-events-container button:disabled:hover {
-  transform: none !important;
-  box-shadow: none !important;
-}
-
 /* Button groups */
 .vaccination-events-container .button-group {
   display: flex;
@@ -838,4 +825,60 @@
   font-size: 0.875rem;
   margin-top: 5px;
   display: block;
+}
+
+/* Loading spinner styles */
+.loading-spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Enhanced disabled button styles */
+.vaccination-events-container button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+  background: #c1cbc2 !important;
+  color: #97a19b !important;
+}
+
+.vaccination-events-container button:disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background: #c1cbc2 !important;
+}
+
+/* Loading state for buttons with text */
+.vaccination-events-container button:disabled .loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Specific loading states for different button types */
+.vaccination-events-container .submit-btn:disabled,
+.vaccination-events-container .create-btn:disabled,
+.vaccination-events-container .send-email-btn:disabled {
+  background: linear-gradient(135deg, #c1cbc2 0%, #97a19b 100%) !important;
+  color: #ffffff !important;
+}
+
+.vaccination-events-container .delete-confirm-btn:disabled {
+  background: #c1cbc2 !important;
+  color: #97a19b !important;
+}
+
+/* Loading text styles */
+.vaccination-events-container button:disabled {
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }

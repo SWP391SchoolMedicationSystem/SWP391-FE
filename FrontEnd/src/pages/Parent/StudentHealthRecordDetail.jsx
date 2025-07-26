@@ -9,6 +9,13 @@ const StudentHealthRecordDetail = () => {
   const [healthRecord, setHealthRecord] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  var item = {
+    studentId: 1,
+    studentName: 'Nguyễn Văn A',
+    healthRecordTitle: 'Hồ sơ sức khỏe',
+    healthRecordDate: '2021-01-01',
+    healthCategory: 'Sức khỏe',
+  };
 
   useEffect(() => {
     fetchHealthRecord();

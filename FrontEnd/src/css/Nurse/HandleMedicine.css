@@ -3,7 +3,7 @@
   padding: 20px;
   min-height: 100vh;
   background-color: #f2f6f3; /* $bg-main */
-  font-family: "Satoshi", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Satoshi', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .handle-medicine-header {
@@ -25,14 +25,14 @@
   margin-bottom: 10px;
   font-weight: bold;
   color: #ffffff; /* $text-white */
-  font-family: "Satoshi", sans-serif;
+  font-family: 'Satoshi', sans-serif;
 }
 
 .handle-medicine-header p {
   font-size: 1.2rem;
   color: #ffffff; /* $text-white */
   opacity: 0.9;
-  font-family: "Satoshi", sans-serif;
+  font-family: 'Satoshi', sans-serif;
 }
 
 /* Statistics Cards */
@@ -77,14 +77,14 @@
   margin: 0 0 5px 0;
   font-weight: bold;
   color: #2f5148; /* $text-primary */
-  font-family: "Satoshi", sans-serif;
+  font-family: 'Satoshi', sans-serif;
 }
 
 .stat-content p {
   margin: 0;
   font-size: 1rem;
   color: #97a19b; /* $text-secondary */
-  font-family: "Satoshi", sans-serif;
+  font-family: 'Satoshi', sans-serif;
 }
 
 /* Controls */
@@ -203,7 +203,7 @@
 
 .student-id {
   font-weight: bold;
-  font-family: "Courier New", monospace;
+  font-family: 'Courier New', monospace;
 }
 
 .student-info strong {
@@ -566,4 +566,99 @@
   .form-actions {
     flex-direction: column;
   }
+}
+
+/* Loading spinner styles */
+.loading-spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Enhanced disabled button styles */
+.handle-medicine-container button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+  background: #c1cbc2 !important;
+  color: #97a19b !important;
+}
+
+.handle-medicine-container button:disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background: #c1cbc2 !important;
+}
+
+/* Loading state for buttons with text */
+.handle-medicine-container button:disabled .loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Specific loading states for different button types */
+.handle-medicine-container .submit-btn:disabled {
+  background: linear-gradient(135deg, #c1cbc2 0%, #97a19b 100%) !important;
+  color: #ffffff !important;
+}
+
+.handle-medicine-container .process-btn:disabled {
+  background: #c1cbc2 !important;
+  color: #97a19b !important;
+}
+
+.handle-medicine-container .btn-view:disabled {
+  background: #c1cbc2 !important;
+  color: #97a19b !important;
+}
+
+/* Loading text styles */
+.handle-medicine-container button:disabled {
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Form input disabled states */
+.handle-medicine-container input:disabled,
+.handle-medicine-container textarea:disabled,
+.handle-medicine-container select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f8f9fa !important;
+  color: #97a19b !important;
+}
+
+/* Process button specific styles */
+.process-btn {
+  background: #73ad67;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.process-btn:hover:not(:disabled) {
+  background: #85b06d;
+  transform: translateY(-1px);
+}
+
+.process-btn:disabled {
+  background: #c1cbc2 !important;
+  color: #97a19b !important;
+  cursor: not-allowed;
 }

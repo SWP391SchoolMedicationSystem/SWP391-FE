@@ -1,159 +1,130 @@
-import React, { useState } from "react";
-import "../../css/Nurse/HandleMedicine.css";
+import React, { useState } from 'react';
+import '../../css/Nurse/HandleMedicine.css';
 
 function HandleMedicine() {
-  // Mock data for medicine submissions from parents
-  const [medicineSubmissions] = useState([
-    {
-      id: 1,
-      studentId: "MN001",
-      studentName: "Nguyễn Văn An",
-      className: "Mầm",
-      parentName: "Nguyễn Thị Hoa",
-      parentPhone: "0912345678",
-      submissionDate: "2024-03-20",
-      status: "Đã xử lý",
-      medicines: [
-        {
-          name: "Paracetamol",
-          type: "Siro",
-          dosage: "5ml",
-          frequency: "3 lần/ngày",
-          duration: "3 ngày",
-          notes: "Uống khi sốt trên 38°C",
-        },
-      ],
-    },
-    {
-      id: 2,
-      studentId: "MN003",
-      studentName: "Lê Minh Cường",
-      className: "Lá 1",
-      parentName: "Lê Thị Mai",
-      parentPhone: "0934567890",
-      submissionDate: "2024-03-19",
-      status: "Chờ xử lý",
-      medicines: [
-        {
-          name: "Vitamin C",
-          type: "Viên nang",
-          dosage: "1 viên",
-          frequency: "1 lần/ngày",
-          duration: "7 ngày",
-          notes: "Tăng cường sức đề kháng",
-        },
-      ],
-    },
-    {
-      id: 3,
-      studentId: "MN005",
-      studentName: "Hoàng Văn Em",
-      className: "Lá 3",
-      parentName: "Hoàng Thị Lan",
-      parentPhone: "0956789012",
-      submissionDate: "2024-03-18",
-      status: "Chờ xử lý",
-      medicines: [
-        {
-          name: "Cetirizine",
-          type: "Siro",
-          dosage: "2.5ml",
-          frequency: "1 lần/ngày",
-          duration: "5 ngày",
-          notes: "Dị ứng da, uống vào buổi tối",
-        },
-      ],
-    },
-  ]);
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [selectedSubmission, setSelectedSubmission] = useState(null);
+  const [medicineSubmissions, setMedicineSubmissions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
-
-  // Form data for new medicine entry
+  const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [formData, setFormData] = useState({
-    studentName: "",
-    parentName: "",
-    parentPhone: "",
-    medicineName: "",
-    medicineType: "",
-    dosage: "",
-    frequency: "",
-    duration: "",
-    notes: "",
-    instructions: "",
+    medicineName: '',
+    dosage: '',
+    instructions: '',
+    notes: '',
   });
 
+  // Loading states for different operations
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
   // Filter submissions
-  const filteredSubmissions = medicineSubmissions.filter((submission) => {
+  const filteredSubmissions = medicineSubmissions.filter(submission => {
     const matchesSearch =
       submission.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       submission.parentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       submission.studentId.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
-      filterStatus === "" || submission.status === filterStatus;
+      filterStatus === '' || submission.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
-  const handleViewSubmission = (submission) => {
+  const handleViewSubmission = submission => {
     setSelectedSubmission(submission);
     setShowModal(true);
   };
 
   const handleAddMedicine = () => {
     setFormData({
-      studentName: "",
-      parentName: "",
-      parentPhone: "",
-      medicineName: "",
-      medicineType: "",
-      dosage: "",
-      frequency: "",
-      duration: "",
-      notes: "",
-      instructions: "",
+      studentName: '',
+      parentName: '',
+      parentPhone: '',
+      medicineName: '',
+      medicineType: '',
+      dosage: '',
+      frequency: '',
+      duration: '',
+      notes: '',
+      instructions: '',
     });
     setShowFormModal(true);
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  const handleSubmitForm = (e) => {
+  const handleSubmitForm = async e => {
     e.preventDefault();
-    // Mock submit functionality
-    alert("Đã lưu thông tin thuốc thành công!");
-    setShowFormModal(false);
+    setIsSubmitting(true);
+
+    try {
+      // Mock submit functionality - replace with actual API call
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
+      alert('Đã lưu thông tin thuốc thành công!');
+      setShowFormModal(false);
+      setFormData({
+        medicineName: '',
+        dosage: '',
+        instructions: '',
+        notes: '',
+      });
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Có lỗi xảy ra khi lưu thông tin thuốc!');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const getStatusClass = (status) => {
+  const handleProcessSubmission = async submission => {
+    setIsProcessing(true);
+    try {
+      // Mock processing functionality - replace with actual API call
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
+
+      // Update local state
+      setMedicineSubmissions(prev =>
+        prev.map(s =>
+          s.id === submission.id ? { ...s, status: 'Đã xử lý' } : s
+        )
+      );
+
+      alert('Đã xử lý yêu cầu thuốc thành công!');
+    } catch (error) {
+      console.error('Error processing submission:', error);
+      alert('Có lỗi xảy ra khi xử lý yêu cầu thuốc!');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const getStatusClass = status => {
     switch (status) {
-      case "Đã xử lý":
-        return "status-processed";
-      case "Chờ xử lý":
-        return "status-pending";
-      case "Từ chối":
-        return "status-rejected";
+      case 'Đã xử lý':
+        return 'status-processed';
+      case 'Chờ xử lý':
+        return 'status-pending';
+      case 'Từ chối':
+        return 'status-rejected';
       default:
-        return "status-pending";
+        return 'status-pending';
     }
   };
 
   // Statistics
   const stats = {
     total: medicineSubmissions.length,
-    pending: medicineSubmissions.filter((s) => s.status === "Chờ xử lý").length,
-    processed: medicineSubmissions.filter((s) => s.status === "Đã xử lý")
-      .length,
+    pending: medicineSubmissions.filter(s => s.status === 'Chờ xử lý').length,
+    processed: medicineSubmissions.filter(s => s.status === 'Đã xử lý').length,
     today: medicineSubmissions.filter(
-      (s) => s.submissionDate === new Date().toISOString().split("T")[0]
+      s => s.submissionDate === new Date().toISOString().split('T')[0]
     ).length,
   };
 
@@ -204,7 +175,7 @@ function HandleMedicine() {
               type="text"
               placeholder="Tìm kiếm theo tên học sinh, phụ huynh..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               className="search-input"
             />
           </div>
@@ -212,7 +183,7 @@ function HandleMedicine() {
           <div className="filter-controls">
             <select
               value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
+              onChange={e => setFilterStatus(e.target.value)}
               className="filter-select"
             >
               <option value="">Tất cả trạng thái</option>
@@ -244,7 +215,7 @@ function HandleMedicine() {
             </tr>
           </thead>
           <tbody>
-            {filteredSubmissions.map((submission) => (
+            {filteredSubmissions.map(submission => (
               <tr key={submission.id}>
                 <td className="student-id">{submission.studentId}</td>
                 <td>
@@ -283,6 +254,20 @@ function HandleMedicine() {
                     >
                       👁️
                     </button>
+                    <button
+                      onClick={() => handleProcessSubmission(submission)}
+                      className="process-btn"
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? (
+                        <>
+                          <span className="loading-spinner">⏳</span>
+                          Đang xử lý...
+                        </>
+                      ) : (
+                        '✅ Xử lý'
+                      )}
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -300,7 +285,7 @@ function HandleMedicine() {
       {/* View Modal */}
       {showModal && selectedSubmission && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Chi tiết thuốc - {selectedSubmission.studentName}</h3>
               <button
@@ -387,7 +372,7 @@ function HandleMedicine() {
         <div className="modal-overlay" onClick={() => setShowFormModal(false)}>
           <div
             className="modal-content large"
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <div className="modal-header">
               <h3>Thêm thông tin thuốc mới</h3>
@@ -532,13 +517,25 @@ function HandleMedicine() {
                 <div className="form-actions">
                   <button
                     type="button"
-                    className="btn-cancel"
                     onClick={() => setShowFormModal(false)}
+                    className="cancel-btn"
+                    disabled={isSubmitting}
                   >
                     Hủy
                   </button>
-                  <button type="submit" className="btn-save">
-                    Lưu thông tin
+                  <button
+                    type="submit"
+                    className="submit-btn"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <span className="loading-spinner">⏳</span>
+                        Đang lưu...
+                      </>
+                    ) : (
+                      'Lưu'
+                    )}
                   </button>
                 </div>
               </form>

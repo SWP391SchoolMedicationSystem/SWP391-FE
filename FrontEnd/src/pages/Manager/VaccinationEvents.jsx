@@ -11,6 +11,12 @@ function VaccinationEvents() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Loading states for different operations
+  const [isCreating, setIsCreating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -199,6 +205,7 @@ function VaccinationEvents() {
 
     if (!selectedEvent) return;
 
+    setIsSendingEmail(true);
     try {
       const emailData = {
         vaccinationEventId: selectedEvent.id,
@@ -213,6 +220,8 @@ function VaccinationEvents() {
     } catch (error) {
       console.error('Error sending email:', error);
       alert('Có lỗi xảy ra khi gửi email!');
+    } finally {
+      setIsSendingEmail(false);
     }
   };
 
@@ -230,6 +239,7 @@ function VaccinationEvents() {
       return;
     }
 
+    setIsCreating(true);
     try {
       // Create FormData for file upload
       const formDataToSend = new FormData();
@@ -264,6 +274,8 @@ function VaccinationEvents() {
     } catch (error) {
       console.error('Error creating vaccination event:', error);
       alert('Có lỗi xảy ra khi tạo sự kiện tiêm chủng!');
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -273,6 +285,7 @@ function VaccinationEvents() {
 
     if (!selectedEvent) return;
 
+    setIsUpdating(true);
     try {
       // Format data according to API requirements for PUT
       const eventData = {
@@ -292,6 +305,8 @@ function VaccinationEvents() {
     } catch (error) {
       console.error('Error updating vaccination event:', error);
       alert('Có lỗi xảy ra khi cập nhật sự kiện tiêm chủng!');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -299,6 +314,7 @@ function VaccinationEvents() {
   const handleConfirmDelete = async () => {
     if (!selectedEvent) return;
 
+    setIsDeleting(true);
     try {
       await vaccinationEventService.deleteEvent(selectedEvent.id);
       await fetchVaccinationEvents();
@@ -307,6 +323,8 @@ function VaccinationEvents() {
     } catch (error) {
       console.error('Error deleting vaccination event:', error);
       alert('Có lỗi xảy ra khi xóa sự kiện tiêm chủng!');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -342,7 +360,6 @@ function VaccinationEvents() {
           <p>Tạo và quản lý các đợt tiêm vaccine cho học sinh</p>
         </div>
         <div className="header-actions">
-        
           <button onClick={handleCreateEvent} className="create-btn">
             ➕ Tạo sự kiện mới
           </button>
@@ -563,11 +580,23 @@ function VaccinationEvents() {
                     clearFileData();
                   }}
                   className="cancel-btn"
+                  disabled={isCreating}
                 >
                   Hủy
                 </button>
-                <button type="submit" className="submit-btn">
-                  ➕ Tạo sự kiện
+                <button
+                  type="submit"
+                  className="submit-btn"
+                  disabled={isCreating}
+                >
+                  {isCreating ? (
+                    <>
+                      <span className="loading-spinner">⏳</span>
+                      Đang tạo...
+                    </>
+                  ) : (
+                    '➕ Tạo sự kiện'
+                  )}
                 </button>
               </div>
             </form>
@@ -638,11 +667,23 @@ function VaccinationEvents() {
                   type="button"
                   onClick={() => setShowEditModal(false)}
                   className="cancel-btn"
+                  disabled={isUpdating}
                 >
                   Hủy
                 </button>
-                <button type="submit" className="submit-btn">
-                  Cập nhật
+                <button
+                  type="submit"
+                  className="submit-btn"
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? (
+                    <>
+                      <span className="loading-spinner">⏳</span>
+                      Đang cập nhật...
+                    </>
+                  ) : (
+                    'Cập nhật'
+                  )}
                 </button>
               </div>
             </form>
@@ -686,14 +727,23 @@ function VaccinationEvents() {
               <button
                 onClick={() => setShowDeleteModal(false)}
                 className="cancel-btn"
+                disabled={isDeleting}
               >
                 Hủy
               </button>
               <button
                 onClick={handleConfirmDelete}
                 className="delete-confirm-btn"
+                disabled={isDeleting}
               >
-                🗑️ Xóa
+                {isDeleting ? (
+                  <>
+                    <span className="loading-spinner">⏳</span>
+                    Đang xóa...
+                  </>
+                ) : (
+                  '🗑️ Xóa'
+                )}
               </button>
             </div>
           </div>
@@ -771,11 +821,23 @@ function VaccinationEvents() {
                   type="button"
                   onClick={() => setShowEmailModal(false)}
                   className="cancel-btn"
+                  disabled={isSendingEmail}
                 >
                   Hủy
                 </button>
-                <button type="submit" className="send-email-btn">
-                  📧 Gửi Email
+                <button
+                  type="submit"
+                  className="send-email-btn"
+                  disabled={isSendingEmail}
+                >
+                  {isSendingEmail ? (
+                    <>
+                      <span className="loading-spinner">⏳</span>
+                      Đang gửi...
+                    </>
+                  ) : (
+                    '📧 Gửi Email'
+                  )}
                 </button>
               </div>
             </form>

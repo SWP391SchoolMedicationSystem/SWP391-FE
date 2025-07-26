@@ -12,6 +12,7 @@ import {
   Link,
   TextField,
   Typography,
+  CircularProgress,
 } from '@mui/material';
 import {
   MailOutline,
@@ -37,6 +38,8 @@ export default function LoginForm() {
   });
 
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   // Check if user is already logged in
   useEffect(() => {
@@ -80,6 +83,9 @@ export default function LoginForm() {
   }, [navigate]);
 
   const handleGoogleLoginSuccess = async credentialResponse => {
+    setIsGoogleLoading(true);
+    setError(null);
+
     try {
       const data = await userService.googleLogin(credentialResponse.credential);
       console.log('Google Login success:', data);
@@ -135,10 +141,13 @@ export default function LoginForm() {
         alert('Đăng nhập Google thất bại. Vui lòng thử lại.');
         setError('Đăng nhập Google thất bại.');
       }
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
   const handleGoogleLoginFailure = error => {
+    setIsGoogleLoading(false);
     console.error('Google login failed:', error);
     alert('Đăng nhập Google thất bại. Vui lòng thử lại.');
     setError('Đăng nhập Google thất bại.');
@@ -155,6 +164,7 @@ export default function LoginForm() {
   const handleSubmit = async e => {
     e.preventDefault();
     setError(null);
+    setIsLoading(true);
 
     try {
       const data = await userService.login(formData.email, formData.password);
@@ -232,6 +242,8 @@ export default function LoginForm() {
         ...prev,
         password: '',
       }));
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -292,6 +304,7 @@ export default function LoginForm() {
               value={formData.email}
               onChange={handleChange}
               required
+              disabled={isLoading}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -331,6 +344,7 @@ export default function LoginForm() {
                 value={formData.password}
                 onChange={handleChange}
                 required
+                disabled={isLoading}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -391,6 +405,7 @@ export default function LoginForm() {
                   name="rememberMe"
                   checked={formData.rememberMe}
                   onChange={handleChange}
+                  disabled={isLoading}
                   sx={{
                     color: '#2f5148',
                     '&.Mui-checked': {
@@ -430,6 +445,7 @@ export default function LoginForm() {
               variant="contained"
               fullWidth
               size="large"
+              disabled={isLoading}
               sx={{
                 color: 'white',
                 background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
@@ -439,6 +455,12 @@ export default function LoginForm() {
                   transform: 'translateY(-1px)',
                   boxShadow: '0 6px 20px rgba(47, 81, 72, 0.3)',
                 },
+                '&:disabled': {
+                  background:
+                    'linear-gradient(135deg, #97a19b 0%, #c1cbc2 100%)',
+                  transform: 'none',
+                  boxShadow: 'none',
+                },
                 py: 1.5,
                 mt: 1,
                 borderRadius: 2,
@@ -446,31 +468,75 @@ export default function LoginForm() {
                 fontSize: '1rem',
                 textTransform: 'none',
                 transition: 'all 0.3s ease',
+                position: 'relative',
               }}
             >
-              Sign In
+              {isLoading ? (
+                <>
+                  <CircularProgress
+                    size={20}
+                    sx={{
+                      color: 'white',
+                      mr: 1,
+                      '& .MuiCircularProgress-circle': {
+                        strokeLinecap: 'round',
+                      },
+                    }}
+                  />
+                  Đang đăng nhập...
+                </>
+              ) : (
+                'Sign In'
+              )}
             </Button>
           </form>
 
           <Divider sx={{ my: 1, color: '#97a19b' }}>Or sign in with</Divider>
 
-          <GoogleOAuthProvider clientId={clientId}>
-            <GoogleLogin
-              onSuccess={handleGoogleLoginSuccess}
-              onError={handleGoogleLoginFailure}
-              useOneTap
-            />
-          </GoogleOAuthProvider>
+          <Box sx={{ position: 'relative' }}>
+            <GoogleOAuthProvider clientId={clientId}>
+              <GoogleLogin
+                onSuccess={handleGoogleLoginSuccess}
+                onError={handleGoogleLoginFailure}
+                useOneTap
+                disabled={isGoogleLoading}
+              />
+            </GoogleOAuthProvider>
+            {isGoogleLoading && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  borderRadius: 1,
+                  zIndex: 1,
+                }}
+              >
+                <CircularProgress size={24} sx={{ color: '#2f5148' }} />
+              </Box>
+            )}
+          </Box>
 
           <Box
             sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 1 }}
           >
             <IconButton
+              disabled={isLoading}
               sx={{
                 color: '#2f5148',
                 '&:hover': {
                   backgroundColor: 'rgba(47, 81, 72, 0.1)',
                   transform: 'translateY(-2px)',
+                },
+                '&:disabled': {
+                  color: '#c1cbc2',
+                  transform: 'none',
                 },
                 transition: 'all 0.3s ease',
               }}
@@ -478,11 +544,16 @@ export default function LoginForm() {
               <Facebook />
             </IconButton>
             <IconButton
+              disabled={isLoading}
               sx={{
                 color: '#2f5148',
                 '&:hover': {
                   backgroundColor: 'rgba(47, 81, 72, 0.1)',
                   transform: 'translateY(-2px)',
+                },
+                '&:disabled': {
+                  color: '#c1cbc2',
+                  transform: 'none',
                 },
                 transition: 'all 0.3s ease',
               }}
@@ -490,11 +561,16 @@ export default function LoginForm() {
               <Twitter />
             </IconButton>
             <IconButton
+              disabled={isLoading}
               sx={{
                 color: '#2f5148',
                 '&:hover': {
                   backgroundColor: 'rgba(47, 81, 72, 0.1)',
                   transform: 'translateY(-2px)',
+                },
+                '&:disabled': {
+                  color: '#c1cbc2',
+                  transform: 'none',
                 },
                 transition: 'all 0.3s ease',
               }}

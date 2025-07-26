@@ -1290,3 +1290,77 @@
     max-height: 400px;
   }
 }
+
+/* Loading spinner styles */
+.loading-spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Enhanced disabled button styles */
+.blog-management-container button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+  background: #c1cbc2 !important;
+  color: #97a19b !important;
+}
+
+.blog-management-container button:disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background: #c1cbc2 !important;
+}
+
+/* Loading state for buttons with text */
+.blog-management-container button:disabled .loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Specific loading states for different button types */
+.blog-management-container .btn-save:disabled {
+  background: linear-gradient(135deg, #c1cbc2 0%, #97a19b 100%) !important;
+  color: #ffffff !important;
+}
+
+.blog-management-container .btn-approve:disabled {
+  background: #c1cbc2 !important;
+  color: #97a19b !important;
+}
+
+.blog-management-container .btn-reject:disabled {
+  background: #c1cbc2 !important;
+  color: #97a19b !important;
+}
+
+.blog-management-container .btn-delete:disabled {
+  background: #c1cbc2 !important;
+  color: #97a19b !important;
+}
+
+/* Loading text styles */
+.blog-management-container button:disabled {
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Form input disabled states */
+.blog-management-container input:disabled,
+.blog-management-container textarea:disabled,
+.blog-management-container select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f8f9fa !important;
+  color: #97a19b !important;
+}
