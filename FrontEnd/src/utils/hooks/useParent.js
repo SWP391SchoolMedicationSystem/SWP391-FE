@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useApi, useApiCall } from './useApi';
 import {
   parentService,
@@ -7,6 +7,7 @@ import {
   parentBlogService,
   consultationService,
   parentChatService,
+  parentVaccinationService,
 } from '../../services/parentService';
 
 // Hook for parent profile data
@@ -55,6 +56,11 @@ export const useParentNotifications = () => {
     fetchNotifications();
   }, [fetchNotifications]);
 
+  // Auto-fetch on mount
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
   return {
     data: notifications,
     loading,
@@ -84,7 +90,7 @@ export const useParentStudents = () => {
         throw new Error('Không tìm thấy thông tin phụ huynh');
       }
 
-          const data = await parentService.getMyChildren(parentId);
+      const data = await parentService.getMyChildren(parentId);
 
       setStudents(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -135,6 +141,11 @@ export const useConsultations = () => {
 // Hook for chat messages
 export const useParentChat = () => {
   return useApi(parentChatService.getChatMessages);
+};
+
+// Hook for vaccination events
+export const useParentVaccinationEvents = () => {
+  return useApi(parentVaccinationService.getAllVaccinationEvents);
 };
 
 // Hook for parent actions

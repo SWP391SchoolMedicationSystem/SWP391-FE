@@ -3,8 +3,10 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import {
   useParentNotifications,
   useParentBlogs,
+  useParentVaccinationEvents,
 } from '../../utils/hooks/useParent';
 import '../../css/Parent/Dashboard.css';
+import * as signalR from '@microsoft/signalr';
 
 // Material-UI Icons
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -20,6 +22,8 @@ import LocalPharmacyIcon from '@mui/icons-material/LocalPharmacy';
 function ParentDashboard() {
   const navigate = useNavigate();
   const [quickStats, setQuickStats] = useState([]);
+  const [signalRConnection, setSignalRConnection] = useState(null);
+  const [realTimeNotifications, setRealTimeNotifications] = useState([]);
 
   // Get theme from parent layout
   const context = useOutletContext();
@@ -29,15 +33,112 @@ function ParentDashboard() {
   const { data: notifications, loading: notificationsLoading } =
     useParentNotifications();
   const { data: blogs, loading: blogsLoading } = useParentBlogs();
+  const { data: vaccinationEvents, loading: vaccinationEventsLoading } =
+    useParentVaccinationEvents();
+
+  // SignalR Connection Setup
+  useEffect(() => {
+    if (!signalRConnection) {
+      const newConnection = new signalR.HubConnectionBuilder()
+        .withUrl(
+          'https://api-schoolhealth.purintech.id.vn/hubs/notifications',
+          {
+            skipNegotiation: true,
+            transport: signalR.HttpTransportType.WebSockets,
+            accessTokenFactory: () => {
+              const token = localStorage.getItem('token');
+              return token;
+            },
+          }
+        )
+        .withAutomaticReconnect()
+        .build();
+
+      setSignalRConnection(newConnection);
+    }
+
+    return () => {
+      if (
+        signalRConnection &&
+        signalRConnection.state === signalR.HubConnectionState.Connected
+      ) {
+        signalRConnection.stop();
+      }
+    };
+  }, [signalRConnection]);
+
+  // SignalR Event Handlers
+  useEffect(() => {
+    if (signalRConnection) {
+      signalRConnection
+        .start()
+        .then(() => {
+          console.log('🔗 SignalR connected for Parent dashboard');
+
+          // Listen for new notifications
+          signalRConnection.on('ReceiveNotification', notification => {
+            console.log('📢 New real-time notification:', notification);
+
+            const newNotification = {
+              id: Date.now(),
+              title:
+                notification.Title || notification.title || 'Thông báo mới',
+              message: notification.Message || notification.message || '',
+              type: notification.Type || 'general',
+              targetType: 'parent',
+              createdAt: new Date().toISOString(),
+              createdBy: 'Hệ thống',
+              isNew: true,
+            };
+
+            setRealTimeNotifications(prev => [newNotification, ...prev]);
+          });
+
+          // Listen for parent-specific notifications
+          signalRConnection.on('ReceiveParentNotification', notification => {
+            console.log('👨‍👩‍👧‍👦 Parent notification:', notification);
+
+            const newNotification = {
+              id: Date.now(),
+              title:
+                notification.Title ||
+                notification.title ||
+                'Thông báo phụ huynh',
+              message: notification.Message || notification.message || '',
+              type: notification.Type || 'general',
+              targetType: 'parent',
+              createdAt: new Date().toISOString(),
+              createdBy: 'Hệ thống',
+              isNew: true,
+            };
+
+            setRealTimeNotifications(prev => [newNotification, ...prev]);
+          });
+        })
+        .catch(err => {
+          console.error('SignalR connection failed:', err);
+        });
+    }
+  }, [signalRConnection]);
 
   // Calculate real statistics
   useEffect(() => {
     const calculateStats = () => {
+      console.log('🔍 Dashboard - notifications data:', notifications);
+      console.log('🔍 Dashboard - vaccination events:', vaccinationEvents);
+      console.log(
+        '🔍 Dashboard - realTimeNotifications:',
+        realTimeNotifications
+      );
+
       const totalNotifications = notifications ? notifications.length : 0;
       const unreadNotifications = notifications
         ? notifications.filter(n => !n.isRead).length
         : 0;
       const totalBlogs = blogs ? blogs.length : 0;
+      const totalVaccinationEvents = vaccinationEvents
+        ? vaccinationEvents.length
+        : 0;
 
       const stats = [
         {
@@ -49,7 +150,7 @@ function ParentDashboard() {
           color: 'stat-notification',
         },
         {
-          title: 'Tổng thông báo',
+          title: 'Số lượng thông báo',
           value: totalNotifications.toString(),
           icon: <InboxIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />,
           color: 'stat-health',
@@ -61,8 +162,8 @@ function ParentDashboard() {
           color: 'stat-vaccine',
         },
         {
-          title: 'Tin nhắn chưa đọc',
-          value: '1', // Mock data - chat API not available
+          title: 'Sự kiện tiêm chủng',
+          value: totalVaccinationEvents.toString(),
           icon: <ChatIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />,
           color: 'stat-message',
         },
@@ -71,49 +172,48 @@ function ParentDashboard() {
       setQuickStats(stats);
     };
 
-    if (!notificationsLoading && !blogsLoading) {
+    if (!notificationsLoading && !blogsLoading && !vaccinationEventsLoading) {
       calculateStats();
     }
-  }, [notifications, blogs, notificationsLoading, blogsLoading]);
+  }, [
+    notifications,
+    blogs,
+    vaccinationEvents,
+    notificationsLoading,
+    blogsLoading,
+    vaccinationEventsLoading,
+    realTimeNotifications,
+  ]);
 
   // Get recent notifications from real data
   const getRecentNotifications = () => {
+    console.log('🔍 getRecentNotifications called');
+    console.log('🔍 notifications from API:', notifications);
+
     if (!notifications || notifications.length === 0) {
-      // Return mock data if no real notifications
-      return [
-        {
-          id: 1,
-          title: 'Lịch tiêm vaccine mới',
-          content:
-            'Thông báo lịch tiêm vaccine sởi - rubella cho học sinh lớp 5',
-          date: '2024-03-15',
-          type: 'vaccination',
-        },
-        {
-          id: 2,
-          title: 'Kết quả khám sức khỏe định kỳ',
-          content: 'Kết quả khám sức khỏe của con em đã được cập nhật',
-          date: '2024-03-12',
-          type: 'health',
-        },
-      ];
+      console.log('🔍 No notifications found');
+      return [];
     }
 
-    // Use real notifications data
-    return notifications
+    // Simple approach: just use API notifications
+    const recentNotifications = notifications
       .sort(
         (a, b) =>
           new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date)
       )
-      .slice(0, 3)
+      .slice(0, 2)
       .map(notification => ({
-        id: notification.id,
-        title: notification.title,
-        content: notification.content,
-        date: notification.date,
-        type: notification.type,
+        id: notification.notificationId || notification.id,
+        title: notification.title || 'Không có tiêu đề',
+        content:
+          notification.message || notification.content || 'Không có nội dung',
+        date: notification.createdAt || notification.date,
+        type: notification.type || 'Chung',
         isRead: notification.isRead,
       }));
+
+    console.log('🔍 Recent notifications:', recentNotifications);
+    return recentNotifications;
   };
 
   const handleViewAllNotifications = () => {
@@ -124,20 +224,16 @@ function ParentDashboard() {
     navigate('/parent/blogs');
   };
 
-  const handleViewHealthHistory = () => {
-    navigate('/parent/health-history');
-  };
-
-  const handleConsultation = () => {
-    navigate('/parent/consultation');
-  };
-
-  const handleChatWithNurse = () => {
-    navigate('/parent/chat');
+  const handleViewHealthRecords = () => {
+    navigate('/parent/health-records');
   };
 
   const handleMedicineRequest = () => {
     navigate('/parent/medicine-request');
+  };
+
+  const handleViewNotificationDetail = notificationId => {
+    navigate(`/parent/notifications?notificationId=${notificationId}`);
   };
 
   return (
@@ -372,80 +468,101 @@ function ParentDashboard() {
           </button>
         </div>
         <div>
-          {getRecentNotifications().map(notification => (
-            <div
-              key={notification.id}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '15px',
-                marginBottom: '10px',
-                borderRadius: '12px',
-                background: theme
-                  ? isDarkMode
-                    ? '#333333'
-                    : '#f8f9fa'
-                  : '#f8f9fa',
-                border: theme
-                  ? `1px solid ${theme.border}`
-                  : '1px solid #e9ecef',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              <div style={{ flex: 1 }}>
-                <h4
-                  style={{
-                    margin: '0 0 5px 0',
-                    color: theme ? theme.textPrimary : '#2f5148',
-                    fontFamily: 'Satoshi, sans-serif',
-                    fontSize: '1rem',
-                    fontWeight: 600,
-                  }}
-                >
-                  {notification.title}
-                </h4>
-                <p
-                  style={{
-                    margin: '0 0 5px 0',
-                    color: theme ? theme.textSecondary : '#97a19b',
-                    fontFamily: 'Satoshi, sans-serif',
-                    fontSize: '0.9rem',
-                  }}
-                >
-                  {notification.content}
-                </p>
-                <span
-                  style={{
-                    color: theme ? theme.textSecondary : '#97a19b',
-                    fontSize: '0.8rem',
-                    fontFamily: 'Satoshi, sans-serif',
-                  }}
-                >
-                  {notification.date}
-                </span>
-              </div>
-              <button
+          {getRecentNotifications().length > 0 ? (
+            getRecentNotifications().map(notification => (
+              <div
+                key={notification.id}
                 style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '15px',
+                  marginBottom: '10px',
+                  borderRadius: '12px',
                   background: theme
                     ? isDarkMode
-                      ? '#4a5568'
-                      : '#85b06d'
-                    : '#85b06d',
-                  color: 'white',
-                  border: 'none',
-                  padding: '8px 15px',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontFamily: 'Satoshi, sans-serif',
-                  fontSize: '0.9rem',
-                  fontWeight: 500,
+                      ? '#333333'
+                      : '#f8f9fa'
+                    : '#f8f9fa',
+                  border: theme
+                    ? `1px solid ${theme.border}`
+                    : '1px solid #e9ecef',
+                  transition: 'all 0.2s ease',
                 }}
               >
-                Đọc
-              </button>
+                <div style={{ flex: 1 }}>
+                  <h4
+                    style={{
+                      margin: '0 0 5px 0',
+                      color: theme ? theme.textPrimary : '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {notification.title}
+                  </h4>
+                  <p
+                    style={{
+                      margin: '0 0 5px 0',
+                      color: theme ? theme.textSecondary : '#97a19b',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                    }}
+                  >
+                    {notification.content}
+                  </p>
+                  <span
+                    style={{
+                      color: theme ? theme.textSecondary : '#97a19b',
+                      fontSize: '0.8rem',
+                      fontFamily: 'Satoshi, sans-serif',
+                    }}
+                  >
+                    {notification.date}
+                  </span>
+                </div>
+                <button
+                  style={{
+                    background: theme
+                      ? isDarkMode
+                        ? '#4a5568'
+                        : '#85b06d'
+                      : '#85b06d',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 15px',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontFamily: 'Satoshi, sans-serif',
+                    fontSize: '0.9rem',
+                    fontWeight: 500,
+                  }}
+                  onClick={() => handleViewNotificationDetail(notification.id)}
+                >
+                  Đọc
+                </button>
+              </div>
+            ))
+          ) : (
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '40px 20px',
+                color: theme ? theme.textSecondary : '#97a19b',
+                fontFamily: 'Satoshi, sans-serif',
+              }}
+            >
+              <NotificationsIcon
+                sx={{
+                  fontSize: '3rem',
+                  marginBottom: '10px',
+                  opacity: 0.5,
+                }}
+              />
+              <p>Chưa có thông báo nào</p>
             </div>
-          ))}
+          )}
         </div>
       </div>
 
@@ -504,7 +621,7 @@ function ParentDashboard() {
                 : '#2f5148',
               color: 'white',
             }}
-            onClick={handleViewHealthHistory}
+            onClick={handleViewHealthRecords}
           >
             <AssignmentIcon sx={{ color: '#97a19b', fontSize: '1.5rem' }} />
             <div style={{ textAlign: 'left' }}>
@@ -517,89 +634,7 @@ function ParentDashboard() {
                   fontSize: '0.8rem',
                 }}
               >
-                Kiểm tra lịch sử khám bệnh và thông tin sức khỏe
-              </small>
-            </div>
-          </button>
-          <button
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '15px 20px',
-              border: 'none',
-              borderRadius: '14px',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              fontSize: '1.1rem',
-              fontWeight: 500,
-              fontFamily: 'Satoshi, sans-serif',
-              background: theme
-                ? isDarkMode
-                  ? '#3a3a3a'
-                  : '#bfefa1'
-                : '#bfefa1',
-              color: theme ? (isDarkMode ? '#ffffff' : '#1a3a2e') : '#1a3a2e',
-            }}
-            onClick={handleConsultation}
-          >
-            <ChatIcon sx={{ color: '#97a19b', fontSize: '1.5rem' }} />
-            <div style={{ textAlign: 'left' }}>
-              <span style={{ display: 'block', fontWeight: 600 }}>
-                Đặt Lịch Tư Vấn
-              </span>
-              <small
-                style={{
-                  color: theme
-                    ? isDarkMode
-                      ? 'rgba(255, 255, 255, 0.7)'
-                      : '#1a3a2e'
-                    : '#1a3a2e',
-                  fontSize: '0.8rem',
-                }}
-              >
-                Đặt lịch hẹn tư vấn với bác sĩ
-              </small>
-            </div>
-          </button>
-          <button
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '15px 20px',
-              border: 'none',
-              borderRadius: '14px',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              fontSize: '1.1rem',
-              fontWeight: 500,
-              fontFamily: 'Satoshi, sans-serif',
-              background: theme
-                ? isDarkMode
-                  ? '#3a3a3a'
-                  : '#bfefa1'
-                : '#bfefa1',
-              color: theme ? (isDarkMode ? '#ffffff' : '#1a3a2e') : '#1a3a2e',
-            }}
-            onClick={handleChatWithNurse}
-          >
-            <ForumIcon sx={{ color: '#97a19b', fontSize: '1.5rem' }} />
-            <div style={{ textAlign: 'left' }}>
-              <span style={{ display: 'block', fontWeight: 600 }}>
-                Chat Với Y Tá
-              </span>
-              <small
-                style={{
-                  color: theme
-                    ? isDarkMode
-                      ? 'rgba(255, 255, 255, 0.7)'
-                      : '#1a3a2e'
-                    : '#1a3a2e',
-                  fontSize: '0.8rem',
-                }}
-              >
-                Liên hệ trực tiếp với y tá trường
+                Kiểm tra thông tin sức khỏe chi tiết
               </small>
             </div>
           </button>

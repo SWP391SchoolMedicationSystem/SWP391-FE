@@ -203,11 +203,10 @@ export const parentHealthService = {
   getChildHealthRecords: async studentId => {
     try {
       const url = `${API_ENDPOINTS.HEALTH_RECORD.GET_BY_STUDENT}?studentId=${studentId}`;
-            const response = await apiClient.get(url);
+      const response = await apiClient.get(url);
 
       const records = Array.isArray(response) ? response : [];
       const mappedRecords = records.map(parentService.mapHealthRecordData);
-      
 
       return mappedRecords;
     } catch (error) {
@@ -220,7 +219,7 @@ export const parentHealthService = {
   updateHealthRecord: async (recordId, recordData) => {
     try {
       const url = `${API_ENDPOINTS.HEALTH_RECORD.UPDATE}?id=${recordId}`;
-            const response = await apiClient.put(url, recordData);
+      const response = await apiClient.put(url, recordData);
 
       return response;
     } catch (error) {
@@ -402,6 +401,22 @@ export const donationService = {
   },
 };
 
+// Vaccination Event Services
+export const parentVaccinationService = {
+  // Get all vaccination events
+  getAllVaccinationEvents: async () => {
+    try {
+      const response = await apiClient.get(
+        API_ENDPOINTS.VACCINATION_EVENT.GET_ALL
+      );
+      return response;
+    } catch (error) {
+      console.error('Error getting vaccination events:', error);
+      throw error;
+    }
+  },
+};
+
 // Standalone functions for easier import
 export const submitDonation = donationService.submitDonation;
 export const getDonationHistory = donationService.getDonationHistory;
@@ -414,4 +429,5 @@ export default {
   consultationService,
   parentChatService,
   donationService,
+  parentVaccinationService,
 };
