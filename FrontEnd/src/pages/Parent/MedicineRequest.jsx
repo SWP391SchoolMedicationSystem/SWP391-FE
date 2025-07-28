@@ -610,8 +610,7 @@ Vui lòng:
         </div>
 
         <div className="contact-info">
-          <h4>📞 Liên hệ hỗ trợ</h4>
-          <p>Nếu bạn có thắc mắc về việc gửi {activeTab === 'medicine' ? 'yêu cầu thuốc' : activeTab === 'absent' ? 'đơn xin nghỉ' : 'đơn xin khác'}, vui lòng liên hệ:</p>
+        
           <ul>
             <li>Hotline: 1900-xxxx</li>
             <li>Email: schoolhealth@medlearn.com</li>

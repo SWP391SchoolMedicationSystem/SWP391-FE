@@ -606,6 +606,7 @@ export const nurseFormService = {
       console.log('🔄 nurseFormService.getAllForms: Fetching from API...');
       const response = await apiClient.get(API_ENDPOINTS.FORM.GET_ALL);
       console.log('📥 Raw API response:', response);
+      console.log('🔍 Raw form data (first item):', response[0]);
       
       if (!Array.isArray(response)) {
         console.warn('⚠️ API response is not an array:', response);
@@ -752,6 +753,16 @@ export const nurseFormService = {
 
     const statusInfo = getStatusInfo(apiForm.isPending, apiForm.isaccepted);
 
+    console.log('🔍 Mapping form data:', {
+      formId: apiForm.formId || apiForm.id,
+      originalFilename: apiForm.originalfilename,
+      storedPath: apiForm.storedpath,
+      attachmentFile: apiForm.attachmentFile,
+      fileName: apiForm.fileName,
+      filePath: apiForm.filePath,
+      fileUrl: apiForm.fileUrl
+    });
+    
     return {
       formId: apiForm.formId || apiForm.id,
       parentId: apiForm.parentId,
@@ -762,8 +773,8 @@ export const nurseFormService = {
       formCategoryName: apiForm.formCategoryName || getFormCategoryName(apiForm.formCategoryId),
       title: apiForm.title || 'Chưa có tiêu đề',
       reason: (apiForm.reason && apiForm.reason !== 'string') ? apiForm.reason : 'Chưa có lý do chi tiết',
-      originalFilename: apiForm.originalfilename,
-      storedPath: apiForm.storedpath,
+      originalFilename: apiForm.originalfilename || apiForm.fileName || apiForm.attachmentFile,
+      storedPath: apiForm.storedpath || apiForm.filePath || apiForm.fileUrl,
       staffId: apiForm.staffid,
       staffName: apiForm.staffName || '',
       isPending: apiForm.isPending === true || apiForm.isPending === 'true',
