@@ -437,134 +437,447 @@ function ReviewRequests() {
         </div>
       </div>
 
-      {/* Requests Table */}
-      <div className="table-container">
-        <table className="requests-table">
-          <thead>
-            <tr>
-              <th>Thông tin phụ huynh</th>
-              <th>Thông tin học sinh</th>
-              <th>Loại đơn</th>
-              <th>Tiêu đề</th>
-              <th>Ngày tạo</th>
-              <th>Trạng thái</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredRequests.map(request => {
-              // Debug: Log each request's pending status
-              console.log(
-                `🔍 Request ${request.formId}: isPending = ${
-                  request.isPending
-                }, type = ${typeof request.isPending}`
-              );
-              
-              // Debug button visibility
-              const shouldShowActionButtons = request.isPending === true;
-              console.log(`🔘 Request ${request.formId}: Should show action buttons = ${shouldShowActionButtons}`);
-              
-              return (
-                <tr key={request.formId}>
-                  <td>
-                    <div className="parent-info">
-                      <div className="parent-name" style={{
-                        color: '#2f5148',
-                        fontWeight: 700,
-                        fontSize: '1.08rem',
-                        background: 'rgba(47,81,72,0.06)',
-                        borderRadius: 8,
-                        padding: '2px 10px',
-                        display: 'inline-block',
-                      }}>{request.parentName}</div>
-                      {/* Bỏ ID phụ huynh */}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="student-info">
-                      <div className="student-name">{request.studentName}</div>
-                      {/* Bỏ ID học sinh */}
-                    </div>
-                  </td>
-                  <td>
-                    {/* Chỉnh lại loại đơn */}
-                    <span style={{
-                      display: 'inline-block',
-                      padding: '6px 18px',
-                      borderRadius: '16px',
-                      fontWeight: 600,
-                      fontSize: 14,
-                      background: request.formCategoryId === 2 ? 'rgba(115,173,103,0.12)' // thuốc
-                        : request.formCategoryId === 1 ? 'rgba(33,150,243,0.12)' // nghỉ phép
-                        : request.formCategoryId === 3 ? 'rgba(255,152,0,0.12)' // tư vấn
-                        : 'rgba(120,120,120,0.10)', // khác
-                      color: request.formCategoryId === 2 ? '#2f5148'
-                        : request.formCategoryId === 1 ? '#2196f3'
-                        : request.formCategoryId === 3 ? '#ff9800'
-                        : '#555',
-                      border: 'none',
-                      boxShadow: 'none',
-                    }}>
-                      {request.formCategoryName}
-                    </span>
-                  </td>
-                  <td className="request-title">{request.title}</td>
-                  <td className="created-date">{request.createdDate}</td>
-                  <td>
-                    <span className={getStatusBadgeClass(request)}>
-                      {getStatusText(request)}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      <button
-                        className="btn-view"
-                        onClick={() => handleViewDetails(request)}
-                        title="Xem chi tiết"
-                      >
-                        <InfoIcon />
-                      </button>
-                      {shouldShowActionButtons && (
-                        <>
-                          <button
-                            className="btn-approve"
-                            onClick={() => handleApprove(request)}
-                            title="Phê duyệt"
-                          >
-                            <CheckCircleIcon />
-                          </button>
-                          <button
-                            className="btn-decline"
-                            onClick={() => handleDecline(request)}
-                            title="Từ chối"
-                          >
-                            <CancelIcon />
-                          </button>
-                        </>
-                      )}
-                      {/* Chỉ hiển thị nút Delete khi đã chấp thuận hoặc từ chối */}
-                      {!shouldShowActionButtons && (
-                        <button
-                          className="btn-delete"
-                          onClick={() => handleDelete(request)}
-                          title="Xóa yêu cầu"
-                        >
-                          <DeleteIcon />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      {/* Enhanced Modern Table */}
+      <div
+        style={{
+          background: '#ffffff',
+          borderRadius: '20px',
+          boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+          border: '1px solid #c1cbc2',
+          overflow: 'hidden',
+          marginBottom: '30px',
+        }}
+      >
+        {/* Table Header */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+            color: 'white',
+            padding: '20px 25px',
+            borderBottom: '1px solid #e9ecef',
+          }}
+        >
+          <h3
+            style={{
+              margin: 0,
+              fontSize: '1.3rem',
+              fontWeight: 600,
+              fontFamily: 'Satoshi, sans-serif',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+            }}
+          >
+            <InfoIcon sx={{ fontSize: '1.5rem' }} />
+            Danh sách yêu cầu ({filteredRequests.length})
+          </h3>
+        </div>
 
-        {filteredRequests.length === 0 && (
-          <div className="no-data">
-            <p>Không tìm thấy yêu cầu nào</p>
-          </div>
-        )}
+        {/* Table Content */}
+        <div style={{ overflowX: 'auto' }}>
+          <table
+            style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              fontFamily: 'Satoshi, sans-serif',
+            }}
+          >
+            <thead>
+              <tr
+                style={{
+                  background: '#f8f9fa',
+                  borderBottom: '2px solid #e9ecef',
+                }}
+              >
+                <th
+                  style={{
+                    padding: '15px 20px',
+                    textAlign: 'left',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    color: '#2f5148',
+                    borderRight: '1px solid #e9ecef',
+                  }}
+                >
+                  THÔNG TIN PHỤ HUYNH
+                </th>
+                <th
+                  style={{
+                    padding: '15px 20px',
+                    textAlign: 'left',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    color: '#2f5148',
+                    borderRight: '1px solid #e9ecef',
+                  }}
+                >
+                  THÔNG TIN HỌC SINH
+                </th>
+                <th
+                  style={{
+                    padding: '15px 20px',
+                    textAlign: 'left',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    color: '#2f5148',
+                    borderRight: '1px solid #e9ecef',
+                  }}
+                >
+                  LOẠI ĐƠN
+                </th>
+                <th
+                  style={{
+                    padding: '15px 20px',
+                    textAlign: 'left',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    color: '#2f5148',
+                    borderRight: '1px solid #e9ecef',
+                  }}
+                >
+                  TIÊU ĐỀ
+                </th>
+                <th
+                  style={{
+                    padding: '15px 20px',
+                    textAlign: 'left',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    color: '#2f5148',
+                    borderRight: '1px solid #e9ecef',
+                  }}
+                >
+                  NGÀY TẠO
+                </th>
+                <th
+                  style={{
+                    padding: '15px 20px',
+                    textAlign: 'center',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    color: '#2f5148',
+                    borderRight: '1px solid #e9ecef',
+                  }}
+                >
+                  TRẠNG THÁI
+                </th>
+                <th
+                  style={{
+                    padding: '15px 20px',
+                    textAlign: 'center',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    color: '#2f5148',
+                  }}
+                >
+                  THAO TÁC
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredRequests.map((request, index) => {
+                const shouldShowActionButtons = request.isPending === true;
+                console.log(`🔘 Request ${request.formId}: Should show action buttons = ${shouldShowActionButtons}`);
+                
+                return (
+                  <tr
+                    key={request.formId}
+                    style={{
+                      borderBottom: '1px solid #e9ecef',
+                      transition: 'all 0.2s ease',
+                      backgroundColor: index % 2 === 0 ? '#ffffff' : '#f8f9fa',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.backgroundColor = '#f0f8ff';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.backgroundColor =
+                        index % 2 === 0 ? '#ffffff' : '#f8f9fa';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    <td
+                      style={{
+                        padding: '15px 20px',
+                        borderRight: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: '10px',
+                            height: '10px',
+                            borderRadius: '50%',
+                            backgroundColor: '#73ad67',
+                            flexShrink: 0,
+                          }}
+                        />
+                        <div>
+                          <div
+                            style={{
+                              fontSize: '0.95rem',
+                              fontWeight: 600,
+                              color: '#2f5148',
+                              marginBottom: '2px',
+                            }}
+                          >
+                            {request.parentName}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td
+                      style={{
+                        padding: '15px 20px',
+                        borderRight: '1px solid #e9ecef',
+                        fontSize: '0.9rem',
+                        color: '#97a19b',
+                      }}
+                    >
+                      {request.studentName}
+                    </td>
+                    <td
+                      style={{
+                        padding: '15px 20px',
+                        borderRight: '1px solid #e9ecef',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <span
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: '20px',
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          backgroundColor: request.formCategoryId === 2 ? 'rgba(47, 81, 72, 0.10)'
+                            : request.formCategoryId === 1 ? 'rgba(33, 150, 243, 0.10)'
+                            : request.formCategoryId === 3 ? 'rgba(255, 152, 0, 0.10)'
+                            : 'rgba(120,120,120,0.10)',
+                          color: request.formCategoryId === 2 ? '#2f5148'
+                            : request.formCategoryId === 1 ? '#2196f3'
+                            : request.formCategoryId === 3 ? '#ff9800'
+                            : '#555',
+                          border: 'none',
+                          boxShadow: 'none',
+                        }}
+                      >
+                        {request.formCategoryName}
+                      </span>
+                    </td>
+                    <td
+                      style={{
+                        padding: '15px 20px',
+                        borderRight: '1px solid #e9ecef',
+                        fontSize: '0.9rem',
+                        color: '#97a19b',
+                      }}
+                    >
+                      {request.title}
+                    </td>
+                    <td
+                      style={{
+                        padding: '15px 20px',
+                        borderRight: '1px solid #e9ecef',
+                        fontSize: '0.9rem',
+                        color: '#97a19b',
+                      }}
+                    >
+                      {request.createdDate}
+                    </td>
+                    <td
+                      style={{
+                        padding: '15px 20px',
+                        borderRight: '1px solid #e9ecef',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <span
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: '15px',
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          backgroundColor: request.isPending 
+                            ? 'rgba(255, 193, 7, 0.1)'
+                            : request.isaccepted 
+                            ? 'rgba(40, 167, 69, 0.1)'
+                            : 'rgba(220, 53, 69, 0.1)',
+                          color: request.isPending 
+                            ? '#ffc107'
+                            : request.isaccepted 
+                            ? '#28a745'
+                            : '#dc3545',
+                          border: `1px solid ${
+                            request.isPending 
+                              ? '#ffc107'
+                              : request.isaccepted 
+                              ? '#28a745'
+                              : '#dc3545'
+                          }`,
+                        }}
+                      >
+                        {getStatusText(request)}
+                      </span>
+                    </td>
+                    <td
+                      style={{
+                        padding: '15px 20px',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: '8px',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <button
+                          onClick={() => handleViewDetails(request)}
+                          title="Xem chi tiết"
+                          style={{
+                            background: 'linear-gradient(135deg, #2196f3 0%, #1976d2 100%)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '8px 12px',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                            transition: 'all 0.2s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
+                          onMouseEnter={e => {
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(33, 150, 243, 0.3)';
+                          }}
+                          onMouseLeave={e => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        >
+                          <InfoIcon sx={{ fontSize: '1rem' }} />
+                        </button>
+                        {shouldShowActionButtons && (
+                          <>
+                            <button
+                              onClick={() => handleApprove(request)}
+                              title="Phê duyệt"
+                              style={{
+                                background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                                color: 'white',
+                                border: 'none',
+                                padding: '8px 12px',
+                                borderRadius: '8px',
+                                cursor: 'pointer',
+                                fontSize: '0.9rem',
+                                fontWeight: 500,
+                                transition: 'all 0.2s ease',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                              }}
+                              onMouseEnter={e => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(40, 167, 69, 0.3)';
+                              }}
+                              onMouseLeave={e => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = 'none';
+                              }}
+                            >
+                              <CheckCircleIcon sx={{ fontSize: '1rem' }} />
+                            </button>
+                            <button
+                              onClick={() => handleDecline(request)}
+                              title="Từ chối"
+                              style={{
+                                background: 'linear-gradient(135deg, #ffc107 0%, #ff9800 100%)',
+                                color: 'white',
+                                border: 'none',
+                                padding: '8px 12px',
+                                borderRadius: '8px',
+                                cursor: 'pointer',
+                                fontSize: '0.9rem',
+                                fontWeight: 500,
+                                transition: 'all 0.2s ease',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                              }}
+                              onMouseEnter={e => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 193, 7, 0.3)';
+                              }}
+                              onMouseLeave={e => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = 'none';
+                              }}
+                            >
+                              <CancelIcon sx={{ fontSize: '1rem' }} />
+                            </button>
+                          </>
+                        )}
+                        {!shouldShowActionButtons && (
+                          <button
+                            onClick={() => handleDelete(request)}
+                            title="Xóa yêu cầu"
+                            style={{
+                              background: 'linear-gradient(135deg, #dc3545 0%, #e74c3c 100%)',
+                              color: 'white',
+                              border: 'none',
+                              padding: '8px 12px',
+                              borderRadius: '8px',
+                              cursor: 'pointer',
+                              fontSize: '0.9rem',
+                              fontWeight: 500,
+                              transition: 'all 0.2s ease',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.transform = 'translateY(-2px)';
+                              e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.transform = 'translateY(0)';
+                              e.currentTarget.style.boxShadow = 'none';
+                            }}
+                          >
+                            <DeleteIcon sx={{ fontSize: '1rem' }} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+
+          {filteredRequests.length === 0 && (
+            <div
+              style={{
+                padding: '40px 20px',
+                textAlign: 'center',
+                color: '#97a19b',
+                fontSize: '1rem',
+              }}
+            >
+              <p>Không tìm thấy yêu cầu nào</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Detail Modal */}
