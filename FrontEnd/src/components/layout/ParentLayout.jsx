@@ -18,12 +18,10 @@ import {
   Article,
   MedicalServices,
   Notifications,
-  Chat,
   FolderShared,
   PersonalVideo,
   Menu,
   Logout,
-  ChatBubbleOutline,
   Search,
   Vaccines,
   LocalPharmacy,
@@ -380,51 +378,6 @@ export default function ParentLayout() {
         {/* Bottom section */}
         <Box sx={{ p: 2 }}>
           <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              p: '12px 16px',
-              borderRadius: '15px',
-              background: currentTheme.cardBgInactive,
-              backdropFilter: 'blur(15px)',
-              border: `1px solid ${currentTheme.border}`,
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                background: currentTheme.cardBgHover,
-                transform: 'translateY(-1px)',
-                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-              },
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 24,
-                height: 24,
-                '& svg': {
-                  fontSize: '20px',
-                  color: currentTheme.textSecondary,
-                },
-              }}
-            >
-              <FolderShared />
-            </Box>
-            <Typography
-              sx={{
-                fontSize: '16px',
-                fontWeight: 400,
-                color: currentTheme.textSecondary,
-              }}
-            >
-              Transfers
-            </Typography>
-          </Box>
-
-          <Box
             onClick={() => setShowProfile(true)}
             sx={{
               display: 'flex',
@@ -549,7 +502,6 @@ export default function ParentLayout() {
             </Box>
 
             <IconButton
-              onClick={() => navigate('/parent/notifications')}
               sx={{
                 width: 40,
                 height: 40,
@@ -567,26 +519,6 @@ export default function ParentLayout() {
               }}
             >
               <Notifications />
-            </IconButton>
-
-            <IconButton
-              sx={{
-                width: 40,
-                height: 40,
-                background: currentTheme.iconButton,
-                backdropFilter: 'blur(15px)',
-                border: `1px solid ${currentTheme.border}`,
-                color: currentTheme.textSecondary,
-                borderRadius: '12px',
-                '&:hover': {
-                  background: currentTheme.iconButtonHover,
-                  color: currentTheme.textPrimary,
-                  transform: 'translateY(-1px)',
-                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-                },
-              }}
-            >
-              <ChatBubbleOutline />
             </IconButton>
 
             {/* Dark Mode Toggle */}

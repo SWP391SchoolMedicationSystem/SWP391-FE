@@ -9,18 +9,18 @@ import {
 const featureCards = [
   {
     icon: <PersonOutline sx={{ fontSize: 32, color: 'white' }} />,
-    title: '200+ Students',
-    description: 'Medical Experts',
+    title: '200+ Học sinh',
+    description: 'Chuyên gia Y tế',
   },
   {
     icon: <ShieldOutlined sx={{ fontSize: 32, color: 'white' }} />,
-    title: 'Secure',
-    description: 'Safe Information',
+    title: 'Bảo mật',
+    description: 'Thông tin An toàn',
   },
   {
     icon: <FavoriteBorder sx={{ fontSize: 32, color: 'white' }} />,
     title: '24/7',
-    description: 'Continuous Support',
+    description: 'Hỗ trợ Liên tục',
   },
 ];
 

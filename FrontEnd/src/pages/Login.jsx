@@ -34,21 +34,22 @@ export default function MedlearnLoginPage() {
               component="h1"
               sx={{ fontWeight: "bold", color: "#2f5148" }}
             >
-              Welcome back to <br />
-              <Box
-                component="span"
-                sx={{ color: "#2f5148", fontWeight: "900" }}
-              >
-                Medlearn
-              </Box>
+              Chào mừng đến 
+            </Typography>
+            <Typography
+              variant="h2"
+              component="h1"
+              sx={{ fontWeight: "800", color: "#2f5148" }}
+            >
+              Medlearn
             </Typography>
             <Typography
               variant="h6"
               color="text.secondary"
               sx={{ mt: 2, lineHeight: 1.6, color: "#97a19b" }}
             >
-              Log in to access the best healthcare services. Connect with
-              doctors, book appointments, and manage your health with ease.
+              Đăng nhập để truy cập các dịch vụ y tế học đường tốt nhất. 
+              Kết nối với y tá, đặt lịch chăm sóc và theo dõi tình trạng sức khỏe học sinh một cách dễ dàng.
             </Typography>
             <FeatureCards />
           </Box>
