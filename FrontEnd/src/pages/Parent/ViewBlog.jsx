@@ -641,45 +641,47 @@ function ViewBlog() {
       {/* Blog Feed - Facebook Style */}
       {!loading && !error && blogs && blogs.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {filteredBlogs.map(blog => (
-            <div key={blog.id} className="blog-card-fb">
-              {blog.image && (
-                <div
-                  className="blog-image"
-                  onClick={() => handleViewBlog(blog)}
-                >
-                  <img
-                    src={blog.image}
-                    alt={blog.title}
-                    className="blog-image-img"
-                    onError={e => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                    }}
-                  />
-                  <div className="blog-image-fallback">
-                    <span>🖼️</span>
-                    <span>Không thể tải hình ảnh</span>
+          {filteredBlogs
+            .slice()
+            .reverse()
+            .map(blog => (
+              <div key={blog.id} className="blog-card-fb">
+                {blog.image && (
+                  <div
+                    className="blog-image"
+                    onClick={() => handleViewBlog(blog)}
+                  >
+                    <img
+                      src={blog.image}
+                      alt={blog.title}
+                      className="blog-image-img"
+                      onError={e => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                    <div className="blog-image-fallback">
+                      <span>🖼️</span>
+                      <span>Không thể tải hình ảnh</span>
+                    </div>
+                  </div>
+                )}
+                <div className="blog-content-fb">
+                  <div className="blog-title-fb">{blog.title}</div>
+                  <div className="blog-meta-fb">
+                    {blog.author} ·{' '}
+                    {blog.createdAt
+                      ? new Date(blog.createdAt).toLocaleDateString()
+                      : ''}{' '}
+                  </div>
+                  <div className="blog-body-fb">
+                    {blog.content?.length > 120
+                      ? blog.content.substring(0, 120) + '...'
+                      : blog.content}
                   </div>
                 </div>
-              )}
-              <div className="blog-content-fb">
-                <div className="blog-title-fb">{blog.title}</div>
-                <div className="blog-meta-fb">
-                  {blog.author} ·{' '}
-                  {blog.createdAt
-                    ? new Date(blog.createdAt).toLocaleDateString()
-                    : ''}{' '}
-                  · 👁️ {blog.readCount || 0}
-                </div>
-                <div className="blog-body-fb">
-                  {blog.content?.length > 120
-                    ? blog.content.substring(0, 120) + '...'
-                    : blog.content}
-                </div>
               </div>
-            </div>
-          ))}
+            ))}
           {filteredBlogs.length === 0 && (
             <div
               style={{
@@ -991,17 +993,7 @@ function ViewBlog() {
                       gap: '8px',
                       color: '#2f5148',
                     }}
-                  >
-                    <RestaurantIcon
-                      sx={{ color: '#97a19b', fontSize: '1.2rem' }}
-                    />
-                    <span style={{ fontWeight: 500, fontSize: '0.9rem' }}>
-                      Lượt xem:
-                    </span>
-                    <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>
-                      {selectedBlog.readCount || 0}
-                    </span>
-                  </div>
+                  ></div>
                 </div>
               </div>
 

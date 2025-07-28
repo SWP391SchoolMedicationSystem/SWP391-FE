@@ -59,13 +59,27 @@ function VaccinationEvents() {
     setShowDetailModal(true);
   };
 
-  // Get status text
+  // Get status text based on parent response
   const getStatusText = event => {
-    const eventDate = new Date(event.eventDate);
-    const today = new Date();
+    return event.responseStatus || 'Chưa phản hồi';
+  };
 
-    if (eventDate < today) return 'Đã phản hồi';
-    return 'Chưa phản hồi';
+  // Get status color based on response
+  const getStatusColor = event => {
+    const status = getStatusText(event);
+    switch (status) {
+      case 'Đã phản hồi':
+        return {
+          background: '#2f5148',
+          color: 'white',
+        };
+      case 'Chưa phản hồi':
+      default:
+        return {
+          background: theme ? (isDarkMode ? '#4a5568' : '#bfefa1') : '#bfefa1',
+          color: theme ? (isDarkMode ? '#ffffff' : '#1a3a2e') : '#1a3a2e',
+        };
+    }
   };
 
   if (loading) {
@@ -346,7 +360,7 @@ function VaccinationEvents() {
                 fontFamily: 'Satoshi, sans-serif',
               }}
             >
-              {events.filter(e => e.responseStatus === 'Đã đồng ý').length}
+              {events.filter(e => e.hasResponded).length}
             </h3>
             <p
               style={{
@@ -355,56 +369,7 @@ function VaccinationEvents() {
                 fontFamily: 'Satoshi, sans-serif',
               }}
             >
-              Đã đồng ý
-            </p>
-          </div>
-        </div>
-
-        <div
-          style={{
-            background: theme ? theme.cardBg : 'white',
-            padding: '25px',
-            borderRadius: '18px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '20px',
-            boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
-            border: theme ? `1px solid ${theme.border}` : '1px solid #c1cbc2',
-            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-          }}
-        >
-          <div
-            style={{
-              padding: '15px',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: 'rgba(191, 239, 161, 0.3)',
-            }}
-          >
-            <CancelIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
-          </div>
-          <div>
-            <h3
-              style={{
-                fontSize: '2rem',
-                margin: 0,
-                color: theme ? theme.textPrimary : '#2f5148',
-                fontWeight: 700,
-                fontFamily: 'Satoshi, sans-serif',
-              }}
-            >
-              {events.filter(e => e.responseStatus === 'Đã từ chối').length}
-            </h3>
-            <p
-              style={{
-                margin: '5px 0 0 0',
-                color: theme ? theme.textSecondary : '#97a19b',
-                fontFamily: 'Satoshi, sans-serif',
-              }}
-            >
-              Đã từ chối
+              Đã phản hồi
             </p>
           </div>
         </div>
@@ -444,7 +409,7 @@ function VaccinationEvents() {
                 fontFamily: 'Satoshi, sans-serif',
               }}
             >
-              {events.filter(e => e.responseStatus === 'Chưa phản hồi').length}
+              {events.filter(e => !e.hasResponded).length}
             </h3>
             <p
               style={{
@@ -545,22 +510,8 @@ function VaccinationEvents() {
                   >
                     <span
                       style={{
-                        background:
-                          getStatusText(event) === 'Đã phản hồi'
-                            ? '#85b06d'
-                            : theme
-                            ? isDarkMode
-                              ? '#4a5568'
-                              : '#bfefa1'
-                            : '#bfefa1',
-                        color:
-                          getStatusText(event) === 'Đã phản hồi'
-                            ? 'white'
-                            : theme
-                            ? isDarkMode
-                              ? '#ffffff'
-                              : '#1a3a2e'
-                            : '#1a3a2e',
+                        background: getStatusColor(event).background,
+                        color: getStatusColor(event).color,
                         padding: '4px 12px',
                         borderRadius: '15px',
                         fontSize: '0.8rem',
@@ -1137,22 +1088,8 @@ function VaccinationEvents() {
                     </span>
                     <span
                       style={{
-                        background:
-                          getStatusText(selectedEvent) === 'Đã phản hồi'
-                            ? '#85b06d'
-                            : theme
-                            ? isDarkMode
-                              ? '#4a5568'
-                              : '#bfefa1'
-                            : '#bfefa1',
-                        color:
-                          getStatusText(selectedEvent) === 'Đã phản hồi'
-                            ? 'white'
-                            : theme
-                            ? isDarkMode
-                              ? '#ffffff'
-                              : '#1a3a2e'
-                            : '#1a3a2e',
+                        background: getStatusColor(selectedEvent).background,
+                        color: getStatusColor(selectedEvent).color,
                         padding: '4px 12px',
                         borderRadius: '15px',
                         fontSize: '0.8rem',
@@ -1262,9 +1199,131 @@ function VaccinationEvents() {
                 </div>
               )}
 
+              {/* Parent Response Details */}
+              <div style={{ marginBottom: '30px' }}>
+                <h4
+                  style={{
+                    margin: '0 0 15px 0',
+                    color: theme ? theme.textPrimary : '#2f5148',
+                    fontFamily: 'Satoshi, sans-serif',
+                    fontSize: '1.2rem',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <InfoIcon sx={{ color: '#97a19b', fontSize: '1.2rem' }} />
+                  Thông tin phản hồi
+                </h4>
+                <div
+                  style={{
+                    background: theme
+                      ? isDarkMode
+                        ? '#333333'
+                        : '#f8f9fa'
+                      : '#f8f9fa',
+                    padding: '15px',
+                    borderRadius: '12px',
+                    border: theme
+                      ? `1px solid ${theme.border}`
+                      : '1px solid #e9ecef',
+                  }}
+                >
+                  {selectedEvent.hasResponded ? (
+                    <div>
+                      <div style={{ marginBottom: '10px' }}>
+                        <strong
+                          style={{
+                            color: theme ? theme.textPrimary : '#2f5148',
+                          }}
+                        >
+                          Tình trạng phản hồi:
+                        </strong>
+                        <span
+                          style={{
+                            background:
+                              getStatusColor(selectedEvent).background,
+                            color: getStatusColor(selectedEvent).color,
+                            padding: '4px 12px',
+                            borderRadius: '15px',
+                            fontSize: '0.8rem',
+                            fontWeight: 500,
+                            marginLeft: '10px',
+                          }}
+                        >
+                          {getStatusText(selectedEvent)}
+                        </span>
+                      </div>
+
+                      {selectedEvent.myResponses &&
+                        selectedEvent.myResponses.length > 0 && (
+                          <div>
+                            <strong
+                              style={{
+                                color: theme ? theme.textPrimary : '#2f5148',
+                              }}
+                            >
+                              Chi tiết con em:
+                            </strong>
+                            <div style={{ marginTop: '10px' }}>
+                              {selectedEvent.myResponses.map(
+                                (response, index) => (
+                                  <div
+                                    key={index}
+                                    style={{
+                                      padding: '8px',
+                                      marginBottom: '8px',
+                                      background: 'white',
+                                      borderRadius: '8px',
+                                      border: '1px solid #e9ecef',
+                                    }}
+                                  >
+                                    <div
+                                      style={{
+                                        fontWeight: 500,
+                                        marginBottom: '4px',
+                                      }}
+                                    >
+                                      Học sinh ID: {response.studentId}
+                                    </div>
+                                    <div style={{ fontSize: '0.9rem' }}>
+                                      <span style={{ marginRight: '15px' }}>
+                                        <strong>Tham gia:</strong>{' '}
+                                        {response.willAttend ? 'Có' : 'Không'}
+                                      </span>
+                                      {response.reasonForDecline && (
+                                        <span>
+                                          <strong>Lý do:</strong>{' '}
+                                          {response.reasonForDecline}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          </div>
+                        )}
+                    </div>
+                  ) : (
+                    <p
+                      style={{
+                        margin: 0,
+                        color: theme ? theme.textSecondary : '#97a19b',
+                      }}
+                    >
+                      Bạn chưa phản hồi cho sự kiện tiêm chủng này.
+                    </p>
+                  )}
+                </div>
+              </div>
+
               {/* Decline Reason */}
-              {selectedEvent.myResponse &&
-                selectedEvent.responseStatus === 'Đã từ chối' && (
+              {selectedEvent.hasResponded &&
+                selectedEvent.parentConsent === false &&
+                selectedEvent.myResponses &&
+                selectedEvent.myResponses.length > 0 && (
                   <div style={{ marginBottom: '30px' }}>
                     <h4
                       style={{
@@ -1300,8 +1359,8 @@ function VaccinationEvents() {
                           lineHeight: 1.6,
                         }}
                       >
-                        {selectedEvent.myResponse.reasonForDecline ||
-                          'Không có lý do cụ thể'}
+                        {selectedEvent.myResponses.find(r => r.reasonForDecline)
+                          ?.reasonForDecline || 'Không có lý do cụ thể'}
                       </p>
                     </div>
                   </div>

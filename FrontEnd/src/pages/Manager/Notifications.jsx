@@ -28,7 +28,8 @@ const Notifications = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [staffMap, setStaffMap] = useState({}); // Map staff ID to staff name
+
+  const [parentMap, setParentMap] = useState({}); // Map parent ID to parent name
   const [formData, setFormData] = useState({
     title: '',
     message: '',
@@ -113,25 +114,89 @@ const Notifications = () => {
     }
   }, [signalRConnection]); // selectedUser đã được loại bỏ khỏi dependency array vì chúng ta dùng ref
 
-  // Fetch staff list to map IDs to names
+  // Fetch all parents once and cache them
+  const [allParents, setAllParents] = useState([]);
+  const [parentsLoading, setParentsLoading] = useState(false);
+
+  // Fetch all parents data once
   useEffect(() => {
-    const fetchStaffList = async () => {
+    const fetchAllParents = async () => {
+      setParentsLoading(true);
       try {
-        const staffList = await managerStaffService.getAllStaff();
-        if (Array.isArray(staffList)) {
-          const staffMapping = staffList.reduce((acc, staff) => {
-            acc[staff.staffid] = staff.fullname;
-            return acc;
-          }, {});
-          setStaffMap(staffMapping);
+        const response = await fetch(
+          `https://api-schoolhealth.purintech.id.vn/api/Parent/parent`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (response.ok) {
+          const parents = await response.json();
+          setAllParents(parents);
         }
       } catch (error) {
-        console.error('Error fetching staff list:', error);
+        console.error('Error fetching all parents:', error);
+      } finally {
+        setParentsLoading(false);
       }
     };
 
-    fetchStaffList();
+    fetchAllParents();
   }, []);
+
+  // Fetch all staff once and cache them
+  const [allStaff, setAllStaff] = useState([]);
+  const [staffLoading, setStaffLoading] = useState(false);
+
+  // Fetch all staff data once
+  useEffect(() => {
+    const fetchAllStaff = async () => {
+      setStaffLoading(true);
+      try {
+        const response = await fetch(
+          `https://api-schoolhealth.purintech.id.vn/api/Staff/staff`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (response.ok) {
+          const staff = await response.json();
+          setAllStaff(staff);
+        }
+      } catch (error) {
+        console.error('Error fetching all staff:', error);
+      } finally {
+        setStaffLoading(false);
+      }
+    };
+
+    fetchAllStaff();
+  }, []);
+
+  // Function to get parent name from cached data
+  const getParentNameFromCache = parentId => {
+    const parent = allParents.find(
+      p => p.parentid === parentId || p.parentid === Number(parentId)
+    );
+    return parent ? parent.fullname : null;
+  };
+
+  // Function to get staff name from cached data
+  const getStaffNameFromCache = staffId => {
+    const staff = allStaff.find(
+      s => s.staffid === staffId || s.staffid === Number(staffId)
+    );
+    return staff ? staff.fullname : null;
+  };
 
   // Gọi API khi component mount hoặc khi thay đổi loại thông báo
   useEffect(() => {
@@ -164,6 +229,19 @@ const Notifications = () => {
     setSubmitLoading(true);
 
     try {
+      // Validation: Không cho phép gửi thông báo cho admin và manager
+      if (notificationType === 'staff') {
+        const hasAdminOrManager = allStaff.some(
+          staff => staff.roleid === 1 || staff.roleid === 2
+        );
+
+        if (hasAdminOrManager) {
+          alert('Không thể gửi thông báo cho Admin và Manager!');
+          setSubmitLoading(false);
+          return;
+        }
+      }
+
       const notificationData = {
         title: formData.title,
         message: formData.message,
@@ -305,6 +383,122 @@ const Notifications = () => {
 
   const handleTypeChange = newType => {
     setNotificationType(newType);
+  };
+
+  // Component for displaying parent information
+  const ParentDisplay = ({
+    detail,
+    getParentNameFromCache,
+    parentsLoading,
+  }) => {
+    const parentName = getParentNameFromCache(detail.parentId);
+
+    return (
+      <div
+        style={{
+          background: 'white',
+          padding: '15px',
+          borderRadius: '10px',
+          border: '1px solid #e9ecef',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            marginBottom: '10px',
+          }}
+        >
+          <FamilyRestroomIcon sx={{ color: '#97a19b', fontSize: '1.1rem' }} />
+          <span
+            style={{
+              color: '#2f5148',
+              fontFamily: 'Satoshi, sans-serif',
+              fontSize: '0.9rem',
+              fontWeight: 600,
+            }}
+          >
+            {parentsLoading ? (
+              'Đang tải...'
+            ) : parentName ? (
+              <>
+                {parentName} (ID: {detail.parentId})
+              </>
+            ) : (
+              `Phụ huynh ID: ${detail.parentId} (Không tìm thấy)`
+            )}
+          </span>
+        </div>
+        <p
+          style={{
+            margin: 0,
+            color: '#97a19b',
+            fontSize: '0.9rem',
+            fontFamily: 'Satoshi, sans-serif',
+            lineHeight: 1.5,
+          }}
+        >
+          {detail.message}
+        </p>
+      </div>
+    );
+  };
+
+  // Component for displaying staff information
+  const StaffDisplay = ({ detail, getStaffNameFromCache, staffLoading }) => {
+    const staffName = getStaffNameFromCache(detail.staffid);
+
+    return (
+      <div
+        style={{
+          background: 'white',
+          padding: '15px',
+          borderRadius: '10px',
+          border: '1px solid #e9ecef',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            marginBottom: '10px',
+          }}
+        >
+          <BadgeIcon sx={{ color: '#97a19b', fontSize: '1.1rem' }} />
+          <span
+            style={{
+              color: '#2f5148',
+              fontFamily: 'Satoshi, sans-serif',
+              fontSize: '0.9rem',
+              fontWeight: 600,
+            }}
+          >
+            {staffLoading ? (
+              'Đang tải...'
+            ) : staffName ? (
+              <>
+                {staffName} (ID: {detail.staffid})
+              </>
+            ) : (
+              `Nhân viên ID: ${detail.staffid} (Không tìm thấy)`
+            )}
+          </span>
+        </div>
+        <p
+          style={{
+            margin: 0,
+            color: '#97a19b',
+            fontSize: '0.9rem',
+            fontFamily: 'Satoshi, sans-serif',
+            lineHeight: 1.5,
+          }}
+        >
+          {detail.message}
+        </p>
+      </div>
+    );
   };
 
   if (loading) {
@@ -751,8 +945,9 @@ const Notifications = () => {
                           fontWeight: 600,
                         }}
                       >
-                        {staffMap[selectedNotification.createdBy] ||
-                          `ID: ${selectedNotification.createdBy}`}
+                        {getStaffNameFromCache(
+                          selectedNotification.createdBy
+                        ) || `ID: ${selectedNotification.createdBy}`}
                       </span>
                     </div>
 
@@ -891,49 +1086,12 @@ const Notifications = () => {
                   >
                     {selectedNotification.notificationParentDetails.map(
                       (detail, index) => (
-                        <div
+                        <ParentDisplay
                           key={index}
-                          style={{
-                            background: 'white',
-                            padding: '15px',
-                            borderRadius: '10px',
-                            border: '1px solid #e9ecef',
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                              marginBottom: '10px',
-                            }}
-                          >
-                            <FamilyRestroomIcon
-                              sx={{ color: '#97a19b', fontSize: '1.1rem' }}
-                            />
-                            <span
-                              style={{
-                                color: '#2f5148',
-                                fontFamily: 'Satoshi, sans-serif',
-                                fontSize: '0.9rem',
-                                fontWeight: 600,
-                              }}
-                            >
-                              Phụ huynh ID: {detail.parentId}
-                            </span>
-                          </div>
-                          <p
-                            style={{
-                              margin: 0,
-                              color: '#97a19b',
-                              fontSize: '0.9rem',
-                              fontFamily: 'Satoshi, sans-serif',
-                              lineHeight: 1.5,
-                            }}
-                          >
-                            {detail.message}
-                          </p>
-                        </div>
+                          detail={detail}
+                          getParentNameFromCache={getParentNameFromCache}
+                          parentsLoading={parentsLoading}
+                        />
                       )
                     )}
                   </div>
@@ -973,60 +1131,26 @@ const Notifications = () => {
                       gap: '15px',
                     }}
                   >
-                    {selectedNotification.notificationstaffdetails.map(
-                      (detail, index) => (
-                        <div
+                    {selectedNotification.notificationstaffdetails
+                      .filter(detail => {
+                        // Filter out admin and manager (roleid 1 and 2)
+                        const staff = allStaff.find(
+                          s =>
+                            s.staffid === detail.staffid ||
+                            s.staffid === Number(detail.staffid)
+                        );
+                        return (
+                          staff && staff.roleid !== 1 && staff.roleid !== 2
+                        );
+                      })
+                      .map((detail, index) => (
+                        <StaffDisplay
                           key={index}
-                          style={{
-                            background: 'white',
-                            padding: '15px',
-                            borderRadius: '10px',
-                            border: '1px solid #e9ecef',
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                              marginBottom: '10px',
-                            }}
-                          >
-                            <BadgeIcon
-                              sx={{ color: '#97a19b', fontSize: '1.1rem' }}
-                            />
-                            <span
-                              style={{
-                                color: '#2f5148',
-                                fontFamily: 'Satoshi, sans-serif',
-                                fontSize: '0.9rem',
-                                fontWeight: 600,
-                              }}
-                            >
-                              {staffMap[detail.staffid] ? (
-                                <>
-                                  {staffMap[detail.staffid]} (ID:{' '}
-                                  {detail.staffid})
-                                </>
-                              ) : (
-                                `Nhân viên ID: ${detail.staffid}`
-                              )}
-                            </span>
-                          </div>
-                          <p
-                            style={{
-                              margin: 0,
-                              color: '#97a19b',
-                              fontSize: '0.9rem',
-                              fontFamily: 'Satoshi, sans-serif',
-                              lineHeight: 1.5,
-                            }}
-                          >
-                            {detail.message}
-                          </p>
-                        </div>
-                      )
-                    )}
+                          detail={detail}
+                          getStaffNameFromCache={getStaffNameFromCache}
+                          staffLoading={staffLoading}
+                        />
+                      ))}
                   </div>
                 </div>
               )}

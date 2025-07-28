@@ -142,12 +142,7 @@ function ManageHealthRecords() {
           <h1>🏥 Hồ Sơ Sức Khỏe Con Em</h1>
           <p>Theo dõi tình trạng sức khỏe của các con</p>
         </div>
-        <button
-          onClick={() => window.location.reload()}
-          className="refresh-btn"
-        >
-          🔄 Tải lại
-        </button>
+        
       </div>
 
       {/* Children Cards */}

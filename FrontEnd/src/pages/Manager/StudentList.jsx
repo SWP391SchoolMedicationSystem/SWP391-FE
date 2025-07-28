@@ -42,11 +42,15 @@ function StudentList() {
   // Available classes for preschool (updated to match API classid)
   const classes = [
     { value: '', label: 'Tất cả lớp' },
-    { value: '1', label: 'Lớp 1' },
-    { value: '2', label: 'Lớp 2' },
-    { value: '3', label: 'Lớp 3' },
-    { value: '4', label: 'Lớp 4' },
-    { value: '5', label: 'Lớp 5' },
+    { value: 'Lớp Mầm A', label: 'Lớp Mầm A' },
+    { value: 'Lớp Mầm B', label: 'Lớp Mầm B' },
+    { value: 'Lớp Mầm C', label: 'Lớp Mầm C' },
+    { value: 'Lớp Chồi A', label: 'Lớp Chồi A' },
+    { value: 'Lớp Chồi B', label: 'Lớp Chồi B' },
+    { value: 'Lớp Chồi C', label: 'Lớp Chồi C' },
+    { value: 'Lớp Lá A', label: 'Lớp Lá A' },
+    { value: 'Lớp Lá B', label: 'Lớp Lá B' },
+    { value: 'Lớp Lá C', label: 'Lớp Lá C' },
   ];
 
   // API endpoint - để trống theo yêu cầu
@@ -60,7 +64,7 @@ function StudentList() {
           student.studentId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           student.parentName?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesClass =
-          filterClass === '' || student.classId?.toString() === filterClass;
+          filterClass === '' || student.className === filterClass;
         return matchesSearch && matchesClass;
       })
     : [];
@@ -288,9 +292,6 @@ function StudentList() {
       {!loading && !error && (!students || students.length === 0) && (
         <div className="empty-state">
           <p>📭 Chưa có học sinh nào trong hệ thống</p>
-          <button onClick={refetch} className="retry-btn">
-            🔄 Tải lại
-          </button>
         </div>
       )}
 

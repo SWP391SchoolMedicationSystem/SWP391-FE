@@ -30,8 +30,7 @@ function MedicineManagement() {
     3: 'Thuốc tiêu hóa',
     4: 'Thuốc ho',
     5: 'Thuốc tiểu đường',
-    6: 'Vitamin & Khoáng chất',
-    7: 'Thuốc hô hấp',
+    
   };
 
   // Load medicines on component mount

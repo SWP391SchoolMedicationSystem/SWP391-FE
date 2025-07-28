@@ -212,7 +212,7 @@ function VaccinationEventStudents() {
             }}
             className="refresh-btn"
           >
-            🔄 Tải lại
+             Tải lại
           </button>
         </div>
       </div>

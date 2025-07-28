@@ -4,6 +4,7 @@ import {
   useParentNotifications,
   useParentBlogs,
   useParentVaccinationEvents,
+  useParentStudents,
 } from '../../utils/hooks/useParent';
 import '../../css/Parent/Dashboard.css';
 import * as signalR from '@microsoft/signalr';
@@ -18,6 +19,7 @@ import BoltIcon from '@mui/icons-material/Bolt';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import ForumIcon from '@mui/icons-material/Forum';
 import LocalPharmacyIcon from '@mui/icons-material/LocalPharmacy';
+import PersonIcon from '@mui/icons-material/Person';
 
 function ParentDashboard() {
   const navigate = useNavigate();
@@ -35,6 +37,7 @@ function ParentDashboard() {
   const { data: blogs, loading: blogsLoading } = useParentBlogs();
   const { data: vaccinationEvents, loading: vaccinationEventsLoading } =
     useParentVaccinationEvents();
+  const { data: students, loading: studentsLoading } = useParentStudents();
 
   // SignalR Connection Setup
   useEffect(() => {
@@ -126,12 +129,12 @@ function ParentDashboard() {
     const calculateStats = () => {
       console.log('🔍 Dashboard - notifications data:', notifications);
       console.log('🔍 Dashboard - vaccination events:', vaccinationEvents);
+      console.log('🔍 Dashboard - students data:', students);
       console.log(
         '🔍 Dashboard - realTimeNotifications:',
         realTimeNotifications
       );
 
-      const totalNotifications = notifications ? notifications.length : 0;
       const unreadNotifications = notifications
         ? notifications.filter(n => !n.isRead).length
         : 0;
@@ -139,10 +142,11 @@ function ParentDashboard() {
       const totalVaccinationEvents = vaccinationEvents
         ? vaccinationEvents.length
         : 0;
+      const totalChildren = students ? students.length : 0;
 
       const stats = [
         {
-          title: 'Thông báo mới',
+          title: 'Thông báo',
           value: unreadNotifications.toString(),
           icon: (
             <NotificationsIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />
@@ -150,9 +154,9 @@ function ParentDashboard() {
           color: 'stat-notification',
         },
         {
-          title: 'Số lượng thông báo',
-          value: totalNotifications.toString(),
-          icon: <InboxIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />,
+          title: 'Số lượng con cái',
+          value: totalChildren.toString(),
+          icon: <PersonIcon sx={{ color: '#97a19b', fontSize: '2.5rem' }} />,
           color: 'stat-health',
         },
         {
@@ -172,16 +176,23 @@ function ParentDashboard() {
       setQuickStats(stats);
     };
 
-    if (!notificationsLoading && !blogsLoading && !vaccinationEventsLoading) {
+    if (
+      !notificationsLoading &&
+      !blogsLoading &&
+      !vaccinationEventsLoading &&
+      !studentsLoading
+    ) {
       calculateStats();
     }
   }, [
     notifications,
     blogs,
     vaccinationEvents,
+    students,
     notificationsLoading,
     blogsLoading,
     vaccinationEventsLoading,
+    studentsLoading,
     realTimeNotifications,
   ]);
 

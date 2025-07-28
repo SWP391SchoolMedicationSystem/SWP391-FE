@@ -443,9 +443,7 @@ const Notifications = () => {
                   <th>Tiêu đề</th>
                   <th>Loại</th>
                   <th>Nội dung</th>
-                  <th>Đối tượng</th>
                   <th>Ngày tạo</th>
-                  <th>Người tạo</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
@@ -481,24 +479,10 @@ const Notifications = () => {
                           : notification.message}
                       </div>
                     </td>
-                    <td className="target-cell">
-                      <span
-                        className={`target-badge target-${
-                          notification.targetType || 'unknown'
-                        }`}
-                      >
-                        {notification.targetType === 'parent'
-                          ? '👨‍👩‍👧‍👦 Phụ Huynh'
-                          : '👩‍💼 Nhân Viên'}
-                      </span>
-                    </td>
                     <td className="date-cell">
                       {new Date(notification.createdAt).toLocaleDateString(
                         'vi-VN'
                       )}
-                    </td>
-                    <td className="creator-cell">
-                      {notification.createdBy || 'Hệ thống'}
                     </td>
                     <td className="action-cell">
                       <button

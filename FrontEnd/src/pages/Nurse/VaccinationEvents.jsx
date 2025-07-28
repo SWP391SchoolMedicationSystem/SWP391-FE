@@ -480,25 +480,7 @@ function VaccinationEvents() {
                       flexWrap: 'wrap',
                     }}
                   >
-                    <span
-                      style={{
-                        background:
-                          getStatusText(event) === 'Đã phản hồi'
-                            ? '#85b06d'
-                            : '#bfefa1',
-                        color:
-                          getStatusText(event) === 'Đã phản hồi'
-                            ? 'white'
-                            : '#1a3a2e',
-                        padding: '4px 12px',
-                        borderRadius: '15px',
-                        fontSize: '0.8rem',
-                        fontWeight: 500,
-                        fontFamily: 'Satoshi, sans-serif',
-                      }}
-                    >
-                      {getStatusText(event)}
-                    </span>
+                    
                   </div>
                 </div>
 
@@ -540,7 +522,7 @@ function VaccinationEvents() {
                           fontWeight: 600,
                         }}
                       >
-                        {event.vaccineName}
+                        {event.title}
                       </span>
                     </div>
 
@@ -594,7 +576,7 @@ function VaccinationEvents() {
                           fontWeight: 500,
                         }}
                       >
-                        Giờ tiêm:
+                        Tổ chức:
                       </span>
                       <span
                         style={{
@@ -604,7 +586,7 @@ function VaccinationEvents() {
                           fontWeight: 600,
                         }}
                       >
-                        {event.eventTime || 'Chưa có'}
+                        {event.organizedBy || 'Chưa có'}
                       </span>
                     </div>
 
@@ -925,7 +907,7 @@ function VaccinationEvents() {
                       fontWeight: 500,
                     }}
                   >
-                    Giờ tiêm:
+                    Tổ chức:
                   </span>
                   <span
                     style={{
@@ -935,7 +917,7 @@ function VaccinationEvents() {
                       fontWeight: 600,
                     }}
                   >
-                    {selectedEvent.eventTime || 'Chưa có'}
+                    {selectedEvent.organizedBy || 'Chưa có'}
                   </span>
                 </div>
 

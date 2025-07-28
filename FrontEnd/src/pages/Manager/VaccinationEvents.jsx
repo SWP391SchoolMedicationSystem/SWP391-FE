@@ -783,8 +783,13 @@ function VaccinationEvents() {
                   className="template-select"
                 >
                   {emailTemplateOptions.map(template => (
-                    <option key={template.id} value={template.id}>
+                    <option
+                      key={template.id}
+                      value={template.id}
+                      disabled={template.id !== 3}
+                    >
                       {template.name} (ID: {template.id})
+                      {template.id !== 3 ? ' - Không khả dụng' : ''}
                     </option>
                   ))}
                 </select>

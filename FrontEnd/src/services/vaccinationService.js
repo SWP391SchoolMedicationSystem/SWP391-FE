@@ -26,7 +26,6 @@ export const vaccinationEventService = {
       );
       const response = await apiClient.get(url);
 
-
       return vaccinationEventService.mapEventData(response);
     } catch (error) {
       console.error('❌ Error getting vaccination event by ID:', error);
@@ -55,19 +54,19 @@ export const vaccinationEventService = {
   createEventWithFile: async formData => {
     try {
       console.log('🌐 Creating vaccination event with file...');
-      
+
       // Get token for authorization
       const token = localStorage.getItem('token');
-      
+
       const response = await fetch(
         `${apiClient.defaults.baseURL}${API_ENDPOINTS.VACCINATION_EVENT.CREATE}`,
         {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             // Don't set Content-Type for FormData - browser will set it with boundary
           },
-          body: formData
+          body: formData,
         }
       );
 
@@ -314,7 +313,11 @@ export const vaccinationEventService = {
       }
 
       const parsedUserInfo = JSON.parse(userInfo);
-      const parentId = parsedUserInfo.userId || parsedUserInfo.id;
+      const parentId =
+        parsedUserInfo.parentid || parsedUserInfo.userId || parsedUserInfo.id;
+
+      console.log('🔍 Current parent ID:', parentId);
+      console.log('🔍 Parsed user info:', parsedUserInfo);
 
       if (!parentId) {
         throw new Error('Parent ID not found');
@@ -322,57 +325,76 @@ export const vaccinationEventService = {
 
       // Get all events first
       const allEvents = await vaccinationEventService.getAllEvents();
+      console.log('📋 All events:', allEvents);
 
       // Get responses for each event
       const eventsWithResponses = await Promise.all(
         allEvents.map(async event => {
           try {
-            const parentResponses =
-              await vaccinationEventService.getParentResponses(event.id);
-
-            // Find all responses for this parent (can have multiple children)
-            const myResponses = parentResponses.filter(
-              response => response.parentId === parentId
+            // Call the parent-responses API for this specific event
+            const url = buildApiUrl(
+              API_ENDPOINTS.VACCINATION_EVENT.GET_PARENT_RESPONSES,
+              event.id
             );
+            const response = await apiClient.get(url);
 
-            // Group responses by student for better display
-            const responsesByStudent = myResponses.reduce((acc, response) => {
-              if (!acc[response.studentId]) {
-                acc[response.studentId] = [];
-              }
-              acc[response.studentId].push(response);
-              return acc;
-            }, {});
+            console.log(`📥 Parent responses for event ${event.id}:`, response);
+            console.log(`🔍 Looking for parent ID: ${parentId} in responses`);
 
-            // Determine overall response status for the event
-            let overallStatus = 'Chưa phản hồi';
-            if (myResponses.length > 0) {
-              const confirmedCount = myResponses.filter(
-                r => r.willAttend === true
-              ).length;
-              const declinedCount = myResponses.filter(
-                r => r.willAttend === false
-              ).length;
-              const pendingCount = myResponses.filter(
-                r => r.willAttend === null
-              ).length;
+            // Check if parent has responded
+            let hasResponded = false;
+            let parentConsent = null;
+            let myResponses = [];
 
-              if (pendingCount === myResponses.length) {
-                overallStatus = 'Chưa phản hồi';
-              } else if (confirmedCount === myResponses.length) {
-                overallStatus = 'Đã đồng ý (tất cả)';
-              } else if (declinedCount === myResponses.length) {
-                overallStatus = 'Đã từ chối (tất cả)';
+            if (response && Array.isArray(response)) {
+              // Find response for current parent
+              const myResponse = response.find(r => {
+                console.log(
+                  `🔍 Comparing: response.parentId (${
+                    r.parentId
+                  }, type: ${typeof r.parentId}) === current parentId (${parentId}, type: ${typeof parentId})`
+                );
+                // Convert both to numbers for comparison
+                const responseParentId = Number(r.parentId);
+                const currentParentId = Number(parentId);
+                return responseParentId === currentParentId;
+              });
+
+              console.log(`🔍 Found my response:`, myResponse);
+
+              if (myResponse) {
+                hasResponded = true;
+                parentConsent = myResponse.parentConsent;
+                myResponses = myResponse.responses || [];
+                console.log(
+                  `✅ Parent ${parentId} has responded for event ${event.id}:`,
+                  {
+                    hasResponded,
+                    parentConsent,
+                    myResponses,
+                  }
+                );
               } else {
-                overallStatus = `Đã phản hồi (${confirmedCount} đồng ý, ${declinedCount} từ chối, ${pendingCount} chưa phản hồi)`;
+                console.log(
+                  `❌ Parent ${parentId} has NOT responded for event ${event.id}`
+                );
               }
             }
 
+            // Determine response status
+            let responseStatus = 'Chưa phản hồi';
+            if (hasResponded) {
+              responseStatus = 'Đã phản hồi';
+            }
+
+            console.log(`📊 Event ${event.id} final status:`, responseStatus);
+
             return {
               ...event,
-              myResponses: myResponses || [],
-              responsesByStudent,
-              responseStatus: overallStatus,
+              hasResponded,
+              parentConsent,
+              myResponses,
+              responseStatus,
               totalChildren: myResponses.length,
               confirmedChildren: myResponses.filter(r => r.willAttend === true)
                 .length,
@@ -388,8 +410,9 @@ export const vaccinationEventService = {
             );
             return {
               ...event,
+              hasResponded: false,
+              parentConsent: null,
               myResponses: [],
-              responsesByStudent: {},
               responseStatus: 'Chưa phản hồi',
               totalChildren: 0,
               confirmedChildren: 0,
@@ -400,9 +423,10 @@ export const vaccinationEventService = {
         })
       );
 
+      console.log('✅ Events with responses:', eventsWithResponses);
       return eventsWithResponses;
     } catch (error) {
-      console.error("❌ Error getting parent's vaccination responses:", error);
+      console.error('❌ Error getting parent responses:', error);
       throw error;
     }
   },

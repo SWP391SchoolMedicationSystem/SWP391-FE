@@ -225,18 +225,33 @@ function Blog() {
     switch (status) {
       case 'Đã đăng':
       case 'Published':
-        return 'status-published';
+        return {
+          backgroundColor: '#4caf50',
+          color: 'white',
+        };
       case 'Bản nháp':
       case 'Draft':
-        return 'status-draft';
+        return {
+          backgroundColor: '#ff9800',
+          color: 'white',
+        };
       case 'Rejected':
       case 'Từ chối':
-        return 'status-rejected';
+        return {
+          backgroundColor: '#f44336',
+          color: 'white',
+        };
       case 'Pending':
       case 'Chờ duyệt':
-        return 'status-pending';
+        return {
+          backgroundColor: '#2196f3',
+          color: 'white',
+        };
       default:
-        return 'status-draft';
+        return {
+          backgroundColor: '#9e9e9e',
+          color: 'white',
+        };
     }
   };
 
@@ -675,133 +690,160 @@ function Blog() {
 
       {/* Blog Feed - Facebook Style */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        {filteredBlogs.map(blog => (
-          <div key={blog.id} className="blog-card-fb">
-            {blog.image && (
-              <div className="blog-image" onClick={() => handleViewBlog(blog)}>
-                <img
-                  src={blog.image}
-                  alt={blog.title}
-                  className="blog-image-img"
-                  onError={e => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
-                />
-                <div className="blog-image-fallback">
-                  <span>🖼️</span>
-                  <span>Không thể tải hình ảnh</span>
+        {filteredBlogs
+          .slice()
+          .reverse()
+          .map(blog => (
+            <div key={blog.id} className="blog-card-fb">
+              {blog.image && (
+                <div
+                  className="blog-image"
+                  onClick={() => handleViewBlog(blog)}
+                >
+                  <img
+                    src={blog.image}
+                    alt={blog.title}
+                    className="blog-image-img"
+                    onError={e => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                  <div className="blog-image-fallback">
+                    <span>🖼️</span>
+                    <span>Không thể tải hình ảnh</span>
+                  </div>
+                </div>
+              )}
+              <div className="blog-content-fb">
+                <div className="blog-title-fb">{blog.title}</div>
+
+                {/* Status Badge */}
+                <div style={{ marginBottom: '10px' }}>
+                  <span
+                    style={{
+                      padding: '4px 12px',
+                      borderRadius: '15px',
+                      fontSize: '0.8rem',
+                      fontWeight: 500,
+                      fontFamily: 'Satoshi, sans-serif',
+                      ...getStatusClass(blog.status),
+                    }}
+                  >
+                    {blog.status === 'Draft' && '📝 Bản nháp'}
+                    {blog.status === 'Published' && '✅ Đã đăng'}
+                    {blog.status === 'Pending' && '⏳ Chờ duyệt'}
+                    {blog.status === 'Rejected' && '❌ Bị từ chối'}
+                  </span>
+                </div>
+
+                <div className="blog-meta-fb">
+                  {blog.author} ·{' '}
+                  {blog.createdAt
+                    ? new Date(blog.createdAt).toLocaleDateString()
+                    : ''}{' '}
+                </div>
+                <div className="blog-body-fb">
+                  {blog.content?.length > 120
+                    ? blog.content.substring(0, 120) + '...'
+                    : blog.content}
                 </div>
               </div>
-            )}
-            <div className="blog-content-fb">
-              <div className="blog-title-fb">{blog.title}</div>
-              <div className="blog-meta-fb">
-                {blog.author} ·{' '}
-                {blog.createdAt
-                  ? new Date(blog.createdAt).toLocaleDateString()
-                  : ''}{' '}
-                · 👁️ {blog.readCount || 0}
-              </div>
-              <div className="blog-body-fb">
-                {blog.content?.length > 120
-                  ? blog.content.substring(0, 120) + '...'
-                  : blog.content}
-              </div>
-            </div>
 
-            {/* Action buttons */}
-            <div className="blog-actions-fb">
-              <button
-                className="action-btn-fb edit"
-                onClick={() => handleEditBlog(blog)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '10px 16px',
-                  backgroundColor: '#e3f2fd',
-                  color: '#1976d2',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'all 0.3s ease',
-                }}
-                onMouseEnter={e => {
-                  e.target.style.backgroundColor = '#bbdefb';
-                  e.target.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={e => {
-                  e.target.style.backgroundColor = '#e3f2fd';
-                  e.target.style.transform = 'translateY(0)';
-                }}
-              >
-                <EditIcon sx={{ fontSize: '1.2rem', color: '#97a19b' }} />
-                Chỉnh sửa
-              </button>
-              <button
-                className="action-btn-fb reject"
-                onClick={() => handleDeleteBlog(blog)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '10px 16px',
-                  backgroundColor: '#ffebee',
-                  color: '#c62828',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'all 0.3s ease',
-                }}
-                onMouseEnter={e => {
-                  e.target.style.backgroundColor = '#ffcdd2';
-                  e.target.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={e => {
-                  e.target.style.backgroundColor = '#ffebee';
-                  e.target.style.transform = 'translateY(0)';
-                }}
-              >
-                <DeleteIcon sx={{ fontSize: '1.2rem', color: '#97a19b' }} />
-                Xóa
-              </button>
-              <button
-                className="action-btn-fb"
-                onClick={() => handleViewBlog(blog)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '10px 16px',
-                  backgroundColor: '#f0f2f5',
-                  color: '#65676b',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'all 0.3s ease',
-                }}
-                onMouseEnter={e => {
-                  e.target.style.backgroundColor = '#e4e6ea';
-                  e.target.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={e => {
-                  e.target.style.backgroundColor = '#f0f2f5';
-                  e.target.style.transform = 'translateY(0)';
-                }}
-              >
-                <VisibilityIcon sx={{ fontSize: '1.2rem', color: '#97a19b' }} />
-                Xem chi tiết
-              </button>
+              {/* Action buttons */}
+              <div className="blog-actions-fb">
+                <button
+                  className="action-btn-fb edit"
+                  onClick={() => handleEditBlog(blog)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 16px',
+                    backgroundColor: '#e3f2fd',
+                    color: '#1976d2',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    transition: 'all 0.3s ease',
+                  }}
+                  onMouseEnter={e => {
+                    e.target.style.backgroundColor = '#bbdefb';
+                    e.target.style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={e => {
+                    e.target.style.backgroundColor = '#e3f2fd';
+                    e.target.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <EditIcon sx={{ fontSize: '1.2rem', color: '#97a19b' }} />
+                  Chỉnh sửa
+                </button>
+                <button
+                  className="action-btn-fb reject"
+                  onClick={() => handleDeleteBlog(blog)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 16px',
+                    backgroundColor: '#ffebee',
+                    color: '#c62828',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    transition: 'all 0.3s ease',
+                  }}
+                  onMouseEnter={e => {
+                    e.target.style.backgroundColor = '#ffcdd2';
+                    e.target.style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={e => {
+                    e.target.style.backgroundColor = '#ffebee';
+                    e.target.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <DeleteIcon sx={{ fontSize: '1.2rem', color: '#97a19b' }} />
+                  Xóa
+                </button>
+                <button
+                  className="action-btn-fb"
+                  onClick={() => handleViewBlog(blog)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 16px',
+                    backgroundColor: '#f0f2f5',
+                    color: '#65676b',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    transition: 'all 0.3s ease',
+                  }}
+                  onMouseEnter={e => {
+                    e.target.style.backgroundColor = '#e4e6ea';
+                    e.target.style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={e => {
+                    e.target.style.backgroundColor = '#f0f2f5';
+                    e.target.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <VisibilityIcon
+                    sx={{ fontSize: '1.2rem', color: '#97a19b' }}
+                  />
+                  Xem chi tiết
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
 
         {filteredBlogs.length === 0 && (
           <div className="no-data">
@@ -860,11 +902,19 @@ function Blog() {
                 <div className="meta-row">
                   <span className="meta-label">Trạng thái:</span>
                   <span
-                    className={`status-badge ${getStatusClass(
-                      selectedBlog.status
-                    )}`}
+                    style={{
+                      padding: '4px 12px',
+                      borderRadius: '15px',
+                      fontSize: '0.8rem',
+                      fontWeight: 500,
+                      fontFamily: 'Satoshi, sans-serif',
+                      ...getStatusClass(selectedBlog.status),
+                    }}
                   >
-                    {selectedBlog.status}
+                    {selectedBlog.status === 'Draft' && '📝 Bản nháp'}
+                    {selectedBlog.status === 'Published' && '✅ Đã đăng'}
+                    {selectedBlog.status === 'Pending' && '⏳ Chờ duyệt'}
+                    {selectedBlog.status === 'Rejected' && '❌ Bị từ chối'}
                   </span>
                 </div>
                 {selectedBlog.status === 'Rejected' &&
@@ -908,25 +958,10 @@ function Blog() {
                   <span className="meta-label">Ngày tạo:</span>
                   <span>{selectedBlog.createdDate}</span>
                 </div>
-                <div className="meta-row">
-                  <span className="meta-label">Lượt đọc:</span>
-                  <span>{selectedBlog.readCount}</span>
-                </div>
               </div>
 
               <div className="blog-content">
                 <p>{selectedBlog.content}</p>
-              </div>
-
-              <div className="blog-tags-section">
-                <span className="tags-label">Tags:</span>
-                {selectedBlog.tags &&
-                  Array.isArray(selectedBlog.tags) &&
-                  selectedBlog.tags.map((tag, index) => (
-                    <span key={index} className="tag">
-                      #{tag}
-                    </span>
-                  ))}
               </div>
             </div>
           </div>

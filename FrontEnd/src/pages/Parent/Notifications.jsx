@@ -244,7 +244,7 @@ const ParentNotifications = () => {
       Chung: { label: 'Chung', class: 'type-chung' },
       general: { label: 'Chung', class: 'type-general' },
       health: { label: 'Sức khỏe', class: 'type-health' },
-      emergency: { label: 'Khẩn cấp', class: 'type-emergency' },
+      emergency: { label: 'Khẩn cấp', class: 'type-khẩn-cấp' },
       reminder: { label: 'Nhắc nhở', class: 'type-reminder' },
       event: { label: 'Sự kiện', class: 'type-event' },
     };
