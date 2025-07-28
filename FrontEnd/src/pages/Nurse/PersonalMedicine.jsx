@@ -408,6 +408,10 @@ const PersonalMedicine = () => {
     }
 
     console.log('🔧 Editing medicine:', medicine);
+    console.log('🔧 Raw date values from API:', {
+      receiveddate: medicine.receiveddate,
+      expiryDate: medicine.expiryDate
+    });
     
     const parentInfo = parents.find(p => String(p.id) === String(parentId));
     const studentInfo = students.find(s => String(s.id) === String(medicine.studentid));
@@ -417,9 +421,19 @@ const PersonalMedicine = () => {
       if (!dateValue) return '';
       
       try {
+        // If it's already a date string in YYYY-MM-DD format, return as is
+        if (typeof dateValue === 'string' && /^\d{4}-\d{2}-\d{2}/.test(dateValue)) {
+          return dateValue.split('T')[0];
+        }
+        
         const date = new Date(dateValue);
         if (isNaN(date.getTime())) return '';
-        return date.toISOString().split('T')[0];
+        
+        // Use local date to avoid timezone issues
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
       } catch (error) {
         console.warn('Invalid date value:', dateValue);
         return '';
@@ -430,9 +444,12 @@ const PersonalMedicine = () => {
       ...medicine,
       parentName: parentInfo?.name || 'Unknown Parent',
       studentName: studentInfo?.name || 'Unknown Student',
-      // Safe date formatting
+      // Safe date formatting - use original API data
       receivedDateFormatted: formatDateForInput(medicine.receiveddate),
-      expiryDateFormatted: formatDateForInput(medicine.expiryDate)
+      expiryDateFormatted: formatDateForInput(medicine.expiryDate),
+      // Also keep original values for fallback
+      originalReceivedDate: medicine.receiveddate,
+      originalExpiryDate: medicine.expiryDate
     };
     
     console.log('🔧 Edit data prepared:', editData);
@@ -801,8 +818,7 @@ const PersonalMedicine = () => {
         </div>
 
         <div className="contact-info">
-          <h4>📞 Liên hệ hỗ trợ</h4>
-          <p>Nếu bạn có thắc mắc về quản lý thuốc cá nhân, vui lòng liên hệ:</p>
+  
           <ul>
             <li>Hotline: 1900-xxxx</li>
             <li>Email: schoolhealth@medlearn.com</li>
@@ -1191,7 +1207,7 @@ const PersonalMedicine = () => {
                   <input
                     type="date"
                     name="receivedDate"
-                    defaultValue={editingMedicine.receivedDateFormatted || ''}
+                    defaultValue={editingMedicine.receivedDateFormatted || editingMedicine.originalReceivedDate || ''}
                     required
                   />
                 </div>
@@ -1201,7 +1217,7 @@ const PersonalMedicine = () => {
                   <input
                     type="date"
                     name="expiryDate"
-                    defaultValue={editingMedicine.expiryDateFormatted || ''}
+                    defaultValue={editingMedicine.expiryDateFormatted || editingMedicine.originalExpiryDate || ''}
                     required
                   />
                 </div>

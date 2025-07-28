@@ -11,6 +11,7 @@ import ChildCareIcon from '@mui/icons-material/ChildCare';
 import CategoryIcon from '@mui/icons-material/Category';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import DescriptionIcon from '@mui/icons-material/Description';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloseIcon from '@mui/icons-material/Close';
 
 function ReviewRequests() {
@@ -61,6 +62,7 @@ function ReviewRequests() {
       console.log('🔄 Fetching form requests from API...');
       const response = await nurseFormService.getAllForms();
       console.log('✅ API Response:', response);
+      console.log('🔍 Raw form data (first item):', response[0]);
       const activeForms = response.filter(form => !form.isDeleted);
       
       // Clean and normalize the data with detailed logging
@@ -147,6 +149,38 @@ function ReviewRequests() {
   const handleViewDetails = request => {
     setSelectedRequest(request);
     setShowDetailModal(true);
+  };
+
+  // Handle file download
+  const handleDownloadFile = async (request) => {
+    try {
+      console.log('🔍 Opening file:', {
+        filename: request.originalFilename,
+        path: request.storedPath
+      });
+
+      // Nếu storedPath là URL đầy đủ
+      if (request.storedPath && request.storedPath.startsWith('http')) {
+        window.open(request.storedPath, '_blank');
+        return;
+      }
+
+      // Nếu storedPath là đường dẫn tương đối, tạo URL đầy đủ
+      if (request.storedPath) {
+        const baseUrl = 'https://api-schoolhealth.purintech.id.vn';
+        const fullUrl = `${baseUrl}${request.storedPath.startsWith('/') ? '' : '/'}${request.storedPath}`;
+        console.log('🔗 Full URL:', fullUrl);
+        
+        // Mở file trực tiếp trong tab mới (không download)
+        window.open(fullUrl, '_blank');
+      } else {
+        console.error('❌ No file path available');
+        alert('Không tìm thấy đường dẫn file!');
+      }
+    } catch (error) {
+      console.error('❌ Error opening file:', error);
+      alert('Lỗi khi mở file: ' + error.message);
+    }
   };
 
   // Handle approve action
@@ -508,13 +542,16 @@ function ReviewRequests() {
                           </button>
                         </>
                       )}
-                      <button
-                        className="btn-delete"
-                        onClick={() => handleDelete(request)}
-                        title="Xóa yêu cầu"
-                      >
-                        <DeleteIcon />
-                      </button>
+                      {/* Chỉ hiển thị nút Delete khi đã chấp thuận hoặc từ chối */}
+                      {!shouldShowActionButtons && (
+                        <button
+                          className="btn-delete"
+                          onClick={() => handleDelete(request)}
+                          title="Xóa yêu cầu"
+                        >
+                          <DeleteIcon />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -624,6 +661,35 @@ function ReviewRequests() {
                     </div>
                   </div>
                 </div>
+                {/* Dòng 6: File đính kèm (nếu có, full width) */}
+                {selectedRequest.originalFilename && (
+                  <div style={{gridColumn:'1/3',background:'#f0f8ff',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'center',gap:12,minHeight:70}}>
+                    <AttachFileIcon style={{color:'#2196f3',fontSize:28}}/>
+                    <div>
+                      <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>FILE ĐÍNH KÈM:</div>
+                      <div style={{fontWeight:600,color:'#2196f3',fontSize:15}}>
+                        <button 
+                          onClick={() => handleDownloadFile(selectedRequest)}
+                          style={{
+                            color: '#2196f3',
+                            textDecoration: 'none',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '15px',
+                            fontWeight: '600'
+                          }}
+                        >
+                          📎 {selectedRequest.originalFilename}
+                          <span style={{fontSize:12,color:'#666'}}>(Nhấn để xem)</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 {/* Dòng 6: Lý do từ chối (nếu có, full width) */}
                 {!selectedRequest.isPending &&
                   !selectedRequest.isaccepted &&

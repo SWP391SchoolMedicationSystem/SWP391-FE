@@ -12,11 +12,11 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 40px;
-  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
-  padding: 40px;
+  background: linear-gradient(135deg, #2f5148 0%, #73ad67 100%) !important;
+  padding: 50px;
   border-radius: 16px;
   color: white;
-  box-shadow: 0 8px 32px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 8px 32px rgba(47, 81, 72, 0.3) !important;
 }
 
 .medicine-header h1 {
@@ -92,7 +92,7 @@
 .medicine-info-section {
   background: white;
   border-radius: 12px;
-  padding: 40px;
+  padding: 50px;
   margin-bottom: 40px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid #e8eaed;
@@ -194,7 +194,7 @@
 }
 
 .add-medicine-btn {
-  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+  background: linear-gradient(135deg, #2f5148 0%, #73ad67 100%);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -203,13 +203,13 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.95rem;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 4px 12px rgba(47, 81, 72, 0.3);
 }
 
 .add-medicine-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
-  background: linear-gradient(135deg, #45a049 0%, #5da65f 100%);
+  box-shadow: 0 6px 20px rgba(47, 81, 72, 0.4);
+  background: linear-gradient(135deg, #1e342a 0%, #5a8a4f 100%);
 }
 
 
@@ -217,7 +217,7 @@
 .add-medicine-section {
   background: white;
   border-radius: 12px;
-  padding: 40px;
+  padding: 50px;
   margin-bottom: 40px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid #e8eaed;
@@ -264,9 +264,9 @@
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #4CAF50;
+  border-color: #2f5148;
   background: white;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  box-shadow: 0 0 0 3px rgba(47, 81, 72, 0.1);
 }
 
 .form-group textarea {
@@ -285,7 +285,7 @@
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+  background: linear-gradient(135deg, #2f5148 0%, #73ad67 100%);
   color: white;
   padding: 14px 32px;
   border: none;
@@ -300,8 +300,8 @@
 
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
-  background: linear-gradient(135deg, #45a049 0%, #5da65f 100%);
+  box-shadow: 0 6px 20px rgba(47, 81, 72, 0.4);
+  background: linear-gradient(135deg, #1e342a 0%, #5a8a4f 100%);
 }
 
 .submit-btn:disabled {
@@ -682,7 +682,7 @@
 .medicines-list-section {
   background: white;
   border-radius: 12px;
-  padding: 40px;
+  padding: 50px;
   margin-bottom: 40px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid #e8eaed;
@@ -740,8 +740,8 @@
 }
 
 .parent-group:hover {
-  border-color: #4CAF50;
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.1);
+  border-color: #2f5148;
+  box-shadow: 0 4px 15px rgba(47, 81, 72, 0.1);
 }
 
 .parent-header {
@@ -767,13 +767,13 @@
 }
 
 .medicine-count {
-  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+  background: linear-gradient(135deg, #2f5148 0%, #73ad67 100%);
   color: white;
   padding: 4px 12px;
   border-radius: 16px;
   font-size: 0.85rem;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 2px 8px rgba(47, 81, 72, 0.3);
 }
 
 .expand-btn {
@@ -803,7 +803,7 @@
 }
 
 .medicine-item {
-  padding: 20px;
+  padding: 28px;
   border-bottom: 1px solid #f1f3f4;
   transition: all 0.3s ease;
 }
@@ -840,9 +840,9 @@
 
 .medicine-header h5 {
   margin: 0;
-  color: #2c3e50;
+  color: white;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.3;
 }
 
@@ -899,15 +899,15 @@
 }
 
 .edit-btn {
-  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+  background: linear-gradient(135deg, #2f5148 0%, #73ad67 100%);
   color: white;
-  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 2px 8px rgba(47, 81, 72, 0.3);
 }
 
 .edit-btn:hover {
-  background: linear-gradient(135deg, #45a049 0%, #5da65f 100%);
+  background: linear-gradient(135deg, #1e342a 0%, #5a8a4f 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 4px 12px rgba(47, 81, 72, 0.4);
 }
 
 .delete-btn {
@@ -946,11 +946,12 @@
 }
 
 .detail-row .value {
-  color: #6c757d;
+  color: #6c757d !important;
   font-size: 0.9rem;
   flex: 1;
   line-height: 1.4;
   word-break: break-word;
+  margin-left: 12px !important;
 }
 
 /* Animation for expanding/collapsing */
