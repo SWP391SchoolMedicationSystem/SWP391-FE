@@ -21,7 +21,6 @@ import {
   Notifications,
   Menu,
   Logout,
-  ChatBubbleOutline,
   BarChart,
   Search,
   DarkMode,
@@ -366,7 +365,7 @@ export default function ManagerLayout() {
                 },
               }}
             >
-              <ChatBubbleOutline />
+              <Notifications />
             </Box>
             <Typography
               sx={{
@@ -375,7 +374,7 @@ export default function ManagerLayout() {
                 color: currentTheme.textSecondary,
               }}
             >
-              Transfers
+              Notifications
             </Typography>
           </Box>
 
@@ -522,26 +521,6 @@ export default function ManagerLayout() {
               }}
             >
               <Notifications />
-            </IconButton>
-
-            <IconButton
-              sx={{
-                width: 40,
-                height: 40,
-                background: currentTheme.iconButton,
-                backdropFilter: 'blur(15px)',
-                border: `1px solid ${currentTheme.border}`,
-                color: currentTheme.textSecondary,
-                borderRadius: '12px',
-                '&:hover': {
-                  background: currentTheme.iconButtonHover,
-                  color: currentTheme.textPrimary,
-                  transform: 'translateY(-1px)',
-                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-                },
-              }}
-            >
-              <ChatBubbleOutline />
             </IconButton>
 
             {/* Dark Mode Toggle */}

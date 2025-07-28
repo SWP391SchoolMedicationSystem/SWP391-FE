@@ -17,9 +17,6 @@ import {
 import {
   MailOutline,
   LockOutlined,
-  Facebook,
-  Twitter,
-  Instagram,
 } from '@mui/icons-material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -282,7 +279,7 @@ export default function LoginForm() {
                 mb: 1,
               }}
             >
-              Sign In
+              Đăng Nhập
             </Typography>
             <Typography
               color="text.secondary"
@@ -291,7 +288,7 @@ export default function LoginForm() {
                 fontSize: '0.95rem',
               }}
             >
-              Access your account
+              Truy cập tài khoản của bạn
             </Typography>
           </Box>
 
@@ -338,7 +335,7 @@ export default function LoginForm() {
               <TextField
                 id="password-field"
                 name="password"
-                label="Password"
+                label="Mật khẩu"
                 type="password"
                 fullWidth
                 value={formData.password}
@@ -394,7 +391,7 @@ export default function LoginForm() {
                     },
                   }}
                 >
-                  Forgot password?
+                  Quên mật khẩu?
                 </Link>
               </Box>
             </Box>
@@ -414,7 +411,7 @@ export default function LoginForm() {
                   }}
                 />
               }
-              label="Remember me"
+              label="Ghi nhớ đăng nhập"
               sx={{
                 '& .MuiFormControlLabel-label': {
                   color: '#97a19b',
@@ -486,14 +483,16 @@ export default function LoginForm() {
                   Đang đăng nhập...
                 </>
               ) : (
-                'Sign In'
+                'Đăng Nhập'
               )}
             </Button>
           </form>
 
-          <Divider sx={{ my: 1, color: '#97a19b' }}>Or sign in with</Divider>
+          <Divider sx={{ my: 1, color: '#97a19b' }}>Hoặc đăng nhập bằng</Divider>
 
-          <Box sx={{ position: 'relative' }}>
+          <Box
+            sx={{ position: 'relative' }}
+          >
             <GoogleOAuthProvider clientId={clientId}>
               <GoogleLogin
                 onSuccess={handleGoogleLoginSuccess}
@@ -521,62 +520,6 @@ export default function LoginForm() {
                 <CircularProgress size={24} sx={{ color: '#2f5148' }} />
               </Box>
             )}
-          </Box>
-
-          <Box
-            sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 1 }}
-          >
-            <IconButton
-              disabled={isLoading}
-              sx={{
-                color: '#2f5148',
-                '&:hover': {
-                  backgroundColor: 'rgba(47, 81, 72, 0.1)',
-                  transform: 'translateY(-2px)',
-                },
-                '&:disabled': {
-                  color: '#c1cbc2',
-                  transform: 'none',
-                },
-                transition: 'all 0.3s ease',
-              }}
-            >
-              <Facebook />
-            </IconButton>
-            <IconButton
-              disabled={isLoading}
-              sx={{
-                color: '#2f5148',
-                '&:hover': {
-                  backgroundColor: 'rgba(47, 81, 72, 0.1)',
-                  transform: 'translateY(-2px)',
-                },
-                '&:disabled': {
-                  color: '#c1cbc2',
-                  transform: 'none',
-                },
-                transition: 'all 0.3s ease',
-              }}
-            >
-              <Twitter />
-            </IconButton>
-            <IconButton
-              disabled={isLoading}
-              sx={{
-                color: '#2f5148',
-                '&:hover': {
-                  backgroundColor: 'rgba(47, 81, 72, 0.1)',
-                  transform: 'translateY(-2px)',
-                },
-                '&:disabled': {
-                  color: '#c1cbc2',
-                  transform: 'none',
-                },
-                transition: 'all 0.3s ease',
-              }}
-            >
-              <Instagram />
-            </IconButton>
           </Box>
 
           {/* <Typography

@@ -1,5 +1,5 @@
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { Box, Container, Link, Typography, Button, Avatar } from '@mui/material';
+import { Box, Container, Link, Typography, Button, Avatar, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { LogoutOutlined } from '@mui/icons-material';
 import MedlearnLogo from '../../assets/images/Medlearn-logo.png';
@@ -9,6 +9,7 @@ export default function Header() {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
 
   useEffect(() => {
     // Check if user is logged in
@@ -40,21 +41,50 @@ export default function Header() {
     e.preventDefault();
     if (isLoggedIn && userInfo?.role === 'Parent') {
       navigate('/parent');
+    } else if (!isLoggedIn) {
+      // Show dialog for non-logged in users
+      setLoginDialogOpen(true);
     } else {
-      // If not logged in, redirect to login page
+      // If logged in but not parent, redirect to login page
       navigate('/');
     }
   };
 
+  const handleCloseLoginDialog = () => {
+    setLoginDialogOpen(false);
+  };
+
+  const handleLoginNow = () => {
+    setLoginDialogOpen(false);
+    navigate('/');
+  };
+
   const handleAboutUsClick = (e) => {
     e.preventDefault();
-    const aboutUsSection = document.getElementById('about-us');
-    if (aboutUsSection) {
-      aboutUsSection.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
+    // Navigate to Home page first
+    navigate('/Home');
+    
+    // Wait for navigation to complete, then scroll to about section
+    setTimeout(() => {
+      const aboutUsSection = document.getElementById('about-us');
+      if (aboutUsSection) {
+        aboutUsSection.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      } else {
+        // If element not found, try again after a longer delay
+        setTimeout(() => {
+          const aboutUsSection = document.getElementById('about-us');
+          if (aboutUsSection) {
+            aboutUsSection.scrollIntoView({ 
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        }, 500);
+      }
+    }, 300);
   };
 
   const getUserDisplayName = () => {
@@ -120,7 +150,7 @@ export default function Header() {
                     lineHeight: 1,
                   }}
                 >
-                  Medical Education
+                  Giáo dục Y tế
                 </Typography>
               </Box>
             </Box>
@@ -137,7 +167,7 @@ export default function Header() {
                 color="text.secondary"
                 sx={{ textDecoration: 'none', '&:hover': { color: 'info.main' } }}
               >
-                Home
+                Trang chủ
               </Link>
               <Link
                 onClick={handleServicesClick}
@@ -148,7 +178,7 @@ export default function Header() {
                   '&:hover': { color: 'info.main' } 
                 }}
               >
-                Services
+                Dịch vụ
               </Link>
               <Link
                 onClick={handleAboutUsClick}
@@ -159,7 +189,7 @@ export default function Header() {
                   '&:hover': { color: 'info.main' } 
                 }}
               >
-                About Us
+                Về chúng tôi
               </Link>
             </Box>
             
@@ -211,6 +241,102 @@ export default function Header() {
           </Box>
         </Box>
       </Container>
+
+      {/* Login Required Dialog */}
+      <Dialog
+        open={loginDialogOpen}
+        onClose={handleCloseLoginDialog}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+          }
+        }}
+      >
+        <DialogTitle
+          sx={{
+            textAlign: 'center',
+            color: '#2f5148',
+            fontWeight: 'bold',
+            fontSize: '1.5rem',
+            pb: 1,
+            background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+            borderBottom: '1px solid #e9ecef'
+          }}
+        >
+          🔐 Yêu cầu đăng nhập
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3, pb: 2 }}>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography
+              variant="body1"
+              sx={{
+                color: '#666',
+                lineHeight: 1.6,
+                fontSize: '1.1rem',
+                mb: 2
+              }}
+            >
+              Để truy cập các dịch vụ của MedLearn, bạn cần đăng nhập vào tài khoản của mình.
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#97a19b',
+                fontSize: '0.95rem'
+              }}
+            >
+              Đăng nhập để trải nghiệm đầy đủ các tính năng chăm sóc sức khỏe học đường.
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            p: 3,
+            pt: 1,
+            justifyContent: 'center',
+            gap: 2
+          }}
+        >
+          <Button
+            onClick={handleCloseLoginDialog}
+            variant="outlined"
+            sx={{
+              color: '#97a19b',
+              borderColor: '#c1cbc2',
+              '&:hover': {
+                borderColor: '#97a19b',
+                backgroundColor: 'rgba(151, 161, 155, 0.04)'
+              },
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 3
+            }}
+          >
+            Để sau
+          </Button>
+          <Button
+            onClick={handleLoginNow}
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+              color: 'white',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #1e342a 0%, #5c8a53 100%)',
+                transform: 'translateY(-1px)',
+                boxShadow: '0 6px 20px rgba(47, 81, 72, 0.3)',
+              },
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 3
+            }}
+          >
+            Đăng nhập ngay
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
