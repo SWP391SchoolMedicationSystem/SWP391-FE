@@ -80,51 +80,6 @@ export default function Home() {
     }
   }, []);
 
-  // Fallback mock data for blogs
-  const mockBlogs = [
-    {
-      blogId: 1,
-      title: "Hướng dẫn chăm sóc sức khỏe học sinh mùa đông",
-      content: "Mùa đông là thời điểm học sinh dễ mắc các bệnh về đường hô hấp. Để bảo vệ sức khỏe con em, phụ huynh cần lưu ý những điều sau: Giữ ấm cơ thể, uống đủ nước, ăn nhiều trái cây giàu vitamin C, và thường xuyên rửa tay sạch sẽ. Ngoài ra, nên đảm bảo trẻ ngủ đủ giấc và tập thể dục đều đặn để tăng cường sức đề kháng.",
-      approvedBy: "Bác sĩ Nguyễn Thị Lan",
-      image: null
-    },
-    {
-      blogId: 2,
-      title: "Tầm quan trọng của việc tiêm chủng đầy đủ",
-      content: "Tiêm chủng là biện pháp phòng ngừa bệnh tật hiệu quả nhất. Trẻ em cần được tiêm chủng đầy đủ theo lịch để tránh các bệnh truyền nhiễm nguy hiểm như bại liệt, ho gà, sởi, quai bị. Phụ huynh cần theo dõi sổ tiêm chủng và đưa trẻ đi tiêm đúng lịch hẹn.",
-      approvedBy: "Y tá Trần Văn Minh",
-      image: null
-    },
-    {
-      blogId: 3,
-      title: "Dinh dưỡng cân bằng cho học sinh",
-      content: "Chế độ dinh dưỡng cân bằng là yếu tố quan trọng giúp học sinh phát triển toàn diện. Bữa ăn cần đảm bảo đủ các nhóm thực phẩm: tinh bột, protein, chất béo, vitamin và khoáng chất. Nên hạn chế đồ ăn vặt, nước ngọt và khuyến khích uống nhiều nước lọc.",
-      approvedBy: "Chuyên gia dinh dưỡng Lê Thị Hương",
-      image: null
-    },
-    {
-      blogId: 4,
-      title: "Phòng chống cận thị ở học sinh",
-      content: "Tỷ lệ cận thị ở học sinh ngày càng tăng do thời gian sử dụng thiết bị điện tử nhiều và ánh sáng không đủ. Để phòng ngừa, cần đảm bảo ánh sáng đủ khi học, nghỉ ngơi mắt 20 giây sau mỗi 20 phút nhìn gần, và tham gia các hoạt động ngoài trời.",
-      approvedBy: "Bác sĩ nhãn khoa Phạm Đức Thành",
-      image: null
-    },
-    {
-      blogId: 5,
-      title: "Xử lý các tình huống y tế khẩn cấp tại trường",
-      content: "Khi xảy ra tình huống y tế khẩn cấp, việc xử lý nhanh chóng và đúng cách là rất quan trọng. Giáo viên và nhân viên y tế cần được đào tạo về sơ cứu cơ bản, biết cách liên hệ với cơ sở y tế và thông báo cho phụ huynh kịp thời.",
-      approvedBy: "Y tá trưởng Nguyễn Thị Mai",
-      image: null
-    },
-    {
-      blogId: 6,
-      title: "Tầm quan trọng của việc khám sức khỏe định kỳ",
-      content: "Khám sức khỏe định kỳ giúp phát hiện sớm các vấn đề sức khỏe và có biện pháp can thiệp kịp thời. Học sinh nên được khám sức khỏe ít nhất 1 lần/năm học, bao gồm đo chiều cao, cân nặng, kiểm tra thị lực, nghe tim phổi và các xét nghiệm cần thiết.",
-      approvedBy: "Bác sĩ Hoàng Văn Đức",
-      image: null
-    }
-  ];
 
   // Fetch blogs on component mount
   useEffect(() => {
