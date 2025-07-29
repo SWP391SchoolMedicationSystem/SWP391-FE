@@ -106,14 +106,17 @@ export default function ManagerLayout() {
     try {
       setNotificationLoading(true);
       console.log('🔔 Fetching manager notifications from API...');
-      
-      const notifications = await managerNotificationService.getStaffNotifications();
+
+      const notifications =
+        await managerNotificationService.getStaffNotifications();
       console.log('📨 Manager API Response:', notifications);
-      
+
       // Đếm số thông báo chưa đọc
-      const unreadCount = notifications.filter(notification => !notification.isRead).length;
+      const unreadCount = notifications.filter(
+        notification => !notification.isRead
+      ).length;
       console.log('🔢 Manager unread notifications count:', unreadCount);
-      
+
       setNotificationCount(unreadCount);
       console.log('🔢 Setting manager notification count to:', unreadCount);
     } catch (error) {
@@ -454,7 +457,6 @@ export default function ManagerLayout() {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-
             <Badge
               badgeContent={notificationLoading ? '...' : notificationCount}
               color="error"
@@ -465,7 +467,7 @@ export default function ManagerLayout() {
                   height: '18px',
                   minWidth: '18px',
                   borderRadius: '9px',
-                  background: notificationLoading 
+                  background: notificationLoading
                     ? 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)'
                     : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                   color: 'white',
@@ -686,7 +688,7 @@ export default function ManagerLayout() {
                       mr: 2,
                     }}
                   >
-                    🆔
+                    👤
                   </Box>
                   <Box>
                     <Typography
@@ -697,7 +699,7 @@ export default function ManagerLayout() {
                         fontWeight: 500,
                       }}
                     >
-                      User ID
+                      Username
                     </Typography>
                     <Typography
                       variant="body1"
@@ -706,7 +708,7 @@ export default function ManagerLayout() {
                         fontWeight: 600,
                       }}
                     >
-                      {userInfo.userId || 'N/A'}
+                      {getUserDisplayName()}
                     </Typography>
                   </Box>
                 </Box>
@@ -755,54 +757,6 @@ export default function ManagerLayout() {
                       }}
                     >
                       {getUserEmail()}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    p: 2,
-                    background: currentTheme.iconButton,
-                    borderRadius: 2,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                    border: `1px solid ${currentTheme.border}`,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: '50%',
-                      background: currentTheme.cardBgInactive,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mr: 2,
-                    }}
-                  >
-                    👤
-                  </Box>
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: currentTheme.textSecondary,
-                        fontSize: '0.75rem',
-                        fontWeight: 500,
-                      }}
-                    >
-                      Username
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        color: currentTheme.textPrimary,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {userInfo.userName || 'N/A'}
                     </Typography>
                   </Box>
                 </Box>
