@@ -5,13 +5,13 @@ import {
   Typography,
   Avatar,
   IconButton,
-  InputBase,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogContentText,
   DialogActions,
   Button,
+  Badge,
 } from '@mui/material';
 import {
   People,
@@ -24,7 +24,6 @@ import {
   VaccinesOutlined,
   Medication,
   Assignment,
-  Search,
   DarkMode,
   LightMode,
 } from '@mui/icons-material';
@@ -91,6 +90,7 @@ export default function NurseLayout() {
   const [userInfo, setUserInfo] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
     // Lấy thông tin user từ localStorage
@@ -108,6 +108,12 @@ export default function NurseLayout() {
     const storedTheme = localStorage.getItem('nurseTheme');
     if (storedTheme) {
       setIsDarkMode(storedTheme === 'dark');
+    }
+
+    // Lấy số lượng thông báo từ localStorage
+    const storedNotificationCount = localStorage.getItem('notificationCount');
+    if (storedNotificationCount) {
+      setNotificationCount(parseInt(storedNotificationCount, 10));
     }
   }, []);
 
@@ -142,6 +148,84 @@ export default function NurseLayout() {
     const displayName = getUserDisplayName();
     return displayName.charAt(0).toUpperCase();
   };
+
+  // Fetch notification count
+  const fetchNotificationCount = async () => {
+    try {
+      const response = await fetch(
+        'https://api-schoolhealth.purintech.id.vn/api/Notification/getNotiForStaff',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        if (data && Array.isArray(data)) {
+          // Đếm thông báo mới: isNew = true hoặc thông báo trong 24h gần đây
+          const newCount = data.filter(notification => {
+            // Kiểm tra isNew = true
+            if (notification.isNew === true || notification.isNew === 'true') {
+              return true;
+            }
+
+            // Kiểm tra thông báo trong 24h gần đây (nếu không có isNew)
+            if (notification.createdAt || notification.createdDate) {
+              const createdDate = new Date(
+                notification.createdAt || notification.createdDate
+              );
+              const now = new Date();
+              const hoursDiff = (now - createdDate) / (1000 * 60 * 60);
+              return hoursDiff <= 24; // Thông báo trong 24h gần đây
+            }
+
+            return false;
+          }).length;
+
+          setNotificationCount(newCount);
+          localStorage.setItem('notificationCount', newCount.toString());
+        }
+      } else {
+        console.error('Error fetching notification count:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching notification count:', error);
+    }
+  };
+
+  // Function to increment notification count (called when new notification arrives)
+  const incrementNotificationCount = () => {
+    setNotificationCount(prev => {
+      const newCount = prev + 1;
+      localStorage.setItem('notificationCount', newCount.toString());
+      return newCount;
+    });
+  };
+
+  // Function to reset notification count (called when user views notifications)
+  const resetNotificationCount = () => {
+    setNotificationCount(0);
+    localStorage.setItem('notificationCount', '0');
+  };
+
+  // Expose functions globally so they can be called from other components
+  useEffect(() => {
+    window.updateNurseNotificationCount = {
+      increment: incrementNotificationCount,
+      reset: resetNotificationCount,
+      refresh: fetchNotificationCount,
+    };
+  }, []);
+
+  useEffect(() => {
+    fetchNotificationCount();
+    // Set up interval to refresh notification count every 30 seconds
+    const interval = setInterval(fetchNotificationCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Theme colors
   const theme = {
@@ -443,36 +527,6 @@ export default function NurseLayout() {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            {/* Search Bar */}
-            <Box
-              sx={{
-                position: 'relative',
-                width: 300,
-                background: currentTheme.iconButton,
-                backdropFilter: 'blur(15px)',
-                border: `1px solid ${currentTheme.border}`,
-                borderRadius: '12px',
-                '&:hover': {
-                  background: currentTheme.iconButtonHover,
-                },
-              }}
-            >
-              <InputBase
-                placeholder="Tìm kiếm học sinh, thuốc, etc."
-                sx={{
-                  pl: 2,
-                  pr: 2,
-                  py: 0.5,
-                  width: '100%',
-                  color: currentTheme.textSecondary,
-                  '& ::placeholder': {
-                    color: currentTheme.textSecondary,
-                    opacity: 0.7,
-                  },
-                }}
-              />
-            </Box>
-
             <IconButton
               onClick={() => navigate('/nurse/notifications')}
               sx={{
@@ -491,7 +545,9 @@ export default function NurseLayout() {
                 },
               }}
             >
-              <Notifications />
+              <Badge badgeContent={notificationCount} color="error">
+                <Notifications />
+              </Badge>
             </IconButton>
 
             {/* Dark Mode Toggle */}
