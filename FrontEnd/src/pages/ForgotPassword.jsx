@@ -287,14 +287,16 @@ function ForgotPassword() {
               </div>
 
               <div className="form-actions">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={handleGoBack}
-                  disabled={loading}
-                >
-                  ← Quay lại
-                </button>
+                {currentStep !== 3 && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={handleGoBack}
+                    disabled={loading}
+                  >
+                    ← Quay lại
+                  </button>
+                )}
                 <button
                   type="submit"
                   className="btn btn-primary"

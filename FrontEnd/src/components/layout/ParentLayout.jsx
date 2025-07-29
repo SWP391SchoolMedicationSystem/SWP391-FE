@@ -1,9 +1,13 @@
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
+  Drawer,
+  AppBar,
+  Toolbar,
+  List,
   Typography,
-  Avatar,
+  Divider,
   IconButton,
   Badge,
   Dialog,
@@ -14,17 +18,11 @@ import {
   Button,
 } from '@mui/material';
 import {
-  Home,
-  Article,
-  MedicalServices,
+  Menu as MenuIcon,
+  Dashboard,
+  People,
+  Event,
   Notifications,
-  FolderShared,
-  PersonalVideo,
-  Menu,
-  Logout,
-  Search,
-  Vaccines,
-  LocalPharmacy,
   DarkMode,
   LightMode,
 } from '@mui/icons-material';
@@ -35,17 +33,17 @@ import MedlearnLogo from '../../assets/images/Medlearn-logo.png';
 const drawerWidth = 280;
 
 const navItems = [
-  { to: '/parent', label: 'Trang Chủ', icon: <Home />, key: 'home' },
+  { to: '/parent', label: 'Trang Chủ', icon: <Dashboard />, key: 'home' },
   {
     to: '/parent/view-blog',
     label: 'Xem Blog',
-    icon: <Article />,
+    icon: <People />,
     key: 'blog',
   },
   {
     to: '/parent/vaccination-events',
     label: 'Thông Tin Tiêm Chủng',
-    icon: <Vaccines />,
+    icon: <Event />,
     key: 'vaccination',
   },
   // {
@@ -75,13 +73,13 @@ const navItems = [
   {
     to: '/parent/medicine-request',
     label: 'Gửi đơn yêu cầu',
-    icon: <LocalPharmacy />,
+    icon: <People />, // Changed from LocalPharmacy to People
     key: 'medicine-request',
   },
   {
     to: '/parent/health-records',
     label: 'Hồ Sơ Sức Khỏe',
-    icon: <FolderShared />,
+    icon: <People />, // Changed from FolderShared to People
     key: 'records',
   },
 ];
@@ -200,6 +198,45 @@ export default function ParentLayout() {
     const displayName = getUserDisplayName();
     return displayName.charAt(0).toUpperCase();
   };
+
+  // Fetch notification count
+  const fetchNotificationCount = async () => {
+    try {
+      const response = await fetch(
+        'https://api-schoolhealth.purintech.id.vn/api/Notification/getNotiForParent',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        if (data && Array.isArray(data)) {
+          // Chỉ đếm những thông báo mới (background xanh lá - isNew = true)
+          const newCount = data.filter(
+            notification =>
+              notification.isNew === true || notification.isNew === 'true'
+          ).length;
+          setNotificationCount(newCount);
+          localStorage.setItem('notificationCount', newCount.toString());
+        }
+      } else {
+        console.error('Error fetching notification count:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching notification count:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotificationCount();
+    // Set up interval to refresh notification count every 30 seconds
+    const interval = setInterval(fetchNotificationCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Theme colors
   const theme = {

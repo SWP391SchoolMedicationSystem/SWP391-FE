@@ -12,6 +12,7 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  Badge,
 } from '@mui/material';
 import {
   People,
@@ -24,7 +25,6 @@ import {
   VaccinesOutlined,
   Medication,
   Assignment,
-  Search,
   DarkMode,
   LightMode,
 } from '@mui/icons-material';
@@ -170,6 +170,84 @@ export default function NurseLayout() {
     const displayName = getUserDisplayName();
     return displayName.charAt(0).toUpperCase();
   };
+
+  // Fetch notification count
+  const fetchNotificationCount = async () => {
+    try {
+      const response = await fetch(
+        'https://api-schoolhealth.purintech.id.vn/api/Notification/getNotiForStaff',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        if (data && Array.isArray(data)) {
+          // Đếm thông báo mới: isNew = true hoặc thông báo trong 24h gần đây
+          const newCount = data.filter(notification => {
+            // Kiểm tra isNew = true
+            if (notification.isNew === true || notification.isNew === 'true') {
+              return true;
+            }
+
+            // Kiểm tra thông báo trong 24h gần đây (nếu không có isNew)
+            if (notification.createdAt || notification.createdDate) {
+              const createdDate = new Date(
+                notification.createdAt || notification.createdDate
+              );
+              const now = new Date();
+              const hoursDiff = (now - createdDate) / (1000 * 60 * 60);
+              return hoursDiff <= 24; // Thông báo trong 24h gần đây
+            }
+
+            return false;
+          }).length;
+
+          setNotificationCount(newCount);
+          localStorage.setItem('notificationCount', newCount.toString());
+        }
+      } else {
+        console.error('Error fetching notification count:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching notification count:', error);
+    }
+  };
+
+  // Function to increment notification count (called when new notification arrives)
+  const incrementNotificationCount = () => {
+    setNotificationCount(prev => {
+      const newCount = prev + 1;
+      localStorage.setItem('notificationCount', newCount.toString());
+      return newCount;
+    });
+  };
+
+  // Function to reset notification count (called when user views notifications)
+  const resetNotificationCount = () => {
+    setNotificationCount(0);
+    localStorage.setItem('notificationCount', '0');
+  };
+
+  // Expose functions globally so they can be called from other components
+  useEffect(() => {
+    window.updateNurseNotificationCount = {
+      increment: incrementNotificationCount,
+      reset: resetNotificationCount,
+      refresh: fetchNotificationCount,
+    };
+  }, []);
+
+  useEffect(() => {
+    fetchNotificationCount();
+    // Set up interval to refresh notification count every 30 seconds
+    const interval = setInterval(fetchNotificationCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Theme colors
   const theme = {

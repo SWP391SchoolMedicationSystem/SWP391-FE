@@ -229,19 +229,6 @@ const Notifications = () => {
     setSubmitLoading(true);
 
     try {
-      // Validation: Không cho phép gửi thông báo cho admin và manager
-      if (notificationType === 'staff') {
-        const hasAdminOrManager = allStaff.some(
-          staff => staff.roleid === 1 || staff.roleid === 2
-        );
-
-        if (hasAdminOrManager) {
-          alert('Không thể gửi thông báo cho Admin và Manager!');
-          setSubmitLoading(false);
-          return;
-        }
-      }
-
       const notificationData = {
         title: formData.title,
         message: formData.message,
