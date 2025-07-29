@@ -827,126 +827,6 @@ const PersonalMedicine = () => {
         </div>
       </div>
 
-      {/* Medicines List Section */}
-      <div className="medicines-list-section">
-        <div className="list-header">
-          <h3>📋 Danh Sách Thuốc Đã Thêm</h3>
-          <p>Danh sách thuốc mà phụ huynh đã gửi cho học sinh, được tổ chức theo phụ huynh</p>
-        </div>
-        
-        {parentMedicineGroups.length === 0 ? (
-          <div className="empty-state">
-            <p>📭 Chưa có thuốc nào được thêm từ phụ huynh</p>
-            <p>Sử dụng form bên dưới để thêm thuốc mới</p>
-          </div>
-        ) : (
-          <div className="parent-medicine-groups">
-            {parentMedicineGroups.map((group, index) => (
-              <div key={`parent_${group.parentId}_${index}`} className="parent-group">
-                <div 
-                  className="parent-header"
-                  onClick={() => toggleParentExpansion(group.parentId)}
-                >
-                  <div className="parent-info">
-                    <h4>👨‍👩‍👧‍👦 {group.parentName}</h4>
-                    <span className="medicine-count">
-                      {group.totalMedicines} thuốc đã gửi
-                    </span>
-                  </div>
-                  <button className="expand-btn">
-                    {expandedParent === group.parentId ? '▼' : '▶'}
-                  </button>
-                </div>
-                
-                {expandedParent === group.parentId && (
-                  <div className="medicines-list">
-                    {group.medicines.map((medicine, medIndex) => (
-                      <div 
-                        key={`medicine_${group.parentId}_${medicine.personalmedicineid || medIndex}_${medicine.medicineid}_${medIndex}`} 
-                        className="medicine-item"
-                      >
-                                                 <div className="medicine-info">
-                           <div className="medicine-header">
-                             <div className="medicine-title">
-                               <h5>💊 {medicine.medicineName}</h5>
-                               {medicine.medicineType && medicine.medicineType !== 'Không xác định' && (
-                                 <span className="medicine-type">({medicine.medicineType})</span>
-                               )}
-                             </div>
-                             <div className="medicine-actions">
-                               <button 
-                                 className="action-btn edit-btn"
-                                 onClick={() => handleEditMedicine(medicine, group.parentId)}
-                                 title="Chỉnh sửa thuốc"
-                                 disabled={
-                                   submitting || 
-                                   showEditForm || 
-                                   (!medicine.id && !medicine.personalmedicineid && !medicine.personalMedicineId)
-                                 }
-                               >
-                                 ✏️ Sửa
-                               </button>
-                               <button 
-                                 className="action-btn delete-btn"
-                                 onClick={() => handleDeleteMedicine(medicine)}
-                                 title="Xóa thuốc"
-                                 disabled={
-                                   submitting || 
-                                   showDeleteConfirm || 
-                                   (!medicine.id && !medicine.personalmedicineid && !medicine.personalMedicineId)
-                                 }
-                               >
-                                 🗑️ Xóa
-                               </button>
-                             </div>
-                           </div>
-                          
-                          <div className="medicine-details">
-                            <div className="detail-row">
-                              <span className="label">Học sinh:</span>
-                              <span className="value">
-                                {medicine.studentName} - Lớp {medicine.className}
-                              </span>
-                            </div>
-                            
-                            <div className="detail-row">
-                              <span className="label">Số lượng:</span>
-                              <span className="value">{medicine.quantity}</span>
-                            </div>
-                            
-                            <div className="detail-row">
-                              <span className="label">Ngày nhận:</span>
-                              <span className="value">{medicine.receivedDate}</span>
-                            </div>
-                            
-                            <div className="detail-row">
-                              <span className="label">Hạn sử dụng:</span>
-                              <span className="value">{medicine.expiryDate}</span>
-                            </div>
-                            
-                            {medicine.note && (
-                              <div className="detail-row">
-                                <span className="label">Ghi chú:</span>
-                                <span className="value">{medicine.note}</span>
-                              </div>
-                            )}
-                            
-                            <div className="detail-row">
-                              <span className="label">Người tạo:</span>
-                              <span className="value">{getCurrentNurseName()}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
       {/* Action Section */}
       <div className="action-section">
         <div className="action-header">
@@ -1147,6 +1027,126 @@ const PersonalMedicine = () => {
         </div>
       )}
 
+      {/* Medicines List Section */}
+      <div className="medicines-list-section">
+        <div className="list-header">
+          <h3>📋 Danh Sách Thuốc Đã Thêm</h3>
+          <p>Danh sách thuốc mà phụ huynh đã gửi cho học sinh, được tổ chức theo phụ huynh</p>
+        </div>
+        
+        {parentMedicineGroups.length === 0 ? (
+          <div className="empty-state">
+            <p>📭 Chưa có thuốc nào được thêm từ phụ huynh</p>
+            <p>Sử dụng form bên dưới để thêm thuốc mới</p>
+          </div>
+        ) : (
+          <div className="parent-medicine-groups">
+            {parentMedicineGroups.map((group, index) => (
+              <div key={`parent_${group.parentId}_${index}`} className="parent-group">
+                <div 
+                  className="parent-header"
+                  onClick={() => toggleParentExpansion(group.parentId)}
+                >
+                  <div className="parent-info">
+                    <h4>👨‍👩‍👧‍👦 {group.parentName}</h4>
+                    <span className="medicine-count">
+                      {group.totalMedicines} thuốc đã gửi
+                    </span>
+                  </div>
+                  <button className="expand-btn">
+                    {expandedParent === group.parentId ? '▼' : '▶'}
+                  </button>
+                </div>
+                
+                {expandedParent === group.parentId && (
+                  <div className="medicines-list">
+                    {group.medicines.map((medicine, medIndex) => (
+                      <div 
+                        key={`medicine_${group.parentId}_${medicine.personalmedicineid || medIndex}_${medicine.medicineid}_${medIndex}`} 
+                        className="medicine-item"
+                      >
+                                                 <div className="medicine-info">
+                           <div className="medicine-header">
+                             <div className="medicine-title">
+                               <h5>💊 {medicine.medicineName}</h5>
+                               {medicine.medicineType && medicine.medicineType !== 'Không xác định' && (
+                                 <span className="medicine-type">({medicine.medicineType})</span>
+                               )}
+                             </div>
+                             <div className="medicine-actions">
+                               <button 
+                                 className="action-btn edit-btn"
+                                 onClick={() => handleEditMedicine(medicine, group.parentId)}
+                                 title="Chỉnh sửa thuốc"
+                                 disabled={
+                                   submitting || 
+                                   showEditForm || 
+                                   (!medicine.id && !medicine.personalmedicineid && !medicine.personalMedicineId)
+                                 }
+                               >
+                                 ✏️ Sửa
+                               </button>
+                               <button 
+                                 className="action-btn delete-btn"
+                                 onClick={() => handleDeleteMedicine(medicine)}
+                                 title="Xóa thuốc"
+                                 disabled={
+                                   submitting || 
+                                   showDeleteConfirm || 
+                                   (!medicine.id && !medicine.personalmedicineid && !medicine.personalMedicineId)
+                                 }
+                               >
+                                 🗑️ Xóa
+                               </button>
+                             </div>
+                           </div>
+                          
+                          <div className="medicine-details">
+                            <div className="detail-row">
+                              <span className="label">Học sinh:</span>
+                              <span className="value">
+                                {medicine.studentName} - Lớp {medicine.className}
+                              </span>
+                            </div>
+                            
+                            <div className="detail-row">
+                              <span className="label">Số lượng:</span>
+                              <span className="value">{medicine.quantity}</span>
+                            </div>
+                            
+                            <div className="detail-row">
+                              <span className="label">Ngày nhận:</span>
+                              <span className="value">{medicine.receivedDate}</span>
+                            </div>
+                            
+                            <div className="detail-row">
+                              <span className="label">Hạn sử dụng:</span>
+                              <span className="value">{medicine.expiryDate}</span>
+                            </div>
+                            
+                            {medicine.note && (
+                              <div className="detail-row">
+                                <span className="label">Ghi chú:</span>
+                                <span className="value">{medicine.note}</span>
+                              </div>
+                            )}
+                            
+                            <div className="detail-row">
+                              <span className="label">Người tạo:</span>
+                              <span className="value">{getCurrentNurseName()}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {message.text && (
         <div className={`${message.type}-message`}>
           {message.text}
@@ -1156,7 +1156,7 @@ const PersonalMedicine = () => {
       {/* Edit Medicine Modal */}
       {showEditForm && editingMedicine && (
         <div className="modal-overlay">
-          <div className="modal edit-modal">
+          <div className="modal edit-modal" style={{ display: 'block' }}>
             <div className="modal-header">
               <h3>✏️ Chỉnh Sửa Thuốc</h3>
               <button 
@@ -1170,7 +1170,7 @@ const PersonalMedicine = () => {
               </button>
             </div>
             
-            <div className="modal-body">
+            <div className="modal-body" style={{ display: 'block' }}>
               <div className="medicine-info-display">
                 <p><strong>Thuốc:</strong> {editingMedicine.medicineName}</p>
                 <p><strong>Phụ huynh:</strong> {editingMedicine.parentName}</p>

@@ -238,7 +238,7 @@ function ReviewRequests() {
       setDeclineReason('');
 
       const messages = {
-        approve: 'Đã phê duyệt yêu cầu thành công!',
+        approve: 'Phê duyệt yêu cầu thành công!',
         decline: 'Đã từ chối yêu cầu thành công!',
         delete: 'Đã xóa yêu cầu thành công!',
       };
@@ -273,7 +273,7 @@ function ReviewRequests() {
     );
 
     if (request.isPending === true) return 'Chờ xử lý';
-    if (request.isaccepted === true) return 'Đã phê duyệt';
+    if (request.isaccepted === true) return 'Phê duyệt';
     return 'Đã từ chối';
   };
   
@@ -378,7 +378,7 @@ function ReviewRequests() {
           <div className="stat-icon">✅</div>
           <div className="stat-info">
             <h3>{stats.approved}</h3>
-            <p>Đã phê duyệt</p>
+                            <p>Phê duyệt</p>
           </div>
         </div>
         <div className="stat-card declined">
@@ -409,7 +409,7 @@ function ReviewRequests() {
           >
             <option value="">Tất cả trạng thái</option>
             <option value="pending">Chờ xử lý</option>
-            <option value="approved">Đã phê duyệt</option>
+                            <option value="approved">Phê duyệt</option>
             <option value="declined">Đã từ chối</option>
           </select>
         </div>
@@ -652,9 +652,9 @@ function ReviewRequests() {
                     >
                       <span
                         style={{
-                          padding: '6px 12px',
+                          padding: '8px 16px',
                           borderRadius: '20px',
-                          fontSize: '0.8rem',
+                          fontSize: '0.9rem',
                           fontWeight: 600,
                           backgroundColor: request.formCategoryId === 2 ? 'rgba(47, 81, 72, 0.10)'
                             : request.formCategoryId === 1 ? 'rgba(33, 150, 243, 0.10)'
@@ -666,6 +666,12 @@ function ReviewRequests() {
                             : '#555',
                           border: 'none',
                           boxShadow: 'none',
+                          whiteSpace: 'nowrap',
+                          display: 'inline-block',
+                          minWidth: 'fit-content',
+                          width: 'auto',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
                         }}
                       >
                         {request.formCategoryName}
@@ -700,9 +706,9 @@ function ReviewRequests() {
                     >
                       <span
                         style={{
-                          padding: '6px 12px',
-                          borderRadius: '15px',
-                          fontSize: '0.8rem',
+                          padding: '8px 16px',
+                          borderRadius: '20px',
+                          fontSize: '0.9rem',
                           fontWeight: 600,
                           backgroundColor: request.isPending 
                             ? 'rgba(255, 193, 7, 0.1)'
@@ -721,6 +727,12 @@ function ReviewRequests() {
                               ? '#28a745'
                               : '#dc3545'
                           }`,
+                          whiteSpace: 'nowrap',
+                          display: 'inline-block',
+                          minWidth: 'fit-content',
+                          width: 'auto',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
                         }}
                       >
                         {getStatusText(request)}

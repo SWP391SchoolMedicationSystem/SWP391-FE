@@ -573,6 +573,12 @@
 .edit-modal {
   max-width: 600px;
   width: 95%;
+  display: block !important;
+}
+
+.edit-modal .modal-body {
+  display: block !important;
+  flex-direction: column !important;
 }
 
 .confirm-modal {
@@ -593,6 +599,11 @@
   margin: 0;
   color: #2c3e50;
   font-size: 1.4rem;
+}
+
+.modal-header h3::before {
+  display: none !important;
+  content: none !important;
 }
 
 .close-btn {
@@ -665,6 +676,8 @@
   border-top: 2px solid #f0f2f5;
 }
 
+
+
 .action-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -735,7 +748,7 @@
   border-radius: 8px;
   overflow: hidden;
   transition: all 0.3s ease;
-  background: transparent;
+  background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
@@ -745,7 +758,7 @@
 }
 
 .parent-header {
-  background: transparent;
+  background: #f8f9fa;
   padding: 16px 20px;
   cursor: pointer;
   display: flex;
@@ -756,11 +769,12 @@
 }
 
 .parent-header:hover {
-  background: transparent;
+  background: #f1f3f4;
 }
 
 .parent-info h4 {
   margin: 0 0 4px 0;
+  color: #2c3e50;
   font-size: 1.2rem;
   font-weight: 600;
 }
@@ -797,7 +811,7 @@
 }
 
 .medicines-list {
-  background: transparent;
+  background: white;
   padding: 0;
 }
 
@@ -812,7 +826,7 @@
 }
 
 .medicine-item:hover {
-  background: transparent;
+  background: #f8f9fa;
   transform: translateX(4px);
 }
 
