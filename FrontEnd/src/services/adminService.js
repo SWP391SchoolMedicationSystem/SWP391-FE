@@ -8,6 +8,8 @@ export const adminDashboardService = {
       console.log('🔄 adminDashboardService.getDashboardStatistics: Fetching from API...');
       const response = await apiClient.get(API_ENDPOINTS.DASHBOARD.USERS_STATISTICS);
       console.log('📊 Dashboard statistics response:', response);
+      
+      // Return the response data directly since apiClient already extracts response.data
       return response;
     } catch (error) {
       console.error('❌ Error getting dashboard statistics:', error);

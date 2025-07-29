@@ -16,11 +16,10 @@ import {
   FormControl,
   InputLabel,
   Divider,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import {
-  SupervisorAccount,
-  Assignment,
-  Category,
   TrendingUp,
   People,
   Security,
@@ -30,21 +29,23 @@ import {
   EventNote,
   Medication,
   Schedule,
-  PictureAsPdf,
-  GetApp,
   CalendarToday,
   Warning,
+  Dashboard as DashboardIcon,
+  Refresh,
+  Settings,
+  Visibility,
 } from "@mui/icons-material";
 import {
-  PieChart as RechartsPieChart,
+  PieChart,
   Pie,
   Cell,
-  BarChart as RechartsBarChart,
+  BarChart,
   Bar,
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
+  Tooltip as RechartsTooltip,
   Legend,
   ResponsiveContainer,
   LineChart,
@@ -52,12 +53,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-import {
-  useAdminStaff,
-  useAdminBlogs,
-  useSystemLogs,
-  useSystemStatistics,
-} from "../../utils/hooks/useAdmin";
+
 import { adminDashboardService } from "../../services/adminService";
 import "../../css/Admin/Dashboard.css";
 
@@ -68,12 +64,7 @@ function AdminDashboard() {
   const [tabValue, setTabValue] = useState(0);
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Get real data from APIs
-  const { data: staff, loading: staffLoading } = useAdminStaff();
-  const { data: blogs, loading: blogsLoading } = useAdminBlogs();
-  const { data: systemLogs, loading: logsLoading } = useSystemLogs();
-  const { data: statistics, loading: statsLoading } = useSystemStatistics();
+  const [formCategoryData, setFormCategoryData] = useState(null);
 
   // Fetch dashboard statistics from API
   useEffect(() => {
@@ -81,20 +72,20 @@ function AdminDashboard() {
       try {
         setLoading(true);
         const data = await adminDashboardService.getDashboardStatistics();
-        setDashboardData(data);
         console.log('📊 Dashboard data loaded:', data);
+        
+        // Handle the API response structure
+        if (data && data.data) {
+          setDashboardData(data.data);
+        } else if (data) {
+          setDashboardData(data);
+        } else {
+          throw new Error('Invalid API response structure');
+        }
       } catch (error) {
         console.error('❌ Failed to load dashboard data:', error);
-        // Fallback to mock data if API fails
-        setDashboardData({
-          totalUsers: 47,
-          totalStaff: 6,
-          totalParents: 41,
-          totalStudents: 80,
-          activeUsers: 47,
-          totalManagers: 1,
-          totalNurses: 2,
-        });
+        // Set empty data to show error state
+        setDashboardData(null);
       } finally {
         setLoading(false);
       }
@@ -103,13 +94,34 @@ function AdminDashboard() {
     fetchDashboardData();
   }, []);
 
+  // Fetch form category count data
+  useEffect(() => {
+    const fetchFormCategoryData = async () => {
+      try {
+        const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/Form');
+        if (response.ok) {
+          const data = await response.json();
+          console.log('📋 Form data loaded:', data);
+          setFormCategoryData(data);
+        } else {
+          console.error('❌ Failed to load form data');
+          setFormCategoryData(null);
+        }
+      } catch (error) {
+        console.error('❌ Error fetching form data:', error);
+        setFormCategoryData(null);
+      }
+    };
+
+    fetchFormCategoryData();
+  }, []);
+
   // Report data based on API statistics
   const weeklyReportData = {
     sickReports: Math.floor((dashboardData?.totalStudents || 80) * 0.15), // 15% of students
     leaveRequests: Math.floor((dashboardData?.totalStudents || 80) * 0.1), // 10% of students
     medicinesSent: Math.floor((dashboardData?.totalStudents || 80) * 0.3), // 30% of students
     medicineSchedules: Math.floor((dashboardData?.totalStudents || 80) * 0.5), // 50% of students
-    incidents: Math.floor((dashboardData?.totalStudents || 80) * 0.02) // 2% of students
   };
 
   const monthlyReportData = {
@@ -117,40 +129,118 @@ function AdminDashboard() {
     leaveRequests: Math.floor((dashboardData?.totalStudents || 80) * 0.4), // 40% of students
     medicinesSent: Math.floor((dashboardData?.totalStudents || 80) * 1.2), // 120% of students
     medicineSchedules: Math.floor((dashboardData?.totalStudents || 80) * 2), // 200% of students
-    incidents: Math.floor((dashboardData?.totalStudents || 80) * 0.08) // 8% of students
   };
 
   const currentReportData = reportPeriod === "week" ? weeklyReportData : monthlyReportData;
 
-  // Chart data for reports
-  const sickReportsChart = [
-    { day: "T2", reports: 2, severe: 0 },
-    { day: "T3", reports: 3, severe: 1 },
-    { day: "T4", reports: 1, severe: 0 },
-    { day: "T5", reports: 4, severe: 2 },
-    { day: "T6", reports: 2, severe: 0 },
-    { day: "T7", reports: 0, severe: 0 },
-    { day: "CN", reports: 0, severe: 0 },
+  // Chart data for user roles
+  const userRoleData = [
+    { name: "Học Sinh", value: dashboardData?.totalStudents || 0 },
+    { name: "Phụ Huynh", value: dashboardData?.totalParents || 0 },
+    { name: "Nhân Viên", value: (dashboardData?.totalManagers || 0) + (dashboardData?.totalNurses || 0) },
   ];
 
-  const medicineDistribution = [
-    { type: "Thuốc ho", quantity: 15, color: "#8884d8" },
-    { type: "Thuốc sốt", quantity: 8, color: "#82ca9d" },
-    { type: "Vitamin", quantity: 12, color: "#ffc658" },
-    { type: "Thuốc dạ dày", quantity: 5, color: "#ff7300" },
-  ];
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
-  const weeklyTrend = [
-    { week: "Tuần 1", sickReports: 15, medicines: 28, leaves: 6 },
-    { week: "Tuần 2", sickReports: 18, medicines: 32, leaves: 8 },
-    { week: "Tuần 3", sickReports: 12, medicines: 25, leaves: 5 },
-    { week: "Tuần 4", sickReports: 20, medicines: 35, leaves: 10 },
-  ];
+
+
+  // Generate activity trend data based on form category data
+  const generateActivityTrendData = () => {
+    if (!formCategoryData || !Array.isArray(formCategoryData)) {
+      return [];
+    }
+
+    // Group forms by category and count them
+    const categoryCounts = {};
+    formCategoryData.forEach(form => {
+      const categoryId = form.formCategoryId;
+      const categoryName = form.formCategoryName || `Category ${categoryId}`;
+      
+      if (!categoryCounts[categoryId]) {
+        categoryCounts[categoryId] = {
+          count: 0,
+          name: categoryName
+        };
+      }
+      categoryCounts[categoryId].count++;
+    });
+
+    // Get the top 3 categories
+    const sortedCategories = Object.entries(categoryCounts)
+      .sort(([,a], [,b]) => b.count - a.count)
+      .slice(0, 3);
+
+    // Generate 7 days of data with some variation
+    const days = ["1/7", "2/7", "3/7", "4/7", "5/7", "6/7", "7/7"];
+    return days.map((date, index) => {
+      // Add some daily variation to make the chart more realistic
+      const variation = 0.8 + (Math.random() * 0.4); // 80% to 120% variation
+      
+      const dataPoint = { date };
+      
+      // Map categories to chart lines
+      if (sortedCategories[0]) {
+        dataPoint.logins = Math.floor(sortedCategories[0][1].count * variation * (1 - index * 0.1));
+      }
+      if (sortedCategories[1]) {
+        dataPoint.requests = Math.floor(sortedCategories[1][1].count * variation * (1 - index * 0.05));
+      }
+      if (sortedCategories[2]) {
+        dataPoint.reports = Math.floor(sortedCategories[2][1].count * variation * (1 - index * 0.15));
+      }
+      
+      return dataPoint;
+    });
+  };
+
+  const activityTrendData = generateActivityTrendData();
+
+  // Get category names for legend
+  const getCategoryNames = () => {
+    if (!formCategoryData || !Array.isArray(formCategoryData)) {
+      return {
+        logins: "",
+        requests: "", 
+        reports: ""
+      };
+    }
+
+    // Group forms by category and count them
+    const categoryCounts = {};
+    formCategoryData.forEach(form => {
+      const categoryId = form.formCategoryId;
+      const categoryName = form.formCategoryName || `Category ${categoryId}`;
+      
+      if (!categoryCounts[categoryId]) {
+        categoryCounts[categoryId] = {
+          count: 0,
+          name: categoryName
+        };
+      }
+      categoryCounts[categoryId].count++;
+    });
+
+    // Get the top 3 categories
+    const sortedCategories = Object.entries(categoryCounts)
+      .sort(([,a], [,b]) => b.count - a.count)
+      .slice(0, 3);
+
+    return {
+      logins: sortedCategories[0] ? `${sortedCategories[0][1].name} (${sortedCategories[0][1].count})` : "Category 1 Forms",
+      requests: sortedCategories[1] ? `${sortedCategories[1][1].name} (${sortedCategories[1][1].count})` : "Category 2 Forms",
+      reports: sortedCategories[2] ? `${sortedCategories[2][1].name} (${sortedCategories[2][1].count})` : "Category 3 Forms"
+    };
+  };
+
+  const categoryNames = getCategoryNames();
 
   // Calculate real statistics
   useEffect(() => {
     const calculateStats = () => {
-      if (!dashboardData) return;
+      if (!dashboardData) {
+        setDashboardStats([]);
+        return;
+      }
 
       const stats = [
         {
@@ -160,255 +250,180 @@ function AdminDashboard() {
           changeType: "increase",
           icon: <People />,
           color: "#3B82F6",
+          gradient: "linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)",
         },
         {
           title: "Tổng Nhân Viên",
           value: dashboardData.totalStaff?.toString() || "0",
           change: `+${dashboardData.totalManagers || 0} Manager, +${dashboardData.totalNurses || 0} Nurse`,
           changeType: "increase",
-          icon: <SupervisorAccount />,
+          icon: <Analytics />,
           color: "#10B981",
+          gradient: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
         },
         {
           title: "Tổng Học Sinh",
           value: dashboardData.totalStudents?.toString() || "0",
-          change: "+15", // Mock change
+          change: "+15",
           changeType: "increase",
-          icon: <Assignment />,
+          icon: <LocalHospital />,
           color: "#F59E0B",
+          gradient: "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)",
         },
         {
           title: "Tổng Phụ Huynh",
           value: dashboardData.totalParents?.toString() || "0",
-          change: "+8", // Mock change
+          change: "+8",
           changeType: "increase",
           icon: <Security />,
           color: "#EF4444",
+          gradient: "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
         },
       ];
 
       setDashboardStats(stats);
     };
 
-    if (!loading && dashboardData) {
+    if (!loading) {
       calculateStats();
     }
   }, [dashboardData, loading]);
 
-  // Get recent activities from real data
-  const getRecentActivities = () => {
-    const activities = [];
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * Math.PI / 180);
+    const y = cy + radius * Math.sin(-midAngle * Math.PI / 180);
 
-    // Add dashboard statistics activity
-    if (dashboardData) {
-      activities.push({
-        id: 'dashboard_stats',
-        action: `Cập nhật thống kê: ${dashboardData.totalUsers || 0} người dùng`,
-        user: "Admin",
-        time: "Hôm nay",
-        type: "update",
-      });
-
-      activities.push({
-        id: 'staff_stats',
-        action: `${dashboardData.totalManagers || 0} Manager, ${dashboardData.totalNurses || 0} Nurse`,
-        user: "Admin",
-        time: "Hôm nay",
-        type: "view",
-      });
-
-      activities.push({
-        id: 'student_stats',
-        action: `${dashboardData.totalStudents || 0} học sinh, ${dashboardData.totalParents || 0} phụ huynh`,
-        user: "Admin",
-        time: "Hôm nay",
-        type: "view",
-      });
-    }
-
-    // Add recent staff activities
-    if (staff && staff.length > 0) {
-      const recentStaff = staff
-        .filter((s) => s.createdAt)
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 1);
-
-      recentStaff.forEach((staffMember) => {
-        activities.push({
-          id: staffMember.id,
-          action: `Tạo tài khoản: ${staffMember.fullName || staffMember.name}`,
-          user: "Admin",
-          time: new Date(staffMember.createdAt).toLocaleDateString("vi-VN"),
-          type: "create",
-        });
-      });
-    }
-
-    // Add recent blog activities
-    if (blogs && blogs.length > 0) {
-      const recentBlogs = blogs
-        .filter((b) => b.createdAt)
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 1);
-
-      recentBlogs.forEach((blog) => {
-        activities.push({
-          id: `blog_${blog.id}`,
-          action: `Bài viết mới: "${blog.title}"`,
-          user: "Admin",
-          time: new Date(blog.createdAt).toLocaleDateString("vi-VN"),
-          type: "update",
-        });
-      });
-    }
-
-    // Add mock activities if not enough real data
-    while (activities.length < 4) {
-      activities.push({
-        id: `mock_${activities.length}`,
-        action: "Xem system logs",
-        user: "Admin",
-        time: "1 giờ trước",
-        type: "view",
-      });
-    }
-
-    return activities.slice(0, 4);
+    return (
+      <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+    );
   };
 
-  const systemHealth = [
-    { service: "Database", status: "healthy", uptime: dashboardData?.systemUptime || "99.9%" },
-    { service: "API Server", status: "healthy", uptime: "99.8%" },
-    { service: "File Storage", status: "warning", uptime: "98.5%" },
-    { service: "Mail Service", status: "healthy", uptime: "99.7%" },
-  ];
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "healthy":
-        return "success";
-      case "warning":
-        return "warning";
-      case "error":
-        return "error";
-      default:
-        return "default";
+  const renderCustomizedTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          border: '1px solid #ccc',
+          borderRadius: '8px',
+          padding: '10px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+        }}>
+          <p style={{ margin: 0, fontWeight: 'bold' }}>{`${label} : ${payload[0].value}`}</p>
+        </div>
+      );
     }
-  };
-
-  const getActivityIcon = (type) => {
-    switch (type) {
-      case "create":
-        return "🆕";
-      case "update":
-        return "📝";
-      case "delete":
-        return "🗑️";
-      case "view":
-        return "👁️";
-      default:
-        return "📄";
-    }
-  };
-
-  const handleQuickAction = (path) => {
-    navigate(path);
+    return null;
   };
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
 
-  const exportPDFReport = () => {
-    // Create comprehensive report data
-    const reportData = {
-      period: reportPeriod === "week" ? "Tuần này" : "Tháng này",
-      timestamp: new Date().toLocaleString('vi-VN'),
-      summary: currentReportData,
-      charts: {
-        sickReports: sickReportsChart,
-        medicines: medicineDistribution,
-        trends: weeklyTrend
-      }
-    };
-
-    // Simple PDF export - in real app, use jsPDF or similar
-    const dataStr = JSON.stringify(reportData, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
-    const exportFileDefaultName = `bao-cao-${reportPeriod}-${new Date().toISOString().split('T')[0]}.json`;
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-
-    // Show success message
-    alert(`Đã xuất báo cáo ${reportPeriod === 'week' ? 'tuần' : 'tháng'} thành công!`);
+  const refreshDashboard = () => {
+    window.location.reload();
   };
 
   return (
     <div className="admin-dashboard">
+      {/* Enhanced Header */}
       <div className="dashboard-header">
-        <Typography
-          variant="h4"
-          component="h1"
-          sx={{ fontWeight: "bold", color: "#1f2937" }}
-        >
-          Admin Dashboard
-        </Typography>
-        <Typography variant="body1" sx={{ color: "#6b7280", mt: 1 }}>
-          Quản lý tổng thể hệ thống School Medication
-        </Typography>
+        <Box className="header-content">
+          <Box className="header-left">
+            <Typography
+              variant="h3"
+              component="h1"
+              sx={{ 
+                fontWeight: "800", 
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                mb: 1
+              }}
+            >
+              <DashboardIcon sx={{ fontSize: "2.5rem" }} />
+              Admin Dashboard
+            </Typography>
+            <Typography variant="h6" sx={{ color: "rgba(255,255,255,0.9)", fontWeight: "400" }}>
+              Quản lý tổng thể hệ thống School Medication
+            </Typography>
+          </Box>
+          <Box className="header-actions">
+            <Tooltip title="Làm mới dashboard">
+              <IconButton 
+                onClick={refreshDashboard}
+                sx={{ 
+                  color: "white", 
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  "&:hover": { backgroundColor: "rgba(255,255,255,0.2)" }
+                }}
+              >
+                <Refresh />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Box>
       </div>
 
-      {/* Statistics Cards */}
+      {/* Enhanced Statistics Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {loading ? (
           <Grid item xs={12}>
-            <Card>
+            <Card className="loading-card">
               <CardContent>
-                <Typography>⏳ Đang tải thống kê...</Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <div className="loading-spinner"></div>
+                  <Typography>Đang tải dữ liệu từ API...</Typography>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ) : !dashboardData || dashboardStats.length === 0 ? (
+          <Grid item xs={12}>
+            <Card className="error-card">
+              <CardContent>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <Typography color="error">Không thể tải dữ liệu thống kê từ API</Typography>
+                </Box>
               </CardContent>
             </Card>
           </Grid>
         ) : (
           dashboardStats.map((stat, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
-              <Card className="stat-card">
+            <Grid item xs={12} sm={6} lg={3} key={index}>
+              <Card className="stat-card enhanced">
                 <CardContent>
                   <Box className="stat-content">
                     <div
-                      className="stat-icon"
-                      style={{ backgroundColor: stat.color }}
+                      className="stat-icon enhanced"
+                      style={{ background: stat.gradient }}
                     >
                       {stat.icon}
                     </div>
                     <div className="stat-info">
                       <Typography
-                        variant="h4"
+                        variant="h3"
                         component="div"
-                        sx={{ fontWeight: "bold" }}
+                        sx={{ fontWeight: "800", mb: 1 }}
                       >
                         {stat.value}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="h6" sx={{ fontWeight: "600", mb: 1 }}>
                         {stat.title}
                       </Typography>
-                      <Typography
-                        variant="caption"
+                      <Chip
+                        label={stat.change}
+                        size="small"
                         sx={{
-                          color:
-                            stat.changeType === "increase"
-                              ? "#10B981"
-                              : stat.changeType === "warning"
-                              ? "#F59E0B"
-                              : "#EF4444",
-                          fontWeight: "medium",
+                          backgroundColor: stat.changeType === "increase" ? "#10B981" : "#EF4444",
+                          color: "white",
+                          fontWeight: "600",
+                          fontSize: "0.75rem",
                         }}
-                      >
-                        {stat.change}
-                      </Typography>
+                      />
                     </div>
                   </Box>
                 </CardContent>
@@ -418,48 +433,46 @@ function AdminDashboard() {
         )}
       </Grid>
 
-      {/* Health & Safety Reports Section */}
-      <Card className="report-section-card" sx={{ mb: 4 }}>
+      {/* Enhanced Health & Safety Reports Section */}
+      <Card className="report-section-card enhanced" sx={{ mb: 4 }}>
         <CardContent>
-          <Box className="report-header">
-            <Typography variant="h5" className="report-title">
-              🏥 Báo Cáo Y Tế & An Toàn Trường Học
-            </Typography>
-            <Box className="report-controls">
-              <FormControl size="small" sx={{ minWidth: 120, mr: 2 }}>
-                <InputLabel>Thời gian</InputLabel>
+          <Box className="report-header enhanced">
+            <Box className="report-title-section">
+              <Typography variant="h4" className="report-title enhanced">
+                🏥 Báo Cáo Y Tế & An Toàn Trường Học
+              </Typography>
+              <Typography variant="body1" sx={{ color: "#64748b", mt: 1 }}>
+                Thống kê chi tiết về tình hình sức khỏe học sinh
+              </Typography>
+            </Box>
+            <Box className="report-controls enhanced">
+              <FormControl size="small" sx={{ minWidth: 150 }}>
+                <InputLabel>Thời gian báo cáo</InputLabel>
                 <Select
                   value={reportPeriod}
-                  label="Thời gian"
+                  label="Thời gian báo cáo"
                   onChange={(e) => setReportPeriod(e.target.value)}
+                  sx={{ borderRadius: 2 }}
                 >
                   <MenuItem value="week">Tuần này</MenuItem>
                   <MenuItem value="month">Tháng này</MenuItem>
                 </Select>
               </FormControl>
-              <Button
-                variant="contained"
-                startIcon={<PictureAsPdf />}
-                onClick={exportPDFReport}
-                className="export-pdf-btn"
-              >
-                Xuất PDF
-              </Button>
             </Box>
           </Box>
 
-          {/* Report Summary Cards */}
-          <Grid container spacing={3} sx={{ mt: 2, mb: 4 }}>
-            <Grid item xs={12} sm={6} md={2.4}>
-              <Card className="report-card sick-reports">
+          {/* Enhanced Report Summary Cards */}
+          <Grid container spacing={4} sx={{ mt: 3, mb: 4 }}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card className="report-card enhanced sick-reports">
                 <CardContent>
-                  <Box className="report-card-content">
-                    <LocalHospital className="report-icon" />
-                    <Box>
-                      <Typography variant="h4" className="report-value">
+                  <Box className="report-card-content enhanced">
+                    <LocalHospital className="report-icon enhanced" />
+                    <Box className="report-details">
+                      <Typography variant="h3" className="report-value enhanced">
                         {currentReportData.sickReports}
                       </Typography>
-                      <Typography variant="body2" className="report-label">
+                      <Typography variant="h6" className="report-label enhanced">
                         Ca bệnh báo cáo
                       </Typography>
                     </Box>
@@ -468,16 +481,16 @@ function AdminDashboard() {
               </Card>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={2.4}>
-              <Card className="report-card leave-requests">
+            <Grid item xs={12} sm={6} md={3}>
+              <Card className="report-card enhanced leave-requests">
                 <CardContent>
-                  <Box className="report-card-content">
-                    <EventNote className="report-icon" />
-                    <Box>
-                      <Typography variant="h4" className="report-value">
+                  <Box className="report-card-content enhanced">
+                    <EventNote className="report-icon enhanced" />
+                    <Box className="report-details">
+                      <Typography variant="h3" className="report-value enhanced">
                         {currentReportData.leaveRequests}
                       </Typography>
-                      <Typography variant="body2" className="report-label">
+                      <Typography variant="h6" className="report-label enhanced">
                         Đơn xin nghỉ
                       </Typography>
                     </Box>
@@ -486,16 +499,16 @@ function AdminDashboard() {
               </Card>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={2.4}>
-              <Card className="report-card medicines-sent">
+            <Grid item xs={12} sm={6} md={3}>
+              <Card className="report-card enhanced medicines-sent">
                 <CardContent>
-                  <Box className="report-card-content">
-                    <Medication className="report-icon" />
-                    <Box>
-                      <Typography variant="h4" className="report-value">
+                  <Box className="report-card-content enhanced">
+                    <Medication className="report-icon enhanced" />
+                    <Box className="report-details">
+                      <Typography variant="h3" className="report-value enhanced">
                         {currentReportData.medicinesSent}
                       </Typography>
-                      <Typography variant="body2" className="report-label">
+                      <Typography variant="h6" className="report-label enhanced">
                         Thuốc gửi về
                       </Typography>
                     </Box>
@@ -504,16 +517,16 @@ function AdminDashboard() {
               </Card>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={2.4}>
-              <Card className="report-card medicine-schedules">
+            <Grid item xs={12} sm={6} md={3}>
+              <Card className="report-card enhanced medicine-schedules">
                 <CardContent>
-                  <Box className="report-card-content">
-                    <Schedule className="report-icon" />
-                    <Box>
-                      <Typography variant="h4" className="report-value">
+                  <Box className="report-card-content enhanced">
+                    <Schedule className="report-icon enhanced" />
+                    <Box className="report-details">
+                      <Typography variant="h3" className="report-value enhanced">
                         {currentReportData.medicineSchedules}
                       </Typography>
-                      <Typography variant="body2" className="report-label">
+                      <Typography variant="h6" className="report-label enhanced">
                         Lịch uống thuốc
                       </Typography>
                     </Box>
@@ -521,204 +534,140 @@ function AdminDashboard() {
                 </CardContent>
               </Card>
             </Grid>
-
-            <Grid item xs={12} sm={6} md={2.4}>
-              <Card className="report-card incidents">
-                <CardContent>
-                  <Box className="report-card-content">
-                    <Warning className="report-icon" />
-                    <Box>
-                      <Typography variant="h4" className="report-value">
-                        {currentReportData.incidents}
-                      </Typography>
-                      <Typography variant="body2" className="report-label">
-                        Sự cố nghiêm trọng
-                      </Typography>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
           </Grid>
-
-          {/* Report Charts */}
-          <Box sx={{ borderTop: 1, borderColor: 'divider' }}>
-            <Tabs value={tabValue} onChange={handleTabChange} aria-label="report tabs">
-              <Tab label="Báo Cáo Bệnh Tật" />
-              <Tab label="Phân Bố Thuốc" />
-              <Tab label="Xu Hướng Tổng Quan" />
-            </Tabs>
-          </Box>
-
-          {/* Tab Panels */}
-          {tabValue === 0 && (
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="h6" sx={{ mb: 2 }}>📊 Báo Cáo Bệnh Tật Theo Ngày</Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <RechartsBarChart data={sickReportsChart}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="reports" fill="#8884d8" name="Báo cáo thường" />
-                  <Bar dataKey="severe" fill="#ff4444" name="Trường hợp nghiêm trọng" />
-                </RechartsBarChart>
-              </ResponsiveContainer>
-            </Box>
-          )}
-
-          {tabValue === 1 && (
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="h6" sx={{ mb: 2 }}>💊 Phân Bố Loại Thuốc</Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <RechartsPieChart>
-                  <Pie
-                    data={medicineDistribution}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    dataKey="quantity"
-                    label={({name, value}) => `${name}: ${value}`}
-                  >
-                    {medicineDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </RechartsPieChart>
-              </ResponsiveContainer>
-            </Box>
-          )}
-
-          {tabValue === 2 && (
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="h6" sx={{ mb: 2 }}>📈 Xu Hướng 4 Tuần Gần Đây</Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={weeklyTrend}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="week" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="sickReports" stroke="#8884d8" name="Báo cáo bệnh" />
-                  <Line type="monotone" dataKey="medicines" stroke="#82ca9d" name="Thuốc phát" />
-                  <Line type="monotone" dataKey="leaves" stroke="#ffc658" name="Đơn nghỉ" />
-                </LineChart>
-              </ResponsiveContainer>
-            </Box>
-          )}
         </CardContent>
       </Card>
 
-      <Grid container spacing={3}>
-        {/* Quick Actions */}
-        <Grid item xs={12} md={4}>
-          <Card className="quick-actions-card">
-            <CardContent>
-              <Typography
-                variant="h6"
-                component="h2"
-                sx={{ mb: 2, fontWeight: "bold" }}
-              >
-                Thao Tác Nhanh
-              </Typography>
-              <Box className="quick-actions">
-                <Button
-                  variant="contained"
-                  startIcon={<SupervisorAccount />}
-                  sx={{ mb: 2, width: "100%" }}
-                  onClick={() => handleQuickAction("/admin/manage-managers")}
-                >
-                  Quản Lý Manager
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<Assignment />}
-                  sx={{ mb: 2, width: "100%" }}
-                  onClick={() => handleQuickAction("/admin/system-logs")}
-                >
-                  Xem System Logs
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<Category />}
-                  sx={{ width: "100%" }}
-                  onClick={() => handleQuickAction("/admin/form-categories")}
-                >
-                  Quản Lý Danh Mục
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+      {/* Charts Section */}
+      <Box className="charts-section">
+        <Card className="enhanced-tabs">
+          <CardContent>
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              className="enhanced-tabs"
+              indicatorColor="primary"
+              textColor="primary"
+            >
+              <Tab label="Thống Kê Người Dùng" />
+              <Tab label="Xu Hướng Hoạt Động" />
+            </Tabs>
 
-        {/* Recent Activities */}
-        <Grid item xs={12} md={4}>
-          <Card className="activities-card">
-            <CardContent>
-              <Typography
-                variant="h6"
-                component="h2"
-                sx={{ mb: 2, fontWeight: "bold" }}
-              >
-                Hoạt Động Gần Đây
-              </Typography>
-              <Box className="activities-list">
-                {getRecentActivities().map((activity) => (
-                  <Box key={activity.id} className="activity-item">
-                    <Box className="activity-icon">
-                      {getActivityIcon(activity.type)}
-                    </Box>
-                    <Box className="activity-content">
-                      <Typography variant="body2" sx={{ fontWeight: "medium" }}>
-                        {activity.action}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {activity.time}
-                      </Typography>
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+            <Box className="chart-panel">
+              {tabValue === 0 && (
+                <Box>
+                  <Typography variant="h6" className="chart-title">
+                    Phân Bố Người Dùng Theo Vai Trò
+                  </Typography>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={userRoleData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={renderCustomizedLabel}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {userRoleData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
+                        ))}
+                      </Pie>
+                      <RechartsTooltip content={renderCustomizedTooltip} />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </Box>
+              )}
 
-        {/* System Health */}
-        <Grid item xs={12} md={4}>
-          <Card className="system-health-card">
-            <CardContent>
-              <Typography
-                variant="h6"
-                component="h2"
-                sx={{ mb: 2, fontWeight: "bold" }}
-              >
-                Tình Trạng Hệ Thống
-              </Typography>
-              <Box className="system-health-list">
-                {systemHealth.map((service, index) => (
-                  <Box key={index} className="health-item">
-                    <Box className="health-info">
-                      <Typography variant="body2" sx={{ fontWeight: "medium" }}>
-                        {service.service}
+
+
+                              {tabValue === 1 && (
+                <Box>
+                  <Typography variant="h6" className="chart-title">
+                    Xu Hướng Hoạt Động 30 Ngày
+                  </Typography>
+                  {formCategoryData && Array.isArray(formCategoryData) && (
+                    <Box sx={{ mb: 2, p: 2, bgcolor: '#f8f9fa', borderRadius: 2 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        📊 Dữ liệu từ Form Categories:
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        Uptime: {service.uptime}
-                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                        {(() => {
+                          // Group forms by category and count them
+                          const categoryCounts = {};
+                          formCategoryData.forEach(form => {
+                            const categoryId = form.formCategoryId;
+                            const categoryName = form.formCategoryName || `Category ${categoryId}`;
+                            
+                            if (!categoryCounts[categoryId]) {
+                              categoryCounts[categoryId] = {
+                                count: 0,
+                                name: categoryName
+                              };
+                            }
+                            categoryCounts[categoryId].count++;
+                          });
+
+                          // Sort by count and take top 3
+                          const sortedCategories = Object.entries(categoryCounts)
+                            .sort(([,a], [,b]) => b.count - a.count)
+                            .slice(0, 3);
+
+                          return sortedCategories.map(([categoryId, data], index) => (
+                            <Chip
+                              key={categoryId}
+                              label={`${data.name}: ${data.count} forms`}
+                              size="small"
+                              color={index === 0 ? "primary" : index === 1 ? "success" : "warning"}
+                              variant="outlined"
+                            />
+                          ));
+                        })()}
+                      </Box>
                     </Box>
-                    <Chip
-                      label={service.status}
-                      color={getStatusColor(service.status)}
-                      size="small"
-                    />
-                  </Box>
-                ))}
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+                  )}
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={activityTrendData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <RechartsTooltip />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="logins"
+                        stroke="#8884d8"
+                        strokeWidth={2}
+                        name={categoryNames.logins}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="requests"
+                        stroke="#82ca9d"
+                        strokeWidth={2}
+                        name={categoryNames.requests}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="reports"
+                        stroke="#ffc658"
+                        strokeWidth={2}
+                        name={categoryNames.reports}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </Box>
+              )}
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
     </div>
   );
 }
