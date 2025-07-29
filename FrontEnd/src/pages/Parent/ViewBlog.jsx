@@ -71,10 +71,7 @@ function ViewBlog() {
     setShowModal(true);
   };
 
-  const getCategoryName = category => {
-    const cat = categories.find(c => c.id === category);
-    return cat ? cat.name : category;
-  };
+
 
   // Statistics
   const stats = {
@@ -966,24 +963,9 @@ function ViewBlog() {
                       color: '#2f5148',
                     }}
                   >
-                    <VaccinesIcon
-                      sx={{ color: '#97a19b', fontSize: '1.2rem' }}
-                    />
-                    <span style={{ fontWeight: 500, fontSize: '0.9rem' }}>
-                      Danh mục:
-                    </span>
-                    <span
-                      style={{
-                        fontWeight: 600,
-                        fontSize: '0.9rem',
-                        padding: '4px 12px',
-                        background: 'rgba(115, 173, 103, 0.1)',
-                        color: '#2f5148',
-                        borderRadius: '12px',
-                      }}
-                    >
-                      {getCategoryName(selectedBlog.category)}
-                    </span>
+                    
+                    
+                  
                   </div>
 
                   <div

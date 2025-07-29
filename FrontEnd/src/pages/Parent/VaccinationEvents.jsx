@@ -866,21 +866,21 @@ function VaccinationEvents() {
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                    gap: '15px',
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    gap: '20px',
                   }}
                 >
                   <div
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      padding: '12px 15px',
+                      padding: '15px 20px',
                       background: theme
                         ? isDarkMode
                           ? '#333333'
                           : '#f8f9fa'
                         : '#f8f9fa',
-                      borderRadius: '10px',
+                      borderRadius: '12px',
                       border: theme
                         ? `1px solid ${theme.border}`
                         : '1px solid #e9ecef',
@@ -890,7 +890,7 @@ function VaccinationEvents() {
                       style={{
                         color: theme ? theme.textSecondary : '#97a19b',
                         fontFamily: 'Satoshi, sans-serif',
-                        fontSize: '0.9rem',
+                        fontSize: '1rem',
                         fontWeight: 500,
                       }}
                     >
@@ -900,7 +900,7 @@ function VaccinationEvents() {
                       style={{
                         color: theme ? theme.textPrimary : '#2f5148',
                         fontFamily: 'Satoshi, sans-serif',
-                        fontSize: '0.9rem',
+                        fontSize: '1rem',
                         fontWeight: 600,
                       }}
                     >
@@ -912,13 +912,13 @@ function VaccinationEvents() {
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      padding: '12px 15px',
+                      padding: '15px 20px',
                       background: theme
                         ? isDarkMode
                           ? '#333333'
                           : '#f8f9fa'
                         : '#f8f9fa',
-                      borderRadius: '10px',
+                      borderRadius: '12px',
                       border: theme
                         ? `1px solid ${theme.border}`
                         : '1px solid #e9ecef',
@@ -928,45 +928,7 @@ function VaccinationEvents() {
                       style={{
                         color: theme ? theme.textSecondary : '#97a19b',
                         fontFamily: 'Satoshi, sans-serif',
-                        fontSize: '0.9rem',
-                        fontWeight: 500,
-                      }}
-                    >
-                      Vaccine:
-                    </span>
-                    <span
-                      style={{
-                        color: theme ? theme.textPrimary : '#2f5148',
-                        fontFamily: 'Satoshi, sans-serif',
-                        fontSize: '0.9rem',
-                        fontWeight: 600,
-                      }}
-                    >
-                      {selectedEvent.vaccineName}
-                    </span>
-                  </div>
-
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      padding: '12px 15px',
-                      background: theme
-                        ? isDarkMode
-                          ? '#333333'
-                          : '#f8f9fa'
-                        : '#f8f9fa',
-                      borderRadius: '10px',
-                      border: theme
-                        ? `1px solid ${theme.border}`
-                        : '1px solid #e9ecef',
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: theme ? theme.textSecondary : '#97a19b',
-                        fontFamily: 'Satoshi, sans-serif',
-                        fontSize: '0.9rem',
+                        fontSize: '1rem',
                         fontWeight: 500,
                       }}
                     >
@@ -976,7 +938,7 @@ function VaccinationEvents() {
                       style={{
                         color: theme ? theme.textPrimary : '#2f5148',
                         fontFamily: 'Satoshi, sans-serif',
-                        fontSize: '0.9rem',
+                        fontSize: '1rem',
                         fontWeight: 600,
                       }}
                     >
@@ -988,13 +950,13 @@ function VaccinationEvents() {
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      padding: '12px 15px',
+                      padding: '15px 20px',
                       background: theme
                         ? isDarkMode
                           ? '#333333'
                           : '#f8f9fa'
                         : '#f8f9fa',
-                      borderRadius: '10px',
+                      borderRadius: '12px',
                       border: theme
                         ? `1px solid ${theme.border}`
                         : '1px solid #e9ecef',
@@ -1004,45 +966,7 @@ function VaccinationEvents() {
                       style={{
                         color: theme ? theme.textSecondary : '#97a19b',
                         fontFamily: 'Satoshi, sans-serif',
-                        fontSize: '0.9rem',
-                        fontWeight: 500,
-                      }}
-                    >
-                      Giờ tiêm:
-                    </span>
-                    <span
-                      style={{
-                        color: theme ? theme.textPrimary : '#2f5148',
-                        fontFamily: 'Satoshi, sans-serif',
-                        fontSize: '0.9rem',
-                        fontWeight: 600,
-                      }}
-                    >
-                      {selectedEvent.eventTime || 'Chưa có'}
-                    </span>
-                  </div>
-
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      padding: '12px 15px',
-                      background: theme
-                        ? isDarkMode
-                          ? '#333333'
-                          : '#f8f9fa'
-                        : '#f8f9fa',
-                      borderRadius: '10px',
-                      border: theme
-                        ? `1px solid ${theme.border}`
-                        : '1px solid #e9ecef',
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: theme ? theme.textSecondary : '#97a19b',
-                        fontFamily: 'Satoshi, sans-serif',
-                        fontSize: '0.9rem',
+                        fontSize: '1rem',
                         fontWeight: 500,
                       }}
                     >
@@ -1052,7 +976,7 @@ function VaccinationEvents() {
                       style={{
                         color: theme ? theme.textPrimary : '#2f5148',
                         fontFamily: 'Satoshi, sans-serif',
-                        fontSize: '0.9rem',
+                        fontSize: '1rem',
                         fontWeight: 600,
                       }}
                     >
@@ -1064,13 +988,13 @@ function VaccinationEvents() {
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      padding: '12px 15px',
+                      padding: '15px 20px',
                       background: theme
                         ? isDarkMode
                           ? '#333333'
                           : '#f8f9fa'
                         : '#f8f9fa',
-                      borderRadius: '10px',
+                      borderRadius: '12px',
                       border: theme
                         ? `1px solid ${theme.border}`
                         : '1px solid #e9ecef',
@@ -1080,7 +1004,7 @@ function VaccinationEvents() {
                       style={{
                         color: theme ? theme.textSecondary : '#97a19b',
                         fontFamily: 'Satoshi, sans-serif',
-                        fontSize: '0.9rem',
+                        fontSize: '1rem',
                         fontWeight: 500,
                       }}
                     >
@@ -1090,10 +1014,10 @@ function VaccinationEvents() {
                       style={{
                         background: getStatusColor(selectedEvent).background,
                         color: getStatusColor(selectedEvent).color,
-                        padding: '4px 12px',
-                        borderRadius: '15px',
-                        fontSize: '0.8rem',
-                        fontWeight: 500,
+                        padding: '6px 15px',
+                        borderRadius: '20px',
+                        fontSize: '0.9rem',
+                        fontWeight: 600,
                         fontFamily: 'Satoshi, sans-serif',
                       }}
                     >

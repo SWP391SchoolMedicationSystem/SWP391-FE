@@ -332,7 +332,6 @@ const ParentNotifications = () => {
                   <th>Loại</th>
                   <th>Nội dung</th>
                   <th>Ngày tạo</th>
-                  <th>Người tạo</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
@@ -372,9 +371,6 @@ const ParentNotifications = () => {
                       {new Date(notification.createdAt).toLocaleDateString(
                         'vi-VN'
                       )}
-                    </td>
-                    <td className="creator-cell">
-                      {notification.createdBy || 'Hệ thống'}
                     </td>
                     <td className="action-cell">
                       <button
