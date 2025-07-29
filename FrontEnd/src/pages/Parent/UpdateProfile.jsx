@@ -128,16 +128,50 @@ export default function UpdateProfile() {
     }
   };
 
-  // Function to get email from JWT token
+  // Function to get email from userInfo
   const getEmailFromToken = () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) return null;
+      console.log('🔍 Getting email from userInfo:', userInfo);
 
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.Email || payload.email || null;
+      // First try to get email from userInfo
+      if (userInfo && userInfo.email) {
+        console.log('✅ Found email in userInfo:', userInfo.email);
+        return userInfo.email;
+      }
+
+      // Fallback: try to get from localStorage userInfo
+      const storedUserInfo = localStorage.getItem('userInfo');
+      console.log('🔍 Stored userInfo:', storedUserInfo);
+
+      if (storedUserInfo) {
+        const parsedInfo = JSON.parse(storedUserInfo);
+        console.log('🔍 Parsed userInfo:', parsedInfo);
+
+        if (parsedInfo.email) {
+          console.log('✅ Found email in localStorage:', parsedInfo.email);
+          return parsedInfo.email;
+        }
+      }
+
+      // Last fallback: try to decode JWT token
+      const token = localStorage.getItem('token');
+      console.log('🔍 Token exists:', !!token);
+
+      if (token) {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log('🔍 JWT payload:', payload);
+
+        const email = payload.Email || payload.email;
+        if (email) {
+          console.log('✅ Found email in JWT:', email);
+          return email;
+        }
+      }
+
+      console.log('❌ No email found in any source');
+      return null;
     } catch (error) {
-      console.error('Error decoding token:', error);
+      console.error('Error getting email:', error);
       return null;
     }
   };
@@ -177,13 +211,15 @@ export default function UpdateProfile() {
       // Validate current password
       if (!passwordData.currentPassword) {
         setPasswordError('Vui lòng nhập mật khẩu hiện tại');
+        setPasswordLoading(false);
         return;
       }
 
-      // Get email from token
+      // Get email from userInfo
       const email = getEmailFromToken();
       if (!email) {
         setPasswordError('Không thể xác định email từ thông tin đăng nhập');
+        setPasswordLoading(false);
         return;
       }
 
@@ -217,18 +253,18 @@ export default function UpdateProfile() {
       setCurrentPasswordVerified(false);
 
       // Handle different types of errors
-      if (error.response?.status === 401) {
-        setPasswordError('Mật khẩu hiện tại không đúng');
+      if (error.message && error.message.includes('Mật khẩu sai')) {
+        setPasswordError('Mật khẩu sai');
+      } else if (error.response?.status === 401) {
+        setPasswordError('Mật khẩu sai');
       } else if (error.response?.status === 400) {
         setPasswordError('Thông tin đăng nhập không hợp lệ');
       } else if (error.response?.status === 404) {
         setPasswordError('Không tìm thấy tài khoản');
+      } else if (error.response?.status === 500) {
+        setPasswordError('Lỗi server, vui lòng thử lại sau');
       } else {
-        setPasswordError(
-          error.message ||
-            error.response?.data?.message ||
-            'Có lỗi xảy ra khi xác minh mật khẩu'
-        );
+        setPasswordError('Mật khẩu sai');
       }
     } finally {
       setPasswordLoading(false);
@@ -246,23 +282,34 @@ export default function UpdateProfile() {
       // Validate passwords
       if (!passwordData.newPassword || !passwordData.confirmPassword) {
         setPasswordError('Vui lòng nhập đầy đủ thông tin mật khẩu');
+        setPasswordLoading(false);
         return;
       }
 
       if (passwordData.newPassword !== passwordData.confirmPassword) {
         setPasswordError('Mật khẩu xác nhận không khớp');
+        setPasswordLoading(false);
         return;
       }
 
       if (passwordData.newPassword.length < 6) {
         setPasswordError('Mật khẩu phải có ít nhất 6 ký tự');
+        setPasswordLoading(false);
         return;
       }
 
-      // Get email from token
+      // Validate that new password is not the same as current password
+      if (passwordData.newPassword === passwordData.currentPassword) {
+        setPasswordError('Mật khẩu mới không được trùng với mật khẩu hiện tại');
+        setPasswordLoading(false);
+        return;
+      }
+
+      // Get email from userInfo
       const email = getEmailFromToken();
       if (!email) {
         setPasswordError('Không thể xác định email từ thông tin đăng nhập');
+        setPasswordLoading(false);
         return;
       }
 
