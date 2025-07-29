@@ -32,6 +32,11 @@ const Notifications = () => {
   // Gọi API khi component mount
   useEffect(() => {
     fetchNotifications();
+
+    // Reset notification count when entering notifications page
+    if (window.updateNurseNotificationCount) {
+      window.updateNurseNotificationCount.reset();
+    }
   }, [fetchNotifications]);
 
   // Mock data for fallback - cập nhật theo cấu trúc API thực tế
@@ -241,9 +246,9 @@ const Notifications = () => {
           console.log('🔗 SignalR connected for Nurse notifications');
           setConnectionStatus('Connected');
 
-          // Listen for staff notifications
+          // Listen for general notifications
           signalRConnection.on('ReceiveNotification', notification => {
-            console.log('📢 New staff notification:', notification);
+            console.log('📢 General notification:', notification);
 
             const newNotification = {
               id: Date.now(),
@@ -258,6 +263,11 @@ const Notifications = () => {
             };
 
             setRealTimeNotifications(prev => [newNotification, ...prev]);
+
+            // Update notification count in layout
+            if (window.updateNurseNotificationCount) {
+              window.updateNurseNotificationCount.increment();
+            }
 
             // Show browser notification
             if (Notification.permission === 'granted') {
@@ -293,6 +303,11 @@ const Notifications = () => {
             };
 
             setRealTimeNotifications(prev => [newNotification, ...prev]);
+
+            // Update notification count in layout
+            if (window.updateNurseNotificationCount) {
+              window.updateNurseNotificationCount.increment();
+            }
 
             // Show browser notification
             if (Notification.permission === 'granted') {
