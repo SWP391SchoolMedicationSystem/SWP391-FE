@@ -14,7 +14,7 @@ const AccountManagement = () => {
     fullname: '',
     email: '',
     phone: '',
-    password: 'Password123@',
+    password: 'Password123',
     roleID: 1,
   });
 
@@ -67,7 +67,7 @@ const AccountManagement = () => {
       fullname: '',
       email: '',
       phone: '',
-      password: 'Password123@',
+      password: 'Password123',
       roleID: 1,
     });
     setShowCreateModal(true);
@@ -103,7 +103,7 @@ const AccountManagement = () => {
         fullname: '',
         email: '',
         phone: '',
-        password: 'Password123@',
+        password: 'Password123',
         roleID: 1,
       });
       fetchStaff();
