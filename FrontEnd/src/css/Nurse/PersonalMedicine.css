@@ -573,6 +573,12 @@
 .edit-modal {
   max-width: 600px;
   width: 95%;
+  display: block !important;
+}
+
+.edit-modal .modal-body {
+  display: block !important;
+  flex-direction: column !important;
 }
 
 .confirm-modal {
@@ -593,6 +599,11 @@
   margin: 0;
   color: #2c3e50;
   font-size: 1.4rem;
+}
+
+.modal-header h3::before {
+  display: none !important;
+  content: none !important;
 }
 
 .close-btn {
@@ -664,6 +675,8 @@
   padding-top: 24px;
   border-top: 2px solid #f0f2f5;
 }
+
+
 
 .action-btn:disabled {
   opacity: 0.6;

@@ -165,6 +165,12 @@
   vertical-align: middle;
 }
 
+/* Ensure status column has enough width */
+.requests-table td:nth-child(6) {
+  min-width: 120px;
+  white-space: nowrap;
+}
+
 .requests-table tbody tr:hover {
   background: rgba(115, 173, 103, 0.05);
 }
@@ -207,12 +213,18 @@
 
 /* Status and Category Badges */
 .status-badge {
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-size: 1rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap !important;
+  display: inline-block;
+  min-width: fit-content;
+  width: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .status-pending {
@@ -234,12 +246,18 @@
 }
 
 .category-badge {
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-size: 1rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap !important;
+  display: inline-block;
+  min-width: fit-content;
+  width: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .category-leave {
