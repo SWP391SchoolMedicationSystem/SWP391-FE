@@ -199,38 +199,6 @@ export default function ParentLayout() {
     return displayName.charAt(0).toUpperCase();
   };
 
-  // Fetch notification count
-  const fetchNotificationCount = async () => {
-    try {
-      const response = await fetch(
-        'https://api-schoolhealth.purintech.id.vn/api/Notification/getNotiForParent',
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        if (data && Array.isArray(data)) {
-          // Chỉ đếm những thông báo mới (background xanh lá - isNew = true)
-          const newCount = data.filter(
-            notification =>
-              notification.isNew === true || notification.isNew === 'true'
-          ).length;
-          setNotificationCount(newCount);
-          localStorage.setItem('notificationCount', newCount.toString());
-        }
-      } else {
-        console.error('Error fetching notification count:', response.status);
-      }
-    } catch (error) {
-      console.error('Error fetching notification count:', error);
-    }
-  };
-
   useEffect(() => {
     fetchNotificationCount();
     // Set up interval to refresh notification count every 30 seconds

@@ -12,7 +12,6 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-  Badge,
 } from '@mui/material';
 import {
   People,
@@ -171,52 +170,7 @@ export default function NurseLayout() {
     return displayName.charAt(0).toUpperCase();
   };
 
-  // Fetch notification count
-  const fetchNotificationCount = async () => {
-    try {
-      const response = await fetch(
-        'https://api-schoolhealth.purintech.id.vn/api/Notification/getNotiForStaff',
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        if (data && Array.isArray(data)) {
-          // Đếm thông báo mới: isNew = true hoặc thông báo trong 24h gần đây
-          const newCount = data.filter(notification => {
-            // Kiểm tra isNew = true
-            if (notification.isNew === true || notification.isNew === 'true') {
-              return true;
-            }
 
-            // Kiểm tra thông báo trong 24h gần đây (nếu không có isNew)
-            if (notification.createdAt || notification.createdDate) {
-              const createdDate = new Date(
-                notification.createdAt || notification.createdDate
-              );
-              const now = new Date();
-              const hoursDiff = (now - createdDate) / (1000 * 60 * 60);
-              return hoursDiff <= 24; // Thông báo trong 24h gần đây
-            }
-
-            return false;
-          }).length;
-
-          setNotificationCount(newCount);
-          localStorage.setItem('notificationCount', newCount.toString());
-        }
-      } else {
-        console.error('Error fetching notification count:', response.status);
-      }
-    } catch (error) {
-      console.error('Error fetching notification count:', error);
-    }
-  };
 
   // Function to increment notification count (called when new notification arrives)
   const incrementNotificationCount = () => {
