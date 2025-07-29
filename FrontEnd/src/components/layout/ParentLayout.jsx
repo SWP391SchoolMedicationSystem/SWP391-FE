@@ -16,6 +16,7 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  Avatar,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -25,6 +26,7 @@ import {
   Notifications,
   DarkMode,
   LightMode,
+  Logout,
 } from '@mui/icons-material';
 import userService from '../../services/userService';
 import { parentNotificationService } from '../../services/parentService';
