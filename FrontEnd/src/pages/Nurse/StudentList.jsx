@@ -9,6 +9,7 @@ import ClassIcon from '@mui/icons-material/Class';
 import BloodtypeIcon from '@mui/icons-material/Bloodtype';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
+import ContactEmergencyIcon from '@mui/icons-material/ContactEmergency';
 import CloseIcon from '@mui/icons-material/Close';
 import InfoIcon from '@mui/icons-material/Info';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
@@ -137,7 +138,6 @@ function StudentList() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterClass, setFilterClass] = useState('');
-  const [filterHealthStatus, setFilterHealthStatus] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [currentStudent, setCurrentStudent] = useState(null);
 
@@ -148,13 +148,6 @@ function StudentList() {
     { value: 'Lá 1', label: 'Lá 1' },
     { value: 'Lá 2', label: 'Lá 2' },
     { value: 'Lá 3', label: 'Lá 3' },
-  ];
-
-  const healthStatuses = [
-    { value: '', label: 'Tất cả sức khỏe' },
-    { value: 'Tốt', label: 'Tốt' },
-    { value: 'Bình thường', label: 'Bình thường' },
-    { value: 'Yếu', label: 'Yếu' },
   ];
 
   const studentData = students || mockStudents;
@@ -169,10 +162,8 @@ function StudentList() {
         student.parentName.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesClass =
       filterClass === '' || student.className === filterClass;
-    const matchesHealthStatus =
-      filterHealthStatus === '' || student.healthStatus === filterHealthStatus;
 
-    return matchesSearch && matchesClass && matchesHealthStatus;
+    return matchesSearch && matchesClass;
   });
 
   const handleViewStudent = student => {
@@ -236,17 +227,6 @@ function StudentList() {
               {classes.map(classOption => (
                 <option key={classOption.value} value={classOption.value}>
                   {classOption.label}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={filterHealthStatus}
-              onChange={e => setFilterHealthStatus(e.target.value)}
-            >
-              {healthStatuses.map(status => (
-                <option key={status.value} value={status.value}>
-                  {status.label}
                 </option>
               ))}
             </select>
@@ -1016,7 +996,7 @@ function StudentList() {
                     }}
                   >
                     <FamilyRestroomIcon sx={{ fontSize: '1rem' }} />
-                    Phụ huynh:
+                    Tên phụ huynh:
                   </span>
                   <span
                     style={{
@@ -1026,7 +1006,42 @@ function StudentList() {
                       fontWeight: 600,
                     }}
                   >
-                    {currentStudent.parentName}
+                    {currentStudent.parentName || 'Chưa có thông tin'}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '12px 15px',
+                    background: '#f8f9fa',
+                    borderRadius: '10px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <span
+                    style={{
+                      color: '#97a19b',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <ContactEmergencyIcon sx={{ fontSize: '1rem' }} />
+                    Số điện thoại:
+                  </span>
+                  <span
+                    style={{
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {currentStudent.parentPhone || 'Chưa có thông tin'}
                   </span>
                 </div>
               </div>

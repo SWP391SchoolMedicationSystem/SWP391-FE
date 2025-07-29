@@ -44,6 +44,14 @@ import {
   Email,
   Phone,
   Visibility,
+  Info,
+  Close,
+  Cake,
+  Wc,
+  Class,
+  Bloodtype,
+  HealthAndSafety,
+  FamilyRestroom,
 } from '@mui/icons-material';
 
 import '../../css/Admin/StudentManagement.css';
@@ -377,13 +385,6 @@ const StudentManagement = () => {
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
           className="search-input"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
-          }}
         />
         <TextField
           select
@@ -485,7 +486,7 @@ const StudentManagement = () => {
                         size="small"
                       />
                     </TableCell>
-                    <TableCell>
+                                        <TableCell>
                       <div className="action-buttons">
                         <IconButton
                           onClick={() => handleViewStudent(student)}
@@ -553,100 +554,686 @@ const StudentManagement = () => {
       </Modal>
 
       {/* Student Detail Modal */}
-      <Modal
-        open={showDetailModal}
-        onClose={() => setShowDetailModal(false)}
-        className="detail-modal"
-      >
-        <Dialog
-          open={showDetailModal}
-          onClose={() => setShowDetailModal(false)}
-          maxWidth="md"
-          fullWidth
+      {showDetailModal && selectedStudent && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px',
+          }}
+          onClick={() => setShowDetailModal(false)}
         >
-          <DialogTitle>
-            <div className="modal-header">
-              <Person className="modal-icon" />
-              <span>Thông Tin Chi Tiết Học Sinh</span>
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '20px',
+              width: '100%',
+              maxWidth: '900px',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              border: '1px solid #c1cbc2',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(20px)',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '25px',
+                borderBottom: '1px solid #e9ecef',
+                background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                color: 'white',
+                borderRadius: '20px 20px 0 0',
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  color: 'white',
+                  fontFamily:
+                    "Satoshi, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+                  fontSize: '1.5rem',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+              >
+                <Info sx={{ color: 'white', fontSize: '1.5rem' }} />
+                Thông Tin Chi Tiết Học Sinh
+              </h3>
+              <button
+                onClick={() => setShowDetailModal(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  border: 'none',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: '1.5rem',
+                  padding: '8px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.3s ease',
+                  backdropFilter: 'blur(10px)',
+                }}
+              >
+                <Close sx={{ fontSize: '1.5rem' }} />
+              </button>
             </div>
-          </DialogTitle>
-          <DialogContent>
-            {selectedStudent && (
-              <div className="student-detail-content">
-                <div className="detail-section">
-                  <Typography variant="h6" className="section-title">
-                    <School />
-                    Thông tin học sinh
-                  </Typography>
-                  <div className="detail-grid">
-                    <div className="detail-item">
-                      <label>Mã học sinh:</label>
-                      <span>{selectedStudent.studentCode}</span>
+
+            {/* Modal Body */}
+            <div style={{ padding: '30px' }}>
+              {/* Student Name Header */}
+              <div
+                style={{
+                  background:
+                    'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+                  padding: '20px',
+                  borderRadius: '15px',
+                  marginBottom: '25px',
+                  textAlign: 'center',
+                  border: '1px solid #e9ecef',
+                }}
+              >
+                <h4
+                  style={{
+                    margin: 0,
+                    color: '#2f5148',
+                    fontFamily: 'Satoshi, sans-serif',
+                    fontSize: '1.8rem',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '10px',
+                  }}
+                >
+                  <Person sx={{ color: '#97a19b', fontSize: '1.8rem' }} />
+                  {selectedStudent.fullname}
+                </h4>
+                <p
+                  style={{
+                    margin: '8px 0 0 0',
+                    color: '#97a19b',
+                    fontFamily: 'Satoshi, sans-serif',
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  Mã học sinh: {selectedStudent.studentCode}
+                </p>
+              </div>
+
+              {/* Student Details Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+                  gap: '20px',
+                }}
+              >
+                {/* Basic Information */}
+                <div
+                  style={{
+                    background: '#f8f9fa',
+                    padding: '20px',
+                    borderRadius: '15px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <h5
+                    style={{
+                      margin: '0 0 20px 0',
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '1.2rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <Person sx={{ color: '#97a19b', fontSize: '1.2rem' }} />
+                    Thông tin cơ bản
+                  </h5>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '15px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 15px',
+                        background: 'white',
+                        borderRadius: '10px',
+                        border: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <Cake sx={{ color: '#97a19b', fontSize: '1.1rem' }} />
+                        <span
+                          style={{
+                            color: '#97a19b',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Ngày sinh:
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          color: '#2f5148',
+                          fontFamily: 'Satoshi, sans-serif',
+                          fontSize: '0.9rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {selectedStudent.dob}
+                      </span>
                     </div>
-                    <div className="detail-item">
-                      <label>Họ và tên:</label>
-                      <span>{selectedStudent.fullname}</span>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 15px',
+                        background: 'white',
+                        borderRadius: '10px',
+                        border: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <Wc sx={{ color: '#97a19b', fontSize: '1.1rem' }} />
+                        <span
+                          style={{
+                            color: '#97a19b',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Giới tính:
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          color: '#2f5148',
+                          fontFamily: 'Satoshi, sans-serif',
+                          fontSize: '0.9rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {selectedStudent.gender ? 'Nam' : 'Nữ'}
+                      </span>
                     </div>
-                    <div className="detail-item">
-                      <label>Tuổi:</label>
-                      <span>{selectedStudent.age}</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Giới tính:</label>
-                      <span>{selectedStudent.gender ? 'Nam' : 'Nữ'}</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Ngày sinh:</label>
-                      <span>{selectedStudent.dob}</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Nhóm máu:</label>
-                      <span>{selectedStudent.bloodType || 'N/A'}</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Lớp:</label>
-                      <span>{selectedStudent.classname || selectedStudent.className || 'N/A'}</span>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 15px',
+                        background: 'white',
+                        borderRadius: '10px',
+                        border: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <Bloodtype sx={{ color: '#97a19b', fontSize: '1.1rem' }} />
+                        <span
+                          style={{
+                            color: '#97a19b',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Nhóm máu:
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          color: '#2f5148',
+                          fontFamily: 'Satoshi, sans-serif',
+                          fontSize: '0.9rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {selectedStudent.bloodType || 'N/A'}
+                      </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="detail-section">
-                  <Typography variant="h6" className="section-title">
-                    <Person />
-                    Thông tin phụ huynh
-                  </Typography>
-                  <div className="detail-grid">
-                    <div className="detail-item">
-                      <label>Tên phụ huynh:</label>
-                      <span>{selectedStudent.parent?.fullname || 'N/A'}</span>
+                {/* School Information */}
+                <div
+                  style={{
+                    background: '#f8f9fa',
+                    padding: '20px',
+                    borderRadius: '15px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <h5
+                    style={{
+                      margin: '0 0 20px 0',
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '1.2rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <School sx={{ color: '#97a19b', fontSize: '1.2rem' }} />
+                    Thông tin học tập
+                  </h5>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '15px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 15px',
+                        background: 'white',
+                        borderRadius: '10px',
+                        border: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <Class sx={{ color: '#97a19b', fontSize: '1.1rem' }} />
+                        <span
+                          style={{
+                            color: '#97a19b',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Lớp:
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          color: '#2f5148',
+                          fontFamily: 'Satoshi, sans-serif',
+                          fontSize: '0.9rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {selectedStudent.classname || selectedStudent.className || 'N/A'}
+                      </span>
                     </div>
-                    <div className="detail-item">
-                      <label>Email:</label>
-                      <span>{selectedStudent.parent?.email || 'N/A'}</span>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 15px',
+                        background: 'white',
+                        borderRadius: '10px',
+                        border: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <FamilyRestroom sx={{ color: '#97a19b', fontSize: '1.1rem' }} />
+                        <span
+                          style={{
+                            color: '#97a19b',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Tên phụ huynh:
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          color: '#2f5148',
+                          fontFamily: 'Satoshi, sans-serif',
+                          fontSize: '0.9rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {selectedStudent.parent?.fullname || 'N/A'}
+                      </span>
                     </div>
-                    <div className="detail-item">
-                      <label>Số điện thoại:</label>
-                      <span>{selectedStudent.parent?.phone || 'N/A'}</span>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 15px',
+                        background: 'white',
+                        borderRadius: '10px',
+                        border: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <Phone sx={{ color: '#97a19b', fontSize: '1.1rem' }} />
+                        <span
+                          style={{
+                            color: '#97a19b',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Số điện thoại:
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          color: '#2f5148',
+                          fontFamily: 'Satoshi, sans-serif',
+                          fontSize: '0.9rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {selectedStudent.parent?.phone || 'N/A'}
+                      </span>
                     </div>
-                    <div className="detail-item">
-                      <label>Địa chỉ:</label>
-                      <span>{selectedStudent.parent?.address || 'N/A'}</span>
+                  </div>
+                </div>
+
+                {/* Health Information */}
+                <div
+                  style={{
+                    background: '#f8f9fa',
+                    padding: '20px',
+                    borderRadius: '15px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <h5
+                    style={{
+                      margin: '0 0 20px 0',
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '1.2rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <HealthAndSafety sx={{ color: '#97a19b', fontSize: '1.2rem' }} />
+                    Thông tin sức khỏe
+                  </h5>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '15px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 15px',
+                        background: 'white',
+                        borderRadius: '10px',
+                        border: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <HealthAndSafety sx={{ color: '#97a19b', fontSize: '1.1rem' }} />
+                        <span
+                          style={{
+                            color: '#97a19b',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Tình trạng sức khỏe:
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          color: '#2f5148',
+                          fontFamily: 'Satoshi, sans-serif',
+                          fontSize: '0.9rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        Bình thường
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact Information */}
+                <div
+                  style={{
+                    background: '#f8f9fa',
+                    padding: '20px',
+                    borderRadius: '15px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <h5
+                    style={{
+                      margin: '0 0 20px 0',
+                      color: '#2f5148',
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontSize: '1.2rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <Email sx={{ color: '#97a19b', fontSize: '1.2rem' }} />
+                    Thông tin liên hệ
+                  </h5>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '15px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 15px',
+                        background: 'white',
+                        borderRadius: '10px',
+                        border: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <Email sx={{ color: '#97a19b', fontSize: '1.1rem' }} />
+                        <span
+                          style={{
+                            color: '#97a19b',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Email:
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          color: '#2f5148',
+                          fontFamily: 'Satoshi, sans-serif',
+                          fontSize: '0.9rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {selectedStudent.parent?.email || 'N/A'}
+                      </span>
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 15px',
+                        background: 'white',
+                        borderRadius: '10px',
+                        border: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <Info sx={{ color: '#97a19b', fontSize: '1.1rem' }} />
+                        <span
+                          style={{
+                            color: '#97a19b',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Địa chỉ:
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          color: '#2f5148',
+                          fontFamily: 'Satoshi, sans-serif',
+                          fontSize: '0.9rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {selectedStudent.parent?.address || 'N/A'}
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={() => setShowDetailModal(false)}
-              variant="outlined"
+            </div>
+
+            {/* Modal Footer */}
+            <div
+              style={{
+                padding: '20px 25px',
+                borderTop: '1px solid #e9ecef',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                gap: '15px',
+              }}
             >
-              Đóng
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Modal>
+              <button
+                onClick={() => setShowDetailModal(false)}
+                style={{
+                  background: '#bfefa1',
+                  color: '#1a3a2e',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  fontFamily: 'Satoshi, sans-serif',
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Import Modal */}
       <Modal

@@ -402,9 +402,13 @@ export const managerNotificationService = {
   // Get notifications for staff
   getStaffNotifications: async () => {
     try {
+      console.log('🌐 Calling Manager API:', API_ENDPOINTS.NOTIFICATION.GET_FOR_STAFF);
+      
       const response = await apiClient.get(
         API_ENDPOINTS.NOTIFICATION.GET_FOR_STAFF
       );
+
+      console.log('📥 Raw Manager API Response:', response);
 
       // Xử lý các trường hợp khác nhau của response
       let dataToProcess = response;
@@ -416,31 +420,44 @@ export const managerNotificationService = {
       ) {
         if (response.data) {
           dataToProcess = response.data;
+          console.log('📊 Using response.data');
         } else if (response.result) {
           dataToProcess = response.result;
+          console.log('📊 Using response.result');
         } else {
-          return [];
+          console.log('📊 Using response directly');
         }
       }
 
       if (Array.isArray(dataToProcess)) {
-        return dataToProcess.map(notification => ({
-          notificationId: notification.notificationId,
-          title: notification.title,
-          createdAt: notification.createdAt,
-          type: notification.type,
-          isDeleted: notification.isDeleted,
-          createdby: notification.createdby,
-          notificationParentDetails:
-            notification.notificationParentDetails || [],
-          notificationstaffdetails: notification.notificationstaffdetails || [],
-          targetType: 'staff',
-        }));
+        console.log('📋 Processing array of manager notifications:', dataToProcess.length);
+        
+        const processedData = dataToProcess.map(notification => {
+          const processedNotification = {
+            notificationId: notification.notificationId,
+            title: notification.title,
+            createdAt: notification.createdAt,
+            type: notification.type,
+            isDeleted: notification.isDeleted,
+            createdby: notification.createdby,
+            notificationParentDetails:
+              notification.notificationParentDetails || [],
+            notificationstaffdetails: notification.notificationstaffdetails || [],
+            targetType: 'staff',
+          };
+
+          console.log('📝 Processed manager notification:', processedNotification);
+          return processedNotification;
+        });
+
+        console.log('✅ Final processed manager data:', processedData);
+        return processedData;
       }
 
+      console.log('⚠️ Manager response is not an array, returning empty array');
       return [];
     } catch (error) {
-      console.error('Error getting staff notifications:', error);
+      console.error('❌ Error getting manager notifications:', error);
       throw error;
     }
   },

@@ -113,9 +113,13 @@ export const parentNotificationService = {
   // Get notifications for parent
   getNotifications: async () => {
     try {
+      console.log('🌐 Calling Parent API:', API_ENDPOINTS.NOTIFICATION.GET_FOR_PARENT);
+      
       const response = await apiClient.get(
         API_ENDPOINTS.NOTIFICATION.GET_FOR_PARENT
       );
+
+      console.log('📥 Raw Parent API Response:', response);
 
       // Xử lý các trường hợp khác nhau của response
       let dataToProcess = response;
@@ -127,22 +131,26 @@ export const parentNotificationService = {
       ) {
         if (response.data) {
           dataToProcess = response.data;
+          console.log('📊 Using response.data');
         } else if (response.result) {
           dataToProcess = response.result;
+          console.log('📊 Using response.result');
         } else {
-          return [];
+          console.log('📊 Using response directly');
         }
       }
 
       if (Array.isArray(dataToProcess)) {
-        return dataToProcess.map(notification => {
+        console.log('📋 Processing array of parent notifications:', dataToProcess.length);
+        
+        const processedData = dataToProcess.map(notification => {
           // Lấy thông tin chi tiết cho parent hiện tại (giả sử parentId = 1 cho Parent)
           const currentParentDetail =
             notification.notificationParentDetails?.find(
               detail => detail.parentId === 1
             ) || notification.notificationParentDetails?.[0];
 
-          return {
+          const processedNotification = {
             notificationId: notification.notificationId,
             title: notification.title,
             createdAt: notification.createdAt,
@@ -158,12 +166,19 @@ export const parentNotificationService = {
             isRead: currentParentDetail?.isRead || false,
             targetType: 'parent',
           };
+
+          console.log('📝 Processed parent notification:', processedNotification);
+          return processedNotification;
         });
+
+        console.log('✅ Final processed parent data:', processedData);
+        return processedData;
       }
 
+      console.log('⚠️ Parent response is not an array, returning empty array');
       return [];
     } catch (error) {
-      console.error('Error getting parent notifications:', error);
+      console.error('❌ Error getting parent notifications:', error);
       throw error;
     }
   },

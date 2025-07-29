@@ -334,9 +334,13 @@ export const nurseNotificationService = {
   // Get notifications for staff
   getNotifications: async () => {
     try {
+      console.log('🌐 Calling API:', API_ENDPOINTS.NOTIFICATION.GET_FOR_STAFF);
+      
       const response = await apiClient.get(
         API_ENDPOINTS.NOTIFICATION.GET_FOR_STAFF
       );
+
+      console.log('📥 Raw API Response:', response);
 
       // Xử lý các trường hợp khác nhau của response
       let dataToProcess = response;
@@ -349,15 +353,19 @@ export const nurseNotificationService = {
       ) {
         if (response.data) {
           dataToProcess = response.data;
+          console.log('📊 Using response.data');
         } else if (response.result) {
           dataToProcess = response.result;
+          console.log('📊 Using response.result');
         } else {
-          return [];
+          console.log('📊 Using response directly');
         }
       }
 
       // Xử lý dữ liệu từ API để phù hợp với UI
       if (Array.isArray(dataToProcess)) {
+        console.log('📋 Processing array of notifications:', dataToProcess.length);
+        
         const processedData = dataToProcess.map(notification => {
           // Lấy thông tin chi tiết cho staff hiện tại (giả sử staffid = 3 cho Nurse)
           const currentStaffDetail =
@@ -365,7 +373,7 @@ export const nurseNotificationService = {
               detail => detail.staffid === 3
             ) || notification.notificationstaffdetails?.[0];
 
-          return {
+          const processedNotification = {
             notificationId: notification.notificationId,
             title: notification.title,
             createdAt: notification.createdAt,
@@ -381,14 +389,19 @@ export const nurseNotificationService = {
             isRead: currentStaffDetail?.isRead || false,
             targetType: 'staff',
           };
+
+          console.log('📝 Processed notification:', processedNotification);
+          return processedNotification;
         });
 
+        console.log('✅ Final processed data:', processedData);
         return processedData;
       } else {
+        console.log('⚠️ Response is not an array, returning empty array');
         return [];
       }
     } catch (error) {
-      console.error('Error getting nurse notifications:', error);
+      console.error('❌ Error getting nurse notifications:', error);
       throw error;
     }
   },

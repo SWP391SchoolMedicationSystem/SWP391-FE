@@ -1197,7 +1197,7 @@ function StudentList() {
                             fontWeight: 500,
                           }}
                         >
-                          ID phụ huynh:
+                          Tên phụ huynh:
                         </span>
                       </div>
                       <span
@@ -1208,7 +1208,51 @@ function StudentList() {
                           fontWeight: 600,
                         }}
                       >
-                        {currentStudent.parentId}
+                        {currentStudent.parentName || currentStudent.parent?.fullname || 'Chưa có thông tin'}
+                      </span>
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 15px',
+                        background: 'white',
+                        borderRadius: '10px',
+                        border: '1px solid #e9ecef',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <ContactEmergencyIcon
+                          sx={{ color: '#97a19b', fontSize: '1.1rem' }}
+                        />
+                        <span
+                          style={{
+                            color: '#97a19b',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Số điện thoại:
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          color: '#2f5148',
+                          fontFamily: 'Satoshi, sans-serif',
+                          fontSize: '0.9rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {currentStudent.parentPhone || currentStudent.parent?.phone || 'Chưa có thông tin'}
                       </span>
                     </div>
                   </div>

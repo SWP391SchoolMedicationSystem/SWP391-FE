@@ -605,42 +605,6 @@ const ParentNotifications = () => {
                       )}
                     </span>
                   </div>
-
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      padding: '12px 15px',
-                      background: 'white',
-                      borderRadius: '10px',
-                      border: '1px solid #e9ecef',
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: '#97a19b',
-                        fontFamily: 'Satoshi, sans-serif',
-                        fontSize: '0.9rem',
-                        fontWeight: 500,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                      }}
-                    >
-                      <PersonIcon sx={{ color: '#97a19b', fontSize: '1rem' }} />
-                      Người tạo:
-                    </span>
-                    <span
-                      style={{
-                        color: '#2f5148',
-                        fontFamily: 'Satoshi, sans-serif',
-                        fontSize: '0.9rem',
-                        fontWeight: 600,
-                      }}
-                    >
-                      {selectedNotification.createdBy}
-                    </span>
-                  </div>
                 </div>
               </div>
 

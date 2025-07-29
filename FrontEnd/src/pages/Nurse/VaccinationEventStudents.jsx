@@ -30,6 +30,7 @@ function VaccinationEventStudents() {
   // Filter states
   const [statusFilter, setStatusFilter] = useState('all');
   const [classFilter, setClassFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Fetch data on component mount
   useEffect(() => {
@@ -102,7 +103,7 @@ function VaccinationEventStudents() {
       setParentResponses(responses);
     } catch (error) {
       console.error('Error fetching parent responses:', error);
-      // Don't set error for parent responses as it's supplementary data
+      // Don't set error here as it's not critical
     }
   };
 
@@ -112,7 +113,7 @@ function VaccinationEventStudents() {
     setShowDetailModal(true);
   };
 
-  // Filter students based on status and class
+  // Filter students based on status, class, and search term
   const filteredStudents = combinedData.filter(student => {
     const statusMatch =
       statusFilter === 'all' ||
@@ -121,7 +122,11 @@ function VaccinationEventStudents() {
       (statusFilter === 'declined' && student.willAttend === false);
     const classMatch =
       classFilter === 'all' || student.className === classFilter;
-    return statusMatch && classMatch;
+    const searchMatch =
+      searchTerm === '' ||
+      student.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.studentName?.toLowerCase().includes(searchTerm.toLowerCase());
+    return statusMatch && classMatch && searchMatch;
   });
 
   // Get unique classes for filter
@@ -252,17 +257,14 @@ function VaccinationEventStudents() {
       {/* Filters */}
       <div className="filters-section">
         <div className="filter-group">
-          <label>Trạng thái:</label>
-          <select
-            value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">Tất cả</option>
-            <option value="pending">Chưa phản hồi</option>
-            <option value="confirmed">Đồng ý</option>
-            <option value="declined">Từ chối</option>
-          </select>
+          <label>Tìm kiếm học sinh:</label>
+          <input
+            type="text"
+            placeholder="Nhập tên học sinh..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
         </div>
         <div className="filter-group">
           <label>Lớp học:</label>
@@ -277,6 +279,19 @@ function VaccinationEventStudents() {
                 {className}
               </option>
             ))}
+          </select>
+        </div>
+        <div className="filter-group">
+          <label>Trạng thái:</label>
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            className="filter-select"
+          >
+            <option value="all">Tất cả</option>
+            <option value="pending">Chưa phản hồi</option>
+            <option value="confirmed">Đồng ý</option>
+            <option value="declined">Từ chối</option>
           </select>
         </div>
       </div>

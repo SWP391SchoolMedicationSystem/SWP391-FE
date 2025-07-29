@@ -5,7 +5,7 @@ import {
   Typography,
   Avatar,
   IconButton,
-  InputBase,
+  Badge,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -29,6 +29,7 @@ import {
   LightMode,
 } from '@mui/icons-material';
 import userService from '../../services/userService';
+import { nurseNotificationService } from '../../services/nurseService';
 import MedlearnLogo from '../../assets/images/Medlearn-logo.png';
 
 const drawerWidth = 280;
@@ -91,6 +92,8 @@ export default function NurseLayout() {
   const [userInfo, setUserInfo] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [notificationLoading, setNotificationLoading] = useState(false);
 
   useEffect(() => {
     // Lấy thông tin user từ localStorage
@@ -109,7 +112,32 @@ export default function NurseLayout() {
     if (storedTheme) {
       setIsDarkMode(storedTheme === 'dark');
     }
+
+    // Fetch notification count
+    fetchNotificationCount();
   }, []);
+
+  // Fetch notification count
+  const fetchNotificationCount = async () => {
+    try {
+      setNotificationLoading(true);
+      console.log('🔔 Fetching notifications from API...');
+      
+      const notifications = await nurseNotificationService.getNotifications();
+      console.log('📨 API Response:', notifications);
+      
+      // Đếm số thông báo chưa đọc
+      const unreadCount = notifications.filter(notification => !notification.isRead).length;
+      console.log('🔢 Unread notifications count:', unreadCount);
+      
+      setNotificationCount(unreadCount);
+    } catch (error) {
+      console.error('❌ Error fetching notification count:', error);
+      setNotificationCount(0);
+    } finally {
+      setNotificationLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     userService.logout();
@@ -443,56 +471,47 @@ export default function NurseLayout() {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            {/* Search Bar */}
-            <Box
+
+            <Badge
+              badgeContent={notificationLoading ? '...' : notificationCount}
+              color="error"
+              invisible={notificationCount === 0 && !notificationLoading}
               sx={{
-                position: 'relative',
-                width: 300,
-                background: currentTheme.iconButton,
-                backdropFilter: 'blur(15px)',
-                border: `1px solid ${currentTheme.border}`,
-                borderRadius: '12px',
-                '&:hover': {
-                  background: currentTheme.iconButtonHover,
+                '& .MuiBadge-badge': {
+                  fontSize: '10px',
+                  height: '18px',
+                  minWidth: '18px',
+                  borderRadius: '9px',
+                  background: notificationLoading 
+                    ? 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)'
+                    : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                  color: 'white',
+                  fontWeight: 600,
+                  boxShadow: '0 2px 8px rgba(239, 68, 68, 0.4)',
                 },
               }}
             >
-              <InputBase
-                placeholder="Tìm kiếm học sinh, thuốc, etc."
+              <IconButton
+                onClick={() => navigate('/nurse/notifications')}
                 sx={{
-                  pl: 2,
-                  pr: 2,
-                  py: 0.5,
-                  width: '100%',
+                  width: 40,
+                  height: 40,
+                  background: currentTheme.iconButton,
+                  backdropFilter: 'blur(15px)',
+                  border: `1px solid ${currentTheme.border}`,
                   color: currentTheme.textSecondary,
-                  '& ::placeholder': {
-                    color: currentTheme.textSecondary,
-                    opacity: 0.7,
+                  borderRadius: '12px',
+                  '&:hover': {
+                    background: currentTheme.iconButtonHover,
+                    color: currentTheme.textPrimary,
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
                   },
                 }}
-              />
-            </Box>
-
-            <IconButton
-              onClick={() => navigate('/nurse/notifications')}
-              sx={{
-                width: 40,
-                height: 40,
-                background: currentTheme.iconButton,
-                backdropFilter: 'blur(15px)',
-                border: `1px solid ${currentTheme.border}`,
-                color: currentTheme.textSecondary,
-                borderRadius: '12px',
-                '&:hover': {
-                  background: currentTheme.iconButtonHover,
-                  color: currentTheme.textPrimary,
-                  transform: 'translateY(-1px)',
-                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-                },
-              }}
-            >
-              <Notifications />
-            </IconButton>
+              >
+                <Notifications />
+              </IconButton>
+            </Badge>
 
             {/* Dark Mode Toggle */}
             <IconButton

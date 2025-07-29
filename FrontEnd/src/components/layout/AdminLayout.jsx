@@ -6,7 +6,6 @@ import {
   SupervisorAccount,
   Logout,
   AdminPanelSettings,
-  Search,
   DarkMode,
   LightMode,
   School,
@@ -344,25 +343,7 @@ export default function AdminLayout() {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <IconButton
-              sx={{
-                width: 40,
-                height: 40,
-                background: currentTheme.iconButton,
-                backdropFilter: 'blur(15px)',
-                border: `1px solid ${currentTheme.border}`,
-                color: currentTheme.textSecondary,
-                borderRadius: '12px',
-                '&:hover': {
-                  background: currentTheme.iconButtonHover,
-                  color: currentTheme.textPrimary,
-                  transform: 'translateY(-1px)',
-                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-                },
-              }}
-            >
-              <Search />
-            </IconButton>
+
 
             {/* Dark Mode Toggle */}
             <IconButton
