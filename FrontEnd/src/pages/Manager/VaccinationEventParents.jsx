@@ -304,12 +304,30 @@ function VaccinationEventParents() {
             </div>
 
             <form onSubmit={handleSubmitSendEmail} className="modal-body">
+              <div className="email-info">
+                <h4>Gửi email cho phụ huynh</h4>
+                <p>
+                  <strong>👨‍👩‍👧‍👦 Phụ huynh:</strong> {selectedParent.parentName}
+                </p>
+                <p>
+                  <strong>📧 Email:</strong> {selectedParent.parentEmail}
+                </p>
+                <p>
+                  <strong>📱 Số điện thoại:</strong>{' '}
+                  {selectedParent.parentPhone}
+                </p>
+                <p>
+                  <strong>🎯 Gửi cho:</strong> Tất cả học sinh của phụ huynh này
+                </p>
+              </div>
+
               <div className="form-group">
-                <label>Template Email:</label>
+                <label>Chọn Template Email *</label>
                 <select
                   name="emailTemplateId"
                   value={emailFormData.emailTemplateId}
                   onChange={handleEmailInputChange}
+                  required
                   className="template-select"
                 >
                   {emailTemplateOptions.map(template => (
@@ -323,38 +341,42 @@ function VaccinationEventParents() {
                     </option>
                   ))}
                 </select>
+                <small>Chọn template phù hợp cho thông báo</small>
               </div>
 
               <div className="form-group">
-                <label>Tin nhắn tùy chỉnh:</label>
+                <label>Tin nhắn tùy chỉnh</label>
                 <textarea
                   name="customMessage"
                   value={emailFormData.customMessage}
                   onChange={handleEmailInputChange}
-                  placeholder="Nhập tin nhắn tùy chỉnh (tùy chọn)"
-                  className="custom-message-input"
+                  placeholder="Nhập tin nhắn bổ sung cho phụ huynh..."
                   rows="4"
                 />
               </div>
 
-              <div className="recipient-info">
-                <h4>📋 Thông tin người nhận:</h4>
+              <div className="email-preview">
+                <h5>📋 Thông tin gửi:</h5>
                 <p>
-                  <strong>Phụ huynh:</strong> {selectedParent.parentName}
+                  <strong>Sự kiện:</strong> {event?.title} (ID: {eventId})
                 </p>
                 <p>
-                  <strong>Email:</strong> {selectedParent.parentEmail}
+                  <strong>Đối tượng:</strong> {selectedParent.parentName} (
+                  {selectedParent.parentEmail})
                 </p>
                 <p>
-                  <strong>Gửi cho:</strong> Tất cả học sinh của phụ huynh này
+                  <strong>Template:</strong> ID {emailFormData.emailTemplateId}
+                </p>
+                <p>
+                  <strong>Phạm vi:</strong> Tất cả học sinh của phụ huynh này
                 </p>
               </div>
 
               <div className="modal-footer">
                 <button
                   type="button"
-                  className="cancel-btn"
                   onClick={() => setShowEmailModal(false)}
+                  className="cancel-btn"
                 >
                   Hủy
                 </button>
