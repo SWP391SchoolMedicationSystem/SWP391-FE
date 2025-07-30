@@ -773,7 +773,9 @@ export const nurseFormService = {
       attachmentFile: apiForm.attachmentFile,
       fileName: apiForm.fileName,
       filePath: apiForm.filePath,
-      fileUrl: apiForm.fileUrl
+      fileUrl: apiForm.fileUrl,
+      createdDate: apiForm.createdDate,
+      createdDateType: typeof apiForm.createdDate
     });
     
     return {
@@ -796,15 +798,23 @@ export const nurseFormService = {
       isDeleted: apiForm.isDeleted || false,
       status: statusInfo.text,
       statusClass: statusInfo.class,
-      createdDate: apiForm.createdDate
-        ? new Date(apiForm.createdDate).toLocaleDateString('vi-VN', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-          })
-        : 'Chưa có ngày',
+      createdDate: (() => {
+        if (!apiForm.createdDate) return 'Chưa có ngày';
+        const formattedDate = new Date(apiForm.createdDate).toLocaleDateString('vi-VN', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: 'Asia/Ho_Chi_Minh'
+        });
+        console.log('🔍 Date formatting:', {
+          original: apiForm.createdDate,
+          formatted: formattedDate,
+          dateObject: new Date(apiForm.createdDate)
+        });
+        return formattedDate;
+      })(),
       modifiedDate: apiForm.modifiedDate
         ? new Date(apiForm.modifiedDate).toLocaleDateString('vi-VN', {
             year: 'numeric',
@@ -812,6 +822,7 @@ export const nurseFormService = {
             day: '2-digit',
             hour: '2-digit',
             minute: '2-digit',
+            timeZone: 'Asia/Ho_Chi_Minh'
           })
         : null,
       createdBy: apiForm.createdBy || 'Hệ thống',
