@@ -113,6 +113,18 @@ export const adminEmailService = {
     }
   },
 
+  // Delete email template
+  deleteEmailTemplate: async (templateId) => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.EMAIL.DELETE_TEMPLATE, templateId);
+      const response = await apiClient.delete(url);
+      return response;
+    } catch (error) {
+      console.error("Error deleting email template:", error);
+      throw error;
+    }
+  },
+
   // Send single email
   sendEmail: async (emailData) => {
     try {

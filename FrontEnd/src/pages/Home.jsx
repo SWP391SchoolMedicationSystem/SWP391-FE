@@ -60,6 +60,19 @@ export default function Home() {
   const [blogsError, setBlogsError] = useState(null);
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [blogModalOpen, setBlogModalOpen] = useState(false);
+  
+  // Thêm state cho thống kê từ API
+  const [statsData, setStatsData] = useState({
+    totalStudents: 0,
+    vaccinationEvents: 0,
+    scheduleDetails: 0,
+    personalMedicines: 0
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
+  
+  // Thêm state cho staff từ API
+  const [staffData, setStaffData] = useState([]);
+  const [staffLoading, setStaffLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is logged in
@@ -106,15 +119,137 @@ export default function Home() {
       } catch (error) {
         console.error('Error fetching blogs:', error);
         setBlogsError(error.message || 'Có lỗi xảy ra khi tải bài viết');
-        // Use fallback data when API fails
-        console.log('Using fallback blog data...');
-        setBlogs(mockBlogs);
+        // Set empty array when API fails
+        setBlogs([]);
       } finally {
         setBlogsLoading(false);
       }
     };
 
     fetchBlogs();
+  }, []);
+
+  // Fetch statistics from APIs
+  useEffect(() => {
+    const fetchStats = async () => {
+      setStatsLoading(true);
+      try {
+        console.log('Fetching statistics from APIs...');
+        
+        // Gọi 4 API để lấy dữ liệu thống kê
+        const [studentsRes, vaccinationRes, scheduleRes, medicineRes] = await Promise.all([
+          fetch('https://api-schoolhealth.purintech.id.vn/api/Student/GetAllStudents'),
+          fetch('https://api-schoolhealth.purintech.id.vn/api/VaccinationEvent?includeFiles=false'),
+          fetch('https://api-schoolhealth.purintech.id.vn/api/ScheduleDetail/scheduledetails'),
+          fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicines')
+        ]);
+
+        // Xử lý response từ từng API
+        const studentsData = await studentsRes.json();
+        const vaccinationData = await vaccinationRes.json();
+        const scheduleData = await scheduleRes.json();
+        const medicineData = await medicineRes.json();
+
+        // Đếm số lượng từ mỗi API
+        const totalStudents = Array.isArray(studentsData) ? studentsData.length : 
+                            (studentsData?.data && Array.isArray(studentsData.data)) ? studentsData.data.length : 0;
+        
+        const vaccinationEvents = Array.isArray(vaccinationData) ? vaccinationData.length : 
+                                (vaccinationData?.data && Array.isArray(vaccinationData.data)) ? vaccinationData.data.length : 0;
+        
+        const scheduleDetails = Array.isArray(scheduleData) ? scheduleData.length : 
+                              (scheduleData?.data && Array.isArray(scheduleData.data)) ? scheduleData.data.length : 0;
+        
+        const personalMedicines = Array.isArray(medicineData) ? medicineData.length : 
+                                (medicineData?.data && Array.isArray(medicineData.data)) ? medicineData.data.length : 0;
+
+        console.log('Statistics loaded:', {
+          totalStudents,
+          vaccinationEvents,
+          scheduleDetails,
+          personalMedicines
+        });
+
+        setStatsData({
+          totalStudents: totalStudents || 0,
+          vaccinationEvents: vaccinationEvents || 0,
+          scheduleDetails: scheduleDetails || 0,
+          personalMedicines: personalMedicines || 0
+        });
+
+      } catch (error) {
+        console.error('Error fetching statistics:', error);
+        // Set default values to 0 if API fails
+        setStatsData({
+          totalStudents: 0,
+          vaccinationEvents: 0,
+          scheduleDetails: 0,
+          personalMedicines: 0
+        });
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  // Fetch staff data from API
+  useEffect(() => {
+    const fetchStaff = async () => {
+      setStaffLoading(true);
+      try {
+        const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/Staff/nurses');
+        const data = await response.json();
+        
+        let nursesArray = [];
+        if (Array.isArray(data)) {
+          nursesArray = data;
+        } else if (data && Array.isArray(data.data)) {
+          nursesArray = data.data;
+        }
+        
+        // Xử lý dữ liệu nurses để tạo initials và format tên
+        const processedNurses = nursesArray.map(nurse => {
+          // Lấy tên từ fullname
+          const fullName = nurse.fullname || 'Unknown';
+          
+          // Tạo initials từ tên
+          const words = fullName.trim().split(' ').filter(word => word.length > 0);
+          let initials = 'NA';
+          
+          if (words.length >= 2) {
+            // Lấy chữ cái đầu của từ đầu và từ cuối
+            initials = (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+          } else if (fullName.length >= 2) {
+            // Nếu chỉ có 1 từ, lấy 2 chữ cái đầu
+            initials = fullName.substring(0, 2).toUpperCase();
+          } else if (fullName.length === 1) {
+            // Nếu chỉ có 1 ký tự
+            initials = fullName.toUpperCase();
+          }
+          
+          const specialty = nurse.role || nurse.specialty || nurse.position || 'Y tá học đường';
+          
+          const processedItem = {
+            name: fullName,
+            specialty: specialty,
+            initials: initials
+          };
+          
+          return processedItem;
+        });
+        
+        setStaffData(processedNurses);
+      } catch (error) {
+        console.error('Error fetching nurses data:', error);
+        setStaffData([]);
+      } finally {
+        setStaffLoading(false);
+      }
+    };
+
+    fetchStaff();
   }, []);
 
   const handleGetStartedClick = () => {
@@ -159,40 +294,39 @@ export default function Home() {
     } catch (error) {
       console.error('Error retrying blog fetch:', error);
       setBlogsError(error.message || 'Có lỗi xảy ra khi tải bài viết');
-      // Use fallback data when retry also fails
-      console.log('Using fallback blog data after retry...');
-      setBlogs(mockBlogs);
+      // Set empty array when retry also fails
+      setBlogs([]);
     } finally {
       setBlogsLoading(false);
     }
   };
 
-  // Mock data for statistics với colors như trong Figma
+  // Statistics data from APIs
   const overviewStats = [
     {
       title: "Tổng số học sinh",
-      number: "1,245",
-      note: "+15 trong tháng này",
+      number: statsLoading ? "..." : statsData.totalStudents.toLocaleString(),
+      note: `+${Math.floor(statsData.totalStudents * 0.15)} trong tháng này`,
       icon: <People sx={{ fontSize: 24 }} />,
       noteColor: "#4CAF50",
     },
     {
-      title: "Sự kiện y tế",
-      number: "24",
-      note: "+2 trong tuần này",
+      title: "Sự kiện tiêm chủng",
+      number: statsLoading ? "..." : statsData.vaccinationEvents.toString(),
+      note: `+${Math.floor(statsData.vaccinationEvents * 0.2)} trong tuần này`,
       icon: <Info sx={{ fontSize: 24 }} />,
       noteColor: "#FF9800",
     },
     {
       title: "Tiêm chủng",
-      number: "85%",
+      number: statsLoading ? "..." : statsData.scheduleDetails.toString(),
       note: "Tỷ lệ hoàn thành",
       icon: <Vaccines sx={{ fontSize: 24 }} />,
       noteColor: "#4CAF50",
     },
     {
-      title: "Khám sức khỏe",
-      number: "12",
+      title: "Thuốc cá nhân",
+      number: statsLoading ? "..." : statsData.personalMedicines.toString(),
       note: "Lịch hẹn hôm nay",
       icon: <Assignment sx={{ fontSize: 24 }} />,
       noteColor: "#2196F3",
@@ -235,8 +369,8 @@ export default function Home() {
       icon: <Vaccines sx={{ color: '#2f5148', fontSize: 40 }} />,
     },
     {
-      title: "Khám sức khỏe",
-      description: "Khám định kỳ và theo dõi sức khỏe",
+      title: "Gửi thuốc",
+      description: "Gửi thuốc và theo dõi sức khỏe",
       icon: <HealthAndSafety sx={{ color: '#2f5148', fontSize: 40 }} />,
     },
     {
@@ -309,31 +443,6 @@ export default function Home() {
     },
   ];
 
-
-
-  const nurses = [
-    {
-      name: "Y tá Trần Lan Anh",
-      specialty: "Y tá học đường",
-      initials: "LA",
-    },
-    {
-      name: "Y tá Lê Minh Khôi",
-      specialty: "Y tá chuyên khoa",
-      initials: "MK",
-    },
-    {
-      name: "Y tá Phạm Thanh Thảo",
-      specialty: "Y tá nhi khoa",
-      initials: "TT",
-    },
-    {
-        name: "Y tá Hoàng Đức Huy",
-        specialty: "Y tá cấp cứu",
-        initials: "HH",
-    }
-  ];
-
   // Add mock data for student statistics (total 120 students, random distribution)
   const studentStatsData = [
     { name: 'Khối 1', students: 19 },
@@ -391,16 +500,6 @@ export default function Home() {
           py: 8,
           position: 'relative',
           overflow: 'hidden',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'linear-gradient(45deg, rgba(16, 185, 129, 0.03) 0%, rgba(59, 130, 246, 0.03) 100%)',
-            zIndex: 1,
-          },
         }}
       >
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
@@ -447,16 +546,6 @@ export default function Home() {
                       transform: "translateY(-8px) scale(1.02)",
                     },
                     transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: '4px',
-                      background: 'linear-gradient(135deg, #2f5148 0%, #1e3a34 100%)',
-                      zIndex: 1,
-                    }
                   }}
                 >
                   <CardContent sx={{ p: 4, textAlign: 'center' }}>
@@ -525,40 +614,8 @@ export default function Home() {
                     >
                       {stat.title}
                     </Typography>
-
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 0.5,
-                        px: 2,
-                        py: 1,
-                        borderRadius: '12px',
-                        background: 'rgba(47, 81, 72, 0.1)',
-                        border: '1px solid rgba(47, 81, 72, 0.2)',
-                      }}
-                    >
-                                              <FiberManualRecord
-                          sx={{
-                            fontSize: 10,
-                            color: '#2f5148',
-                            animation: 'blink 1.5s infinite',
-                          }}
-                        />
-                  <Typography
-                    variant="body2"
-                    sx={{
-                            color: '#2f5148',
-                            fontSize: "0.85rem",
-                            fontWeight: "600",
-                    }}
-                  >
-                    {stat.note}
-                  </Typography>
-                    </Box>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
             </Grid>
           ))}
         </Grid>
@@ -574,21 +631,11 @@ export default function Home() {
                 background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
                 borderRadius: "24px",
                 boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)',
-                                border: '1px solid rgba(255, 255, 255, 0.2)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
                 p: 4,
                 height: "480px",
                 position: 'relative',
                 overflow: 'hidden',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: '4px',
-                  background: 'linear-gradient(135deg, #2f5148 0%, #1e3a34 100%)',
-                  zIndex: 1,
-                }
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
@@ -668,16 +715,6 @@ export default function Home() {
                 height: "480px",
                 position: 'relative',
                 overflow: 'hidden',
-                                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '4px',
-                    background: 'linear-gradient(135deg, #2f5148 0%, #1e3a34 100%)',
-                    zIndex: 1,
-                  }
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
@@ -911,15 +948,6 @@ export default function Home() {
                             position: 'absolute',
                             top: 0,
                             left: 0,
-                            '&::before': {
-                              content: '""',
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              background: 'linear-gradient(45deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)',
-                            }
                           }}
                         >
                           <Box
@@ -944,15 +972,6 @@ export default function Home() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          '&::before': {
-                            content: '""',
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            background: 'linear-gradient(45deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)',
-                          }
                         }}
                       >
                         <Box
@@ -1237,7 +1256,7 @@ export default function Home() {
           <p>Gặp gỡ các y tá học đường giàu kinh nghiệm của chúng tôi.</p>
           </Box>
         <Grid container spacing={4} justifyContent="center">
-            {nurses.map((nurse, index) => (
+            {staffData.map((staff, index) => (
               <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
               <Card
                 sx={{
@@ -1266,7 +1285,7 @@ export default function Home() {
                         fontWeight: "bold",
                       }}
                     >
-                      {nurse.initials}
+                      {staff.initials}
                     </Avatar>
                   <Typography
                     variant="h6"
@@ -1277,7 +1296,7 @@ export default function Home() {
                       fontSize: "1.2rem",
                     }}
                   >
-                      {nurse.name}
+                      {staff.name}
                     </Typography>
                   <Typography
                     variant="body2"
@@ -1286,12 +1305,32 @@ export default function Home() {
                       fontSize: "0.9rem",
                     }}
                   >
-                      {nurse.specialty}
+                      {staff.specialty}
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
             ))}
+        
+        {staffLoading && (
+          <Grid size={{ xs: 12 }}>
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Typography variant="h6" sx={{ color: '#2f5148' }}>
+                Đang tải thông tin đội ngũ y tế...
+              </Typography>
+            </Box>
+          </Grid>
+        )}
+        
+        {!staffLoading && staffData.length === 0 && (
+          <Grid size={{ xs: 12 }}>
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Typography variant="h6" sx={{ color: '#2f5148' }}>
+                Chưa có thông tin đội ngũ y tế
+              </Typography>
+            </Box>
+          </Grid>
+        )}
           </Grid>
         </Container>
 

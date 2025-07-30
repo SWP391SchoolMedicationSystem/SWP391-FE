@@ -136,10 +136,15 @@ const StudentManagement = () => {
       formData.append('file', importFile);
 
       const response = await fetch(
-        'https://api-schoolhealth.purintech.id.vn/api/Student/ImportStudents',
+        'https://api-schoolhealth.purintech.id.vn/api/Student/student',
         {
           method: 'POST',
           body: formData,
+          headers: {
+            // 'Content-Type': 'multipart/form-data',
+            'accept': '*/*',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
         }
       );
 

@@ -97,6 +97,7 @@ export const API_ENDPOINTS = {
     GET_TEMPLATES: '/Email/GetEmailAllTemplate', // Get email templates
     CREATE_TEMPLATE: '/Email/CreateEmailTemplate', // Admin create template
     UPDATE_TEMPLATE: '/Email/UpdateEmailTemplate', // Admin update template
+    DELETE_TEMPLATE: '/Email/DeleteEmailTemplate', // Admin delete template
   },
 
   // Health Record (6/6 - Full implementation)
