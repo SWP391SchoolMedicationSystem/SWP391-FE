@@ -111,11 +111,7 @@ export default function LoginForm() {
           navigate('/admin');
           break;
         default:
-          if (data.isStaff) {
-            navigate('/manager');
-          } else {
-            navigate('/home');
-          }
+          setError('Tài khoản google không tồn tại.');
           break;
       }
     } catch (err) {
@@ -123,19 +119,15 @@ export default function LoginForm() {
 
       if (err.response) {
         if (err.response.status >= 500) {
-          alert('Không thể kết nối đến server. Vui lòng thử lại sau.');
           setError('Lỗi server.');
         } else {
           const message =
             err.response.data?.message || 'Đăng nhập Google thất bại.';
-          alert(message);
           setError(message);
         }
       } else if (err.request) {
-        alert('Không thể kết nối đến server. Kiểm tra kết nối mạng.');
         setError('Không thể kết nối đến server.');
       } else {
-        alert('Đăng nhập Google thất bại. Vui lòng thử lại.');
         setError('Đăng nhập Google thất bại.');
       }
     } finally {
@@ -146,7 +138,6 @@ export default function LoginForm() {
   const handleGoogleLoginFailure = error => {
     setIsGoogleLoading(false);
     console.error('Google login failed:', error);
-    alert('Đăng nhập Google thất bại. Vui lòng thử lại.');
     setError('Đăng nhập Google thất bại.');
   };
 
@@ -208,29 +199,29 @@ export default function LoginForm() {
       // Handle specific error cases
       if (err.response?.status === 401) {
         // Wrong password/credentials
-        alert('Mật khẩu không đúng. Vui lòng kiểm tra lại.');
+        
         setError('Mật khẩu không đúng.');
       } else if (
         errorMessage.includes('Token') ||
         errorMessage.includes('token')
       ) {
         // JWT/Token validation errors
-        alert('Có lỗi xác thực. Vui lòng thử lại.');
+        
         setError('Lỗi xác thực.');
       } else if (
         errorMessage.includes('server') ||
         errorMessage.includes('Server')
       ) {
         // Server errors
-        alert('Không thể kết nối đến server. Vui lòng thử lại sau.');
+        
         setError('Lỗi kết nối server.');
       } else if (errorMessage.includes('Email không tồn tại')) {
         // Email not found
-        alert('Email không tồn tại trong hệ thống.');
+        
         setError('Email không tồn tại.');
       } else {
         // Other errors - use the message from userService
-        alert(errorMessage);
+        
         setError(errorMessage);
       }
 

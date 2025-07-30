@@ -100,9 +100,10 @@ export default function Home() {
       setBlogsLoading(true);
       setBlogsError(null);
       try {
-        console.log('Fetching blogs...');
-        const blogsData = await blogService.getAllBlogs();
-        console.log('Blog data received:', blogsData);
+        console.log('Fetching published blogs...');
+        const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/Blog/GetPublishedBlogs');
+        const blogsData = await response.json();
+        console.log('Published blog data received:', blogsData);
         
         // Check if data is array or has data property
         if (Array.isArray(blogsData)) {
@@ -117,7 +118,7 @@ export default function Home() {
           setBlogs([]);
         }
       } catch (error) {
-        console.error('Error fetching blogs:', error);
+        console.error('Error fetching published blogs:', error);
         setBlogsError(error.message || 'Có lỗi xảy ra khi tải bài viết');
         // Set empty array when API fails
         setBlogs([]);
@@ -137,17 +138,17 @@ export default function Home() {
         console.log('Fetching statistics from APIs...');
         
         // Gọi 4 API để lấy dữ liệu thống kê
-        const [studentsRes, vaccinationRes, scheduleRes, medicineRes] = await Promise.all([
+        const [studentsRes, vaccinationRes, formsRes, medicineRes] = await Promise.all([
           fetch('https://api-schoolhealth.purintech.id.vn/api/Student/GetAllStudents'),
           fetch('https://api-schoolhealth.purintech.id.vn/api/VaccinationEvent?includeFiles=false'),
-          fetch('https://api-schoolhealth.purintech.id.vn/api/ScheduleDetail/scheduledetails'),
+          fetch('https://api-schoolhealth.purintech.id.vn/api/Form'),
           fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicines')
         ]);
 
         // Xử lý response từ từng API
         const studentsData = await studentsRes.json();
         const vaccinationData = await vaccinationRes.json();
-        const scheduleData = await scheduleRes.json();
+        const formsData = await formsRes.json();
         const medicineData = await medicineRes.json();
 
         // Đếm số lượng từ mỗi API
@@ -157,8 +158,10 @@ export default function Home() {
         const vaccinationEvents = Array.isArray(vaccinationData) ? vaccinationData.length : 
                                 (vaccinationData?.data && Array.isArray(vaccinationData.data)) ? vaccinationData.data.length : 0;
         
-        const scheduleDetails = Array.isArray(scheduleData) ? scheduleData.length : 
-                              (scheduleData?.data && Array.isArray(scheduleData.data)) ? scheduleData.data.length : 0;
+        const totalForms = Array.isArray(formsData) ? 
+          formsData.filter(form => !form.isDeleted).length : 
+          (formsData?.data && Array.isArray(formsData.data)) ? 
+          formsData.data.filter(form => !form.isDeleted).length : 0;
         
         const personalMedicines = Array.isArray(medicineData) ? medicineData.length : 
                                 (medicineData?.data && Array.isArray(medicineData.data)) ? medicineData.data.length : 0;
@@ -166,14 +169,14 @@ export default function Home() {
         console.log('Statistics loaded:', {
           totalStudents,
           vaccinationEvents,
-          scheduleDetails,
+          totalForms,
           personalMedicines
         });
 
         setStatsData({
           totalStudents: totalStudents || 0,
           vaccinationEvents: vaccinationEvents || 0,
-          scheduleDetails: scheduleDetails || 0,
+          scheduleDetails: totalForms || 0,
           personalMedicines: personalMedicines || 0
         });
 
@@ -275,9 +278,10 @@ export default function Home() {
     setBlogsLoading(true);
     setBlogsError(null);
     try {
-      console.log('Retrying blog fetch...');
-      const blogsData = await blogService.getAllBlogs();
-      console.log('Blog data received:', blogsData);
+      console.log('Retrying published blog fetch...');
+      const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/Blog/GetPublishedBlogs');
+      const blogsData = await response.json();
+      console.log('Published blog data received:', blogsData);
       
       // Check if data is array or has data property
       if (Array.isArray(blogsData)) {
@@ -292,7 +296,7 @@ export default function Home() {
         setBlogs([]);
       }
     } catch (error) {
-      console.error('Error retrying blog fetch:', error);
+      console.error('Error retrying published blog fetch:', error);
       setBlogsError(error.message || 'Có lỗi xảy ra khi tải bài viết');
       // Set empty array when retry also fails
       setBlogs([]);
@@ -318,10 +322,10 @@ export default function Home() {
       noteColor: "#FF9800",
     },
     {
-      title: "Tiêm chủng",
+      title: "Yêu cầu hỗ trợ",
       number: statsLoading ? "..." : statsData.scheduleDetails.toString(),
-      note: "Tỷ lệ hoàn thành",
-      icon: <Vaccines sx={{ fontSize: 24 }} />,
+      note: "Tổng số yêu cầu",
+      icon: <Assignment sx={{ fontSize: 24 }} />,
       noteColor: "#4CAF50",
     },
     {
