@@ -1,14 +1,14 @@
 /* Manager Dashboard Styles - Modern & Beautiful Design */
-  .dashboard-container {
+.dashboard-container {
   padding: 24px;
   min-height: 100vh;
   background: linear-gradient(135deg, #f8faf9 0%, #f2f6f3 50%, #eef4f0 100%);
-  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   position: relative;
 }
 
 .dashboard-container::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -57,7 +57,7 @@
 }
 
 .dashboard-welcome::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -118,6 +118,7 @@
 
 /* Section Titles */
 .section-title {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 1.6rem;
   font-weight: 700;
   margin: 0 0 28px 0;
@@ -132,7 +133,7 @@
 }
 
 .section-title::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 0;
   top: 50%;
@@ -187,7 +188,7 @@
 }
 
 .stat-card::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -239,7 +240,7 @@
 }
 
 .stat-icon::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   border-radius: 16px;
@@ -378,7 +379,7 @@
 }
 
 .quick-action-card::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -423,7 +424,7 @@
 }
 
 .action-icon::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   border-radius: 18px;
@@ -517,7 +518,7 @@
 
 .recent-activities h3::before,
 .system-status h3::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 0;
   top: 50%;
@@ -549,7 +550,7 @@
 }
 
 .activity-item::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 0;
   top: 0;
@@ -590,7 +591,7 @@
 }
 
 .activity-icon::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   border-radius: 12px;
@@ -667,8 +668,12 @@
 }
 
 .status-indicator.offline {
-  background: #dc3545;
-  box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.2);
+  background: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+}
+
+.status-indicator.offline::before {
+  background: #dc2626;
 }
 
 @keyframes pulse {
@@ -693,6 +698,76 @@
   font-size: 0.9rem;
   font-weight: 500;
   color: #97a19b;
+}
+
+/* Loading States */
+.loading-stats,
+.loading-activities,
+.loading-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  border: 2px dashed rgba(115, 173, 103, 0.3);
+  animation: pulse 2s infinite;
+}
+
+.loading-stats p,
+.loading-activities p,
+.loading-status p {
+  font-size: 1.1rem;
+  color: #4a7065;
+  font-weight: 500;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* No Data States */
+.no-activities,
+.no-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 16px;
+  border: 2px solid rgba(115, 173, 103, 0.2);
+}
+
+.no-activities p,
+.no-status p {
+  font-size: 1rem;
+  color: #6b7280;
+  font-weight: 500;
+  margin: 0;
+  text-align: center;
+}
+
+/* Enhanced Loading Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.loading-stats,
+.loading-activities,
+.loading-status {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.8) 25%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.8) 75%
+  );
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
 }
 
 /* Responsive Design */

@@ -6,6 +6,7 @@ import {
   managerNotificationService,
   managerEmailService,
   managerAccountService,
+  managerDashboardService,
 } from '../../services/managerService';
 import { useState, useCallback } from 'react';
 
@@ -386,6 +387,105 @@ export const useManagerAccounts = () => {
   };
 };
 
+// Hook for dashboard statistics
+export const useManagerDashboard = () => {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchStats = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await managerDashboardService.getDashboardStats();
+      setStats(data);
+    } catch (err) {
+      console.error('Failed to fetch dashboard stats:', err);
+      setError('Failed to load dashboard statistics');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const refetch = useCallback(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  return {
+    data: stats,
+    loading,
+    error,
+    fetchStats,
+    refetch,
+  };
+};
+
+// Hook for recent activities
+export const useManagerRecentActivities = () => {
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchActivities = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await managerDashboardService.getRecentActivities();
+      setActivities(data);
+    } catch (err) {
+      console.error('Failed to fetch recent activities:', err);
+      setError('Failed to load recent activities');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const refetch = useCallback(() => {
+    fetchActivities();
+  }, [fetchActivities]);
+
+  return {
+    data: activities,
+    loading,
+    error,
+    fetchActivities,
+    refetch,
+  };
+};
+
+// Hook for system status
+export const useManagerSystemStatus = () => {
+  const [status, setStatus] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchStatus = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await managerDashboardService.getSystemStatus();
+      setStatus(data);
+    } catch (err) {
+      console.error('Failed to fetch system status:', err);
+      setError('Failed to load system status');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const refetch = useCallback(() => {
+    fetchStatus();
+  }, [fetchStatus]);
+
+  return {
+    data: status,
+    loading,
+    error,
+    fetchStatus,
+    refetch,
+  };
+};
+
 export default {
   useManagerBlogs,
   useManagerStudents,
@@ -394,4 +494,7 @@ export default {
   useParentAccounts,
   useManagerActions,
   useManagerAccounts,
+  useManagerDashboard,
+  useManagerRecentActivities,
+  useManagerSystemStatus,
 };

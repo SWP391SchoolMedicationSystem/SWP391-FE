@@ -402,8 +402,11 @@ export const managerNotificationService = {
   // Get notifications for staff
   getStaffNotifications: async () => {
     try {
-      console.log('🌐 Calling Manager API:', API_ENDPOINTS.NOTIFICATION.GET_FOR_STAFF);
-      
+      console.log(
+        '🌐 Calling Manager API:',
+        API_ENDPOINTS.NOTIFICATION.GET_FOR_STAFF
+      );
+
       const response = await apiClient.get(
         API_ENDPOINTS.NOTIFICATION.GET_FOR_STAFF
       );
@@ -430,8 +433,11 @@ export const managerNotificationService = {
       }
 
       if (Array.isArray(dataToProcess)) {
-        console.log('📋 Processing array of manager notifications:', dataToProcess.length);
-        
+        console.log(
+          '📋 Processing array of manager notifications:',
+          dataToProcess.length
+        );
+
         const processedData = dataToProcess.map(notification => {
           const processedNotification = {
             notificationId: notification.notificationId,
@@ -442,11 +448,15 @@ export const managerNotificationService = {
             createdby: notification.createdby,
             notificationParentDetails:
               notification.notificationParentDetails || [],
-            notificationstaffdetails: notification.notificationstaffdetails || [],
+            notificationstaffdetails:
+              notification.notificationstaffdetails || [],
             targetType: 'staff',
           };
 
-          console.log('📝 Processed manager notification:', processedNotification);
+          console.log(
+            '📝 Processed manager notification:',
+            processedNotification
+          );
           return processedNotification;
         });
 
@@ -759,6 +769,343 @@ export const managerHealthService = {
   },
 };
 
+// Manager Vaccination Services
+export const managerVaccinationService = {
+  // Get all vaccination events
+  getAllVaccinationEvents: async () => {
+    try {
+      const response = await apiClient.get(
+        API_ENDPOINTS.VACCINATION_EVENT.GET_ALL
+      );
+      return Array.isArray(response) ? response : [];
+    } catch (error) {
+      console.error('Error getting all vaccination events:', error);
+      throw error;
+    }
+  },
+
+  // Get upcoming vaccination events
+  getUpcomingVaccinationEvents: async () => {
+    try {
+      const response = await apiClient.get(
+        API_ENDPOINTS.VACCINATION_EVENT.GET_UPCOMING
+      );
+      return Array.isArray(response) ? response : [];
+    } catch (error) {
+      console.error('Error getting upcoming vaccination events:', error);
+      throw error;
+    }
+  },
+
+  // Create vaccination event
+  createVaccinationEvent: async eventData => {
+    try {
+      const response = await apiClient.post(
+        API_ENDPOINTS.VACCINATION_EVENT.CREATE,
+        eventData
+      );
+      return response;
+    } catch (error) {
+      console.error('Error creating vaccination event:', error);
+      throw error;
+    }
+  },
+
+  // Update vaccination event
+  updateVaccinationEvent: async eventData => {
+    try {
+      const response = await apiClient.put(
+        API_ENDPOINTS.VACCINATION_EVENT.UPDATE,
+        eventData
+      );
+      return response;
+    } catch (error) {
+      console.error('Error updating vaccination event:', error);
+      throw error;
+    }
+  },
+
+  // Delete vaccination event
+  deleteVaccinationEvent: async eventId => {
+    try {
+      const url = buildApiUrl(API_ENDPOINTS.VACCINATION_EVENT.DELETE, eventId);
+      const response = await apiClient.delete(url);
+      return response;
+    } catch (error) {
+      console.error('Error deleting vaccination event:', error);
+      throw error;
+    }
+  },
+
+  // Get vaccination event by ID
+  getVaccinationEventById: async eventId => {
+    try {
+      const url = buildApiUrl(
+        API_ENDPOINTS.VACCINATION_EVENT.GET_BY_ID,
+        eventId
+      );
+      const response = await apiClient.get(url);
+      return response;
+    } catch (error) {
+      console.error('Error getting vaccination event by ID:', error);
+      throw error;
+    }
+  },
+
+  // Send email to all parents for vaccination event
+  sendEmailToAllParents: async (eventId, emailData) => {
+    try {
+      const response = await apiClient.post(
+        `${API_ENDPOINTS.VACCINATION_EVENT.SEND_EMAIL_ALL}?eventId=${eventId}`,
+        emailData
+      );
+      return response;
+    } catch (error) {
+      console.error('Error sending email to all parents:', error);
+      throw error;
+    }
+  },
+};
+
+// Manager Dashboard Services
+export const managerDashboardService = {
+  // Get dashboard statistics
+  getDashboardStats: async () => {
+    try {
+      // Fetch all required data in parallel
+      const [
+        students,
+        parents,
+        staff,
+        blogs,
+        staffNotifications,
+        parentNotifications,
+      ] = await Promise.all([
+        apiClient.get(API_ENDPOINTS.STUDENT.GET_ALL),
+        apiClient.get(API_ENDPOINTS.PARENT.GET_ALL),
+        apiClient.get(API_ENDPOINTS.STAFF.GET_ALL),
+        apiClient.get(API_ENDPOINTS.BLOG.GET_ALL),
+        apiClient.get(API_ENDPOINTS.NOTIFICATION.GET_FOR_STAFF),
+        apiClient.get(API_ENDPOINTS.NOTIFICATION.GET_FOR_PARENT),
+      ]);
+
+      // Process students data
+      const totalStudents = Array.isArray(students) ? students.length : 0;
+      const maleStudents = Array.isArray(students)
+        ? students.filter(s => s.gender === true).length
+        : 0;
+      const femaleStudents = Array.isArray(students)
+        ? students.filter(s => s.gender === false).length
+        : 0;
+
+      // Group students by class
+      const studentsByClass = Array.isArray(students)
+        ? students.reduce((acc, student) => {
+            const className = student.classname || 'Chưa phân lớp';
+            acc[className] = (acc[className] || 0) + 1;
+            return acc;
+          }, {})
+        : {};
+
+      // Process blogs data
+      const totalBlogs = Array.isArray(blogs) ? blogs.length : 0;
+      const pendingBlogs = Array.isArray(blogs)
+        ? blogs.filter(b => b.status === 'pending').length
+        : 0;
+      const approvedBlogs = Array.isArray(blogs)
+        ? blogs.filter(b => b.status === 'Published').length
+        : 0;
+      const rejectedBlogs = Array.isArray(blogs)
+        ? blogs.filter(b => b.status === 'Rejected').length
+        : 0;
+
+      // Process notifications data
+      const totalStaffNotifications = Array.isArray(staffNotifications)
+        ? staffNotifications.length
+        : 0;
+      const totalParentNotifications = Array.isArray(parentNotifications)
+        ? parentNotifications.length
+        : 0;
+      const totalNotifications =
+        totalStaffNotifications + totalParentNotifications;
+
+      // Process parents and staff data
+      const totalParents = Array.isArray(parents) ? parents.length : 0;
+      const totalStaff = Array.isArray(staff) ? staff.length : 0;
+
+      return {
+        students: {
+          total: totalStudents,
+          male: maleStudents,
+          female: femaleStudents,
+          byClass: studentsByClass,
+        },
+        parents: {
+          total: totalParents,
+        },
+        staff: {
+          total: totalStaff,
+        },
+        blogs: {
+          total: totalBlogs,
+          pending: pendingBlogs,
+          approved: approvedBlogs,
+          rejected: rejectedBlogs,
+        },
+        notifications: {
+          total: totalNotifications,
+          staff: totalStaffNotifications,
+          parent: totalParentNotifications,
+        },
+      };
+    } catch (error) {
+      console.error('Error getting dashboard stats:', error);
+      throw error;
+    }
+  },
+
+  // Get recent activities
+  getRecentActivities: async () => {
+    try {
+      const [
+        blogs,
+        students,
+        staffNotifications,
+        parentNotifications,
+        vaccinationEvents,
+      ] = await Promise.all([
+        apiClient.get(API_ENDPOINTS.BLOG.GET_ALL),
+        apiClient.get(API_ENDPOINTS.STUDENT.GET_ALL),
+        apiClient.get(API_ENDPOINTS.NOTIFICATION.GET_FOR_STAFF),
+        apiClient.get(API_ENDPOINTS.NOTIFICATION.GET_FOR_PARENT),
+        apiClient.get(API_ENDPOINTS.VACCINATION_EVENT.GET_UPCOMING),
+      ]);
+
+      const activities = [];
+
+      // Add recent blogs
+      if (Array.isArray(blogs)) {
+        const recentBlogs = blogs
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 3);
+
+        recentBlogs.forEach(blog => {
+          activities.push({
+            type: 'blog',
+            message: `Bài viết mới: "${blog.title}"`,
+            time: new Date(blog.createdAt).toLocaleDateString('vi-VN'),
+            icon: '📝',
+            status: blog.status,
+          });
+        });
+      }
+
+      // Add recent students
+      if (Array.isArray(students)) {
+        const recentStudents = students
+          .filter(s => s.createdAt)
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 2);
+
+        recentStudents.forEach(student => {
+          activities.push({
+            type: 'student',
+            message: `Học sinh mới: ${student.fullname} (${
+              student.classname || 'Chưa phân lớp'
+            })`,
+            time: new Date(student.createdAt).toLocaleDateString('vi-VN'),
+            icon: '🎓',
+          });
+        });
+      }
+
+      // Add recent notifications
+      const allNotifications = [
+        ...(Array.isArray(staffNotifications)
+          ? staffNotifications.map(n => ({ ...n, target: 'staff' }))
+          : []),
+        ...(Array.isArray(parentNotifications)
+          ? parentNotifications.map(n => ({ ...n, target: 'parent' }))
+          : []),
+      ];
+
+      const recentNotifications = allNotifications
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 2);
+
+      recentNotifications.forEach(notification => {
+        activities.push({
+          type: 'notification',
+          message: `Thông báo mới: ${notification.title}`,
+          time: new Date(notification.createdAt).toLocaleDateString('vi-VN'),
+          icon: '🔔',
+          target: notification.target,
+        });
+      });
+
+      // Add upcoming vaccination events
+      if (Array.isArray(vaccinationEvents)) {
+        const upcomingEvents = vaccinationEvents
+          .filter(event => new Date(event.eventDate) > new Date())
+          .sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate))
+          .slice(0, 1);
+
+        upcomingEvents.forEach(event => {
+          activities.push({
+            type: 'vaccination',
+            message: `Sự kiện tiêm chủng sắp tới: ${
+              event.eventName || 'Tiêm chủng'
+            } - ${new Date(event.eventDate).toLocaleDateString('vi-VN')}`,
+            time: new Date(event.eventDate).toLocaleDateString('vi-VN'),
+            icon: '💉',
+          });
+        });
+      }
+
+      return activities
+        .sort((a, b) => new Date(b.time) - new Date(a.time))
+        .slice(0, 6);
+    } catch (error) {
+      console.error('Error getting recent activities:', error);
+      throw error;
+    }
+  },
+
+  // Get system status
+  getSystemStatus: async () => {
+    try {
+      // Test API endpoints health
+      const endpoints = [
+        { name: 'Cơ sở dữ liệu', endpoint: API_ENDPOINTS.STUDENT.GET_ALL },
+        { name: 'API Services', endpoint: API_ENDPOINTS.STAFF.GET_ALL },
+        { name: 'Email Service', endpoint: API_ENDPOINTS.EMAIL.GET_TEMPLATES },
+        { name: 'File Storage', endpoint: API_ENDPOINTS.BLOG.GET_ALL },
+      ];
+
+      const statusChecks = await Promise.allSettled(
+        endpoints.map(async ({ name, endpoint }) => {
+          try {
+            await apiClient.get(endpoint);
+            return { name, status: 'online' };
+          } catch (error) {
+            return { name, status: 'offline' };
+          }
+        })
+      );
+
+      return statusChecks.map(check => {
+        if (check.status === 'fulfilled') {
+          return check.value;
+        }
+        return { name: 'Unknown', status: 'offline' };
+      });
+    } catch (error) {
+      console.error('Error getting system status:', error);
+      throw error;
+    }
+  },
+};
+
 export default {
   managerBlogService,
   managerStudentService,
@@ -767,4 +1114,6 @@ export default {
   managerEmailService,
   managerAccountService,
   managerHealthService,
+  managerVaccinationService,
+  managerDashboardService,
 };
