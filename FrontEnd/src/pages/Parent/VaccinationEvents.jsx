@@ -460,270 +460,273 @@ function VaccinationEvents() {
               gap: '25px',
             }}
           >
-            {events.slice().reverse().map(event => (
-              <div
-                key={event.id}
-                style={{
-                  background: theme
-                    ? isDarkMode
-                      ? '#2a2a2a'
-                      : 'white'
-                    : 'white',
-                  borderRadius: '18px',
-                  overflow: 'hidden',
-                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-                  border: theme
-                    ? `1px solid ${theme.border}`
-                    : '1px solid #e9ecef',
-                  transition: 'all 0.3s ease',
-                  cursor: 'pointer',
-                }}
-              >
-                {/* Card Header */}
+            {events
+              .slice()
+              .reverse()
+              .map(event => (
                 <div
+                  key={event.id}
                   style={{
-                    padding: '20px 25px',
-                    borderBottom: theme
+                    background: theme
+                      ? isDarkMode
+                        ? '#2a2a2a'
+                        : 'white'
+                      : 'white',
+                    borderRadius: '18px',
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+                    border: theme
                       ? `1px solid ${theme.border}`
                       : '1px solid #e9ecef',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
                   }}
                 >
-                  <h3
-                    style={{
-                      margin: '0 0 15px 0',
-                      color: theme ? theme.textPrimary : '#2f5148',
-                      fontFamily: 'Satoshi, sans-serif',
-                      fontSize: '1.3rem',
-                      fontWeight: 600,
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    {event.title}
-                  </h3>
-
+                  {/* Card Header */}
                   <div
                     style={{
-                      display: 'flex',
-                      gap: '10px',
-                      flexWrap: 'wrap',
+                      padding: '20px 25px',
+                      borderBottom: theme
+                        ? `1px solid ${theme.border}`
+                        : '1px solid #e9ecef',
                     }}
                   >
-                    <span
+                    <h3
                       style={{
-                        background: getStatusColor(event).background,
-                        color: getStatusColor(event).color,
-                        padding: '4px 12px',
-                        borderRadius: '15px',
-                        fontSize: '0.8rem',
-                        fontWeight: 500,
+                        margin: '0 0 15px 0',
+                        color: theme ? theme.textPrimary : '#2f5148',
                         fontFamily: 'Satoshi, sans-serif',
+                        fontSize: '1.3rem',
+                        fontWeight: 600,
+                        lineHeight: 1.4,
                       }}
                     >
-                      {getStatusText(event)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Card Body */}
-                <div style={{ padding: '20px 25px' }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '12px',
-                      marginBottom: '20px',
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                      }}
-                    >
-                      <VaccinesIcon
-                        sx={{ color: '#97a19b', fontSize: '1.2rem' }}
-                      />
-                      <span
-                        style={{
-                          color: theme ? theme.textSecondary : '#97a19b',
-                          fontSize: '0.9rem',
-                          fontFamily: 'Satoshi, sans-serif',
-                          fontWeight: 500,
-                        }}
-                      >
-                        Vaccine:
-                      </span>
-                      <span
-                        style={{
-                          color: theme ? theme.textPrimary : '#2f5148',
-                          fontSize: '0.9rem',
-                          fontFamily: 'Satoshi, sans-serif',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {event.vaccineName}
-                      </span>
-                    </div>
+                      {event.title}
+                    </h3>
 
                     <div
                       style={{
                         display: 'flex',
-                        alignItems: 'center',
                         gap: '10px',
+                        flexWrap: 'wrap',
                       }}
                     >
-                      <CalendarTodayIcon
-                        sx={{ color: '#97a19b', fontSize: '1.2rem' }}
-                      />
                       <span
                         style={{
-                          color: theme ? theme.textSecondary : '#97a19b',
-                          fontSize: '0.9rem',
-                          fontFamily: 'Satoshi, sans-serif',
+                          background: getStatusColor(event).background,
+                          color: getStatusColor(event).color,
+                          padding: '4px 12px',
+                          borderRadius: '15px',
+                          fontSize: '0.8rem',
                           fontWeight: 500,
-                        }}
-                      >
-                        Ngày tiêm:
-                      </span>
-                      <span
-                        style={{
-                          color: theme ? theme.textPrimary : '#2f5148',
-                          fontSize: '0.9rem',
                           fontFamily: 'Satoshi, sans-serif',
-                          fontWeight: 600,
                         }}
                       >
-                        {event.eventDate}
-                      </span>
-                    </div>
-
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                      }}
-                    >
-                      <AccessTimeIcon
-                        sx={{ color: '#97a19b', fontSize: '1.2rem' }}
-                      />
-                      <span
-                        style={{
-                          color: theme ? theme.textSecondary : '#97a19b',
-                          fontSize: '0.9rem',
-                          fontFamily: 'Satoshi, sans-serif',
-                          fontWeight: 500,
-                        }}
-                      >
-                        Giờ tiêm:
-                      </span>
-                      <span
-                        style={{
-                          color: theme ? theme.textPrimary : '#2f5148',
-                          fontSize: '0.9rem',
-                          fontFamily: 'Satoshi, sans-serif',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {event.eventTime || 'Chưa có'}
-                      </span>
-                    </div>
-
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                      }}
-                    >
-                      <LocationOnIcon
-                        sx={{ color: '#97a19b', fontSize: '1.2rem' }}
-                      />
-                      <span
-                        style={{
-                          color: theme ? theme.textSecondary : '#97a19b',
-                          fontSize: '0.9rem',
-                          fontFamily: 'Satoshi, sans-serif',
-                          fontWeight: 500,
-                        }}
-                      >
-                        Địa điểm:
-                      </span>
-                      <span
-                        style={{
-                          color: theme ? theme.textPrimary : '#2f5148',
-                          fontSize: '0.9rem',
-                          fontFamily: 'Satoshi, sans-serif',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {event.location}
+                        {getStatusText(event)}
                       </span>
                     </div>
                   </div>
 
-                  {event.description && (
+                  {/* Card Body */}
+                  <div style={{ padding: '20px 25px' }}>
                     <div
                       style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '12px',
+                        marginBottom: '20px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                        }}
+                      >
+                        <VaccinesIcon
+                          sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                        />
+                        <span
+                          style={{
+                            color: theme ? theme.textSecondary : '#97a19b',
+                            fontSize: '0.9rem',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Vaccine:
+                        </span>
+                        <span
+                          style={{
+                            color: theme ? theme.textPrimary : '#2f5148',
+                            fontSize: '0.9rem',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontWeight: 600,
+                          }}
+                        >
+                          {event.title}
+                        </span>
+                      </div>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                        }}
+                      >
+                        <CalendarTodayIcon
+                          sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                        />
+                        <span
+                          style={{
+                            color: theme ? theme.textSecondary : '#97a19b',
+                            fontSize: '0.9rem',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Ngày tiêm:
+                        </span>
+                        <span
+                          style={{
+                            color: theme ? theme.textPrimary : '#2f5148',
+                            fontSize: '0.9rem',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontWeight: 600,
+                          }}
+                        >
+                          {event.eventDate}
+                        </span>
+                      </div>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                        }}
+                      >
+                        <AccessTimeIcon
+                          sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                        />
+                        <span
+                          style={{
+                            color: theme ? theme.textSecondary : '#97a19b',
+                            fontSize: '0.9rem',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Giờ tiêm:
+                        </span>
+                        <span
+                          style={{
+                            color: theme ? theme.textPrimary : '#2f5148',
+                            fontSize: '0.9rem',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontWeight: 600,
+                          }}
+                        >
+                          {event.eventTime || 'Chưa có'}
+                        </span>
+                      </div>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                        }}
+                      >
+                        <LocationOnIcon
+                          sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                        />
+                        <span
+                          style={{
+                            color: theme ? theme.textSecondary : '#97a19b',
+                            fontSize: '0.9rem',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontWeight: 500,
+                          }}
+                        >
+                          Địa điểm:
+                        </span>
+                        <span
+                          style={{
+                            color: theme ? theme.textPrimary : '#2f5148',
+                            fontSize: '0.9rem',
+                            fontFamily: 'Satoshi, sans-serif',
+                            fontWeight: 600,
+                          }}
+                        >
+                          {event.location}
+                        </span>
+                      </div>
+                    </div>
+
+                    {event.description && (
+                      <div
+                        style={{
+                          background: theme
+                            ? isDarkMode
+                              ? '#333333'
+                              : '#f8f9fa'
+                            : '#f8f9fa',
+                          padding: '15px',
+                          borderRadius: '12px',
+                          marginBottom: '20px',
+                          border: theme
+                            ? `1px solid ${theme.border}`
+                            : '1px solid #e9ecef',
+                        }}
+                      >
+                        <p
+                          style={{
+                            margin: 0,
+                            color: theme ? theme.textSecondary : '#97a19b',
+                            fontSize: '0.9rem',
+                            fontFamily: 'Satoshi, sans-serif',
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          {event.description}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Card Footer */}
+                    <button
+                      onClick={() => handleViewDetails(event)}
+                      style={{
+                        width: '100%',
                         background: theme
                           ? isDarkMode
-                            ? '#333333'
-                            : '#f8f9fa'
-                          : '#f8f9fa',
-                        padding: '15px',
-                        borderRadius: '12px',
-                        marginBottom: '20px',
-                        border: theme
-                          ? `1px solid ${theme.border}`
-                          : '1px solid #e9ecef',
+                            ? '#2d4739'
+                            : '#2f5148'
+                          : '#2f5148',
+                        color: 'white',
+                        border: 'none',
+                        padding: '12px 20px',
+                        borderRadius: '10px',
+                        cursor: 'pointer',
+                        fontSize: '1rem',
+                        fontWeight: 500,
+                        fontFamily: 'Satoshi, sans-serif',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        transition: 'all 0.3s ease',
                       }}
                     >
-                      <p
-                        style={{
-                          margin: 0,
-                          color: theme ? theme.textSecondary : '#97a19b',
-                          fontSize: '0.9rem',
-                          fontFamily: 'Satoshi, sans-serif',
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        {event.description}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Card Footer */}
-                  <button
-                    onClick={() => handleViewDetails(event)}
-                    style={{
-                      width: '100%',
-                      background: theme
-                        ? isDarkMode
-                          ? '#2d4739'
-                          : '#2f5148'
-                        : '#2f5148',
-                      color: 'white',
-                      border: 'none',
-                      padding: '12px 20px',
-                      borderRadius: '10px',
-                      cursor: 'pointer',
-                      fontSize: '1rem',
-                      fontWeight: 500,
-                      fontFamily: 'Satoshi, sans-serif',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      transition: 'all 0.3s ease',
-                    }}
-                  >
-                    <VisibilityIcon sx={{ fontSize: '1.2rem' }} />
-                    Xem chi tiết
-                  </button>
+                      <VisibilityIcon sx={{ fontSize: '1.2rem' }} />
+                      Xem chi tiết
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         ) : (
           <div
@@ -1179,8 +1182,6 @@ function VaccinationEvents() {
                           {getStatusText(selectedEvent)}
                         </span>
                       </div>
-
-                     
                     </div>
                   ) : (
                     <p
