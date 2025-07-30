@@ -74,6 +74,8 @@ const StudentManagement = () => {
   const [editSuccess, setEditSuccess] = useState('');
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Fetch students on component mount
   useEffect(() => {
@@ -104,26 +106,69 @@ const StudentManagement = () => {
   const handleFileChange = event => {
     const file = event.target.files[0];
     if (file) {
+      console.log('📁 Selected file:', file.name, 'Type:', file.type, 'Size:', file.size);
+      
+      // Clear previous messages
+      setImportError('');
+      setImportSuccess('');
+      
       // Validate file type
-      if (
-        file.type ===
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-        file.type === 'application/vnd.ms-excel' ||
-        file.name.endsWith('.xlsx') ||
-        file.name.endsWith('.xls')
-      ) {
-        setImportFile(file);
-        setImportError('');
-      } else {
-        setImportError('Vui lòng chọn file Excel (.xlsx hoặc .xls)');
+      const allowedTypes = [
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+        'application/vnd.ms-excel' // .xls
+      ];
+      
+      const isValidType = allowedTypes.includes(file.type) || 
+                         file.name.endsWith('.xlsx');
+      
+      if (!isValidType) {
+        setImportError('❌ File không đúng định dạng. Chỉ chấp nhận file Excel (.xlsx, .xls)');
         setImportFile(null);
+        return;
       }
+      
+      // Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        setImportError('❌ File quá lớn. Kích thước tối đa là 5MB');
+        setImportFile(null);
+        return;
+      }
+      
+      // Validate file is not empty
+      if (file.size === 0) {
+        setImportError('❌ File rỗng. Vui lòng chọn file có dữ liệu');
+        setImportFile(null);
+        return;
+      }
+      
+      // All validations passed
+      setImportFile(file);
+      setImportSuccess('✅ File hợp lệ! Bạn có thể tiến hành import.');
     }
   };
 
   const handleImportStudents = async () => {
     if (!importFile) {
-      setImportError('Vui lòng chọn file để import');
+      setImportError('❌ Vui lòng chọn file để import');
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+      'application/vnd.ms-excel' // .xls
+    ];
+    
+    if (!allowedTypes.includes(importFile.type)) {
+      setImportError('❌ File không đúng định dạng. Chỉ chấp nhận file Excel (.xlsx, .xls)');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (importFile.size > maxSize) {
+      setImportError('❌ File quá lớn. Kích thước tối đa là 5MB');
       return;
     }
 
@@ -135,35 +180,69 @@ const StudentManagement = () => {
       const formData = new FormData();
       formData.append('file', importFile);
 
+      console.log('📤 Importing file:', importFile.name, 'Size:', importFile.size);
+
       const response = await fetch(
         'https://api-schoolhealth.purintech.id.vn/api/Student/student',
         {
           method: 'POST',
           body: formData,
           headers: {
-            // 'Content-Type': 'multipart/form-data',
             'accept': '*/*',
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         }
       );
 
+      console.log('📊 Import response status:', response.status);
+
       if (response.ok) {
         const result = await response.json();
-        setImportSuccess(
-          `Import thành công! Đã thêm ${result.length || 0} học sinh mới.`
-        );
+        console.log('📊 Import result:', result);
+        
+        const successMessage = result.length > 0 
+          ? `Import thành công! Đã thêm ${result.length} học sinh mới.`
+          : 'Import thành công! Không có học sinh mới nào được thêm.';
+        
+        setSuccessMessage(successMessage);
+        setShowSuccessModal(true);
         setImportFile(null);
         setShowImportModal(false);
         // Refresh student list
         fetchStudents();
       } else {
-        const errorData = await response.json();
-        setImportError(errorData.message || 'Có lỗi xảy ra khi import file');
+        let errorMessage = '❌ Có lỗi xảy ra khi import file';
+        
+        try {
+          const errorData = await response.json();
+          console.log('📊 Import error data:', errorData);
+          
+          if (errorData.message) {
+            errorMessage = `❌ ${errorData.message}`;
+          } else if (errorData.error) {
+            errorMessage = `❌ ${errorData.error}`;
+          } else if (errorData.errors && Array.isArray(errorData.errors)) {
+            errorMessage = `❌ ${errorData.errors.join(', ')}`;
+          }
+        } catch (parseError) {
+          console.error('Error parsing error response:', parseError);
+          errorMessage = `❌ Lỗi server (${response.status}): ${response.statusText}`;
+        }
+        
+        setImportError(errorMessage);
       }
     } catch (error) {
-      console.error('Import error:', error);
-      setImportError('Có lỗi xảy ra khi import file. Vui lòng thử lại.');
+      console.error('❌ Import error:', error);
+      
+      let errorMessage = '❌ Có lỗi xảy ra khi import file. Vui lòng thử lại.';
+      
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMessage = '❌ Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
+      } else if (error.message) {
+        errorMessage = `❌ ${error.message}`;
+      }
+      
+      setImportError(errorMessage);
     } finally {
       setImportLoading(false);
     }
@@ -1243,12 +1322,22 @@ const StudentManagement = () => {
       {/* Import Modal */}
       <Modal
         open={showImportModal}
-        onClose={() => setShowImportModal(false)}
+        onClose={() => {
+          setShowImportModal(false);
+          setImportError('');
+          setImportSuccess('');
+          setImportFile(null);
+        }}
         className="import-modal"
       >
         <Dialog
           open={showImportModal}
-          onClose={() => setShowImportModal(false)}
+          onClose={() => {
+            setShowImportModal(false);
+            setImportError('');
+            setImportSuccess('');
+            setImportFile(null);
+          }}
           maxWidth="sm"
           fullWidth
         >
@@ -1309,7 +1398,12 @@ const StudentManagement = () => {
           </DialogContent>
           <DialogActions>
             <Button
-              onClick={() => setShowImportModal(false)}
+              onClick={() => {
+                setShowImportModal(false);
+                setImportError('');
+                setImportSuccess('');
+                setImportFile(null);
+              }}
               disabled={importLoading}
             >
               Hủy
@@ -1326,6 +1420,36 @@ const StudentManagement = () => {
             </Button>
           </DialogActions>
         </Dialog>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal
+        open={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        className="success-modal"
+      >
+        <div className="success-modal-overlay">
+          <div className="success-modal-content">
+            <div className="success-modal-header">
+              <div className="success-icon">
+                ✅
+              </div>
+              <h3>Thành công!</h3>
+            </div>
+            <div className="success-modal-body">
+              <p>{successMessage}</p>
+            </div>
+            <div className="success-modal-footer">
+              <Button
+                onClick={() => setShowSuccessModal(false)}
+                variant="contained"
+                className="success-ok-btn"
+              >
+                OK
+              </Button>
+            </div>
+          </div>
+        </div>
       </Modal>
     </div>
   );

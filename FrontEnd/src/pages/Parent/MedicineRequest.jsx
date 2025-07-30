@@ -648,75 +648,71 @@ Vui lòng:
         </div>
 
         <form onSubmit={handleSubmit} className="add-medicine-form">
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="studentId">Chọn học sinh *</label>
-              <select
-                id="studentId"
-                name="studentId"
-                value={activeTab === 'medicine' ? medicineFormData.studentId : activeTab === 'absent' ? absentFormData.studentId : otherFormData.studentId}
-                onChange={handleInputChange}
-                required
-                disabled={loading || students.length === 0}
-              >
-                <option value="">
-                  {loading ? "Đang tải..." : students.length === 0 ? "Không có học sinh" : "Chọn học sinh"}
+          <div className="form-group">
+            <label htmlFor="studentId">Chọn học sinh *</label>
+            <select
+              id="studentId"
+              name="studentId"
+              value={activeTab === 'medicine' ? medicineFormData.studentId : activeTab === 'absent' ? absentFormData.studentId : otherFormData.studentId}
+              onChange={handleInputChange}
+              required
+              disabled={loading || students.length === 0}
+            >
+              <option value="">
+                {loading ? "Đang tải..." : students.length === 0 ? "Không có học sinh" : "Chọn học sinh"}
+              </option>
+              {students.map((student, idx) => (
+                <option 
+                  key={`student_${student.studentId || student.studentid || student.id}_${idx}`} 
+                  value={student.studentId || student.studentid || student.id}
+                >
+                  {student.fullname || student.fullName || student.name} - Lớp {student.classname || student.className || student.class || '---'}
                 </option>
-                {students.map((student, idx) => (
-                  <option 
-                    key={`student_${student.studentId || student.studentid || student.id}_${idx}`} 
-                    value={student.studentId || student.studentid || student.id}
-                  >
-                    {student.fullname || student.fullName || student.name} - Lớp {student.classname || student.className || student.class || '---'}
-                  </option>
-                ))}
-              </select>
-            </div>
+              ))}
+            </select>
+          </div>
 
-            <div className="form-group">
-              <label htmlFor="title">Tiêu đề yêu cầu *</label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={activeTab === 'medicine' ? medicineFormData.title : activeTab === 'absent' ? absentFormData.title : otherFormData.title}
-                onChange={handleInputChange}
-                placeholder="VD: Yêu cầu thuốc hạ sốt cho con"
-                required
-                maxLength={200}
-              />
-            </div>
+          <div className="form-group">
+            <label htmlFor="title">Tiêu đề yêu cầu *</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={activeTab === 'medicine' ? medicineFormData.title : activeTab === 'absent' ? absentFormData.title : otherFormData.title}
+              onChange={handleInputChange}
+              placeholder="VD: Yêu cầu thuốc hạ sốt cho con"
+              required
+              maxLength={200}
+            />
           </div>
 
           {activeTab === 'medicine' && (
             <>
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="medicineName">Tên thuốc *</label>
-                  <input
-                    type="text"
-                    id="medicineName"
-                    name="medicineName"
-                    value={medicineFormData.medicineName}
-                    onChange={handleInputChange}
-                    placeholder="VD: Paracetamol, Amoxicillin..."
-                    required
-                    maxLength={100}
-                  />
-                </div>
+              <div className="form-group">
+                <label htmlFor="medicineName">Tên thuốc *</label>
+                <input
+                  type="text"
+                  id="medicineName"
+                  name="medicineName"
+                  value={medicineFormData.medicineName}
+                  onChange={handleInputChange}
+                  placeholder="VD: Paracetamol, Amoxicillin..."
+                  required
+                  maxLength={100}
+                />
+              </div>
 
-                <div className="form-group">
-                  <label htmlFor="medicineDescription">Mô tả thuốc</label>
-                  <input
-                    type="text"
-                    id="medicineDescription"
-                    name="medicineDescription"
-                    value={medicineFormData.medicineDescription}
-                    onChange={handleInputChange}
-                    placeholder="VD: Viên nang 500mg, dạng siro..."
-                    maxLength={200}
-                  />
-                </div>
+              <div className="form-group">
+                <label htmlFor="medicineDescription">Mô tả thuốc</label>
+                <input
+                  type="text"
+                  id="medicineDescription"
+                  name="medicineDescription"
+                  value={medicineFormData.medicineDescription}
+                  onChange={handleInputChange}
+                  placeholder="VD: Viên nang 500mg, dạng siro..."
+                  maxLength={200}
+                />
               </div>
 
               <div className="form-group full-width">
