@@ -356,19 +356,31 @@ function BlogManagement() {
     }
   };
 
+  // Helper function to convert status to Vietnamese
+  const getStatusText = status => {
+    switch (status) {
+      case 'Published':
+        return 'Đã duyệt';
+      case 'Draft':
+        return 'Chưa duyệt';
+      case 'Rejected':
+        return 'Bị từ chối';
+      case 'Pending':
+        return 'Chờ duyệt';
+      default:
+        return status;
+    }
+  };
+
   const getStatusBadgeClass = status => {
     switch (status) {
       case 'Published':
-      case 'Đã đăng':
         return 'status-published';
       case 'Draft':
-      case 'Bản nháp':
         return 'status-draft';
       case 'Rejected':
-      case 'Từ chối':
         return 'status-rejected';
       case 'Pending':
-      case 'Chờ duyệt':
         return 'status-pending';
       case 'Scheduled':
         return 'status-scheduled';
@@ -558,7 +570,7 @@ function BlogManagement() {
                   "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
               }}
             >
-              Đã đăng
+              Đã duyệt
             </p>
           </div>
         </div>
@@ -609,7 +621,7 @@ function BlogManagement() {
                   "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
               }}
             >
-              Bản nháp
+              Chưa duyệt
             </p>
           </div>
         </div>
@@ -825,7 +837,7 @@ function BlogManagement() {
                             : 'status-draft'
                         }`}
                       >
-                        {post.status || 'Draft'}
+                        {getStatusText(post.status) || 'Chưa duyệt'}
                       </span>
                     </div>
                     <div className="blog-body-fb">
@@ -1045,7 +1057,7 @@ function BlogManagement() {
                         currentPost?.status
                       )}`}
                     >
-                      {currentPost?.status}
+                      {getStatusText(currentPost?.status)}
                     </span>
                   </div>
                   {currentPost?.status === 'Rejected' &&

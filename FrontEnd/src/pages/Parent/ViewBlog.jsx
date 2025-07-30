@@ -71,8 +71,6 @@ function ViewBlog() {
     setShowModal(true);
   };
 
-
-
   // Statistics
   const stats = {
     total: filteredBlogs.length,
@@ -355,7 +353,7 @@ function ViewBlog() {
                   'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
               }}
             >
-              Đã đăng
+              Đã duyệt
             </p>
           </div>
         </div>
@@ -406,7 +404,7 @@ function ViewBlog() {
                   'Inter, Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
               }}
             >
-              Bản nháp
+              Chưa duyệt
             </p>
           </div>
         </div>
@@ -962,11 +960,7 @@ function ViewBlog() {
                       gap: '8px',
                       color: '#2f5148',
                     }}
-                  >
-                    
-                    
-                  
-                  </div>
+                  ></div>
 
                   <div
                     style={{

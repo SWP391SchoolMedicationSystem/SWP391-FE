@@ -221,28 +221,40 @@ function Blog() {
     }
   };
 
+  // Helper function to convert status to Vietnamese
+  const getStatusText = status => {
+    switch (status) {
+      case 'Published':
+        return 'Đã duyệt';
+      case 'Draft':
+        return 'Chưa duyệt';
+      case 'Rejected':
+        return 'Bị từ chối';
+      case 'Pending':
+        return 'Chờ duyệt';
+      default:
+        return status;
+    }
+  };
+
   const getStatusClass = status => {
     switch (status) {
-      case 'Đã đăng':
       case 'Published':
         return {
           backgroundColor: '#4caf50',
           color: 'white',
         };
-      case 'Bản nháp':
       case 'Draft':
         return {
           backgroundColor: '#ff9800',
           color: 'white',
         };
       case 'Rejected':
-      case 'Từ chối':
         return {
           backgroundColor: '#f44336',
           color: 'white',
         };
       case 'Pending':
-      case 'Chờ duyệt':
         return {
           backgroundColor: '#2196f3',
           color: 'white',
@@ -269,8 +281,8 @@ function Blog() {
   // Statistics
   const stats = {
     total: (blogs || []).length,
-    published: (blogs || []).filter(b => b.status === 'Đã đăng').length,
-    draft: (blogs || []).filter(b => b.status === 'Bản nháp').length,
+    published: (blogs || []).filter(b => b.status === 'Published').length,
+    draft: (blogs || []).filter(b => b.status === 'Draft').length,
     totalReads: (blogs || []).reduce(
       (sum, blog) => sum + (blog.readCount || 0),
       0
@@ -474,7 +486,7 @@ function Blog() {
                   "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
               }}
             >
-              Đã đăng
+              Đã duyệt
             </p>
           </div>
         </div>
@@ -525,7 +537,7 @@ function Blog() {
                   "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
               }}
             >
-              Bản nháp
+              Chưa duyệt
             </p>
           </div>
         </div>
@@ -730,8 +742,8 @@ function Blog() {
                       ...getStatusClass(blog.status),
                     }}
                   >
-                    {blog.status === 'Draft' && '📝 Bản nháp'}
-                    {blog.status === 'Published' && '✅ Đã đăng'}
+                    {blog.status === 'Draft' && '📝 Chưa duyệt'}
+                    {blog.status === 'Published' && '✅ Đã duyệt'}
                     {blog.status === 'Pending' && '⏳ Chờ duyệt'}
                     {blog.status === 'Rejected' && '❌ Bị từ chối'}
                   </span>
@@ -911,8 +923,8 @@ function Blog() {
                       ...getStatusClass(selectedBlog.status),
                     }}
                   >
-                    {selectedBlog.status === 'Draft' && '📝 Bản nháp'}
-                    {selectedBlog.status === 'Published' && '✅ Đã đăng'}
+                    {selectedBlog.status === 'Draft' && '📝 Chưa duyệt'}
+                    {selectedBlog.status === 'Published' && '✅ Đã duyệt'}
                     {selectedBlog.status === 'Pending' && '⏳ Chờ duyệt'}
                     {selectedBlog.status === 'Rejected' && '❌ Bị từ chối'}
                   </span>

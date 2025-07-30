@@ -191,19 +191,7 @@ function StudentList() {
     }
   }, [importError]);
 
-  // Get health status badge class (commented out as not used currently)
-  // const getHealthStatusClass = (status) => {
-  //   switch (status) {
-  //     case "Bình thường":
-  //       return "status-normal";
-  //     case "Cần theo dõi":
-  //       return "status-watch";
-  //     case "Có dị ứng":
-  //       return "status-allergy";
-  //     default:
-  //       return "status-normal";
-  //   }
-  // };
+
 
   return (
     <div className="student-list-container">
