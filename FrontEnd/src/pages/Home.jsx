@@ -24,6 +24,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  CircularProgress,
 } from "@mui/material";
 import {
   TrendingUp,
@@ -73,6 +74,10 @@ export default function Home() {
   // Thêm state cho staff từ API
   const [staffData, setStaffData] = useState([]);
   const [staffLoading, setStaffLoading] = useState(true);
+  
+  // Thêm state cho chart data
+  const [chartData, setChartData] = useState([]);
+  const [chartLoading, setChartLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is logged in
@@ -155,6 +160,32 @@ export default function Home() {
         const totalStudents = Array.isArray(studentsData) ? studentsData.length : 
                             (studentsData?.data && Array.isArray(studentsData.data)) ? studentsData.data.length : 0;
         
+        // Xử lý dữ liệu học sinh để tạo chart data
+        const studentsArray = Array.isArray(studentsData) ? studentsData : 
+                            (studentsData?.data && Array.isArray(studentsData.data)) ? studentsData.data : [];
+        
+        console.log('Raw students data:', studentsArray.slice(0, 3)); // Log 3 học sinh đầu tiên
+        
+        // Tạo chart data theo lớp
+        const chartDataByClass = {};
+        studentsArray.forEach(student => {
+          console.log('Student:', student.fullname, 'classname:', student.classname, 'class:', student.class, 'grade:', student.grade);
+          const className = student.classname || 'Lớp khác';
+          if (!chartDataByClass[className]) {
+            chartDataByClass[className] = 0;
+          }
+          chartDataByClass[className]++;
+        });
+        
+        // Chuyển đổi thành format cho chart
+        const processedChartData = Object.keys(chartDataByClass).map(className => ({
+          name: className,
+          students: chartDataByClass[className]
+        }));
+        
+        console.log('Chart data processed:', processedChartData);
+        setChartData(processedChartData);
+        
         const vaccinationEvents = Array.isArray(vaccinationData) ? vaccinationData.length : 
                                 (vaccinationData?.data && Array.isArray(vaccinationData.data)) ? vaccinationData.data.length : 0;
         
@@ -191,6 +222,7 @@ export default function Home() {
         });
       } finally {
         setStatsLoading(false);
+        setChartLoading(false);
       }
     };
 
@@ -332,7 +364,7 @@ export default function Home() {
       title: "Thuốc cá nhân",
       number: statsLoading ? "..." : statsData.personalMedicines.toString(),
       note: "Lịch hẹn hôm nay",
-      icon: <Assignment sx={{ fontSize: 24 }} />,
+      icon: <LocalPharmacy sx={{ fontSize: 24 }} />,
       noteColor: "#2196F3",
     },
   ];
@@ -361,32 +393,11 @@ export default function Home() {
     },
   ];
 
-  const mainServices = [
-    {
-      title: "Hồ sơ sức khỏe",
-      description: "Theo dõi và quản lý hồ sơ y tế học sinh",
-      icon: <MedicalServices sx={{ color: '#2f5148', fontSize: 40 }} />,
-    },
-    {
-      title: "Tiêm chủng",
-      description: "Lịch tiêm chủng và theo dõi",
-      icon: <Vaccines sx={{ color: '#2f5148', fontSize: 40 }} />,
-    },
-    {
-      title: "Gửi thuốc",
-      description: "Gửi thuốc và theo dõi sức khỏe",
-      icon: <HealthAndSafety sx={{ color: '#2f5148', fontSize: 40 }} />,
-    },
-    {
-      title: "Báo cáo",
-      description: "Báo cáo tình trạng sức khỏe",
-      icon: <Assessment sx={{ color: '#2f5148', fontSize: 40 }} />,
-    },
-  ];
+
 
   const serviceCategories = [
     {
-      category: "Quản lý hồ sơ",
+            category: "Quản lý hồ sơ",
       services: [
         {
           title: "Hồ sơ sức khỏe học sinh",
@@ -398,11 +409,6 @@ export default function Home() {
           description: "Cập nhật thường xuyên về tình trạng sức khỏe",
           icon: <MonitorHeart sx={{ color: '#2f5148', fontSize: 32 }} />,
         },
-        {
-          title: "Lịch sử khám bệnh",
-          description: "Ghi nhận và theo dõi lịch sử khám bệnh",
-          icon: <EventNote sx={{ color: '#2f5148', fontSize: 32 }} />,
-        },
       ],
     },
     {
@@ -412,16 +418,6 @@ export default function Home() {
           title: "Tiêm chủng",
           description: "Quản lý lịch tiêm chủng cho học sinh",
           icon: <Vaccines sx={{ color: '#2f5148', fontSize: 32 }} />,
-        },
-        {
-          title: "Khám sức khỏe định kỳ",
-          description: "Tổ chức khám sức khỏe định kỳ cho học sinh",
-          icon: <LocalHospital sx={{ color: '#2f5148', fontSize: 32 }} />,
-        },
-        {
-          title: "Xử lý y tế khẩn cấp",
-          description: "Hỗ trợ y tế khẩn cấp trong trường học",
-          icon: <Healing sx={{ color: '#2f5148', fontSize: 32 }} />,
         },
       ],
     },
@@ -447,14 +443,7 @@ export default function Home() {
     },
   ];
 
-  // Add mock data for student statistics (total 120 students, random distribution)
-  const studentStatsData = [
-    { name: 'Khối 1', students: 19 },
-    { name: 'Khối 2', students: 27 },
-    { name: 'Khối 3', students: 22 },
-    { name: 'Khối 4', students: 26 },
-    { name: 'Khối 5', students: 26 },
-  ];
+
 
   return (
     <div className="home-page">
@@ -629,7 +618,7 @@ export default function Home() {
       {/* Health Statistics & Recent Events */}
       <Container maxWidth="xl" sx={{ py: 8 }}>
         <Grid container spacing={8} justifyContent="center">
-          <Grid size={{ xs: 12, md: 5.5 }}>
+          <Grid size={{ xs: 12, md: 12 }}>
             <Card
               sx={{
                 background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -637,7 +626,7 @@ export default function Home() {
                 boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)',
                 border: '1px solid rgba(255, 255, 255, 0.2)',
                 p: 4,
-                height: "480px",
+                height: "600px",
                 position: 'relative',
                 overflow: 'hidden',
               }}
@@ -661,7 +650,7 @@ export default function Home() {
                   variant="h5"
                   sx={{ fontWeight: "600", color: "#2f5148" }}
                 >
-                  📊 Thống kê sức khỏe
+                  📊 Thống kê học sinh
                 </Typography>
               </Box>
               
@@ -670,16 +659,24 @@ export default function Home() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  height: "320px",
+                  height: "490px",
                   backgroundColor: "rgba(47, 81, 72, 0.05)",
                   borderRadius: "16px",
                   border: "2px dashed rgba(47, 81, 72, 0.2)",
                   position: 'relative',
                 }}
               >
-                <ResponsiveContainer width="95%" height={320}>
+                {chartLoading ? (
+                  <Box sx={{ textAlign: 'center' }}>
+                    <CircularProgress sx={{ color: '#2f5148', mb: 2 }} />
+                    <Typography sx={{ color: '#64748b', fontSize: '0.9rem' }}>
+                      Đang tải dữ liệu thống kê...
+                    </Typography>
+                  </Box>
+                ) : (
+                <ResponsiveContainer width="95%" height={520}>
                   <BarChart
-                    data={studentStatsData}
+                    data={chartLoading ? [] : chartData}
                     margin={{ top: 16, right: 32, left: 32, bottom: 8 }}
                     barCategoryGap={"20%"}
                   >
@@ -704,103 +701,12 @@ export default function Home() {
                     </defs>
                   </BarChart>
                 </ResponsiveContainer>
+                )}
               </Box>
             </Card>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 5.5 }}>
-            <Card
-              sx={{
-                background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-                borderRadius: "24px",
-                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                p: 4,
-                height: "480px",
-                position: 'relative',
-                overflow: 'hidden',
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-              <Box
-                sx={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: '12px',
-                    background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mr: 2,
-                  }}
-                >
-                  <Event sx={{ color: 'white', fontSize: 24 }} />
-                </Box>
-                <Typography
-                  variant="h5"
-                  sx={{ fontWeight: "600", color: "#2f5148" }}
-                >
-                  ⚡ Hoạt động gần đây
-                </Typography>
-              </Box>
-              
-              <Box sx={{ maxHeight: '380px', overflowY: 'auto', pr: 1 }}>
-                <List sx={{ p: 0 }}>
-                  {recentEvents.map((event, index) => (
-                    <ListItem
-                      key={index}
-                      sx={{
-                        backgroundColor: "rgba(47, 81, 72, 0.05)",
-                        borderRadius: "16px",
-                        mb: 2,
-                        p: 3,
-                        border: "1px solid rgba(47, 81, 72, 0.1)",
-                        transition: 'all 0.3s ease',
-                        '&:hover': {
-                          backgroundColor: "rgba(47, 81, 72, 0.1)",
-                          transform: 'translateX(4px)',
-                        },
-                      }}
-                    >
-                      <ListItemIcon>
-                        <Box
-                          sx={{
-                            width: 44,
-                            height: 44,
-                            borderRadius: "12px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            background: "linear-gradient(135deg, #2f5148 0%, #73ad67 100%)",
-                            boxShadow: '0 4px 12px rgba(47, 81, 72, 0.3)',
-                          }}
-                        >
-                          <Event sx={{ color: "white", fontSize: 22 }} />
-                        </Box>
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={event.title}
-                        secondary={event.time}
-                        sx={{
-                          "& .MuiListItemText-primary": {
-                            fontWeight: "600",
-                            color: "#2f5148",
-                            fontSize: "1rem",
-                            mb: 0.5,
-                          },
-                          "& .MuiListItemText-secondary": {
-                            color: "#64748b",
-                            fontSize: "0.875rem",
-                            fontWeight: "500",
-                          },
-                        }}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              </Box>
-            </Card>
-          </Grid>
+
         </Grid>
       </Container>
 
@@ -1100,71 +1006,7 @@ export default function Home() {
         )}
       </Container>
 
-      {/* Main Services */}
-      <Container maxWidth="lg" sx={{ py: 6 }}>
-        <Box className="section-title">
-          <h2>Dịch vụ chính</h2>
-          <p>Khám phá các dịch vụ y tế học đường toàn diện của chúng tôi.</p>
-        </Box>
-        <Grid container spacing={4} justifyContent="center">
-          {mainServices.map((service, index) => (
-            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
-              <Paper
-                className="service-card"
-                elevation={0}
-                sx={{
-                  p: 3,
-                  textAlign: "center",
-                  borderRadius: "16px",
-                  backgroundColor: "#f8f9fa",
-                  border: "1px solid #e3f2fd",
-                  "&:hover": {
-                    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-                    transform: "translateY(-5px)",
-                  },
-                  transition: "all 0.3s ease",
-                }}
-              >
-                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
-                  <Box sx={{
-                    background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
-                    borderRadius: '12px',
-                    width: 48,
-                    height: 48,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                    {React.cloneElement(service.icon, { sx: { color: 'white', fontSize: 32 } })}
-                  </Box>
-                </Box>
-                <Typography
-                  variant="h6"
-                  component="h3"
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#1a237e",
-                    mb: 2,
-                    fontSize: "1.2rem",
-                  }}
-                >
-                  {service.title}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "#666",
-                    lineHeight: 1.6,
-                    fontSize: "0.9rem",
-                  }}
-                >
-                  {service.description}
-                </Typography>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
+
 
       {/* Service Categories Detail */}
       <Container maxWidth="lg" sx={{ py: 6 }}>
@@ -1183,13 +1025,14 @@ export default function Home() {
                 mb: 3,
                 textAlign: "center",
                 fontSize: "1.8rem",
+                fontFamily: "Satoshi, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
               }}
             >
               {category.category}
             </Typography>
-          <Grid container spacing={4}>
+          <Grid container spacing={4} justifyContent="center">
               {category.services.map((service, serviceIndex) => (
-                <Grid size={{ xs: 12, md: 4 }} key={serviceIndex}>
+                <Grid size={{ xs: 12, md: 6 }} key={serviceIndex}>
                   <Card
                     sx={{
                       background: "#ffffff",
@@ -1210,6 +1053,7 @@ export default function Home() {
                           alignItems: "center",
                           mb: 2,
                           gap: 2,
+                          justifyContent: "center",
                         }}
                       >
                         <Box sx={{
@@ -1229,21 +1073,24 @@ export default function Home() {
                             fontWeight: "bold",
                             color: "#1a237e",
                             fontSize: "1.1rem",
+                            fontFamily: "Satoshi, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+                            textAlign: "center",
                           }}
                         >
                           {service.title}
                     </Typography>
                   </Box>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: "#666",
-                          lineHeight: 1.6,
-                          fontSize: "0.9rem",
-                        }}
-                      >
-                        {service.description}
-                      </Typography>
+                                              <Typography
+                          variant="body2"
+                          sx={{
+                            color: "#666",
+                            lineHeight: 1.6,
+                            fontSize: "0.9rem",
+                            textAlign: "center",
+                          }}
+                        >
+                          {service.description}
+                        </Typography>
                     </CardContent>
                   </Card>
               </Grid>
