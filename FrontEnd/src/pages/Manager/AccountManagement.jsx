@@ -331,7 +331,7 @@ const AccountManagement = () => {
 
           {parentsList.length === 0 ? (
             <div className="empty-state">
-              <p>📭 Không tìm thấy tài khoản phụ huynh nào</p>
+              <p>Đang tải dữ liệu...</p>
             </div>
           ) : (
             <div className="accounts-table">
