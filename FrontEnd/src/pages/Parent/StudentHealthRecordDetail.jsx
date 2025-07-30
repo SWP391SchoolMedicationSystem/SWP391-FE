@@ -121,43 +121,120 @@ const StudentHealthRecordDetail = () => {
       {/* Row 2: Detailed Information */}
       <div className="section-card">
         <div className="section-header">
-          <h2>
+          <h2
+            style={{
+              fontFamily:
+                "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+            }}
+          >
             <span className="material-icons">person</span>
             Thông tin chi tiết
           </h2>
         </div>
         <div className="detail-grid">
           <div className="detail-item">
-            <div className="detail-label">Danh mục sức khỏe</div>
-            <div className="detail-value">{healthRecord.healthCategory}</div>
+            <div
+              className="detail-label"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
+              Danh mục sức khỏe
+            </div>
+            <div
+              className="detail-value"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
+              {healthRecord.healthCategory}
+            </div>
           </div>
           <div className="detail-item">
-            <div className="detail-label">Ngày ghi nhận</div>
-            <div className="detail-value">
+            <div
+              className="detail-label"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
+              Ngày ghi nhận
+            </div>
+            <div
+              className="detail-value"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
               {new Date(healthRecord.healthRecordDate).toLocaleDateString(
                 'vi-VN'
               )}
             </div>
           </div>
           <div className="detail-item">
-            <div className="detail-label">Nhân viên phụ trách</div>
-            <div className="detail-value">{healthRecord.staffName}</div>
+            <div
+              className="detail-label"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
+              Nhân viên phụ trách
+            </div>
+            <div
+              className="detail-value"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
+              {healthRecord.staffName}
+            </div>
           </div>
           <div className="detail-item">
-            <div className="detail-label">Trạng thái xác nhận</div>
+            <div
+              className="detail-label"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
+              Trạng thái xác nhận
+            </div>
             <div className="detail-value">
               <span
                 className={`status-badge ${
                   healthRecord.isConfirm ? 'confirmed' : 'pending'
                 }`}
+                style={{
+                  fontFamily:
+                    "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                }}
               >
                 {healthRecord.isConfirm ? 'Đã xác nhận' : 'Chờ xác nhận'}
               </span>
             </div>
           </div>
           <div className="detail-item description">
-            <div className="detail-label">Mô tả chi tiết</div>
-            <div className="detail-value">
+            <div
+              className="detail-label"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
+              Mô tả chi tiết
+            </div>
+            <div
+              className="detail-value"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
               {healthRecord.healthrecorddescription}
             </div>
           </div>

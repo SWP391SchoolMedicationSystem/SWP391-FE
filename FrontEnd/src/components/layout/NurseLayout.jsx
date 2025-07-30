@@ -1,5 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import * as signalR from '@microsoft/signalr';
 import {
   Box,
   Typography,
@@ -93,6 +94,7 @@ export default function NurseLayout() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
   const [notificationLoading, setNotificationLoading] = useState(false);
+  const [signalRConnection, setSignalRConnection] = useState(null);
 
   useEffect(() => {
     // Lấy thông tin user từ localStorage
@@ -121,14 +123,16 @@ export default function NurseLayout() {
     try {
       setNotificationLoading(true);
       console.log('🔔 Fetching notifications from API...');
-      
+
       const notifications = await nurseNotificationService.getNotifications();
       console.log('📨 API Response:', notifications);
-      
+
       // Đếm số thông báo chưa đọc
-      const unreadCount = notifications.filter(notification => !notification.isRead).length;
+      const unreadCount = notifications.filter(
+        notification => !notification.isRead
+      ).length;
       console.log('🔢 Unread notifications count:', unreadCount);
-      
+
       setNotificationCount(unreadCount);
     } catch (error) {
       console.error('❌ Error fetching notification count:', error);
@@ -170,8 +174,6 @@ export default function NurseLayout() {
     return displayName.charAt(0).toUpperCase();
   };
 
-
-
   // Function to increment notification count (called when new notification arrives)
   const incrementNotificationCount = () => {
     setNotificationCount(prev => {
@@ -195,6 +197,82 @@ export default function NurseLayout() {
       refresh: fetchNotificationCount,
     };
   }, []);
+
+  // SignalR Connection Setup
+  useEffect(() => {
+    if (!signalRConnection) {
+      const newConnection = new signalR.HubConnectionBuilder()
+        .withUrl(
+          'https://api-schoolhealth.purintech.id.vn/hubs/notifications',
+          {
+            skipNegotiation: true,
+            transport: signalR.HttpTransportType.WebSockets,
+            accessTokenFactory: () => {
+              const token = localStorage.getItem('token');
+              console.log(
+                '🔑 Sending JWT token to SignalR:',
+                token ? 'Token found' : 'No token'
+              );
+              return token;
+            },
+          }
+        )
+        .withAutomaticReconnect()
+        .build();
+
+      setSignalRConnection(newConnection);
+    }
+
+    // Cleanup function for connection
+    return () => {
+      if (
+        signalRConnection &&
+        signalRConnection.state === signalR.HubConnectionState.Connected
+      ) {
+        signalRConnection.stop();
+      }
+    };
+  }, [signalRConnection]);
+
+  // SignalR Event Handlers
+  useEffect(() => {
+    if (signalRConnection) {
+      signalRConnection
+        .start()
+        .then(() => {
+          console.log('🔗 SignalR connected for Nurse layout');
+
+          // Listen for general notifications
+          signalRConnection.on('ReceiveNotification', notification => {
+            console.log('📢 General notification in layout:', notification);
+            incrementNotificationCount();
+          });
+
+          // Listen for staff-specific notifications
+          signalRConnection.on('ReceiveStaffNotification', notification => {
+            console.log('👩‍⚕️ Nurse notification in layout:', notification);
+            incrementNotificationCount();
+          });
+
+          // Listen for errors
+          signalRConnection.on('ReceiveError', errorMsg => {
+            console.error('❌ SignalR Error in layout:', errorMsg);
+          });
+        })
+        .catch(e => {
+          console.error('❌ SignalR connection failed in layout:', e);
+        });
+    }
+
+    // Cleanup event listeners
+    return () => {
+      if (signalRConnection) {
+        signalRConnection.off('ReceiveNotification');
+        signalRConnection.off('ReceiveStaffNotification');
+        signalRConnection.off('ReceiveError');
+      }
+    };
+  }, [signalRConnection]);
 
   useEffect(() => {
     fetchNotificationCount();
@@ -503,7 +581,6 @@ export default function NurseLayout() {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-
             <Badge
               badgeContent={notificationLoading ? '...' : notificationCount}
               color="error"
@@ -514,7 +591,7 @@ export default function NurseLayout() {
                   height: '18px',
                   minWidth: '18px',
                   borderRadius: '9px',
-                  background: notificationLoading 
+                  background: notificationLoading
                     ? 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)'
                     : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                   color: 'white',
@@ -668,7 +745,7 @@ export default function NurseLayout() {
             fontSize: '1.3rem',
           }}
         >
-          👩‍⚕️ Thông Tin Y Tá
+          👩‍⚕️ {getUserDisplayName()}
         </DialogTitle>
         <DialogContent sx={{ p: 0 }}>
           {userInfo ? (
@@ -712,54 +789,6 @@ export default function NurseLayout() {
 
               {/* Info Cards */}
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    p: 2,
-                    background: currentTheme.iconButton,
-                    borderRadius: 2,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                    border: `1px solid ${currentTheme.border}`,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: '50%',
-                      background: currentTheme.cardBgInactive,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mr: 2,
-                    }}
-                  >
-                    🆔
-                  </Box>
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: currentTheme.textSecondary,
-                        fontSize: '0.75rem',
-                        fontWeight: 500,
-                      }}
-                    >
-                      User ID
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        color: currentTheme.textPrimary,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {userInfo.userId || 'N/A'}
-                    </Typography>
-                  </Box>
-                </Box>
-
                 <Box
                   sx={{
                     display: 'flex',
@@ -842,7 +871,7 @@ export default function NurseLayout() {
                         fontWeight: 500,
                       }}
                     >
-                      Username
+                      Tên người dùng
                     </Typography>
                     <Typography
                       variant="body1"
@@ -851,7 +880,7 @@ export default function NurseLayout() {
                         fontWeight: 600,
                       }}
                     >
-                      {userInfo.userName || 'N/A'}
+                      {getUserDisplayName()}
                     </Typography>
                   </Box>
                 </Box>

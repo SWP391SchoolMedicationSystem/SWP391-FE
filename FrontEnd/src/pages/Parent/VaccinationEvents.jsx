@@ -460,7 +460,7 @@ function VaccinationEvents() {
               gap: '25px',
             }}
           >
-            {events.map(event => (
+            {events.slice().reverse().map(event => (
               <div
                 key={event.id}
                 style={{
@@ -1180,55 +1180,7 @@ function VaccinationEvents() {
                         </span>
                       </div>
 
-                      {selectedEvent.myResponses &&
-                        selectedEvent.myResponses.length > 0 && (
-                          <div>
-                            <strong
-                              style={{
-                                color: theme ? theme.textPrimary : '#2f5148',
-                              }}
-                            >
-                              Chi tiết con em:
-                            </strong>
-                            <div style={{ marginTop: '10px' }}>
-                              {selectedEvent.myResponses.map(
-                                (response, index) => (
-                                  <div
-                                    key={index}
-                                    style={{
-                                      padding: '8px',
-                                      marginBottom: '8px',
-                                      background: 'white',
-                                      borderRadius: '8px',
-                                      border: '1px solid #e9ecef',
-                                    }}
-                                  >
-                                    <div
-                                      style={{
-                                        fontWeight: 500,
-                                        marginBottom: '4px',
-                                      }}
-                                    >
-                                      Học sinh ID: {response.studentId}
-                                    </div>
-                                    <div style={{ fontSize: '0.9rem' }}>
-                                      <span style={{ marginRight: '15px' }}>
-                                        <strong>Tham gia:</strong>{' '}
-                                        {response.willAttend ? 'Có' : 'Không'}
-                                      </span>
-                                      {response.reasonForDecline && (
-                                        <span>
-                                          <strong>Lý do:</strong>{' '}
-                                          {response.reasonForDecline}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                )
-                              )}
-                            </div>
-                          </div>
-                        )}
+                     
                     </div>
                   ) : (
                     <p

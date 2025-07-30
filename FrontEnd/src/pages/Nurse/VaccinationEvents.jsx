@@ -441,7 +441,7 @@ function VaccinationEvents() {
               gap: '25px',
             }}
           >
-            {events.map(event => (
+            {events.slice().reverse().map(event => (
               <div
                 key={event.id}
                 style={{

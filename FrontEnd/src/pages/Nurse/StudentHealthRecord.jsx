@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import "../../css/Nurse/StudentHealthRecord.css";
+import React, { useState } from 'react';
+import '../../css/Nurse/StudentHealthRecord.css';
 
 function StudentHealthRecord() {
-  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedClass, setSelectedClass] = useState('');
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -11,200 +11,200 @@ function StudentHealthRecord() {
   // Mock data - Danh sách lớp và học sinh
   const classesData = [
     {
-      id: "mam",
-      name: "Lớp Mầm",
+      id: 'mam',
+      name: 'Lớp Mầm',
       students: [
         {
           id: 1,
-          name: "Nguyễn Minh An",
-          studentCode: "MN001",
-          dateOfBirth: "2020-05-15",
-          gender: "Nam",
-          address: "123 Đường ABC, Quận 1, TP.HCM",
-          parentName: "Nguyễn Văn A",
-          parentPhone: "0901234567",
-          healthStatus: "Bình thường",
-          avatar: "👶",
+          name: 'Nguyễn Minh An',
+          studentCode: 'MN001',
+          dateOfBirth: '2020-05-15',
+          gender: 'Nam',
+          address: '123 Đường ABC, Quận 1, TP.HCM',
+          parentName: 'Nguyễn Văn A',
+          parentPhone: '0901234567',
+          healthStatus: 'Bình thường',
+          avatar: '👶',
           healthRecords: [
             {
               id: 1,
-              type: "Dị ứng",
-              title: "Dị ứng sữa bò",
-              description: "Dị ứng với protein sữa bò, gây nôn và tiêu chảy",
-              severity: "Trung bình",
-              date: "2024-01-15",
-              doctor: "BS. Nguyễn Thị Lan",
-              medications: ["Sữa không lactose"],
-              notes: "Cho uống sữa đặc biệt, không cho sữa bò thường",
-              status: "Đang theo dõi",
+              type: 'Dị ứng',
+              title: 'Dị ứng sữa bò',
+              description: 'Dị ứng với protein sữa bò, gây nôn và tiêu chảy',
+              severity: 'Trung bình',
+              date: '2024-01-15',
+              doctor: 'BS. Nguyễn Thị Lan',
+              medications: ['Sữa không lactose'],
+              notes: 'Cho uống sữa đặc biệt, không cho sữa bò thường',
+              status: 'Đang theo dõi',
             },
             {
               id: 2,
-              type: "Khám định kỳ",
-              title: "Tiêm chủng định kỳ",
-              description: "Tiêm vaccine phòng bệnh theo lịch",
-              severity: "Bình thường",
-              date: "2024-03-10",
-              doctor: "BS. Phạm Văn Minh",
+              type: 'Khám định kỳ',
+              title: 'Tiêm chủng định kỳ',
+              description: 'Tiêm vaccine phòng bệnh theo lịch',
+              severity: 'Bình thường',
+              date: '2024-03-10',
+              doctor: 'BS. Phạm Văn Minh',
               medications: [],
-              notes: "Đã tiêm đủ vaccine theo độ tuổi",
-              status: "Hoàn thành",
+              notes: 'Đã tiêm đủ vaccine theo độ tuổi',
+              status: 'Hoàn thành',
             },
           ],
         },
         {
           id: 2,
-          name: "Trần Thị Bé",
-          studentCode: "MN002",
-          dateOfBirth: "2020-08-22",
-          gender: "Nữ",
-          address: "456 Đường DEF, Quận 3, TP.HCM",
-          parentName: "Trần Văn B",
-          parentPhone: "0907654321",
-          healthStatus: "Tốt",
-          avatar: "👧",
+          name: 'Trần Thị Bé',
+          studentCode: 'MN002',
+          dateOfBirth: '2020-08-22',
+          gender: 'Nữ',
+          address: '456 Đường DEF, Quận 3, TP.HCM',
+          parentName: 'Trần Văn B',
+          parentPhone: '0907654321',
+          healthStatus: 'Tốt',
+          avatar: '👧',
           healthRecords: [
             {
               id: 3,
-              type: "Khám định kỳ",
-              title: "Kiểm tra sức khỏe tổng quát",
-              description: "Khám sức khỏe định kỳ cho trẻ mầm non",
-              severity: "Bình thường",
-              date: "2024-02-20",
-              doctor: "BS. Lê Thị Mai",
+              type: 'Khám định kỳ',
+              title: 'Kiểm tra sức khỏe tổng quát',
+              description: 'Khám sức khỏe định kỳ cho trẻ mầm non',
+              severity: 'Bình thường',
+              date: '2024-02-20',
+              doctor: 'BS. Lê Thị Mai',
               medications: [],
-              notes: "Sức khỏe tốt, phát triển bình thường",
-              status: "Hoàn thành",
+              notes: 'Sức khỏe tốt, phát triển bình thường',
+              status: 'Hoàn thành',
             },
           ],
         },
         {
           id: 3,
-          name: "Lê Văn Bình",
-          studentCode: "MN003",
-          dateOfBirth: "2020-12-03",
-          gender: "Nam",
-          address: "789 Đường GHI, Quận 7, TP.HCM",
-          parentName: "Lê Thị C",
-          parentPhone: "0912345678",
-          healthStatus: "Cần chú ý",
-          avatar: "👦",
+          name: 'Lê Văn Bình',
+          studentCode: 'MN003',
+          dateOfBirth: '2020-12-03',
+          gender: 'Nam',
+          address: '789 Đường GHI, Quận 7, TP.HCM',
+          parentName: 'Lê Thị C',
+          parentPhone: '0912345678',
+          healthStatus: 'Cần chú ý',
+          avatar: '👦',
           healthRecords: [
             {
               id: 4,
-              type: "Vấn đề phát triển",
-              title: "Chậm nói",
-              description: "Chậm phát triển ngôn ngữ so với độ tuổi",
-              severity: "Trung bình",
-              date: "2024-02-20",
-              doctor: "BS. Nguyễn Văn Đức",
+              type: 'Vấn đề phát triển',
+              title: 'Chậm nói',
+              description: 'Chậm phát triển ngôn ngữ so với độ tuổi',
+              severity: 'Trung bình',
+              date: '2024-02-20',
+              doctor: 'BS. Nguyễn Văn Đức',
               medications: [],
-              notes: "Cần tham gia các hoạt động kích thích ngôn ngữ",
-              status: "Đang theo dõi",
+              notes: 'Cần tham gia các hoạt động kích thích ngôn ngữ',
+              status: 'Đang theo dõi',
             },
           ],
         },
       ],
     },
     {
-      id: "choi",
-      name: "Lớp Chồi",
+      id: 'choi',
+      name: 'Lớp Chồi',
       students: [
         {
           id: 4,
-          name: "Phạm Thị Lan",
-          studentCode: "MN004",
-          dateOfBirth: "2019-04-18",
-          gender: "Nữ",
-          address: "321 Đường JKL, Quận 5, TP.HCM",
-          parentName: "Phạm Văn D",
-          parentPhone: "0923456789",
-          healthStatus: "Bình thường",
-          avatar: "👧",
+          name: 'Phạm Thị Lan',
+          studentCode: 'MN004',
+          dateOfBirth: '2019-04-18',
+          gender: 'Nữ',
+          address: '321 Đường JKL, Quận 5, TP.HCM',
+          parentName: 'Phạm Văn D',
+          parentPhone: '0923456789',
+          healthStatus: 'Bình thường',
+          avatar: '👧',
           healthRecords: [],
         },
         {
           id: 5,
-          name: "Hoàng Văn Tùng",
-          studentCode: "MN005",
-          dateOfBirth: "2019-07-09",
-          gender: "Nam",
-          address: "654 Đường MNO, Quận 10, TP.HCM",
-          parentName: "Hoàng Thị E",
-          parentPhone: "0934567890",
-          healthStatus: "Tốt",
-          avatar: "👦",
+          name: 'Hoàng Văn Tùng',
+          studentCode: 'MN005',
+          dateOfBirth: '2019-07-09',
+          gender: 'Nam',
+          address: '654 Đường MNO, Quận 10, TP.HCM',
+          parentName: 'Hoàng Thị E',
+          parentPhone: '0934567890',
+          healthStatus: 'Tốt',
+          avatar: '👦',
           healthRecords: [
             {
               id: 5,
-              type: "Dị ứng",
-              title: "Dị ứng phấn hoa",
+              type: 'Dị ứng',
+              title: 'Dị ứng phấn hoa',
               description:
-                "Dị ứng phấn hoa vào mùa xuân, gây hắt hơi và chảy nước mũi",
-              severity: "Nhẹ",
-              date: "2024-03-05",
-              doctor: "BS. Võ Thị Hạnh",
-              medications: ["Thuốc chống dị ứng cho trẻ em"],
-              notes: "Tránh ra ngoài khi có gió lớn, đeo khẩu trang",
-              status: "Đang theo dõi",
+                'Dị ứng phấn hoa vào mùa xuân, gây hắt hơi và chảy nước mũi',
+              severity: 'Nhẹ',
+              date: '2024-03-05',
+              doctor: 'BS. Võ Thị Hạnh',
+              medications: ['Thuốc chống dị ứng cho trẻ em'],
+              notes: 'Tránh ra ngoài khi có gió lớn, đeo khẩu trang',
+              status: 'Đang theo dõi',
             },
           ],
         },
       ],
     },
     {
-      id: "la",
-      name: "Lớp Lá",
+      id: 'la',
+      name: 'Lớp Lá',
       students: [
         {
           id: 6,
-          name: "Đỗ Thị Mai",
-          studentCode: "MN006",
-          dateOfBirth: "2018-11-15",
-          gender: "Nữ",
-          address: "987 Đường PQR, Quận 2, TP.HCM",
-          parentName: "Đỗ Văn F",
-          parentPhone: "0945678901",
-          healthStatus: "Tốt",
-          avatar: "👧",
+          name: 'Đỗ Thị Mai',
+          studentCode: 'MN006',
+          dateOfBirth: '2018-11-15',
+          gender: 'Nữ',
+          address: '987 Đường PQR, Quận 2, TP.HCM',
+          parentName: 'Đỗ Văn F',
+          parentPhone: '0945678901',
+          healthStatus: 'Tốt',
+          avatar: '👧',
           healthRecords: [
             {
               id: 6,
-              type: "Khám định kỳ",
-              title: "Khám sức khỏe trước khi vào lớp 1",
-              description: "Kiểm tra sức khỏe tổng quát chuẩn bị vào tiểu học",
-              severity: "Bình thường",
-              date: "2024-03-15",
-              doctor: "BS. Trần Văn Hùng",
+              type: 'Khám định kỳ',
+              title: 'Khám sức khỏe trước khi vào lớp 1',
+              description: 'Kiểm tra sức khỏe tổng quát chuẩn bị vào tiểu học',
+              severity: 'Bình thường',
+              date: '2024-03-15',
+              doctor: 'BS. Trần Văn Hùng',
               medications: [],
-              notes: "Đã sẵn sàng cho bậc tiểu học",
-              status: "Hoàn thành",
+              notes: 'Đã sẵn sàng cho bậc tiểu học',
+              status: 'Hoàn thành',
             },
           ],
         },
         {
           id: 7,
-          name: "Vũ Minh Quân",
-          studentCode: "MN007",
-          dateOfBirth: "2018-06-20",
-          gender: "Nam",
-          address: "147 Đường STU, Quận 4, TP.HCM",
-          parentName: "Vũ Thị G",
-          parentPhone: "0956789012",
-          healthStatus: "Cần chú ý",
-          avatar: "👦",
+          name: 'Vũ Minh Quân',
+          studentCode: 'MN007',
+          dateOfBirth: '2018-06-20',
+          gender: 'Nam',
+          address: '147 Đường STU, Quận 4, TP.HCM',
+          parentName: 'Vũ Thị G',
+          parentPhone: '0956789012',
+          healthStatus: 'Cần chú ý',
+          avatar: '👦',
           healthRecords: [
             {
               id: 7,
-              type: "Vấn đề hành vi",
-              title: "Tăng động giảm chú ý",
-              description: "Khó tập trung, hiếu động quá mức",
-              severity: "Trung bình",
-              date: "2024-01-20",
-              doctor: "BS. Lê Thị Hương",
+              type: 'Vấn đề hành vi',
+              title: 'Tăng động giảm chú ý',
+              description: 'Khó tập trung, hiếu động quá mức',
+              severity: 'Trung bình',
+              date: '2024-01-20',
+              doctor: 'BS. Lê Thị Hương',
               medications: [],
-              notes: "Cần môi trường học tập phù hợp, giảm kích thích",
-              status: "Đang theo dõi",
+              notes: 'Cần môi trường học tập phù hợp, giảm kích thích',
+              status: 'Đang theo dõi',
             },
           ],
         },
@@ -213,49 +213,49 @@ function StudentHealthRecord() {
   ];
 
   const allClasses = classesData;
-  const selectedClassData = allClasses.find((cls) => cls.id === selectedClass);
+  const selectedClassData = allClasses.find(cls => cls.id === selectedClass);
   const students = selectedClass
     ? selectedClassData
       ? selectedClassData.students
       : []
-    : allClasses.flatMap((cls) => cls.students);
+    : allClasses.flatMap(cls => cls.students);
 
   // Function to get class name for a student
-  const getStudentClassName = (studentId) => {
+  const getStudentClassName = studentId => {
     for (const cls of allClasses) {
-      if (cls.students.find((s) => s.id === studentId)) {
+      if (cls.students.find(s => s.id === studentId)) {
         return cls.name;
       }
     }
-    return "";
+    return '';
   };
 
-  const getHealthStatusColor = (status) => {
+  const getHealthStatusColor = status => {
     const colors = {
-      Tốt: "#28a745",
-      "Bình thường": "#17a2b8",
-      "Cần chú ý": "#ffc107",
-      "Nghiêm trọng": "#dc3545",
+      Tốt: '#28a745',
+      'Bình thường': '#17a2b8',
+      'Cần chú ý': '#ffc107',
+      'Nghiêm trọng': '#dc3545',
     };
-    return colors[status] || "#6c757d";
+    return colors[status] || '#6c757d';
   };
 
-  const getSeverityColor = (severity) => {
+  const getSeverityColor = severity => {
     const colors = {
-      Nhẹ: "#28a745",
-      "Trung bình": "#ffc107",
-      Nặng: "#dc3545",
-      "Bình thường": "#17a2b8",
+      Nhẹ: '#28a745',
+      'Trung bình': '#ffc107',
+      Nặng: '#dc3545',
+      'Bình thường': '#17a2b8',
     };
-    return colors[severity] || "#6c757d";
+    return colors[severity] || '#6c757d';
   };
 
-  const handleViewStudent = (student) => {
+  const handleViewStudent = student => {
     setSelectedStudent(student);
     setShowDetailModal(true);
   };
 
-  const handleEditRecord = (record) => {
+  const handleEditRecord = record => {
     setEditingRecord(record);
     setShowEditModal(true);
   };
@@ -263,20 +263,20 @@ function StudentHealthRecord() {
   const handleAddRecord = () => {
     setEditingRecord({
       id: Date.now(),
-      type: "",
-      title: "",
-      description: "",
-      severity: "Nhẹ",
-      date: new Date().toISOString().split("T")[0],
-      doctor: "",
+      type: '',
+      title: '',
+      description: '',
+      severity: 'Nhẹ',
+      date: new Date().toISOString().split('T')[0],
+      doctor: '',
       medications: [],
-      notes: "",
-      status: "Đang theo dõi",
+      notes: '',
+      status: 'Đang theo dõi',
     });
     setShowEditModal(true);
   };
 
-  const handleSaveRecord = (recordData) => {
+  const handleSaveRecord = recordData => {
     // TODO: Call API to save record
     setShowEditModal(false);
     setEditingRecord(null);
@@ -288,7 +288,7 @@ function StudentHealthRecord() {
   );
   const studentsWithRecords = allClasses.reduce(
     (sum, cls) =>
-      sum + cls.students.filter((s) => s.healthRecords.length > 0).length,
+      sum + cls.students.filter(s => s.healthRecords.length > 0).length,
     0
   );
 
@@ -335,7 +335,7 @@ function StudentHealthRecord() {
               {allClasses.reduce(
                 (sum, cls) =>
                   sum +
-                  cls.students.filter((s) => s.healthStatus === "Cần chú ý")
+                  cls.students.filter(s => s.healthStatus === 'Cần chú ý')
                     .length,
                 0
               )}
@@ -350,17 +350,17 @@ function StudentHealthRecord() {
         <h3>📚 Chọn lớp học</h3>
         <div className="class-buttons">
           <button
-            className={`class-btn ${selectedClass === "" ? "active" : ""}`}
-            onClick={() => setSelectedClass("")}
+            className={`class-btn ${selectedClass === '' ? 'active' : ''}`}
+            onClick={() => setSelectedClass('')}
           >
             <span className="class-icon">📖</span>
             <span>Tất cả lớp</span>
           </button>
-          {allClasses.map((cls) => (
+          {allClasses.map(cls => (
             <button
               key={cls.id}
               className={`class-btn ${
-                selectedClass === cls.id ? "active" : ""
+                selectedClass === cls.id ? 'active' : ''
               }`}
               onClick={() => setSelectedClass(cls.id)}
             >
@@ -376,8 +376,8 @@ function StudentHealthRecord() {
       <div className="students-section">
         <div className="section-header">
           <h3>
-            👨‍🎓 Danh sách học sinh{" "}
-            {selectedClassData ? `- ${selectedClassData.name}` : ""}
+            👨‍🎓 Danh sách học sinh{' '}
+            {selectedClassData ? `- ${selectedClassData.name}` : ''}
           </h3>
           {selectedStudent && (
             <button className="add-record-btn" onClick={handleAddRecord}>
@@ -387,7 +387,7 @@ function StudentHealthRecord() {
         </div>
 
         <div className="students-grid">
-          {students.map((student) => (
+          {students.map(student => (
             <div key={student.id} className="student-card">
               <div className="student-header">
                 <div className="student-avatar">{student.avatar}</div>
@@ -447,7 +447,7 @@ function StudentHealthRecord() {
             <p>
               {selectedClass
                 ? `Không có học sinh nào trong ${selectedClassData?.name}`
-                : "Vui lòng chọn lớp để xem danh sách học sinh"}
+                : 'Vui lòng chọn lớp để xem danh sách học sinh'}
             </p>
           </div>
         )}
@@ -458,7 +458,14 @@ function StudentHealthRecord() {
         <div className="modal-overlay">
           <div className="modal-content large-modal">
             <div className="modal-header">
-              <h3>📋 Hồ sơ sức khỏe - {selectedStudent.name}</h3>
+              <h3
+                style={{
+                  fontFamily:
+                    "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                }}
+              >
+                📋 Hồ sơ sức khỏe - {selectedStudent.name}
+              </h3>
               <button
                 className="modal-close"
                 onClick={() => setShowDetailModal(false)}
@@ -472,41 +479,148 @@ function StudentHealthRecord() {
               <div className="student-info-section">
                 <div className="info-grid">
                   <div className="info-item">
-                    <label>👤 Họ và tên:</label>
-                    <span>{selectedStudent.name}</span>
+                    <label
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      👤 Họ và tên:
+                    </label>
+                    <span
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      {selectedStudent.name}
+                    </span>
                   </div>
                   <div className="info-item">
-                    <label>🏷️ Mã học sinh:</label>
-                    <span>{selectedStudent.studentCode}</span>
+                    <label
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      🏷️ Mã học sinh:
+                    </label>
+                    <span
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      {selectedStudent.studentCode}
+                    </span>
                   </div>
                   <div className="info-item">
-                    <label>🎂 Ngày sinh:</label>
-                    <span>{selectedStudent.dateOfBirth}</span>
+                    <label
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      🎂 Ngày sinh:
+                    </label>
+                    <span
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      {selectedStudent.dateOfBirth}
+                    </span>
                   </div>
                   <div className="info-item">
-                    <label>⚧️ Giới tính:</label>
-                    <span>{selectedStudent.gender}</span>
+                    <label
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      ⚧️ Giới tính:
+                    </label>
+                    <span
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      {selectedStudent.gender}
+                    </span>
                   </div>
                   <div className="info-item">
-                    <label>🏠 Địa chỉ:</label>
-                    <span>{selectedStudent.address}</span>
+                    <label
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      🏠 Địa chỉ:
+                    </label>
+                    <span
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      {selectedStudent.address}
+                    </span>
                   </div>
                   <div className="info-item">
-                    <label>👨‍👩‍👧‍👦 Phụ huynh:</label>
-                    <span>{selectedStudent.parentName}</span>
+                    <label
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      👨‍👩‍👧‍👦 Phụ huynh:
+                    </label>
+                    <span
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      {selectedStudent.parentName}
+                    </span>
                   </div>
                   <div className="info-item">
-                    <label>📞 Số điện thoại:</label>
-                    <span>{selectedStudent.parentPhone}</span>
+                    <label
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      📞 Số điện thoại:
+                    </label>
+                    <span
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      {selectedStudent.parentPhone}
+                    </span>
                   </div>
                   <div className="info-item">
-                    <label>💚 Tình trạng sức khỏe:</label>
+                    <label
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      💚 Tình trạng sức khỏe:
+                    </label>
                     <span
                       className="health-badge"
                       style={{
                         backgroundColor: getHealthStatusColor(
                           selectedStudent.healthStatus
                         ),
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
                       }}
                     >
                       {selectedStudent.healthStatus}
@@ -518,7 +632,14 @@ function StudentHealthRecord() {
               {/* Health Records */}
               <div className="health-records-section">
                 <div className="section-header">
-                  <h4>📋 Hồ sơ y tế</h4>
+                  <h4
+                    style={{
+                      fontFamily:
+                        "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                    }}
+                  >
+                    📋 Hồ sơ y tế
+                  </h4>
                   <button className="add-record-btn" onClick={handleAddRecord}>
                     ➕ Thêm hồ sơ mới
                   </button>
@@ -526,12 +647,27 @@ function StudentHealthRecord() {
 
                 {selectedStudent.healthRecords.length > 0 ? (
                   <div className="records-list">
-                    {selectedStudent.healthRecords.map((record) => (
+                    {selectedStudent.healthRecords.map(record => (
                       <div key={record.id} className="record-item">
                         <div className="record-header">
                           <div className="record-title">
-                            <h5>{record.title}</h5>
-                            <span className="record-type">{record.type}</span>
+                            <h5
+                              style={{
+                                fontFamily:
+                                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                              }}
+                            >
+                              {record.title}
+                            </h5>
+                            <span
+                              className="record-type"
+                              style={{
+                                fontFamily:
+                                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                              }}
+                            >
+                              {record.type}
+                            </span>
                           </div>
                           <div className="record-meta">
                             <span
@@ -540,11 +676,21 @@ function StudentHealthRecord() {
                                 backgroundColor: getSeverityColor(
                                   record.severity
                                 ),
+                                fontFamily:
+                                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
                               }}
                             >
                               {record.severity}
                             </span>
-                            <span className="record-date">{record.date}</span>
+                            <span
+                              className="record-date"
+                              style={{
+                                fontFamily:
+                                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                              }}
+                            >
+                              {record.date}
+                            </span>
                             <button
                               className="edit-btn"
                               onClick={() => handleEditRecord(record)}
@@ -555,22 +701,47 @@ function StudentHealthRecord() {
                         </div>
 
                         <div className="record-content">
-                          <p>
+                          <p
+                            style={{
+                              fontFamily:
+                                "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                            }}
+                          >
                             <strong>Mô tả:</strong> {record.description}
                           </p>
-                          <p>
+                          <p
+                            style={{
+                              fontFamily:
+                                "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                            }}
+                          >
                             <strong>Bác sĩ:</strong> {record.doctor}
                           </p>
                           {record.medications.length > 0 && (
-                            <p>
-                              <strong>Thuốc:</strong>{" "}
-                              {record.medications.join(", ")}
+                            <p
+                              style={{
+                                fontFamily:
+                                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                              }}
+                            >
+                              <strong>Thuốc:</strong>{' '}
+                              {record.medications.join(', ')}
                             </p>
                           )}
-                          <p>
+                          <p
+                            style={{
+                              fontFamily:
+                                "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                            }}
+                          >
                             <strong>Ghi chú:</strong> {record.notes}
                           </p>
-                          <p>
+                          <p
+                            style={{
+                              fontFamily:
+                                "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                            }}
+                          >
                             <strong>Trạng thái:</strong> {record.status}
                           </p>
                         </div>
@@ -579,7 +750,14 @@ function StudentHealthRecord() {
                   </div>
                 ) : (
                   <div className="no-records">
-                    <p>Chưa có hồ sơ y tế nào</p>
+                    <p
+                      style={{
+                        fontFamily:
+                          "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                      }}
+                    >
+                      Chưa có hồ sơ y tế nào
+                    </p>
                   </div>
                 )}
               </div>
@@ -593,10 +771,15 @@ function StudentHealthRecord() {
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
-              <h3>
+              <h3
+                style={{
+                  fontFamily:
+                    "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                }}
+              >
                 {editingRecord.id === Date.now() || !editingRecord.title
-                  ? "➕ Thêm hồ sơ mới"
-                  : "✏️ Sửa hồ sơ"}
+                  ? '➕ Thêm hồ sơ mới'
+                  : '✏️ Sửa hồ sơ'}
               </h3>
               <button
                 className="modal-close"
@@ -608,7 +791,7 @@ function StudentHealthRecord() {
 
             <div className="modal-body">
               <form
-                onSubmit={(e) => {
+                onSubmit={e => {
                   e.preventDefault();
                   handleSaveRecord(editingRecord);
                 }}
@@ -618,7 +801,7 @@ function StudentHealthRecord() {
                     <label>Loại hồ sơ</label>
                     <select
                       value={editingRecord.type}
-                      onChange={(e) =>
+                      onChange={e =>
                         setEditingRecord({
                           ...editingRecord,
                           type: e.target.value,
@@ -643,7 +826,7 @@ function StudentHealthRecord() {
                     <input
                       type="text"
                       value={editingRecord.title}
-                      onChange={(e) =>
+                      onChange={e =>
                         setEditingRecord({
                           ...editingRecord,
                           title: e.target.value,
@@ -657,7 +840,7 @@ function StudentHealthRecord() {
                     <label>Mức độ nghiêm trọng</label>
                     <select
                       value={editingRecord.severity}
-                      onChange={(e) =>
+                      onChange={e =>
                         setEditingRecord({
                           ...editingRecord,
                           severity: e.target.value,
@@ -676,7 +859,7 @@ function StudentHealthRecord() {
                     <input
                       type="date"
                       value={editingRecord.date}
-                      onChange={(e) =>
+                      onChange={e =>
                         setEditingRecord({
                           ...editingRecord,
                           date: e.target.value,
@@ -691,7 +874,7 @@ function StudentHealthRecord() {
                     <input
                       type="text"
                       value={editingRecord.doctor}
-                      onChange={(e) =>
+                      onChange={e =>
                         setEditingRecord({
                           ...editingRecord,
                           doctor: e.target.value,
@@ -704,7 +887,7 @@ function StudentHealthRecord() {
                     <label>Trạng thái</label>
                     <select
                       value={editingRecord.status}
-                      onChange={(e) =>
+                      onChange={e =>
                         setEditingRecord({
                           ...editingRecord,
                           status: e.target.value,
@@ -721,7 +904,7 @@ function StudentHealthRecord() {
                     <label>Mô tả</label>
                     <textarea
                       value={editingRecord.description}
-                      onChange={(e) =>
+                      onChange={e =>
                         setEditingRecord({
                           ...editingRecord,
                           description: e.target.value,
@@ -735,7 +918,7 @@ function StudentHealthRecord() {
                     <label>Ghi chú</label>
                     <textarea
                       value={editingRecord.notes}
-                      onChange={(e) =>
+                      onChange={e =>
                         setEditingRecord({
                           ...editingRecord,
                           notes: e.target.value,

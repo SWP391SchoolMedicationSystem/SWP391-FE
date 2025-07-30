@@ -383,7 +383,7 @@ function VaccinationEvents() {
 
         {events.length > 0 ? (
           <div className="events-grid">
-            {events.map(event => (
+            {events.slice().reverse().map(event => (
               <div key={event.id} className="event-card">
                 <div
                   className="card-header"
@@ -589,14 +589,7 @@ function VaccinationEvents() {
                   className="submit-btn"
                   disabled={isCreating}
                 >
-                  {isCreating ? (
-                    <>
-                      <span className="loading-spinner">⏳</span>
-                      Đang tạo...
-                    </>
-                  ) : (
-                    '➕ Tạo sự kiện'
-                  )}
+                  {isCreating ? 'Đang tải...' : '➕ Tạo sự kiện'}
                 </button>
               </div>
             </form>
@@ -676,14 +669,7 @@ function VaccinationEvents() {
                   className="submit-btn"
                   disabled={isUpdating}
                 >
-                  {isUpdating ? (
-                    <>
-                      <span className="loading-spinner">⏳</span>
-                      Đang cập nhật...
-                    </>
-                  ) : (
-                    'Cập nhật'
-                  )}
+                  {isUpdating ? 'Đang tải...' : 'Cập nhật'}
                 </button>
               </div>
             </form>
@@ -736,14 +722,7 @@ function VaccinationEvents() {
                 className="delete-confirm-btn"
                 disabled={isDeleting}
               >
-                {isDeleting ? (
-                  <>
-                    <span className="loading-spinner">⏳</span>
-                    Đang xóa...
-                  </>
-                ) : (
-                  '🗑️ Xóa'
-                )}
+                {isDeleting ? 'Đang tải...' : '🗑️ Xóa'}
               </button>
             </div>
           </div>
@@ -835,14 +814,7 @@ function VaccinationEvents() {
                   className="send-email-btn"
                   disabled={isSendingEmail}
                 >
-                  {isSendingEmail ? (
-                    <>
-                      <span className="loading-spinner">⏳</span>
-                      Đang gửi...
-                    </>
-                  ) : (
-                    '📧 Gửi Email'
-                  )}
+                  {isSendingEmail ? 'Đang tải...' : '📧 Gửi Email'}
                 </button>
               </div>
             </form>
