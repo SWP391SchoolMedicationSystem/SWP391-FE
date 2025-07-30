@@ -383,65 +383,70 @@ function VaccinationEvents() {
 
         {events.length > 0 ? (
           <div className="events-grid">
-            {events.slice().reverse().map(event => (
-              <div key={event.id} className="event-card">
-                <div
-                  className="card-header"
-                  onClick={() => handleViewStudents(event)}
-                >
-                  <h3>{event.title}</h3>
-                  <span className="click-hint">👥 Xem danh sách học sinh</span>
-                </div>
-
-                <div className="card-body">
-                  <div className="event-info">
-                    <div className="info-row">
-                      <span className="label">📅 Ngày tiêm:</span>
-                      <span className="value">{event.eventDate}</span>
-                    </div>
-                    <div className="info-row">
-                      <span className="label">📍 Địa điểm:</span>
-                      <span className="value">
-                        {event.location || 'Chưa có'}
-                      </span>
-                    </div>
-                    <div className="info-row">
-                      <span className="label">👨‍💼 Tổ chức:</span>
-                      <span className="value">
-                        {event.organizedBy || 'admin'}
-                      </span>
-                    </div>
+            {events
+              .slice()
+              .reverse()
+              .map(event => (
+                <div key={event.id} className="event-card">
+                  <div
+                    className="card-header"
+                    onClick={() => handleViewStudents(event)}
+                  >
+                    <h3>{event.title}</h3>
+                    <span className="click-hint">
+                      👥 Xem danh sách học sinh
+                    </span>
                   </div>
 
-                  {event.description && (
-                    <div className="event-description">
-                      <p>{event.description}</p>
+                  <div className="card-body">
+                    <div className="event-info">
+                      <div className="info-row">
+                        <span className="label">📅 Ngày tiêm:</span>
+                        <span className="value">{event.eventDate}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">📍 Địa điểm:</span>
+                        <span className="value">
+                          {event.location || 'Chưa có'}
+                        </span>
+                      </div>
+                      <div className="info-row">
+                        <span className="label">👨‍💼 Tổ chức:</span>
+                        <span className="value">
+                          {event.organizedBy || 'admin'}
+                        </span>
+                      </div>
                     </div>
-                  )}
-                </div>
 
-                <div className="card-footer">
-                  <button
-                    className="edit-btn"
-                    onClick={() => handleEditEvent(event)}
-                  >
-                    Chỉnh sửa
-                  </button>
-                  <button
-                    className="email-btn"
-                    onClick={() => handleSendEmailAll(event)}
-                  >
-                    Gửi email
-                  </button>
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDeleteEvent(event)}
-                  >
-                    Xóa
-                  </button>
+                    {event.description && (
+                      <div className="event-description">
+                        <p>{event.description}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="card-footer">
+                    <button
+                      className="edit-btn"
+                      onClick={() => handleEditEvent(event)}
+                    >
+                      Chỉnh sửa
+                    </button>
+                    <button
+                      className="email-btn"
+                      onClick={() => handleSendEmailAll(event)}
+                    >
+                      Gửi email
+                    </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDeleteEvent(event)}
+                    >
+                      Xóa
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         ) : (
           <div className="no-events">
@@ -509,6 +514,7 @@ function VaccinationEvents() {
                     name="eventDate"
                     value={formData.eventDate}
                     onChange={handleInputChange}
+                    min={new Date().toISOString().split('T')[0]}
                     required
                   />
                 </div>
@@ -641,6 +647,7 @@ function VaccinationEvents() {
                     name="eventDate"
                     value={formData.eventDate}
                     onChange={handleInputChange}
+                    min={new Date().toISOString().split('T')[0]}
                     required
                   />
                 </div>
