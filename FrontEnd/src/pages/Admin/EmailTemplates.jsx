@@ -33,7 +33,6 @@ import {
   Save as SaveIcon,
   Cancel as CancelIcon,
   Preview as PreviewIcon,
-  Send as SendIcon,
 } from "@mui/icons-material";
 import { adminEmailService } from "../../services/adminService";
 
@@ -63,7 +62,14 @@ function EmailTemplates() {
     try {
       setLoading(true);
       const response = await adminEmailService.getEmailTemplates();
-      setTemplates(response || []);
+      
+      // Lọc ra templates chưa bị xóa (isDeleted = false hoặc không có isDeleted)
+      const activeTemplates = (response || []).filter(template => {
+        const isDeleted = template.isDeleted === true;
+        return !isDeleted;
+      });
+      
+      setTemplates(activeTemplates);
     } catch (error) {
       console.error("Error fetching templates:", error);
       showAlert("Lỗi khi tải danh sách template", "error");
@@ -84,7 +90,7 @@ function EmailTemplates() {
     if (template) {
       setEditingTemplate(template);
       setFormData({
-        to: template.to || "",
+        to: template.to || template.email?.to || "", // Lấy email từ template cũ
         subject: template.subject || "",
         body: template.body || "",
       });
@@ -98,7 +104,7 @@ function EmailTemplates() {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setEditingTemplate(null);
-    setFormData({ to: "", subject: "", body: "" });
+    setFormData({ subject: "", body: "" });
   };
 
   const handleInputChange = (e) => {
@@ -117,35 +123,74 @@ function EmailTemplates() {
       }
 
       if (editingTemplate) {
-        // Update existing template
+        // Update existing template - chỉ gửi id, subject và body
         const updateData = {
-          id: editingTemplate.id,
-          email: formData,
+          id: editingTemplate.emailTemplateId || editingTemplate.id,
+          subject: formData.subject,
+          body: formData.body,
         };
+        
         await adminEmailService.updateEmailTemplate(updateData);
         showAlert("Cập nhật template thành công", "success");
       } else {
-        // Create new template
-        await adminEmailService.createEmailTemplate(formData);
+        // Create new template - chỉ gửi subject và body
+        const createData = {
+          subject: formData.subject,
+          body: formData.body,
+        };
+        
+        await adminEmailService.createEmailTemplate(createData);
         showAlert("Tạo template thành công", "success");
       }
 
       handleCloseDialog();
       fetchTemplates();
     } catch (error) {
-      console.error("Error saving template:", error);
-      showAlert("Lỗi khi lưu template", "error");
+      console.error("=== ERROR DETAILS ===");
+      console.error("Error object:", error);
+      console.error("Error response:", error.response);
+      console.error("Error response data:", error.response?.data);
+      console.error("Error response status:", error.response?.status);
+      console.error("Error response headers:", error.response?.headers);
+      console.error("Error message:", error.message);
+      
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data || 
+                          error.message || 
+                          "Lỗi không xác định";
+      
+      showAlert(`Lỗi khi lưu template: ${errorMessage}`, "error");
     }
   };
 
   const handleDeleteTemplate = async (templateId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa template này?")) {
       try {
-        // Note: Backend chưa có DELETE endpoint, sẽ implement khi có API
-        showAlert("Chức năng xóa sẽ được implement khi backend có API", "info");
+        // Tìm chính xác template cần xóa
+        const templateToDelete = templates.find(t => 
+          t.id === templateId || 
+          t.emailTemplateId === templateId ||
+          t.emailTemplateId === parseInt(templateId)
+        );
+        
+        if (!templateToDelete) {
+          showAlert("Không tìm thấy template để xóa", "error");
+          return;
+        }
+        
+        // Sử dụng emailTemplateId nếu có, không thì dùng id
+        const deleteId = templateToDelete.emailTemplateId || templateToDelete.id;
+        
+        await adminEmailService.deleteEmailTemplate(deleteId);
+        showAlert("Xóa template thành công", "success");
+        await fetchTemplates(); // Refresh danh sách
       } catch (error) {
         console.error("Error deleting template:", error);
-        showAlert("Lỗi khi xóa template", "error");
+        const errorMessage = error.response?.data?.message || 
+                            error.response?.data || 
+                            error.message || 
+                            "Lỗi không xác định";
+        showAlert(`Lỗi khi xóa template: ${errorMessage}`, "error");
       }
     }
   };
@@ -153,22 +198,6 @@ function EmailTemplates() {
   const handlePreview = (template) => {
     setEditingTemplate(template);
     setPreviewDialog(true);
-  };
-
-  const handleSendTest = async (template) => {
-    try {
-      const emailData = {
-        to: "admin@school.com", // Test email
-        subject: `[TEST] ${template.subject}`,
-        body: template.body,
-      };
-
-      await adminEmailService.sendEmail(emailData);
-      showAlert("Gửi email test thành công", "success");
-    } catch (error) {
-      console.error("Error sending test email:", error);
-      showAlert("Lỗi khi gửi email test", "error");
-    }
   };
 
   return (
@@ -208,7 +237,7 @@ function EmailTemplates() {
         <Grid item xs={12} sm={6} md={3}>
           <Card elevation={2}>
             <CardContent sx={{ textAlign: "center" }}>
-              <SendIcon color="success" sx={{ fontSize: 40, mb: 1 }} />
+              <EmailIcon color="success" sx={{ fontSize: 40, mb: 1 }} />
               <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                 0
               </Typography>
@@ -252,7 +281,6 @@ function EmailTemplates() {
                 <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
                   <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
                   <TableCell sx={{ fontWeight: "bold" }}>Subject</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>To</TableCell>
                   <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
                   <TableCell sx={{ fontWeight: "bold" }}>Created</TableCell>
                   <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
@@ -261,13 +289,13 @@ function EmailTemplates() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={6} sx={{ textAlign: "center", py: 3 }}>
+                    <TableCell colSpan={5} sx={{ textAlign: "center", py: 3 }}>
                       <Typography>Đang tải...</Typography>
                     </TableCell>
                   </TableRow>
                 ) : templates.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} sx={{ textAlign: "center", py: 3 }}>
+                    <TableCell colSpan={5} sx={{ textAlign: "center", py: 3 }}>
                       <Typography color="text.secondary">
                         Chưa có template nào. Tạo template đầu tiên!
                       </Typography>
@@ -275,8 +303,8 @@ function EmailTemplates() {
                   </TableRow>
                 ) : (
                   templates.map((template, index) => (
-                    <TableRow key={template.id || index} hover>
-                      <TableCell>{template.id || index + 1}</TableCell>
+                    <TableRow key={template.emailTemplateId || template.id || index} hover>
+                      <TableCell>{template.emailTemplateId || template.id || index + 1}</TableCell>
                       <TableCell>
                         <Typography
                           variant="body2"
@@ -285,7 +313,6 @@ function EmailTemplates() {
                           {template.subject}
                         </Typography>
                       </TableCell>
-                      <TableCell>{template.to || "N/A"}</TableCell>
                       <TableCell>
                         <Chip
                           label="Active"
@@ -317,19 +344,10 @@ function EmailTemplates() {
                               <EditIcon />
                             </IconButton>
                           </Tooltip>
-                          <Tooltip title="Send Test">
-                            <IconButton
-                              size="small"
-                              onClick={() => handleSendTest(template)}
-                              color="success"
-                            >
-                              <SendIcon />
-                            </IconButton>
-                          </Tooltip>
                           <Tooltip title="Delete">
                             <IconButton
                               size="small"
-                              onClick={() => handleDeleteTemplate(template.id)}
+                              onClick={() => handleDeleteTemplate(template.emailTemplateId || template.id)}
                               color="error"
                             >
                               <DeleteIcon />
@@ -365,17 +383,6 @@ function EmailTemplates() {
         </DialogTitle>
         <DialogContent sx={{ p: 3 }}>
           <Grid container spacing={3} sx={{ mt: 1 }}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="To (Email nhận - optional)"
-                name="to"
-                value={formData.to}
-                onChange={handleInputChange}
-                placeholder="admin@school.com"
-                variant="outlined"
-              />
-            </Grid>
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -441,12 +448,6 @@ function EmailTemplates() {
         <DialogContent sx={{ p: 3 }}>
           {editingTemplate && (
             <Box>
-              <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: "bold", mb: 1 }}
-              >
-                To: {editingTemplate.to || "Recipient Email"}
-              </Typography>
               <Typography
                 variant="subtitle1"
                 sx={{ fontWeight: "bold", mb: 2 }}

@@ -154,28 +154,57 @@ function ReviewRequests() {
   // Handle file download
   const handleDownloadFile = async (request) => {
     try {
-      console.log('🔍 Opening file:', {
-        filename: request.originalFilename,
-        path: request.storedPath
+      console.log('🔍 Opening file for request:', request);
+      console.log('🔍 All keys in request object:', Object.keys(request));
+      console.log('🔍 Full request object:', JSON.stringify(request, null, 2));
+      console.log('🔍 Selected request object:', selectedRequest);
+      console.log('🔍 All keys in selectedRequest:', Object.keys(selectedRequest));
+      console.log('🔍 File fields:', {
+        filename: request.filename,
+        originalFilename: request.originalFilename,
+        storedpath: request.storedpath,
+        storedPath: request.storedPath,
+        filePath: request.filePath,
+        path: request.path
       });
 
-      // Nếu storedPath là URL đầy đủ
-      if (request.storedPath && request.storedPath.startsWith('http')) {
-        window.open(request.storedPath, '_blank');
-        return;
+      // Sử dụng selectedRequest nếu request parameter không có đủ data
+      const requestData = request.storedpath ? request : selectedRequest;
+      
+      console.log('🔍 Using request data:', requestData);
+      console.log('🔍 Request data storedpath:', requestData?.storedpath);
+
+      let fileUrl = null;
+
+      // Sử dụng storedpath từ API
+      if (requestData?.storedpath) {
+        if (requestData.storedpath.startsWith('http')) {
+          fileUrl = requestData.storedpath;
+        } else {
+          // Thử nhiều endpoint khác nhau
+          const baseUrl = 'https://api-schoolhealth.purintech.id.vn/api';
+          const possibleUrls = [
+            `${baseUrl}/File/download/${requestData.storedpath}`,
+            `${baseUrl}/File/get/${requestData.storedpath}`,
+            `${baseUrl}/File/${requestData.storedpath}`,
+            `${baseUrl}/upload/${requestData.storedpath}`,
+            `${baseUrl}/files/${requestData.storedpath}`
+          ];
+          
+          console.log('🔗 Trying possible URLs:', possibleUrls);
+          
+          // Thử URL đầu tiên trước
+          fileUrl = possibleUrls[0];
+        }
       }
 
-      // Nếu storedPath là đường dẫn tương đối, tạo URL đầy đủ
-      if (request.storedPath) {
-        const baseUrl = 'https://api-schoolhealth.purintech.id.vn';
-        const fullUrl = `${baseUrl}${request.storedPath.startsWith('/') ? '' : '/'}${request.storedPath}`;
-        console.log('🔗 Full URL:', fullUrl);
-        
-        // Mở file trực tiếp trong tab mới (không download)
-        window.open(fullUrl, '_blank');
+      if (fileUrl) {
+        console.log('🔗 Opening file URL:', fileUrl);
+        window.open(fileUrl, '_blank');
       } else {
-        console.error('❌ No file path available');
-        alert('Không tìm thấy đường dẫn file!');
+        console.error('❌ No valid file URL found');
+        console.error('❌ Request data:', requestData);
+        alert('Không tìm thấy đường dẫn file hợp lệ!');
       }
     } catch (error) {
       console.error('❌ Error opening file:', error);
