@@ -70,7 +70,7 @@ const MedicineRequest = () => {
     documentFile: null
   });
   
-  const [filePreview, setFilePreview] = useState(null);
+
 
   useEffect(() => {
     loadStudents();
@@ -236,57 +236,7 @@ Vui lòng:
     }
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
-      if (!allowedTypes.includes(file.type)) {
-        setMessage({ 
-          type: 'error', 
-          text: 'Chỉ hỗ trợ file ảnh (JPG, PNG) hoặc PDF' 
-        });
-        return;
-      }
 
-      // Validate file size (5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setMessage({ 
-          type: 'error', 
-          text: 'File không được vượt quá 5MB' 
-        });
-        return;
-      }
-
-      if (activeTab === 'medicine') {
-        setMedicineFormData(prev => ({
-          ...prev,
-          documentFile: file
-        }));
-      } else if (activeTab === 'absent') {
-        setAbsentFormData(prev => ({
-          ...prev,
-          documentFile: file
-        }));
-      } else { // activeTab === 'other'
-        setOtherFormData(prev => ({
-          ...prev,
-          documentFile: file
-        }));
-      }
-
-      // Create preview for images
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setFilePreview(e.target.result);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        setFilePreview(null);
-      }
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -425,32 +375,20 @@ Vui lòng:
           medicineName: '',
           medicineDescription: '',
           reason: '',
-          documentFile: null
         });
-        setFilePreview(null);
       } else if (activeTab === 'absent') {
         setAbsentFormData({
           studentId: students.length === 1 ? String(students[0].studentId || students[0].studentid || students[0].id) : '',
           title: '',
           reasonForAbsent: '',
-          absentDate: '',
-          documentFile: null
+          absentDate: ''
         });
-        setFilePreview(null);
       } else { // activeTab === 'other'
         setOtherFormData({
           studentId: students.length === 1 ? String(students[0].studentId || students[0].studentid || students[0].id) : '',
           title: '',
-          reason: '',
-          documentFile: null
+          reason: ''
         });
-        setFilePreview(null);
-      }
-      
-      // Reset file input
-      const fileInput = document.getElementById('documentFile');
-      if (fileInput) {
-        fileInput.value = '';
       }
 
     } catch (error) {
@@ -464,30 +402,7 @@ Vui lòng:
     }
   };
 
-  const removeFile = () => {
-    if (activeTab === 'medicine') {
-      setMedicineFormData(prev => ({
-        ...prev,
-        documentFile: null
-      }));
-    } else if (activeTab === 'absent') {
-      setAbsentFormData(prev => ({
-        ...prev,
-        documentFile: null
-      }));
-    } else { // activeTab === 'other'
-      setOtherFormData(prev => ({
-        ...prev,
-        documentFile: null
-      }));
-    }
-    setFilePreview(null);
-    
-    const fileInput = document.getElementById('documentFile');
-    if (fileInput) {
-      fileInput.value = '';
-    }
-  };
+
 
   // Get today's date in YYYY-MM-DD format for min date
   const getTodayDate = () => {
@@ -556,7 +471,7 @@ Vui lòng:
               {activeTab === 'medicine' ? (
                 <>
                   <li>Gửi yêu cầu thuốc cần thiết cho con em</li>
-                  <li>Đính kèm đơn thuốc từ bác sĩ</li>
+
                   <li>Mô tả rõ lý do và cách sử dụng</li>
                   <li>Theo dõi trạng thái phê duyệt</li>
                 </>
@@ -565,7 +480,6 @@ Vui lòng:
                   <li>Thông báo nghỉ học của con em</li>
                   <li>Nêu rõ lý do nghỉ học</li>
                   <li>Chọn ngày nghỉ học cụ thể</li>
-                  <li>Đính kèm giấy tờ minh chứng (nếu có)</li>
                 </>
               ) : (
                 <>
@@ -592,16 +506,14 @@ Vui lòng:
                 <>
                   <li>Gửi đơn trước ngày nghỉ ít nhất 1 ngày</li>
                   <li>Nêu rõ lý do nghỉ học (ốm, việc gia đình...)</li>
-                  <li>Đính kèm giấy bác sĩ nếu nghỉ do ốm đau</li>
-                  <li>File đính kèm không quá 5MB</li>
+
                   <li>Chờ phản hồi từ giáo viên chủ nhiệm</li>
                 </>
               ) : (
                 <>
                   <li>Gửi đơn xin khác trước ngày nghỉ ít nhất 1 ngày</li>
                   <li>Nêu rõ lý do gửi đơn</li>
-                  <li>Đính kèm giấy tờ minh chứng (nếu có)</li>
-                  <li>File đính kèm không quá 5MB</li>
+
                   <li>Chờ phản hồi từ nhà trường</li>
                 </>
               )}
@@ -789,103 +701,7 @@ Vui lòng:
             </>
           )}
 
-          <div className="form-group full-width">
-            <label htmlFor="documentFile">Đính kèm đơn thuốc/tài liệu</label>
-            <div className="file-upload-area">
-              <input
-                type="file"
-                id="documentFile"
-                name="documentFile"
-                onChange={handleFileChange}
-                accept="image/jpeg,image/jpg,image/png,application/pdf"
-                className="file-input"
-              />
-              <label htmlFor="documentFile" className="file-upload-label">
-                <div className="upload-content">
-                  <span className="upload-icon">📎</span>
-                  <span className="upload-text">
-                    {activeTab === 'medicine' ? medicineFormData.documentFile ? medicineFormData.documentFile.name : 'Chọn file để đính kèm' : activeTab === 'absent' ? absentFormData.documentFile ? absentFormData.documentFile.name : 'Chọn file để đính kèm' : otherFormData.documentFile ? otherFormData.documentFile.name : 'Chọn file để đính kèm'}
-                  </span>
-                  <span className="upload-hint">
-                    JPG, PNG, PDF (tối đa 5MB)
-                  </span>
-                </div>
-              </label>
-            </div>
 
-            {activeTab === 'medicine' && medicineFormData.documentFile && (
-              <div className="file-preview">
-                <div className="file-info">
-                  <span className="file-name">📄 {medicineFormData.documentFile.name}</span>
-                  <span className="file-size">
-                    ({(medicineFormData.documentFile.size / 1024 / 1024).toFixed(2)} MB)
-                  </span>
-                  <button
-                    type="button"
-                    onClick={removeFile}
-                    className="remove-file-btn"
-                    title="Xóa file"
-                  >
-                    ✕
-                  </button>
-                </div>
-                
-                {filePreview && (
-                  <div className="image-preview">
-                    <img src={filePreview} alt="Preview" />
-                  </div>
-                )}
-              </div>
-            )}
-            {activeTab === 'absent' && absentFormData.documentFile && (
-              <div className="file-preview">
-                <div className="file-info">
-                  <span className="file-name">📄 {absentFormData.documentFile.name}</span>
-                  <span className="file-size">
-                    ({(absentFormData.documentFile.size / 1024 / 1024).toFixed(2)} MB)
-                  </span>
-                  <button
-                    type="button"
-                    onClick={removeFile}
-                    className="remove-file-btn"
-                    title="Xóa file"
-                  >
-                    ✕
-                  </button>
-                </div>
-                
-                {filePreview && (
-                  <div className="image-preview">
-                    <img src={filePreview} alt="Preview" />
-                  </div>
-                )}
-              </div>
-            )}
-            {activeTab === 'other' && otherFormData.documentFile && (
-              <div className="file-preview">
-                <div className="file-info">
-                  <span className="file-name">📄 {otherFormData.documentFile.name}</span>
-                  <span className="file-size">
-                    ({(otherFormData.documentFile.size / 1024 / 1024).toFixed(2)} MB)
-                  </span>
-                  <button
-                    type="button"
-                    onClick={removeFile}
-                    className="remove-file-btn"
-                    title="Xóa file"
-                  >
-                    ✕
-                  </button>
-                </div>
-                
-                {filePreview && (
-                  <div className="image-preview">
-                    <img src={filePreview} alt="Preview" />
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
 
           <div className="form-actions">
             <button 
