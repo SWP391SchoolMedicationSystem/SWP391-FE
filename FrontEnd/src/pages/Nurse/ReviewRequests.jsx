@@ -36,6 +36,7 @@ function ReviewRequests() {
   const [actionType, setActionType] = useState(''); // 'approve', 'decline', or 'delete'
   const [declineReason, setDeclineReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+  const [notification, setNotification] = useState({ show: false, type: '', message: '' });
 
   // Fetch requests on component mount
   useEffect(() => {
@@ -271,7 +272,7 @@ function ReviewRequests() {
         decline: 'Đã từ chối yêu cầu thành công!',
         delete: 'Đã xóa yêu cầu thành công!',
       };
-      alert(messages[actionType]);
+      setNotification({ show: true, type: 'success', message: messages[actionType] });
     } catch (error) {
       console.error(`❌ Error ${actionType}ing request:`, error);
       const actionNames = {
@@ -279,11 +280,11 @@ function ReviewRequests() {
         decline: 'từ chối',
         delete: 'xóa',
       };
-      alert(
-        `Có lỗi xảy ra khi ${actionNames[actionType]} yêu cầu: ${
-          error.message || error
-        }`
-      );
+      setNotification({ 
+        show: true, 
+        type: 'error', 
+        message: `Có lỗi xảy ra khi ${actionNames[actionType]} yêu cầu: ${error.message || error}`
+      });
     } finally {
       setActionLoading(false);
     }
@@ -1165,6 +1166,39 @@ function ReviewRequests() {
                     : 'Xóa'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notification Modal */}
+      {notification.show && (
+        <div className="notification-overlay">
+          <div className={`notification-modal ${notification.type}`}>
+            <div className="notification-header">
+              <div className="notification-icon">
+                {notification.type === 'success' ? '✅' : '❌'}
+              </div>
+              <h3>
+                {notification.type === 'success' ? 'Thành công' : 'Lỗi'}
+              </h3>
+              <button 
+                className="notification-close"
+                onClick={() => setNotification({ show: false, type: '', message: '' })}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="notification-body">
+              <p>{notification.message}</p>
+            </div>
+            <div className="notification-footer">
+              <button 
+                className="notification-ok-btn"
+                onClick={() => setNotification({ show: false, type: '', message: '' })}
+              >
+                OK
+              </button>
             </div>
           </div>
         </div>

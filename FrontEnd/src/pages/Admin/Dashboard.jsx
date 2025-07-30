@@ -48,10 +48,6 @@ import {
   Tooltip as RechartsTooltip,
   Legend,
   ResponsiveContainer,
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
 } from "recharts";
 
 import { adminDashboardService } from "../../services/adminService";
@@ -64,7 +60,6 @@ function AdminDashboard() {
   const [tabValue, setTabValue] = useState(0);
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [formCategoryData, setFormCategoryData] = useState(null);
 
   // Fetch dashboard statistics from API
   useEffect(() => {
@@ -94,27 +89,7 @@ function AdminDashboard() {
     fetchDashboardData();
   }, []);
 
-  // Fetch form category count data
-  useEffect(() => {
-    const fetchFormCategoryData = async () => {
-      try {
-        const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/Form');
-        if (response.ok) {
-          const data = await response.json();
-          console.log('📋 Form data loaded:', data);
-          setFormCategoryData(data);
-        } else {
-          console.error('❌ Failed to load form data');
-          setFormCategoryData(null);
-        }
-      } catch (error) {
-        console.error('❌ Error fetching form data:', error);
-        setFormCategoryData(null);
-      }
-    };
 
-    fetchFormCategoryData();
-  }, []);
 
   // Report data based on API statistics
   const weeklyReportData = {
@@ -144,95 +119,7 @@ function AdminDashboard() {
 
 
 
-  // Generate activity trend data based on form category data
-  const generateActivityTrendData = () => {
-    if (!formCategoryData || !Array.isArray(formCategoryData)) {
-      return [];
-    }
 
-    // Group forms by category and count them
-    const categoryCounts = {};
-    formCategoryData.forEach(form => {
-      const categoryId = form.formCategoryId;
-      const categoryName = form.formCategoryName || `Category ${categoryId}`;
-      
-      if (!categoryCounts[categoryId]) {
-        categoryCounts[categoryId] = {
-          count: 0,
-          name: categoryName
-        };
-      }
-      categoryCounts[categoryId].count++;
-    });
-
-    // Get the top 3 categories
-    const sortedCategories = Object.entries(categoryCounts)
-      .sort(([,a], [,b]) => b.count - a.count)
-      .slice(0, 3);
-
-    // Generate 7 days of data with some variation
-    const days = ["1/7", "2/7", "3/7", "4/7", "5/7", "6/7", "7/7"];
-    return days.map((date, index) => {
-      // Add some daily variation to make the chart more realistic
-      const variation = 0.8 + (Math.random() * 0.4); // 80% to 120% variation
-      
-      const dataPoint = { date };
-      
-      // Map categories to chart lines
-      if (sortedCategories[0]) {
-        dataPoint.logins = Math.floor(sortedCategories[0][1].count * variation * (1 - index * 0.1));
-      }
-      if (sortedCategories[1]) {
-        dataPoint.requests = Math.floor(sortedCategories[1][1].count * variation * (1 - index * 0.05));
-      }
-      if (sortedCategories[2]) {
-        dataPoint.reports = Math.floor(sortedCategories[2][1].count * variation * (1 - index * 0.15));
-      }
-      
-      return dataPoint;
-    });
-  };
-
-  const activityTrendData = generateActivityTrendData();
-
-  // Get category names for legend
-  const getCategoryNames = () => {
-    if (!formCategoryData || !Array.isArray(formCategoryData)) {
-      return {
-        logins: "",
-        requests: "", 
-        reports: ""
-      };
-    }
-
-    // Group forms by category and count them
-    const categoryCounts = {};
-    formCategoryData.forEach(form => {
-      const categoryId = form.formCategoryId;
-      const categoryName = form.formCategoryName || `Category ${categoryId}`;
-      
-      if (!categoryCounts[categoryId]) {
-        categoryCounts[categoryId] = {
-          count: 0,
-          name: categoryName
-        };
-      }
-      categoryCounts[categoryId].count++;
-    });
-
-    // Get the top 3 categories
-    const sortedCategories = Object.entries(categoryCounts)
-      .sort(([,a], [,b]) => b.count - a.count)
-      .slice(0, 3);
-
-    return {
-      logins: sortedCategories[0] ? `${sortedCategories[0][1].name} (${sortedCategories[0][1].count})` : "Category 1 Forms",
-      requests: sortedCategories[1] ? `${sortedCategories[1][1].name} (${sortedCategories[1][1].count})` : "Category 2 Forms",
-      reports: sortedCategories[2] ? `${sortedCategories[2][1].name} (${sortedCategories[2][1].count})` : "Category 3 Forms"
-    };
-  };
-
-  const categoryNames = getCategoryNames();
 
   // Calculate real statistics
   useEffect(() => {
@@ -447,14 +334,13 @@ function AdminDashboard() {
               textColor="primary"
             >
               <Tab label="Thống Kê Người Dùng" />
-              <Tab label="Xu Hướng Hoạt Động" />
             </Tabs>
 
             <Box className="chart-panel">
               {tabValue === 0 && (
                 <Box>
                   <Typography variant="h6" className="chart-title">
-                    Phân Bố Người Dùng Theo Vai Trò
+                  Tổng số người đang có mặt trong hệ thống
                   </Typography>
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
@@ -478,86 +364,6 @@ function AdminDashboard() {
                       <RechartsTooltip content={renderCustomizedTooltip} />
                       <Legend />
                     </PieChart>
-                  </ResponsiveContainer>
-                </Box>
-              )}
-
-
-
-                              {tabValue === 1 && (
-                <Box>
-                  <Typography variant="h6" className="chart-title">
-                    Xu Hướng Hoạt Động 30 Ngày
-                  </Typography>
-                  {formCategoryData && Array.isArray(formCategoryData) && (
-                    <Box sx={{ mb: 2, p: 2, bgcolor: '#f8f9fa', borderRadius: 2 }}>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        📊 Dữ liệu từ Form Categories:
-                      </Typography>
-                      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                        {(() => {
-                          // Group forms by category and count them
-                          const categoryCounts = {};
-                          formCategoryData.forEach(form => {
-                            const categoryId = form.formCategoryId;
-                            const categoryName = form.formCategoryName || `Category ${categoryId}`;
-                            
-                            if (!categoryCounts[categoryId]) {
-                              categoryCounts[categoryId] = {
-                                count: 0,
-                                name: categoryName
-                              };
-                            }
-                            categoryCounts[categoryId].count++;
-                          });
-
-                          // Sort by count and take top 3
-                          const sortedCategories = Object.entries(categoryCounts)
-                            .sort(([,a], [,b]) => b.count - a.count)
-                            .slice(0, 3);
-
-                          return sortedCategories.map(([categoryId, data], index) => (
-                            <Chip
-                              key={categoryId}
-                              label={`${data.name}: ${data.count} forms`}
-                              size="small"
-                              color={index === 0 ? "primary" : index === 1 ? "success" : "warning"}
-                              variant="outlined"
-                            />
-                          ));
-                        })()}
-                      </Box>
-                    </Box>
-                  )}
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={activityTrendData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <RechartsTooltip />
-                      <Legend />
-                      <Line
-                        type="monotone"
-                        dataKey="logins"
-                        stroke="#8884d8"
-                        strokeWidth={2}
-                        name={categoryNames.logins}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="requests"
-                        stroke="#82ca9d"
-                        strokeWidth={2}
-                        name={categoryNames.requests}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="reports"
-                        stroke="#ffc658"
-                        strokeWidth={2}
-                        name={categoryNames.reports}
-                      />
-                    </LineChart>
                   </ResponsiveContainer>
                 </Box>
               )}
