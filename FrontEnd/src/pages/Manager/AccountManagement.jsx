@@ -344,7 +344,6 @@ const AccountManagement = () => {
                     <th>Số Điện Thoại</th>
                     <th>Địa Chỉ</th>
                     <th>Trạng Thái</th>
-                    <th>Ngày Tạo</th>
                     <th>Thao Tác</th>
                   </tr>
                 </thead>
@@ -368,11 +367,6 @@ const AccountManagement = () => {
                         >
                           {getAccountStatus(parent)}
                         </button>
-                      </td>
-                      <td>
-                        {parent.createdDate
-                          ? new Date(parent.createdDate).toLocaleDateString()
-                          : 'N/A'}
                       </td>
                       <td className="actions">
                         <button
@@ -417,7 +411,6 @@ const AccountManagement = () => {
                     <th>Số Điện Thoại</th>
                     <th>Vai Trò</th>
                     <th>Trạng Thái</th>
-                    <th>Ngày Tạo</th>
                     <th>Thao Tác</th>
                   </tr>
                 </thead>
@@ -460,11 +453,6 @@ const AccountManagement = () => {
                             {getAccountStatus(staff)}
                           </span>
                         )}
-                      </td>
-                      <td>
-                        {staff.createdAt
-                          ? new Date(staff.createdAt).toLocaleDateString()
-                          : 'N/A'}
                       </td>
                       <td className="actions">
                         {canEditAccount(staff, 'staff') ? (

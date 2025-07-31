@@ -184,24 +184,6 @@ function VaccinationEventStudents() {
     }
   };
 
-  // Send email to specific students
-  const sendEmailToStudents = async () => {
-    try {
-      const selectedStudentIds = filteredStudents.map(student => student.studentId);
-      await vaccinationEventService.sendEmailToSpecificStudents(
-        eventId,
-        emailFormData.emailTemplateId,
-        emailFormData.customMessage,
-        selectedStudentIds
-      );
-      alert('Email đã được gửi thành công!');
-      setShowEmailModal(false);
-    } catch (error) {
-      console.error('Error sending email:', error);
-      alert('Có lỗi xảy ra khi gửi email!');
-    }
-  };
-
   // Filter students based on status, class, and search term
   const filteredStudents = combinedData.filter(student => {
     const statusMatch =

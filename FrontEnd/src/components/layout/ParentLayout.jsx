@@ -150,14 +150,16 @@ export default function ParentLayout() {
     try {
       setNotificationLoading(true);
       console.log('🔔 Fetching parent notifications from API...');
-      
+
       const notifications = await parentNotificationService.getNotifications();
       console.log('📨 Parent API Response:', notifications);
-      
+
       // Đếm số thông báo chưa đọc
-      const unreadCount = notifications.filter(notification => !notification.isRead).length;
+      const unreadCount = notifications.filter(
+        notification => !notification.isRead
+      ).length;
       console.log('🔢 Parent unread notifications count:', unreadCount);
-      
+
       setNotificationCount(unreadCount);
       console.log('🔢 Setting notification count to:', unreadCount);
       console.log('🔢 Current notificationCount state will be:', unreadCount);
@@ -508,47 +510,26 @@ export default function ParentLayout() {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-
-            <Badge
-              badgeContent={notificationLoading ? '...' : notificationCount}
-              color="error"
-              invisible={notificationCount === 0 && !notificationLoading}
+            <IconButton
+              onClick={() => navigate('/parent/notifications')}
               sx={{
-                '& .MuiBadge-badge': {
-                  fontSize: '10px',
-                  height: '18px',
-                  minWidth: '18px',
-                  borderRadius: '9px',
-                  background: notificationLoading 
-                    ? 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)'
-                    : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                  color: 'white',
-                  fontWeight: 600,
-                  boxShadow: '0 2px 8px rgba(239, 68, 68, 0.4)',
+                width: 40,
+                height: 40,
+                background: currentTheme.iconButton,
+                backdropFilter: 'blur(15px)',
+                border: `1px solid ${currentTheme.border}`,
+                color: currentTheme.textSecondary,
+                borderRadius: '12px',
+                '&:hover': {
+                  background: currentTheme.iconButtonHover,
+                  color: currentTheme.textPrimary,
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
                 },
               }}
             >
-              <IconButton
-                onClick={() => navigate('/parent/notifications')}
-                sx={{
-                  width: 40,
-                  height: 40,
-                  background: currentTheme.iconButton,
-                  backdropFilter: 'blur(15px)',
-                  border: `1px solid ${currentTheme.border}`,
-                  color: currentTheme.textSecondary,
-                  borderRadius: '12px',
-                  '&:hover': {
-                    background: currentTheme.iconButtonHover,
-                    color: currentTheme.textPrimary,
-                    transform: 'translateY(-1px)',
-                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-                  },
-                }}
-              >
-                <Notifications />
-              </IconButton>
-            </Badge>
+              <Notifications />
+            </IconButton>
 
             {/* Dark Mode Toggle */}
             <IconButton
