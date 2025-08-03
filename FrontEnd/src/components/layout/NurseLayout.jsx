@@ -27,6 +27,7 @@ import {
   Assignment,
   DarkMode,
   LightMode,
+  HealthAndSafety,
 } from '@mui/icons-material';
 import userService from '../../services/userService';
 import { nurseNotificationService } from '../../services/nurseService';
@@ -41,6 +42,7 @@ const navItems = [
     icon: <VaccinesOutlined />,
     key: 'vaccination',
   },
+
   // {
   //   to: '/nurse/medication-schedule',
   //   label: 'Lịch Uống Thuốc',
@@ -64,6 +66,12 @@ const navItems = [
     label: 'Đơn thuốc từ phụ huynh',
     icon: <Medication />,
     key: 'personal-medicine',
+  },
+  {
+    to: '/nurse/health-check',
+    label: 'Kiểm tra sức khỏe',
+    icon: <HealthAndSafety />,
+    key: 'health-check',
   },
   {
     to: '/nurse/review-requests',

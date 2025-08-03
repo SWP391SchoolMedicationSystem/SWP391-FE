@@ -46,6 +46,7 @@ import NurseStudentHealthRecordDetail from './pages/Nurse/StudentHealthRecordDet
 import NurseNotifications from './pages/Nurse/Notifications';
 import NursePersonalMedicine from './pages/Nurse/PersonalMedicine';
 import ReviewRequests from './pages/Nurse/ReviewRequests';
+import HealthCheck from './pages/Nurse/HealthCheck';
 
 // Parent pages
 import ParentDashboard from './pages/Parent/Dashboard';
@@ -142,6 +143,7 @@ function App() {
           <Route path="handle-medicine" element={<HandleMedicine />} />
           <Route path="medicine-management" element={<MedicineManagement />} />
           <Route path="personal-medicine" element={<NursePersonalMedicine />} />
+          <Route path="health-check" element={<HealthCheck />} />
           <Route path="student-list" element={<NurseStudentList />} />
           <Route path="blog" element={<NurseBlog />} />
           <Route path="chat" element={<ChatWithParents />} />

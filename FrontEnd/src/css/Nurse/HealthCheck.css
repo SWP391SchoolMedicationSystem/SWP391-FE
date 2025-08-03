@@ -1,0 +1,425 @@
+.health-check-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.health-check-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.health-check-header h1 {
+  color: #2c3e50;
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.btn-add {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-add i {
+  font-size: 16px;
+}
+
+.health-check-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.health-check-table {
+  overflow-x: auto;
+}
+
+.health-check-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.health-check-table th {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  color: #2c3e50;
+  font-weight: 600;
+  padding: 16px 12px;
+  text-align: left;
+  border-bottom: 2px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.health-check-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.health-check-table tbody tr:hover {
+  background-color: #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+
+.notes-cell {
+  max-width: 200px;
+}
+
+.notes-text {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-edit,
+.btn-delete {
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+}
+
+.btn-edit {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+}
+
+.btn-edit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+}
+
+.btn-delete {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  color: white;
+}
+
+.btn-delete:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+/* Modal Form Styles */
+.health-check-form {
+  padding: 20px 0;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background: #fafafa;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  background: white;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.btn-cancel,
+.btn-save {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel {
+  background: #f8f9fa;
+  color: #6c757d;
+  border: 2px solid #e0e0e0;
+}
+
+.btn-cancel:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 600px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #6c757d;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Card-based form fields */
+.form-card {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 18px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 70px;
+  transition: all 0.2s ease;
+}
+
+.form-card:hover {
+  background: #f1f5f9;
+}
+
+.form-card-icon {
+  color: #73ad67;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.form-card-content {
+  flex: 1;
+}
+
+.form-card-label {
+  font-size: 13px;
+  color: #888;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.form-card-input {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 700;
+  color: #2f5148;
+  width: 100%;
+  outline: none;
+}
+
+.form-card-input::placeholder {
+  color: #adb5bd;
+  font-weight: 400;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.action-buttons button {
+  transition: all 0.2s ease;
+}
+
+.action-buttons button:hover {
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .health-check-container {
+    padding: 15px;
+  }
+
+  .health-check-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .health-check-header h1 {
+    font-size: 24px;
+    text-align: center;
+  }
+
+  .btn-add {
+    justify-content: center;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .health-check-table {
+    font-size: 12px;
+  }
+
+  .health-check-table th,
+  .health-check-table td {
+    padding: 10px 8px;
+  }
+
+  .modal-content {
+    min-width: 95vw;
+    margin: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .health-check-container {
+    padding: 10px;
+  }
+
+  .health-check-header h1 {
+    font-size: 20px;
+  }
+
+  .btn-add {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+} 
