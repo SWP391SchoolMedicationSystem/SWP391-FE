@@ -190,6 +190,16 @@ export const API_ENDPOINTS = {
   DASHBOARD: {
     USERS_STATISTICS: '/Dashboard/UsersStastic', // Get user statistics for admin dashboard
   },
+
+  // Health Check (Nurse health check for students)
+  HEALTH_CHECK: {
+    GET_ALL: '/HealthCheck', // GET all health checks
+    GET_BY_ID: '/HealthCheck/{id}', // GET health check by ID
+    GET_BY_STUDENT: '/HealthCheck/student/{studentId}', // GET health checks by student ID
+    ADD: '/HealthCheck', // POST add new health check
+    UPDATE: '/HealthCheck', // PUT update health check (checkid in body)
+    DELETE: '/HealthCheck/{id}', // DELETE health check
+  },
 };
 
 // Helper function to build URL with ID or parameters
