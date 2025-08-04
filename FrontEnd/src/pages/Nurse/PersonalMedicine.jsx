@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  getCurrentDateStringGMT7,
-  toGMT7ISOString,
-} from '../../utils/dateUtils';
 import '../../css/Nurse/PersonalMedicine.css';
 import apiClient, { API_ENDPOINTS } from '../../services/config';
 import { CircularProgress, Typography, Box } from '@mui/material';
 
 const PersonalMedicine = () => {
   const navigate = useNavigate();
-
+  
   // Helper function to get current nurse name
   const getCurrentNurseName = () => {
     try {
@@ -20,7 +16,7 @@ const PersonalMedicine = () => {
       return 'Y tá';
     }
   };
-
+  
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -43,9 +39,9 @@ const PersonalMedicine = () => {
     parentId: '',
     studentId: '',
     quantity: '',
-    receivedDate: getCurrentDateStringGMT7(),
+    receivedDate: new Date().toISOString().split('T')[0],
     expiryDate: '',
-    note: '',
+    note: ''
   });
 
   useEffect(() => {
@@ -54,7 +50,7 @@ const PersonalMedicine = () => {
       await loadMedicines();
       await loadPersonalMedicines(); // Load existing personal medicines
     };
-
+    
     loadData();
   }, []);
 
@@ -67,12 +63,7 @@ const PersonalMedicine = () => {
 
   // Re-group medicines when all data is available
   useEffect(() => {
-    if (
-      students.length > 0 &&
-      parents.length > 0 &&
-      medicines.length > 0 &&
-      personalMedicines.length > 0
-    ) {
+    if (students.length > 0 && parents.length > 0 && medicines.length > 0 && personalMedicines.length > 0) {
       console.log('🔄 Re-grouping medicines with all data available');
       console.log('📊 Available medicines:', medicines.length);
       console.log('📊 Available students:', students.length);
@@ -84,7 +75,7 @@ const PersonalMedicine = () => {
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = event => {
+    const handleClickOutside = (event) => {
       if (!event.target.closest('.searchable-select')) {
         setShowParentDropdown(false);
       }
@@ -99,12 +90,8 @@ const PersonalMedicine = () => {
   const loadStudents = async () => {
     try {
       const res = await apiClient.get(API_ENDPOINTS.STUDENT.GET_ALL);
-      const studentsArray = Array.isArray(res)
-        ? res
-        : Array.isArray(res.data)
-        ? res.data
-        : [];
-
+      const studentsArray = Array.isArray(res) ? res : (Array.isArray(res.data) ? res.data : []);
+      
       const mappedStudents = studentsArray.map(stu => ({
         id: stu.studentId,
         name: stu.fullname,
@@ -112,15 +99,15 @@ const PersonalMedicine = () => {
         parentName: stu.parent?.fullname,
         parentId: stu.parentid || stu.parent?.parentid,
       }));
-
+      
       // Remove duplicates based on student ID
-      const uniqueStudents = mappedStudents.filter(
-        (student, index, self) =>
-          index === self.findIndex(s => String(s.id) === String(student.id))
+      const uniqueStudents = mappedStudents.filter((student, index, self) => 
+        index === self.findIndex((s) => String(s.id) === String(student.id))
       );
-
+      
       console.log('✅ Students loaded:', uniqueStudents);
       setStudents(uniqueStudents);
+      
     } catch (error) {
       console.error('Error fetching students:', error);
       setMessage({ type: 'error', text: 'Không thể tải danh sách học sinh' });
@@ -131,31 +118,20 @@ const PersonalMedicine = () => {
   const loadMedicines = async () => {
     try {
       const res = await apiClient.get(API_ENDPOINTS.MEDICINE.GET_ALL);
-      const medicinesArray = Array.isArray(res)
-        ? res
-        : Array.isArray(res.data)
-        ? res.data
-        : [];
+      const medicinesArray = Array.isArray(res) ? res : (Array.isArray(res.data) ? res.data : []);
       const activeMedicines = medicinesArray.filter(med => !med.isDeleted);
-
+      
       // Remove duplicates based on medicine ID
-      const uniqueMedicines = activeMedicines.filter(
-        (medicine, index, self) =>
-          index ===
-          self.findIndex(
-            m => String(m.medicineid) === String(medicine.medicineid)
-          )
+      const uniqueMedicines = activeMedicines.filter((medicine, index, self) => 
+        index === self.findIndex((m) => String(m.medicineid) === String(medicine.medicineid))
       );
-
+      
       console.log('✅ Medicines loaded:', uniqueMedicines.length, 'medicines');
-      console.log(
-        '🔍 Sample medicines:',
-        uniqueMedicines.slice(0, 3).map(m => ({
-          id: m.medicineid,
-          name: m.medicinename,
-          type: m.type,
-        }))
-      );
+      console.log('🔍 Sample medicines:', uniqueMedicines.slice(0, 3).map(m => ({
+        id: m.medicineid,
+        name: m.medicinename,
+        type: m.type
+      })));
       setMedicines(uniqueMedicines);
     } catch (error) {
       console.error('Error loading medicines:', error);
@@ -163,29 +139,26 @@ const PersonalMedicine = () => {
     }
   };
 
-  const loadParents = async () => {
+    const loadParents = async () => {
     try {
       console.log('🔍 Loading parents from students data...');
       console.log('📚 Available students:', students.length);
-
+      
       if (students.length === 0) {
         console.warn('No students data available to extract parents');
         setParents([]);
         return;
       }
-
+      
       // Extract unique parents from students
       const parentMap = new Map();
-
+      
       students.forEach(student => {
         const parentId = student.parentId || student._raw_student?.parentId;
-        const parentName =
-          student.parentName || student._raw_student?.parentName;
-
-        console.log(
-          `Student: ${student.name}, ParentID: ${parentId}, ParentName: ${parentName}`
-        );
-
+        const parentName = student.parentName || student._raw_student?.parentName;
+        
+        console.log(`Student: ${student.name}, ParentID: ${parentId}, ParentName: ${parentName}`);
+        
         if (parentId && parentName && parentName !== 'Chưa có thông tin') {
           const key = String(parentId);
           if (!parentMap.has(key)) {
@@ -195,7 +168,7 @@ const PersonalMedicine = () => {
               email: '',
               phone: '',
               studentCount: 1,
-              studentNames: [student.name],
+              studentNames: [student.name]
             });
           } else {
             const parent = parentMap.get(key);
@@ -204,26 +177,21 @@ const PersonalMedicine = () => {
           }
         }
       });
-
+      
       const parentsArray = Array.from(parentMap.values());
       console.log('✅ Extracted parents:', parentsArray.length, 'parents');
-      console.log(
-        '📋 Parents data for mapping:',
-        parentsArray.map(p => ({
-          id: p.id,
-          name: p.name,
-          studentCount: p.studentCount,
-        }))
-      );
-
+      console.log('📋 Parents data for mapping:', parentsArray.map(p => ({
+        id: p.id,
+        name: p.name,
+        studentCount: p.studentCount
+      })));
+      
       setParents(parentsArray);
-
+      
       if (parentsArray.length === 0) {
-        setMessage({
-          type: 'warning',
-          text: 'Không tìm thấy thông tin phụ huynh từ dữ liệu học sinh',
-        });
+        setMessage({ type: 'warning', text: 'Không tìm thấy thông tin phụ huynh từ dữ liệu học sinh' });
       }
+      
     } catch (error) {
       console.error('Error loading parents:', error);
       setMessage({ type: 'error', text: 'Không thể tải danh sách phụ huynh' });
@@ -234,21 +202,14 @@ const PersonalMedicine = () => {
   const loadPersonalMedicines = async () => {
     try {
       console.log('🔍 Loading personal medicines...');
-
-      const response = await fetch(
-        'https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicines',
-        {
-          method: 'GET',
-          headers: {
-            accept: '*/*',
-            Authorization: `Bearer ${
-              localStorage.getItem('authToken') ||
-              localStorage.getItem('token') ||
-              ''
-            }`,
-          },
+      
+      const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicines', {
+        method: 'GET',
+        headers: {
+          'accept': '*/*',
+          'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`
         }
-      );
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -256,146 +217,109 @@ const PersonalMedicine = () => {
 
       const data = await response.json();
       console.log('📥 Personal medicines response:', data);
-
-      const medicinesArray = Array.isArray(data)
-        ? data
-        : Array.isArray(data.data)
-        ? data.data
-        : [];
-      console.log(
-        '🔍 Total personal medicines from API:',
-        medicinesArray.length
-      );
-
+      
+      const medicinesArray = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+      console.log('🔍 Total personal medicines from API:', medicinesArray.length);
+      
       // Filter out soft-deleted records
       const activeMedicines = medicinesArray.filter(medicine => {
-        const isDeleted =
-          medicine.isDeleted === true ||
-          medicine.isdeleted === true ||
-          medicine.status === false;
+        const isDeleted = medicine.isDeleted === true || medicine.isdeleted === true || medicine.status === false;
         if (isDeleted) {
-          console.log(
-            '🗑️ Filtering out soft-deleted medicine:',
-            medicine.id || medicine.personalmedicineid,
-            medicine.medicinename
-          );
+          console.log('🗑️ Filtering out soft-deleted medicine:', medicine.id || medicine.personalmedicineid, medicine.medicinename);
         }
         return !isDeleted;
       });
-
-      console.log(
-        '✅ Active personal medicines after filtering:',
-        activeMedicines.length
-      );
-      console.log(
-        '🔍 Personal medicines structure:',
-        activeMedicines.slice(0, 2).map(m => ({
-          id: m.personalmedicineid,
-          medicineId: m.medicineid,
-          parentId: m.parentid,
-          studentId: m.studentid,
-          isDeleted: m.isDeleted,
-          status: m.status,
-        }))
-      );
-
+      
+      console.log('✅ Active personal medicines after filtering:', activeMedicines.length);
+      console.log('🔍 Personal medicines structure:', activeMedicines.slice(0, 2).map(m => ({
+        id: m.personalmedicineid,
+        medicineId: m.medicineid,
+        parentId: m.parentid,
+        studentId: m.studentid,
+        isDeleted: m.isDeleted,
+        status: m.status
+      })));
+      
       // Also log the raw structure to see all fields
       if (activeMedicines.length > 0) {
-        console.log(
-          '🔍 Raw active personal medicine sample:',
-          activeMedicines[0]
-        );
+        console.log('🔍 Raw active personal medicine sample:', activeMedicines[0]);
       }
-
+      
       setPersonalMedicines(activeMedicines);
-
+      
       // Don't group here - let useEffect handle it when all data is ready
-      console.log(
-        '✅ Active personal medicines loaded, will group when parents/students are ready'
-      );
+      console.log('✅ Active personal medicines loaded, will group when parents/students are ready');
+      
     } catch (error) {
       console.error('Error loading personal medicines:', error);
-      setMessage({
-        type: 'error',
-        text: 'Không thể tải danh sách thuốc từ phụ huynh',
-      });
+      setMessage({ type: 'error', text: 'Không thể tải danh sách thuốc từ phụ huynh' });
       setPersonalMedicines([]);
       setParentMedicineGroups([]);
     }
   };
 
-  const groupMedicinesByParent = medicines => {
+  const groupMedicinesByParent = (medicines) => {
     const parentGroups = {};
-
+    
     medicines.forEach(medicine => {
       const parentId = medicine.parentid || medicine.parentId;
-
+      
       // Find parent name from students data or parents data
       let parentName = 'Phụ huynh không xác định';
-
+      
       // First try to find from parents array
       const parentInfo = parents.find(p => String(p.id) === String(parentId));
       if (parentInfo) {
         parentName = parentInfo.name;
       } else {
         // If not found in parents, try to find from students data
-        const studentWithParent = students.find(
-          s => String(s.parentId) === String(parentId)
-        );
+        const studentWithParent = students.find(s => String(s.parentId) === String(parentId));
         if (studentWithParent) {
           parentName = studentWithParent.parentName;
         }
       }
-
-      console.log(
-        `🔍 Medicine parentId: ${parentId}, found parentName: ${parentName}`
-      );
-
+      
+      console.log(`🔍 Medicine parentId: ${parentId}, found parentName: ${parentName}`);
+      
       if (!parentGroups[parentId]) {
         parentGroups[parentId] = {
           parentId: parentId,
           parentName: parentName,
           medicines: [],
-          totalMedicines: 0,
+          totalMedicines: 0
         };
       }
-
+      
       // Find medicine and student details
       const medicineId = medicine.medicineid || medicine.medicineId;
       const studentId = medicine.studentid || medicine.studentId;
-
-      const medicineDetail = medicines.find(
-        m => String(m.medicineid || m.id) === String(medicineId)
+      
+      const medicineDetail = medicines.find(m => 
+        String(m.medicineid || m.id) === String(medicineId)
       );
-      const studentDetail = students.find(
-        s => String(s.id) === String(studentId)
+      const studentDetail = students.find(s => 
+        String(s.id) === String(studentId)
       );
-
+      
       console.log(`🔍 Looking for medicine ID: ${medicineId}`);
-      console.log(
-        `🔍 Available medicine IDs:`,
-        medicines.slice(0, 5).map(m => m.medicineid || m.id)
-      );
+      console.log(`🔍 Available medicine IDs:`, medicines.slice(0, 5).map(m => m.medicineid || m.id));
       console.log(`🔍 Found medicine detail:`, medicineDetail);
-      console.log(
-        `🔍 Looking for student ID: ${studentId}, found:`,
-        studentDetail
-      );
-
+      console.log(`🔍 Looking for student ID: ${studentId}, found:`, studentDetail);
+      
       // Let's try different approaches to get the medicine name
       let medicineName = 'Thuốc không xác định';
-
+      
       if (medicineDetail) {
         medicineName = medicineDetail.medicineName || `Thuốc ID: ${medicineId}`;
       } else {
         // If not found in medicines list, check if medicine info is directly in personal medicine record
         medicineName = medicine.medicineName || `Thuốc ID: ${medicineId}`;
       }
-
-      console.log(`✅ Final medicine name: ${medicineName}`);
-
+      
+            console.log(`✅ Final medicine name: ${medicineName}`);
+      
       // Safe date formatting for display
-      const formatDisplayDate = dateValue => {
+      const formatDisplayDate = (dateValue) => {
         if (!dateValue) return 'Chưa có ngày';
         try {
           const date = new Date(dateValue);
@@ -405,74 +329,71 @@ const PersonalMedicine = () => {
           return 'Ngày không hợp lệ';
         }
       };
-
+                           
       parentGroups[parentId].medicines.push({
         ...medicine,
         medicineName: medicineName,
         medicineType: medicineDetail?.type || 'Không xác định',
-        studentName:
-          studentDetail?.name ||
-          medicine.studentName ||
-          `Học sinh ID: ${studentId}`,
+        studentName: studentDetail?.name || medicine.studentName || `Học sinh ID: ${studentId}`,
         className: studentDetail?.class || medicine.className || '---',
         receivedDate: formatDisplayDate(medicine.receiveddate),
-        expiryDate: formatDisplayDate(medicine.expiryDate),
+        expiryDate: formatDisplayDate(medicine.expiryDate)
       });
-
+      
       parentGroups[parentId].totalMedicines++;
     });
-
+    
     const groupsArray = Object.values(parentGroups);
     console.log('📊 Grouped medicines by parent:', groupsArray);
     setParentMedicineGroups(groupsArray);
   };
 
-  const toggleParentExpansion = parentId => {
+  const toggleParentExpansion = (parentId) => {
     setExpandedParent(expandedParent === parentId ? null : parentId);
   };
 
-  const handleParentSearch = e => {
+  const handleParentSearch = (e) => {
     const value = e.target.value;
     setParentSearchTerm(value);
     setShowParentDropdown(true);
     setSelectedParentName(value);
-
+    
     // Clear parent selection if search is cleared
     if (!value) {
       setAddFormData(prev => ({
         ...prev,
         parentId: '',
-        studentId: '',
+        studentId: ''
       }));
     }
   };
 
-  const handleParentSelect = parent => {
+  const handleParentSelect = (parent) => {
     setAddFormData(prev => ({
       ...prev,
       parentId: parent.id,
-      studentId: '', // Clear student selection when parent changes
+      studentId: '' // Clear student selection when parent changes
     }));
     setSelectedParentName(parent.name);
     setParentSearchTerm(parent.name);
     setShowParentDropdown(false);
 
     // Auto-populate student if parent has only one child
-    const parentStudents = students.filter(
-      student => String(student.parentId) === String(parent.id)
+    const parentStudents = students.filter(student => 
+      String(student.parentId) === String(parent.id)
     );
-
+    
     if (parentStudents.length === 1) {
       setAddFormData(prev => ({
         ...prev,
-        studentId: String(parentStudents[0].id),
+        studentId: String(parentStudents[0].id)
       }));
     }
   };
 
   const getFilteredParents = () => {
     if (!parentSearchTerm) return parents;
-
+    
     return parents.filter(parent =>
       parent.name.toLowerCase().includes(parentSearchTerm.toLowerCase())
     );
@@ -489,30 +410,25 @@ const PersonalMedicine = () => {
     console.log('🔧 Editing medicine:', medicine);
     console.log('🔧 Raw date values from API:', {
       receiveddate: medicine.receiveddate,
-      expiryDate: medicine.expiryDate,
+      expiryDate: medicine.expiryDate
     });
-
+    
     const parentInfo = parents.find(p => String(p.id) === String(parentId));
-    const studentInfo = students.find(
-      s => String(s.id) === String(medicine.studentid)
-    );
-
+    const studentInfo = students.find(s => String(s.id) === String(medicine.studentid));
+    
     // Safe date handling
-    const formatDateForInput = dateValue => {
+    const formatDateForInput = (dateValue) => {
       if (!dateValue) return '';
-
+      
       try {
         // If it's already a date string in YYYY-MM-DD format, return as is
-        if (
-          typeof dateValue === 'string' &&
-          /^\d{4}-\d{2}-\d{2}/.test(dateValue)
-        ) {
+        if (typeof dateValue === 'string' && /^\d{4}-\d{2}-\d{2}/.test(dateValue)) {
           return dateValue.split('T')[0];
         }
-
+        
         const date = new Date(dateValue);
         if (isNaN(date.getTime())) return '';
-
+        
         // Use local date to avoid timezone issues
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -523,7 +439,7 @@ const PersonalMedicine = () => {
         return '';
       }
     };
-
+    
     const editData = {
       ...medicine,
       parentName: parentInfo?.name || 'Unknown Parent',
@@ -533,15 +449,15 @@ const PersonalMedicine = () => {
       expiryDateFormatted: formatDateForInput(medicine.expiryDate),
       // Also keep original values for fallback
       originalReceivedDate: medicine.receiveddate,
-      originalExpiryDate: medicine.expiryDate,
+      originalExpiryDate: medicine.expiryDate
     };
-
+    
     console.log('🔧 Edit data prepared:', editData);
     setEditingMedicine(editData);
     setShowEditForm(true);
   };
 
-  const handleUpdateMedicine = async updatedData => {
+  const handleUpdateMedicine = async (updatedData) => {
     // Prevent multiple simultaneous updates
     if (submitting) {
       console.log('🔒 Update already in progress, ignoring duplicate request');
@@ -549,21 +465,21 @@ const PersonalMedicine = () => {
     }
 
     setSubmitting(true);
-
+    
     try {
       // Get the correct ID for the personal medicine record
       const personalMedicineId = editingMedicine.personalmedicineid;
-
+      
       console.log('🔧 Updating medicine with ID:', personalMedicineId);
       console.log('🔧 Update data:', updatedData);
-
+      
       if (!personalMedicineId) {
         throw new Error('Không tìm thấy ID của thuốc để cập nhật');
       }
 
       // Use PUT method to update the medicine
       console.log('🔧 Using PUT method to update medicine...');
-
+      
       const updateData = {
         personalMedicineId: personalMedicineId,
         medicineid: parseInt(editingMedicine.medicineid),
@@ -571,40 +487,31 @@ const PersonalMedicine = () => {
         studentid: parseInt(editingMedicine.studentid),
         quantity: parseInt(updatedData.quantity),
         createdby: getCurrentNurseName(),
-        receiveddate: toGMT7ISOString(updatedData.receivedDate),
-        expiryDate: toGMT7ISOString(updatedData.expiryDate),
+        receiveddate: new Date(updatedData.receivedDate).toISOString(),
+        expiryDate: new Date(updatedData.expiryDate).toISOString(),
         status: true,
         note: updatedData.note || '',
-        isDeleted: false,
+        isDeleted: false
       };
 
       console.log('🔧 PUT request data:', updateData);
 
-      const response = await fetch(
-        'https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine',
-        {
-          method: 'PUT',
-          headers: {
-            accept: '*/*',
-            Authorization: `Bearer ${
-              localStorage.getItem('authToken') ||
-              localStorage.getItem('token') ||
-              ''
-            }`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updateData),
-        }
-      );
+      const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine', {
+        method: 'PUT',
+        headers: {
+          'accept': '*/*',
+          'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData)
+      });
 
       console.log('🔧 PUT response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
         console.error('❌ PUT request failed:', errorText);
-        throw new Error(
-          `Không thể cập nhật thuốc: ${response.status} - ${errorText}`
-        );
+        throw new Error(`Không thể cập nhật thuốc: ${response.status} - ${errorText}`);
       }
 
       // Try to get response data
@@ -620,17 +527,18 @@ const PersonalMedicine = () => {
       setShowEditForm(false);
       setEditingMedicine(null);
       setMessage({ type: 'success', text: '✅ Đã cập nhật thuốc thành công!' });
-
+      
       // Reload data to reflect changes
       console.log('🔄 Reloading personal medicines...');
       await loadPersonalMedicines();
+
     } catch (error) {
       console.error('❌ Error updating medicine:', error);
-      setMessage({
-        type: 'error',
-        text: `❌ Có lỗi xảy ra khi cập nhật: ${error.message}`,
+      setMessage({ 
+        type: 'error', 
+        text: `❌ Có lỗi xảy ra khi cập nhật: ${error.message}` 
       });
-
+      
       // Don't close the modal on error so user can retry
     } finally {
       setSubmitting(false);
@@ -638,7 +546,7 @@ const PersonalMedicine = () => {
   };
 
   // Delete Medicine Functions
-  const handleDeleteMedicine = medicine => {
+  const handleDeleteMedicine = (medicine) => {
     setMedicineToDelete(medicine);
     setShowDeleteConfirm(true);
   };
@@ -647,37 +555,28 @@ const PersonalMedicine = () => {
     setSubmitting(true);
     try {
       const personalMedicineId = medicineToDelete.personalmedicineid;
-
+      
       console.log('🗑️ Deleting medicine with ID:', personalMedicineId);
       console.log('🗑️ Medicine to delete:', medicineToDelete);
-
+      
       if (!personalMedicineId) {
         throw new Error('Không tìm thấy ID của thuốc để xóa');
       }
-
-      const response = await fetch(
-        `https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine/${personalMedicineId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            accept: '*/*',
-            Authorization: `Bearer ${
-              localStorage.getItem('authToken') ||
-              localStorage.getItem('token') ||
-              ''
-            }`,
-          },
+      
+      const response = await fetch(`https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine/${personalMedicineId}`, {
+        method: 'DELETE',
+        headers: {
+          'accept': '*/*',
+          'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`
         }
-      );
+      });
 
       console.log('🗑️ Delete response status:', response.status);
-
+      
       if (!response.ok) {
         const errorText = await response.text();
         console.error('🗑️ Delete failed:', errorText);
-        throw new Error(
-          `HTTP error! status: ${response.status} - ${errorText}`
-        );
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
 
       // Try to get response data to see what API returns
@@ -692,20 +591,21 @@ const PersonalMedicine = () => {
       setMessage({ type: 'success', text: '✅ Đã xóa thuốc thành công!' });
       setShowDeleteConfirm(false);
       setMedicineToDelete(null);
-
+      
       // Add a small delay before reloading to ensure soft delete is processed
       await new Promise(resolve => setTimeout(resolve, 1000));
       await loadPersonalMedicines();
     } catch (error) {
       console.error('❌ Error deleting medicine:', error);
-      setMessage({
-        type: 'error',
-        text: `❌ Có lỗi xảy ra khi xóa: ${error.message}`,
-      });
+      setMessage({ type: 'error', text: `❌ Có lỗi xảy ra khi xóa: ${error.message}` });
     } finally {
       setSubmitting(false);
     }
   };
+
+
+
+
 
   // Add Medicine Form Functions
   const toggleAddForm = () => {
@@ -722,9 +622,9 @@ const PersonalMedicine = () => {
       parentId: '',
       studentId: '',
       quantity: '',
-      receivedDate: getCurrentDateStringGMT7(),
+      receivedDate: new Date().toISOString().split('T')[0],
       expiryDate: '',
-      note: '',
+      note: ''
     });
     setParentSearchTerm('');
     setSelectedParentName('');
@@ -735,91 +635,75 @@ const PersonalMedicine = () => {
     setMedicineToDelete(null);
   };
 
-  const handleAddFormChange = e => {
+  const handleAddFormChange = (e) => {
     const { name, value } = e.target;
     setAddFormData(prev => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }));
 
     // Auto-populate student when parent is selected
     if (name === 'parentId' && value) {
-      const parentStudents = students.filter(
-        student => String(student.parentId) === String(value)
+      const parentStudents = students.filter(student => 
+        String(student.parentId) === String(value)
       );
-      console.log(
-        `🎯 Parent ${value} selected. Found students:`,
-        parentStudents
-      );
-      console.log(
-        '🎯 All students for reference:',
-        students.map(s => ({
-          id: s.id,
-          name: s.name,
-          parentId: s.parentId,
-          _raw_parentId: s._raw_parentId,
-        }))
-      );
-
+      console.log(`🎯 Parent ${value} selected. Found students:`, parentStudents);
+      console.log('🎯 All students for reference:', students.map(s => ({
+        id: s.id, 
+        name: s.name, 
+        parentId: s.parentId,
+        _raw_parentId: s._raw_parentId
+      })));
+      
       if (parentStudents.length === 1) {
-        console.log(
-          `🎯 Auto-selecting single student: ${parentStudents[0].name}`
-        );
+        console.log(`🎯 Auto-selecting single student: ${parentStudents[0].name}`);
         setAddFormData(prev => ({
           ...prev,
-          studentId: String(parentStudents[0].id),
+          studentId: String(parentStudents[0].id)
         }));
       } else if (parentStudents.length === 0) {
         console.log(`🎯 No students found for parent ${value}`);
         setAddFormData(prev => ({
           ...prev,
-          studentId: '',
+          studentId: ''
         }));
       } else {
-        console.log(
-          `🎯 Multiple students found (${parentStudents.length}), clearing selection`
-        );
+        console.log(`🎯 Multiple students found (${parentStudents.length}), clearing selection`);
         setAddFormData(prev => ({
           ...prev,
-          studentId: '',
+          studentId: ''
         }));
       }
     }
   };
-
+  
   // Get students for selected parent
-  const getStudentsForParent = parentId => {
+  const getStudentsForParent = (parentId) => {
     if (!parentId) {
-      console.log(
-        '📚 No parent selected, showing all students:',
-        students.length
-      );
+      console.log('📚 No parent selected, showing all students:', students.length);
       return students;
     }
-
+    
     const filteredStudents = students.filter(student => {
       const studentParentId = String(student.parentId || '');
       const targetParentId = String(parentId);
       const match = studentParentId === targetParentId;
-
+      
       if (match) {
         console.log(`✅ Student ${student.name} matches parent ${parentId}`);
       }
-
+      
       return match;
     });
-
-    console.log(
-      `📚 Parent ${parentId} has ${filteredStudents.length} students:`,
-      filteredStudents
-    );
+    
+    console.log(`📚 Parent ${parentId} has ${filteredStudents.length} students:`, filteredStudents);
     return filteredStudents;
   };
 
-  const handleAddFormSubmit = async e => {
+  const handleAddFormSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-
+    
     try {
       const requestData = {
         medicineid: parseInt(addFormData.medicineId),
@@ -827,55 +711,42 @@ const PersonalMedicine = () => {
         studentid: parseInt(addFormData.studentId),
         quantity: parseInt(addFormData.quantity),
         createdby: getCurrentNurseName(),
-        receiveddate: toGMT7ISOString(addFormData.receivedDate),
-        expiryDate: toGMT7ISOString(addFormData.expiryDate),
+        receiveddate: new Date(addFormData.receivedDate).toISOString(),
+        expiryDate: new Date(addFormData.expiryDate).toISOString(),
         status: true, // Medicine has been received
-        note: addFormData.note || '',
+        note: addFormData.note || ''
       };
 
       console.log('📤 Sending new PersonalMedicine data:', requestData);
 
-      const response = await fetch(
-        'https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine',
-        {
-          method: 'POST',
-          headers: {
-            accept: '*/*',
-            Authorization: `Bearer ${
-              localStorage.getItem('authToken') ||
-              localStorage.getItem('token') ||
-              ''
-            }`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestData),
-        }
-      );
+      const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine', {
+        method: 'POST',
+        headers: {
+          'accept': '*/*',
+          'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      });
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(
-          `HTTP error! status: ${response.status} - ${errorText}`
-        );
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
 
-      setMessage({
-        type: 'success',
-        text: '✅ Đã thêm thuốc từ phụ huynh thành công!',
-      });
+      setMessage({ type: 'success', text: '✅ Đã thêm thuốc từ phụ huynh thành công!' });
       toggleAddForm();
       // Reload personal medicines to show the new entry
       await loadPersonalMedicines();
     } catch (error) {
       console.error('Error adding personal medicine:', error);
-      setMessage({
-        type: 'error',
-        text: `❌ Có lỗi xảy ra khi thêm thuốc: ${error.message}`,
-      });
+      setMessage({ type: 'error', text: `❌ Có lỗi xảy ra khi thêm thuốc: ${error.message}` });
     } finally {
       setSubmitting(false);
     }
   };
+
+
 
   return (
     <div className="personal-medicine-container">
@@ -883,13 +754,10 @@ const PersonalMedicine = () => {
       <div className="medicine-header">
         <div>
           <h1>💊 Đơn Thuốc Từ Phụ Huynh</h1>
-          <p>
-            Xem, kiểm tra và duyệt các đơn thuốc cá nhân gửi từ phụ huynh cho
-            học sinh
-          </p>
+          <p>Xem, kiểm tra và duyệt các đơn thuốc cá nhân gửi từ phụ huynh cho học sinh</p>
         </div>
-        <div className="header-buttons">
-          <button
+                <div className="header-buttons">
+          <button 
             onClick={async () => {
               setLoading(true);
               try {
@@ -898,10 +766,7 @@ const PersonalMedicine = () => {
                 await loadPersonalMedicines();
                 setMessage({ type: 'success', text: '✅ Đã làm mới dữ liệu' });
               } catch (error) {
-                setMessage({
-                  type: 'error',
-                  text: '❌ Có lỗi khi làm mới dữ liệu',
-                });
+                setMessage({ type: 'error', text: '❌ Có lỗi khi làm mới dữ liệu' });
               } finally {
                 setLoading(false);
               }
@@ -915,7 +780,9 @@ const PersonalMedicine = () => {
                 Đang tải...
               </>
             ) : (
-              <>🔄 Làm mới</>
+              <>
+                🔄 Làm mới
+              </>
             )}
           </button>
         </div>
@@ -951,6 +818,7 @@ const PersonalMedicine = () => {
         </div>
 
         <div className="contact-info">
+  
           <ul>
             <li>Hotline: 1900-xxxx</li>
             <li>Email: schoolhealth@medlearn.com</li>
@@ -963,7 +831,10 @@ const PersonalMedicine = () => {
       <div className="action-section">
         <div className="action-header">
           <h3>📝 Thêm Thuốc Từ Phụ Huynh</h3>
-          <button onClick={toggleAddForm} className="add-medicine-btn">
+          <button 
+            onClick={toggleAddForm}
+            className="add-medicine-btn"
+          >
             {showAddForm ? '❌ Đóng form' : '➕ Thêm thuốc nhận từ phụ huynh'}
           </button>
         </div>
@@ -974,7 +845,7 @@ const PersonalMedicine = () => {
         <div className="add-medicine-section">
           <h3>📝 Thêm Thuốc Nhận Từ Phụ Huynh</h3>
           <p>Ghi nhận thông tin thuốc khi phụ huynh gửi đến trường</p>
-
+          
           <form onSubmit={handleAddFormSubmit} className="add-medicine-form">
             <div className="form-group">
               <label htmlFor="parentId">Chọn phụ huynh *</label>
@@ -986,16 +857,12 @@ const PersonalMedicine = () => {
                   value={parentSearchTerm}
                   onChange={handleParentSearch}
                   onFocus={() => setShowParentDropdown(true)}
-                  placeholder={
-                    parents.length === 0
-                      ? 'Đang tải phụ huynh...'
-                      : 'Gõ để tìm phụ huynh...'
-                  }
+                  placeholder={parents.length === 0 ? "Đang tải phụ huynh..." : "Gõ để tìm phụ huynh..."}
                   className="searchable-input"
                   required={!addFormData.parentId}
                   disabled={parents.length === 0}
                 />
-
+                
                 {showParentDropdown && parents.length > 0 && (
                   <div className="dropdown-menu">
                     {getFilteredParents().length === 0 ? (
@@ -1020,7 +887,7 @@ const PersonalMedicine = () => {
                     )}
                   </div>
                 )}
-
+                
                 {/* Hidden input for form validation */}
                 <input
                   type="hidden"
@@ -1029,7 +896,7 @@ const PersonalMedicine = () => {
                   required
                 />
               </div>
-
+              
               {parents.length === 0 && (
                 <small className="form-help">
                   Đang tải danh sách phụ huynh...
@@ -1058,28 +925,19 @@ const PersonalMedicine = () => {
                 disabled={!addFormData.parentId}
               >
                 <option value="">
-                  {addFormData.parentId
-                    ? 'Chọn học sinh'
-                    : 'Vui lòng chọn phụ huynh trước'}
+                  {addFormData.parentId ? "Chọn học sinh" : "Vui lòng chọn phụ huynh trước"}
                 </option>
-                {getStudentsForParent(addFormData.parentId).map(
-                  (student, idx) => (
-                    <option
-                      key={`student_${student.id}_${idx}`}
-                      value={student.id}
-                    >
-                      {student.name} - Lớp {student.class}{' '}
-                      {!addFormData.parentId && `(PH: ${student.parentName})`}
-                    </option>
-                  )
-                )}
+                {getStudentsForParent(addFormData.parentId).map((student, idx) => (
+                  <option key={`student_${student.id}_${idx}`} value={student.id}>
+                    {student.name} - Lớp {student.class} {!addFormData.parentId && `(PH: ${student.parentName})`}
+                  </option>
+                ))}
               </select>
-              {addFormData.parentId &&
-                getStudentsForParent(addFormData.parentId).length === 0 && (
-                  <small className="form-help">
-                    Không tìm thấy học sinh nào cho phụ huynh này
-                  </small>
-                )}
+              {addFormData.parentId && getStudentsForParent(addFormData.parentId).length === 0 && (
+                <small className="form-help">
+                  Không tìm thấy học sinh nào cho phụ huynh này
+                </small>
+              )}
             </div>
 
             <div className="form-group">
@@ -1093,10 +951,7 @@ const PersonalMedicine = () => {
               >
                 <option value="">Chọn thuốc từ danh sách</option>
                 {medicines.map((medicine, idx) => (
-                  <option
-                    key={`medicine_${medicine.medicineid}_${idx}`}
-                    value={medicine.medicineid}
-                  >
+                  <option key={`medicine_${medicine.medicineid}_${idx}`} value={medicine.medicineid}>
                     {medicine.medicinename} - {medicine.type}
                   </option>
                 ))}
@@ -1153,15 +1008,15 @@ const PersonalMedicine = () => {
             </div>
 
             <div className="form-actions">
-              <button
-                type="button"
+              <button 
+                type="button" 
                 onClick={toggleAddForm}
                 className="cancel-btn"
               >
                 Hủy
               </button>
-              <button
-                type="submit"
+              <button 
+                type="submit" 
                 className="submit-btn"
                 disabled={submitting}
               >
@@ -1176,12 +1031,9 @@ const PersonalMedicine = () => {
       <div className="medicines-list-section">
         <div className="list-header">
           <h3>📋 Danh Sách Thuốc Đã Thêm</h3>
-          <p>
-            Danh sách thuốc mà phụ huynh đã gửi cho học sinh, được tổ chức theo
-            phụ huynh
-          </p>
+          <p>Danh sách thuốc mà phụ huynh đã gửi cho học sinh, được tổ chức theo phụ huynh</p>
         </div>
-
+        
         {parentMedicineGroups.length === 0 ? (
           <div className="empty-state">
             <p>📭 Chưa có thuốc nào được thêm từ phụ huynh</p>
@@ -1190,11 +1042,8 @@ const PersonalMedicine = () => {
         ) : (
           <div className="parent-medicine-groups">
             {parentMedicineGroups.map((group, index) => (
-              <div
-                key={`parent_${group.parentId}_${index}`}
-                className="parent-group"
-              >
-                <div
+              <div key={`parent_${group.parentId}_${index}`} className="parent-group">
+                <div 
                   className="parent-header"
                   onClick={() => toggleParentExpansion(group.parentId)}
                 >
@@ -1208,101 +1057,83 @@ const PersonalMedicine = () => {
                     {expandedParent === group.parentId ? '▼' : '▶'}
                   </button>
                 </div>
-
+                
                 {expandedParent === group.parentId && (
                   <div className="medicines-list">
                     {group.medicines.map((medicine, medIndex) => (
-                      <div
-                        key={`medicine_${group.parentId}_${
-                          medicine.personalmedicineid || medIndex
-                        }_${medicine.medicineid}_${medIndex}`}
+                      <div 
+                        key={`medicine_${group.parentId}_${medicine.personalmedicineid || medIndex}_${medicine.medicineid}_${medIndex}`} 
                         className="medicine-item"
                       >
-                        <div className="medicine-info">
-                          <div className="medicine-header">
-                            <div className="medicine-title">
-                              <h5>💊 {medicine.medicineName}</h5>
-                              {medicine.medicineType &&
-                                medicine.medicineType !== 'Không xác định' && (
-                                  <span className="medicine-type">
-                                    ({medicine.medicineType})
-                                  </span>
-                                )}
-                            </div>
-                            <div className="medicine-actions">
-                              <button
-                                className="action-btn edit-btn"
-                                onClick={() =>
-                                  handleEditMedicine(medicine, group.parentId)
-                                }
-                                title="Chỉnh sửa thuốc"
-                                disabled={
-                                  submitting ||
-                                  showEditForm ||
-                                  (!medicine.id &&
-                                    !medicine.personalmedicineid &&
-                                    !medicine.personalMedicineId)
-                                }
-                              >
-                                ✏️ Sửa
-                              </button>
-                              <button
-                                className="action-btn delete-btn"
-                                onClick={() => handleDeleteMedicine(medicine)}
-                                title="Xóa thuốc"
-                                disabled={
-                                  submitting ||
-                                  showDeleteConfirm ||
-                                  (!medicine.id &&
-                                    !medicine.personalmedicineid &&
-                                    !medicine.personalMedicineId)
-                                }
-                              >
-                                🗑️ Xóa
-                              </button>
-                            </div>
-                          </div>
-
+                                                 <div className="medicine-info">
+                           <div className="medicine-header">
+                             <div className="medicine-title">
+                               <h5>💊 {medicine.medicineName}</h5>
+                               {medicine.medicineType && medicine.medicineType !== 'Không xác định' && (
+                                 <span className="medicine-type">({medicine.medicineType})</span>
+                               )}
+                             </div>
+                             <div className="medicine-actions">
+                               <button 
+                                 className="action-btn edit-btn"
+                                 onClick={() => handleEditMedicine(medicine, group.parentId)}
+                                 title="Chỉnh sửa thuốc"
+                                 disabled={
+                                   submitting || 
+                                   showEditForm || 
+                                   (!medicine.id && !medicine.personalmedicineid && !medicine.personalMedicineId)
+                                 }
+                               >
+                                 ✏️ Sửa
+                               </button>
+                               <button 
+                                 className="action-btn delete-btn"
+                                 onClick={() => handleDeleteMedicine(medicine)}
+                                 title="Xóa thuốc"
+                                 disabled={
+                                   submitting || 
+                                   showDeleteConfirm || 
+                                   (!medicine.id && !medicine.personalmedicineid && !medicine.personalMedicineId)
+                                 }
+                               >
+                                 🗑️ Xóa
+                               </button>
+                             </div>
+                           </div>
+                          
                           <div className="medicine-details">
                             <div className="detail-row">
                               <span className="label">Học sinh:</span>
                               <span className="value">
-                                {medicine.studentName} - Lớp{' '}
-                                {medicine.className}
+                                {medicine.studentName} - Lớp {medicine.className}
                               </span>
                             </div>
-
+                            
                             <div className="detail-row">
                               <span className="label">Số lượng:</span>
                               <span className="value">{medicine.quantity}</span>
                             </div>
-
+                            
                             <div className="detail-row">
                               <span className="label">Ngày nhận:</span>
-                              <span className="value">
-                                {medicine.receivedDate}
-                              </span>
+                              <span className="value">{medicine.receivedDate}</span>
                             </div>
-
+                            
                             <div className="detail-row">
                               <span className="label">Hạn sử dụng:</span>
-                              <span className="value">
-                                {medicine.expiryDate}
-                              </span>
+                              <span className="value">{medicine.expiryDate}</span>
                             </div>
-
+                            
                             {medicine.note && (
                               <div className="detail-row">
                                 <span className="label">Ghi chú:</span>
                                 <span className="value">{medicine.note}</span>
                               </div>
                             )}
-
+                            
                             <div className="detail-row">
                               <span className="label">Người tạo:</span>
-                              <span className="value">
-                                {getCurrentNurseName()}
-                              </span>
+                              <span className="value">{getCurrentNurseName()}</span>
                             </div>
                           </div>
                         </div>
@@ -1317,7 +1148,9 @@ const PersonalMedicine = () => {
       </div>
 
       {message.text && (
-        <div className={`${message.type}-message`}>{message.text}</div>
+        <div className={`${message.type}-message`}>
+          {message.text}
+        </div>
       )}
 
       {/* Edit Medicine Modal */}
@@ -1326,7 +1159,7 @@ const PersonalMedicine = () => {
           <div className="modal edit-modal" style={{ display: 'block' }}>
             <div className="modal-header">
               <h3>✏️ Chỉnh Sửa Thuốc</h3>
-              <button
+              <button 
                 className="close-btn"
                 onClick={() => {
                   setShowEditForm(false);
@@ -1336,41 +1169,28 @@ const PersonalMedicine = () => {
                 ✕
               </button>
             </div>
-
+            
             <div className="modal-body" style={{ display: 'block' }}>
               <div className="medicine-info-display">
-                <p>
-                  <strong>Thuốc:</strong> {editingMedicine.medicineName}
-                </p>
-                <p>
-                  <strong>Phụ huynh:</strong> {editingMedicine.parentName}
-                </p>
-                <p>
-                  <strong>Học sinh:</strong> {editingMedicine.studentName}
-                </p>
+                <p><strong>Thuốc:</strong> {editingMedicine.medicineName}</p>
+                <p><strong>Phụ huynh:</strong> {editingMedicine.parentName}</p>
+                <p><strong>Học sinh:</strong> {editingMedicine.studentName}</p>
               </div>
-
+              
               <div className="edit-note">
-                <p>
-                  <small>
-                    💡 <strong>Lưu ý:</strong> Chỉ có thể chỉnh sửa số lượng,
-                    ngày nhận, hạn sử dụng và ghi chú.
-                  </small>
-                </p>
+                <p><small>💡 <strong>Lưu ý:</strong> Chỉ có thể chỉnh sửa số lượng, ngày nhận, hạn sử dụng và ghi chú.</small></p>
               </div>
-
-              <form
-                onSubmit={e => {
-                  e.preventDefault();
-                  const formData = new FormData(e.target);
-                  handleUpdateMedicine({
-                    quantity: formData.get('quantity'),
-                    receivedDate: formData.get('receivedDate'),
-                    expiryDate: formData.get('expiryDate'),
-                    note: formData.get('note'),
-                  });
-                }}
-              >
+              
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                handleUpdateMedicine({
+                  quantity: formData.get('quantity'),
+                  receivedDate: formData.get('receivedDate'),
+                  expiryDate: formData.get('expiryDate'),
+                  note: formData.get('note')
+                });
+              }}>
                 <div className="form-group">
                   <label>Số lượng *</label>
                   <input
@@ -1381,35 +1201,27 @@ const PersonalMedicine = () => {
                     min="1"
                   />
                 </div>
-
+                
                 <div className="form-group">
                   <label>Ngày nhận *</label>
                   <input
                     type="date"
                     name="receivedDate"
-                    defaultValue={
-                      editingMedicine.receivedDateFormatted ||
-                      editingMedicine.originalReceivedDate ||
-                      ''
-                    }
+                    defaultValue={editingMedicine.receivedDateFormatted || editingMedicine.originalReceivedDate || ''}
                     required
                   />
                 </div>
-
+                
                 <div className="form-group">
                   <label>Hạn sử dụng *</label>
                   <input
                     type="date"
                     name="expiryDate"
-                    defaultValue={
-                      editingMedicine.expiryDateFormatted ||
-                      editingMedicine.originalExpiryDate ||
-                      ''
-                    }
+                    defaultValue={editingMedicine.expiryDateFormatted || editingMedicine.originalExpiryDate || ''}
                     required
                   />
                 </div>
-
+                
                 <div className="form-group">
                   <label>Ghi chú</label>
                   <textarea
@@ -1418,10 +1230,10 @@ const PersonalMedicine = () => {
                     placeholder="Ghi chú về thuốc, liều dùng..."
                   />
                 </div>
-
+                
                 <div className="modal-actions">
-                  <button
-                    type="button"
+                  <button 
+                    type="button" 
                     className="cancel-btn"
                     onClick={() => {
                       setShowEditForm(false);
@@ -1430,8 +1242,8 @@ const PersonalMedicine = () => {
                   >
                     Hủy
                   </button>
-                  <button
-                    type="submit"
+                  <button 
+                    type="submit" 
                     className="submit-btn"
                     disabled={submitting}
                   >
@@ -1451,27 +1263,19 @@ const PersonalMedicine = () => {
             <div className="modal-header">
               <h3>🗑️ Xóa Thuốc</h3>
             </div>
-
+            
             <div className="modal-body">
               <p>Bạn có chắc chắn muốn xóa thuốc này không?</p>
               <div className="medicine-info-display">
-                <p>
-                  <strong>Thuốc:</strong> {medicineToDelete.medicineName}
-                </p>
-                <p>
-                  <strong>Số lượng:</strong> {medicineToDelete.quantity}
-                </p>
-                <p>
-                  <strong>Ngày nhận:</strong> {medicineToDelete.receivedDate}
-                </p>
+                <p><strong>Thuốc:</strong> {medicineToDelete.medicineName}</p>
+                <p><strong>Số lượng:</strong> {medicineToDelete.quantity}</p>
+                <p><strong>Ngày nhận:</strong> {medicineToDelete.receivedDate}</p>
               </div>
-              <p className="warning-text">
-                ⚠️ Hành động này không thể hoàn tác!
-              </p>
+              <p className="warning-text">⚠️ Hành động này không thể hoàn tác!</p>
             </div>
-
+            
             <div className="modal-actions">
-              <button
+              <button 
                 className="cancel-btn"
                 onClick={() => {
                   setShowDeleteConfirm(false);
@@ -1480,7 +1284,7 @@ const PersonalMedicine = () => {
               >
                 Hủy
               </button>
-              <button
+              <button 
                 className="delete-btn"
                 onClick={confirmDeleteMedicine}
                 disabled={submitting}
@@ -1521,18 +1325,13 @@ const PersonalMedicine = () => {
             }}
           >
             <CircularProgress sx={{ color: '#2f5148', mb: 2 }} />
-            <Typography
-              variant="h6"
-              sx={{ color: '#2f5148', fontWeight: 600, mb: 1 }}
-            >
+            <Typography variant="h6" sx={{ color: '#2f5148', fontWeight: 600, mb: 1 }}>
               Đang xử lý...
             </Typography>
             <Typography variant="body2" sx={{ color: '#2f5148', opacity: 0.8 }}>
-              {showEditForm
-                ? 'Đang cập nhật thông tin thuốc...'
-                : showDeleteConfirm
-                ? 'Đang xóa thuốc...'
-                : 'Vui lòng chờ trong giây lát'}
+              {showEditForm ? 'Đang cập nhật thông tin thuốc...' : 
+               showDeleteConfirm ? 'Đang xóa thuốc...' : 
+               'Vui lòng chờ trong giây lát'}
             </Typography>
           </Box>
         </Box>
@@ -1541,4 +1340,4 @@ const PersonalMedicine = () => {
   );
 };
 
-export default PersonalMedicine;
+export default PersonalMedicine; 

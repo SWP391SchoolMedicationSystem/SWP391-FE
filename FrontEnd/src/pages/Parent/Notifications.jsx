@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParentNotifications } from '../../utils/hooks/useParent';
-import { getCurrentDateGMT7 } from '../../utils/dateUtils';
 import '../../css/Parent/Notifications.css';
 // Material-UI Icons
 import InfoIcon from '@mui/icons-material/Info';
@@ -89,7 +88,7 @@ const ParentNotifications = () => {
               message: notification.Message || notification.message || '',
               type: notification.Type || 'general',
               targetType: 'parent',
-              createdAt: getCurrentDateGMT7(),
+              createdAt: new Date().toISOString(),
               createdBy: 'Hệ thống',
               isNew: true,
             };
@@ -124,7 +123,7 @@ const ParentNotifications = () => {
               message: notification.Message || notification.message || '',
               type: notification.Type || 'general',
               targetType: 'parent',
-              createdAt: getCurrentDateGMT7(),
+              createdAt: new Date().toISOString(),
               createdBy: 'Hệ thống',
               isNew: true,
             };
@@ -213,7 +212,7 @@ const ParentNotifications = () => {
           message: currentParentDetail?.message || 'Không có nội dung',
           type: notification.type || 'Chung',
           targetType: 'parent',
-          createdAt: notification.createdAt || getCurrentDateGMT7(),
+          createdAt: notification.createdAt || new Date().toISOString(),
           createdBy: notification.createdby || 'Hệ thống',
           notificationParentDetails:
             notification.notificationParentDetails || [],

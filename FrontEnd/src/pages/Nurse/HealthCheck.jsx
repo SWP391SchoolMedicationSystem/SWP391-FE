@@ -4,10 +4,6 @@ import { nurseStudentService } from '../../services/nurseService';
 import { healthCheckEventService } from '../../services/healthCheckEventService';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Modal from '../../components/common/Modal';
-import {
-  getCurrentDateStringGMT7,
-  getTomorrowDateStringGMT7,
-} from '../../utils/dateUtils';
 import '../../css/Nurse/HealthCheck.css';
 
 const HealthCheck = () => {
@@ -21,13 +17,13 @@ const HealthCheck = () => {
   const [formData, setFormData] = useState({
     eventid: 1, // Default event ID
     studentid: '',
-    checkdate: getCurrentDateStringGMT7(),
+    checkdate: new Date().toISOString().split('T')[0],
     height: '',
     weight: '',
     visionleft: '',
     visionright: '',
     bloodpressure: '',
-    notes: '',
+    notes: ''
   });
   const [showStudentDropdown, setShowStudentDropdown] = useState(false);
   const [studentSearchTerm, setStudentSearchTerm] = useState('');
@@ -42,11 +38,8 @@ const HealthCheck = () => {
 
   // Handle click outside to close dropdowns
   useEffect(() => {
-    const handleClickOutside = event => {
-      if (
-        showStudentDropdown &&
-        !event.target.closest('.student-dropdown-container')
-      ) {
+    const handleClickOutside = (event) => {
+      if (showStudentDropdown && !event.target.closest('.student-dropdown-container')) {
         setShowStudentDropdown(false);
       }
       if (showEventDropdown && !event.target.closest('.event-dropdown-container')) {
@@ -60,37 +53,39 @@ const HealthCheck = () => {
     };
   }, [showStudentDropdown, showEventDropdown]);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const [healthChecksData, studentsData] = await Promise.all([
-        healthCheckService.getAllHealthChecks(),
-        nurseStudentService.getAllStudents(),
-      ]);
+           const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [healthChecksData, studentsData, eventsData] = await Promise.all([
+          healthCheckService.getAllHealthChecks(),
+          nurseStudentService.getAllStudents(),
+          healthCheckEventService.getAllHealthCheckEvents()
+        ]);
+        
+        // Filter out soft deleted records and sort by date (newest first)
+        const filteredHealthChecks = (healthChecksData || []).filter(check => 
+          !check.isdeleted || check.isdeleted === false
+        );
+        
+        const sortedHealthChecks = filteredHealthChecks.sort((a, b) => {
+          return new Date(b.checkdate) - new Date(a.checkdate);
+        });
+        
+        setHealthChecks(sortedHealthChecks);
+        setStudents(studentsData || []);
+        setEvents(eventsData || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      // Filter out soft deleted records and sort by date (newest first)
-      const filteredHealthChecks = (healthChecksData || []).filter(
-        check => !check.isdeleted || check.isdeleted === false
-      );
-
-      const sortedHealthChecks = filteredHealthChecks.sort((a, b) => {
-        return new Date(b.checkdate) - new Date(a.checkdate);
-      });
-
-      setHealthChecks(sortedHealthChecks);
-      setStudents(studentsData || []);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleInputChange = e => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }));
     
     // If eventid is changed, update the event name
@@ -100,76 +95,60 @@ const HealthCheck = () => {
     }
   };
 
-  const handleSubmit = async e => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-      const selectedStudent = students.find(
-        s => s.id.toString() === formData.studentid
-      );
+      const selectedStudent = students.find(s => s.id.toString() === formData.studentid);
+      
+             // Validate required fields and convert to proper data types
+       const healthCheckData = {
+         eventid: parseInt(formData.eventid),
+         studentid: parseInt(formData.studentid),
+         checkdate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Use tomorrow's date to avoid past date issues
+         staffid: userInfo?.id || 1, // Provide fallback staff ID
+         height: parseFloat(formData.height) || 0,
+         weight: parseFloat(formData.weight) || 0,
+         visionleft: parseFloat(formData.visionleft) || 0,
+         visionright: parseFloat(formData.visionright) || 0,
+         bloodpressure: formData.bloodpressure || 'string',
+         notes: formData.notes || 'string'
+       };
 
-      // Validate required fields and convert to proper data types
-      const healthCheckData = {
-        eventid: parseInt(formData.eventid),
-        studentid: parseInt(formData.studentid),
-        checkdate: getTomorrowDateStringGMT7(), // Use tomorrow's date to avoid past date issues
-        staffid: userInfo?.id || 1, // Provide fallback staff ID
-        height: parseFloat(formData.height) || 0,
-        weight: parseFloat(formData.weight) || 0,
-        visionleft: parseFloat(formData.visionleft) || 0,
-        visionright: parseFloat(formData.visionright) || 0,
-        bloodpressure: formData.bloodpressure || 'string',
-        notes: formData.notes || 'string',
-      };
+       // Debug: Log the data being sent
+       console.log('Form Data:', formData);
+       console.log('Health Check Data being sent:', healthCheckData);
 
-      // Debug: Log the data being sent
-      console.log('Form Data:', formData);
-      console.log('Health Check Data being sent:', healthCheckData);
+             // Validate that required fields are not empty
+       if (!formData.studentid) {
+         alert('Vui lòng chọn học sinh');
+         return;
+       }
 
-      // Validate that required fields are not empty
-      if (!formData.studentid) {
-        alert('Vui lòng chọn học sinh');
-        return;
-      }
+       if (!formData.eventid) {
+         alert('Vui lòng nhập ID sự kiện');
+         return;
+       }
 
-      if (!formData.eventid) {
-        alert('Vui lòng nhập ID sự kiện');
-        return;
-      }
+       if (!formData.height || !formData.weight || !formData.visionleft || !formData.visionright) {
+         alert('Vui lòng điền đầy đủ thông tin chiều cao, cân nặng và thị lực');
+         return;
+       }
 
-      if (
-        !formData.height ||
-        !formData.weight ||
-        !formData.visionleft ||
-        !formData.visionright
-      ) {
-        alert('Vui lòng điền đầy đủ thông tin chiều cao, cân nặng và thị lực');
-        return;
-      }
-
-      // Validate that all numeric fields are valid numbers
-      if (
-        isNaN(parseFloat(formData.height)) ||
-        isNaN(parseFloat(formData.weight)) ||
-        isNaN(parseFloat(formData.visionleft)) ||
-        isNaN(parseFloat(formData.visionright))
-      ) {
-        alert(
-          'Vui lòng nhập đúng định dạng số cho các trường chiều cao, cân nặng và thị lực'
-        );
-        return;
-      }
+       // Validate that all numeric fields are valid numbers
+       if (isNaN(parseFloat(formData.height)) || isNaN(parseFloat(formData.weight)) || 
+           isNaN(parseFloat(formData.visionleft)) || isNaN(parseFloat(formData.visionright))) {
+         alert('Vui lòng nhập đúng định dạng số cho các trường chiều cao, cân nặng và thị lực');
+         return;
+       }
 
       if (editingHealthCheck) {
         // For update, ensure we have the correct data structure
         const updateData = {
           ...healthCheckData,
-          studentName: selectedStudent?.fullName || 'string',
+          studentName: selectedStudent?.fullName || 'string'
         };
-        await healthCheckService.updateHealthCheck(
-          editingHealthCheck.checkid,
-          updateData
-        );
+        await healthCheckService.updateHealthCheck(editingHealthCheck.checkid, updateData);
       } else {
         await healthCheckService.addHealthCheck(healthCheckData);
       }
@@ -184,7 +163,7 @@ const HealthCheck = () => {
     }
   };
 
-  const handleEdit = healthCheck => {
+  const handleEdit = (healthCheck) => {
     setEditingHealthCheck(healthCheck);
     const studentName = getStudentName(healthCheck.studentid);
     setFormData({
@@ -196,14 +175,14 @@ const HealthCheck = () => {
       visionleft: healthCheck.visionleft.toString(),
       visionright: healthCheck.visionright.toString(),
       bloodpressure: healthCheck.bloodpressure,
-      notes: healthCheck.notes,
+      notes: healthCheck.notes
     });
     setStudentSearchTerm(studentName);
     setShowStudentDropdown(false);
     setShowModal(true);
   };
 
-  const handleDelete = async id => {
+  const handleDelete = async (id) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa kiểm tra sức khỏe này?')) {
       try {
         await healthCheckService.deleteHealthCheck(id);
@@ -218,13 +197,13 @@ const HealthCheck = () => {
     setFormData({
       eventid: 1, // Default event ID
       studentid: '',
-      checkdate: getCurrentDateStringGMT7(),
+      checkdate: new Date().toISOString().split('T')[0],
       height: '',
       weight: '',
       visionleft: '',
       visionright: '',
       bloodpressure: '',
-      notes: '',
+      notes: ''
     });
     setStudentSearchTerm('');
     setShowStudentDropdown(false);
@@ -248,7 +227,7 @@ const HealthCheck = () => {
     }
   };
 
-  const getStudentName = studentId => {
+  const getStudentName = (studentId) => {
     const student = students.find(s => s.id === studentId);
     return student ? student.fullName : 'Unknown Student';
   };
@@ -261,10 +240,10 @@ const HealthCheck = () => {
     event.healthcheckeventname.toLowerCase().includes(eventSearchTerm.toLowerCase())
   );
 
-  const handleStudentSelect = student => {
+  const handleStudentSelect = (student) => {
     setFormData(prev => ({
       ...prev,
-      studentid: student.id.toString(),
+      studentid: student.id.toString()
     }));
     setStudentSearchTerm(student.fullName);
     setShowStudentDropdown(false);
@@ -292,45 +271,37 @@ const HealthCheck = () => {
   return (
     <div className="review-requests-container">
       {/* Header */}
-      <div
-        className="review-requests-header"
-        style={{
-          background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
-          color: 'white',
-          boxShadow: '0 4px 20px rgba(47, 81, 72, 0.3)',
-          padding: '32px 40px',
-          borderRadius: '24px',
-        }}
-      >
+      <div className="review-requests-header" style={{
+        background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+        color: 'white',
+        boxShadow: '0 4px 20px rgba(47, 81, 72, 0.3)',
+        padding: '32px 40px',
+        borderRadius: '24px',
+      }}>
         <div>
           <h1 style={{ color: 'white' }}>
-            <i
-              className="fas fa-stethoscope"
-              style={{ marginRight: '12px' }}
-            ></i>
+            <i className="fas fa-stethoscope" style={{ marginRight: '12px' }}></i>
             Kiểm tra sức khỏe học sinh
           </h1>
-          <p style={{ color: 'white', opacity: 0.95 }}>
-            Quản lý và theo dõi tình trạng sức khỏe của học sinh
-          </p>
+          <p style={{ color: 'white', opacity: 0.95 }}>Quản lý và theo dõi tình trạng sức khỏe của học sinh</p>
         </div>
         <div className="header-actions">
-          <button
+          <button 
             onClick={openAddModal}
             className="refresh-button"
-            style={{
-              color: 'white',
-              background: 'rgba(255,255,255,0.15)',
-              border: 'none',
-              borderRadius: 10,
-              padding: '10px 18px',
-              fontWeight: 600,
-              fontSize: 16,
-              cursor: 'pointer',
+            style={{ 
+              color: 'white', 
+              background: 'rgba(255,255,255,0.15)', 
+              border: 'none', 
+              borderRadius: 10, 
+              padding: '10px 18px', 
+              fontWeight: 600, 
+              fontSize: 16, 
+              cursor: 'pointer', 
               boxShadow: '0 2px 8px rgba(47,81,72,0.08)',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: '8px'
             }}
           >
             <i className="fas fa-plus"></i>
@@ -358,70 +329,53 @@ const HealthCheck = () => {
         <div className="stat-card approved">
           <div className="stat-icon">⏳</div>
           <div className="stat-info">
-            <h3>
-              {
-                healthChecks.filter(
-                  check => new Date(check.checkdate) >= new Date()
-                ).length
-              }
-            </h3>
+            <h3>{healthChecks.filter(check => new Date(check.checkdate) >= new Date()).length}</h3>
             <p>Kiểm tra gần đây</p>
           </div>
         </div>
         <div className="stat-card declined">
           <div className="stat-icon">📊</div>
           <div className="stat-info">
-            <h3>
-              {healthChecks.length > 0
-                ? Math.round(
-                    (healthChecks.reduce(
-                      (sum, check) => sum + (check.height || 0),
-                      0
-                    ) /
-                      healthChecks.length) *
-                      100
-                  ) / 100
-                : 0}
-            </h3>
+            <h3>{healthChecks.length > 0 ? Math.round(healthChecks.reduce((sum, check) => sum + (check.height || 0), 0) / healthChecks.length * 100) / 100 : 0}</h3>
             <p>Chiều cao TB (m)</p>
           </div>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="filters-container">
-        <div className="filter-group">
-          <input
-            type="text"
-            placeholder="🔍 Tìm kiếm theo tên học sinh..."
-            className="search-input"
-          />
-        </div>
-        <div className="filter-group">
-          <button
-            onClick={fetchData}
-            className="refresh-button"
-            style={{
-              background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
-              color: 'white',
-              border: 'none',
-              padding: '12px 24px',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '600',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 4px 15px rgba(47, 81, 72, 0.3)',
-            }}
-          >
-            <i className="fas fa-sync-alt"></i>
-            Làm mới
-          </button>
-        </div>
-      </div>
+             {/* Filters */}
+       <div className="filters-container">
+         <div className="filter-group">
+           <input
+             type="text"
+             placeholder="🔍 Tìm kiếm theo tên học sinh..."
+             className="search-input"
+           />
+         </div>
+         <div className="filter-group">
+           <button 
+             onClick={fetchData}
+             className="refresh-button"
+             style={{ 
+               background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+               color: 'white',
+               border: 'none',
+               padding: '12px 24px',
+               borderRadius: '12px',
+               cursor: 'pointer',
+               fontSize: '14px',
+               fontWeight: '600',
+               display: 'flex',
+               alignItems: 'center',
+               gap: '8px',
+               transition: 'all 0.3s ease',
+               boxShadow: '0 4px 15px rgba(47, 81, 72, 0.3)'
+             }}
+           >
+             <i className="fas fa-sync-alt"></i>
+             Làm mới
+           </button>
+         </div>
+       </div>
 
       {/* Enhanced Modern Table */}
       <div
@@ -767,8 +721,7 @@ const HealthCheck = () => {
                         onClick={() => handleEdit(check)}
                         title="Chỉnh sửa"
                         style={{
-                          background:
-                            'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                          background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
                           color: 'white',
                           border: 'none',
                           padding: '8px 12px',
@@ -782,29 +735,24 @@ const HealthCheck = () => {
                           gap: '4px',
                           minWidth: '36px',
                           height: '36px',
-                          justifyContent: 'center',
+                          justifyContent: 'center'
                         }}
                         onMouseEnter={e => {
                           e.currentTarget.style.transform = 'translateY(-2px)';
-                          e.currentTarget.style.boxShadow =
-                            '0 4px 12px rgba(40, 167, 69, 0.3)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(40, 167, 69, 0.3)';
                         }}
                         onMouseLeave={e => {
                           e.currentTarget.style.transform = 'translateY(0)';
                           e.currentTarget.style.boxShadow = 'none';
                         }}
                       >
-                        <i
-                          className="fas fa-edit"
-                          style={{ fontSize: '14px' }}
-                        ></i>
+                        <i className="fas fa-edit" style={{ fontSize: '14px' }}></i>
                       </button>
                       <button
                         onClick={() => handleDelete(check.checkid)}
                         title="Xóa"
                         style={{
-                          background:
-                            'linear-gradient(135deg, #dc3545 0%, #e74c3c 100%)',
+                          background: 'linear-gradient(135deg, #dc3545 0%, #e74c3c 100%)',
                           color: 'white',
                           border: 'none',
                           padding: '8px 12px',
@@ -818,22 +766,18 @@ const HealthCheck = () => {
                           gap: '4px',
                           minWidth: '36px',
                           height: '36px',
-                          justifyContent: 'center',
+                          justifyContent: 'center'
                         }}
                         onMouseEnter={e => {
                           e.currentTarget.style.transform = 'translateY(-2px)';
-                          e.currentTarget.style.boxShadow =
-                            '0 4px 12px rgba(220, 53, 69, 0.3)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
                         }}
                         onMouseLeave={e => {
                           e.currentTarget.style.transform = 'translateY(0)';
                           e.currentTarget.style.boxShadow = 'none';
                         }}
                       >
-                        <i
-                          className="fas fa-trash"
-                          style={{ fontSize: '14px' }}
-                        ></i>
+                        <i className="fas fa-trash" style={{ fontSize: '14px' }}></i>
                       </button>
                     </div>
                   </td>
@@ -859,66 +803,40 @@ const HealthCheck = () => {
 
       {/* Health Check Modal */}
       {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+        <div
+          className="modal-overlay"
+          onClick={() => setShowModal(false)}
+        >
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>
-                <i
-                  className="fas fa-stethoscope"
-                  style={{ marginRight: '10px', color: '#73ad67' }}
-                ></i>
-                {editingHealthCheck
-                  ? 'Chỉnh sửa kiểm tra sức khỏe'
-                  : 'Thêm kiểm tra sức khỏe mới'}
+                <i className="fas fa-stethoscope" style={{ marginRight: '10px', color: '#73ad67' }}></i>
+                {editingHealthCheck ? 'Chỉnh sửa kiểm tra sức khỏe' : 'Thêm kiểm tra sức khỏe mới'}
               </h3>
-              <button
-                className="modal-close"
-                onClick={() => {
-                  setShowModal(false);
-                  resetForm();
-                }}
-              >
+                             <button
+                 className="modal-close"
+                 onClick={() => {
+                   setShowModal(false);
+                   resetForm();
+                 }}
+               >
                 <i className="fas fa-times"></i>
               </button>
             </div>
-
+            
             <form onSubmit={handleSubmit} className="health-check-form">
               <div className="modal-body">
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '20px',
-                    marginBottom: '20px',
-                  }}
-                >
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '20px',
+                  marginBottom: '20px',
+                }}>
                   {/* Row 1: Event ID - Student */}
-                  <div
-                    style={{
-                      background: '#f8fafc',
-                      borderRadius: 12,
-                      padding: '18px 16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      minHeight: 70,
-                    }}
-                  >
-                    <i
-                      className="fas fa-calendar-alt"
-                      style={{ color: '#73ad67', fontSize: 24 }}
-                    ></i>
-                    <div>
-                      <div
-                        style={{
-                          fontSize: 13,
-                          color: '#888',
-                          fontWeight: 500,
-                          marginBottom: 2,
-                        }}
-                      >
-                        ID SỰ KIỆN:
-                      </div>
+                  <div style={{background:'#f8fafc',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'center',gap:12,minHeight:70,position:'relative'}}>
+                    <i className="fas fa-calendar-alt" style={{color:'#73ad67',fontSize:24}}></i>
+                    <div className="event-dropdown-container" style={{width:'100%',position:'relative'}}>
+                      <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>SỰ KIỆN:</div>
                       <input
                         type="text"
                         placeholder="Gõ tên sự kiện để tìm..."
@@ -939,7 +857,7 @@ const HealthCheck = () => {
                           fontWeight: '700',
                           color: '#2f5148',
                           width: '100%',
-                          outline: 'none',
+                          outline: 'none'
                         }}
                       />
                       {showEventDropdown && (
@@ -996,42 +914,16 @@ const HealthCheck = () => {
                       )}
                     </div>
                   </div>
-
-                  <div
-                    style={{
-                      background: '#f8fafc',
-                      borderRadius: 12,
-                      padding: '18px 16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      minHeight: 70,
-                      position: 'relative',
-                    }}
-                  >
-                    <i
-                      className="fas fa-user-graduate"
-                      style={{ color: '#73ad67', fontSize: 24 }}
-                    ></i>
-                    <div
-                      className="student-dropdown-container"
-                      style={{ width: '100%', position: 'relative' }}
-                    >
-                      <div
-                        style={{
-                          fontSize: 13,
-                          color: '#888',
-                          fontWeight: 500,
-                          marginBottom: 2,
-                        }}
-                      >
-                        HỌC SINH:
-                      </div>
+                  
+                  <div style={{background:'#f8fafc',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'center',gap:12,minHeight:70,position:'relative'}}>
+                    <i className="fas fa-user-graduate" style={{color:'#73ad67',fontSize:24}}></i>
+                    <div className="student-dropdown-container" style={{width:'100%',position:'relative'}}>
+                      <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>HỌC SINH:</div>
                       <input
                         type="text"
                         placeholder="Gõ tên học sinh để tìm..."
                         value={studentSearchTerm}
-                        onChange={e => {
+                        onChange={(e) => {
                           setStudentSearchTerm(e.target.value);
                           setShowStudentDropdown(true);
                           if (!e.target.value) {
@@ -1046,28 +938,26 @@ const HealthCheck = () => {
                           fontWeight: '700',
                           color: '#2f5148',
                           width: '100%',
-                          outline: 'none',
+                          outline: 'none'
                         }}
                       />
                       {showStudentDropdown && (
-                        <div
-                          style={{
-                            position: 'absolute',
-                            top: '100%',
-                            left: 0,
-                            right: 0,
-                            background: 'white',
-                            border: '1px solid #e0e0e0',
-                            borderRadius: '8px',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                            maxHeight: '200px',
-                            overflowY: 'auto',
-                            zIndex: 1000,
-                            marginTop: '4px',
-                          }}
-                        >
+                        <div style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: 0,
+                          right: 0,
+                          background: 'white',
+                          border: '1px solid #e0e0e0',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                          maxHeight: '200px',
+                          overflowY: 'auto',
+                          zIndex: 1000,
+                          marginTop: '4px'
+                        }}>
                           {filteredStudents.length > 0 ? (
-                            filteredStudents.map(student => (
+                            filteredStudents.map((student) => (
                               <div
                                 key={student.id}
                                 onClick={() => handleStudentSelect(student)}
@@ -1077,28 +967,25 @@ const HealthCheck = () => {
                                   borderBottom: '1px solid #f0f0f0',
                                   fontSize: '14px',
                                   color: '#2f5148',
-                                  transition: 'background-color 0.2s ease',
+                                  transition: 'background-color 0.2s ease'
                                 }}
-                                onMouseEnter={e => {
+                                onMouseEnter={(e) => {
                                   e.target.style.backgroundColor = '#f8f9fa';
                                 }}
-                                onMouseLeave={e => {
-                                  e.target.style.backgroundColor =
-                                    'transparent';
+                                onMouseLeave={(e) => {
+                                  e.target.style.backgroundColor = 'transparent';
                                 }}
                               >
                                 {student.fullName}
                               </div>
                             ))
                           ) : (
-                            <div
-                              style={{
-                                padding: '12px 16px',
-                                fontSize: '14px',
-                                color: '#6c757d',
-                                textAlign: 'center',
-                              }}
-                            >
+                            <div style={{
+                              padding: '12px 16px',
+                              fontSize: '14px',
+                              color: '#6c757d',
+                              textAlign: 'center'
+                            }}>
                               Không tìm thấy học sinh
                             </div>
                           )}
@@ -1108,32 +995,10 @@ const HealthCheck = () => {
                   </div>
 
                   {/* Row 2: Check Date - Height */}
-                  <div
-                    style={{
-                      background: '#f8fafc',
-                      borderRadius: 12,
-                      padding: '18px 16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      minHeight: 70,
-                    }}
-                  >
-                    <i
-                      className="fas fa-calendar-check"
-                      style={{ color: '#73ad67', fontSize: 24 }}
-                    ></i>
+                  <div style={{background:'#f8fafc',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'center',gap:12,minHeight:70}}>
+                    <i className="fas fa-calendar-check" style={{color:'#73ad67',fontSize:24}}></i>
                     <div>
-                      <div
-                        style={{
-                          fontSize: 13,
-                          color: '#888',
-                          fontWeight: 500,
-                          marginBottom: 2,
-                        }}
-                      >
-                        NGÀY KIỂM TRA:
-                      </div>
+                      <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>NGÀY KIỂM TRA:</div>
                       <input
                         type="date"
                         name="checkdate"
@@ -1147,38 +1012,16 @@ const HealthCheck = () => {
                           fontWeight: '700',
                           color: '#2f5148',
                           width: '100%',
-                          outline: 'none',
+                          outline: 'none'
                         }}
                       />
                     </div>
                   </div>
 
-                  <div
-                    style={{
-                      background: '#f8fafc',
-                      borderRadius: 12,
-                      padding: '18px 16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      minHeight: 70,
-                    }}
-                  >
-                    <i
-                      className="fas fa-ruler-vertical"
-                      style={{ color: '#73ad67', fontSize: 24 }}
-                    ></i>
+                  <div style={{background:'#f8fafc',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'center',gap:12,minHeight:70}}>
+                    <i className="fas fa-ruler-vertical" style={{color:'#73ad67',fontSize:24}}></i>
                     <div>
-                      <div
-                        style={{
-                          fontSize: 13,
-                          color: '#888',
-                          fontWeight: 500,
-                          marginBottom: 2,
-                        }}
-                      >
-                        CHIỀU CAO (m):
-                      </div>
+                      <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>CHIỀU CAO (m):</div>
                       <input
                         type="number"
                         name="height"
@@ -1196,39 +1039,17 @@ const HealthCheck = () => {
                           fontWeight: '700',
                           color: '#2f5148',
                           width: '100%',
-                          outline: 'none',
+                          outline: 'none'
                         }}
                       />
                     </div>
                   </div>
 
                   {/* Row 3: Weight - Vision Left */}
-                  <div
-                    style={{
-                      background: '#f8fafc',
-                      borderRadius: 12,
-                      padding: '18px 16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      minHeight: 70,
-                    }}
-                  >
-                    <i
-                      className="fas fa-weight"
-                      style={{ color: '#73ad67', fontSize: 24 }}
-                    ></i>
+                  <div style={{background:'#f8fafc',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'center',gap:12,minHeight:70}}>
+                    <i className="fas fa-weight" style={{color:'#73ad67',fontSize:24}}></i>
                     <div>
-                      <div
-                        style={{
-                          fontSize: 13,
-                          color: '#888',
-                          fontWeight: 500,
-                          marginBottom: 2,
-                        }}
-                      >
-                        CÂN NẶNG (kg):
-                      </div>
+                      <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>CÂN NẶNG (kg):</div>
                       <input
                         type="number"
                         name="weight"
@@ -1246,38 +1067,16 @@ const HealthCheck = () => {
                           fontWeight: '700',
                           color: '#2f5148',
                           width: '100%',
-                          outline: 'none',
+                          outline: 'none'
                         }}
                       />
                     </div>
                   </div>
 
-                  <div
-                    style={{
-                      background: '#f8fafc',
-                      borderRadius: 12,
-                      padding: '18px 16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      minHeight: 70,
-                    }}
-                  >
-                    <i
-                      className="fas fa-eye"
-                      style={{ color: '#73ad67', fontSize: 24 }}
-                    ></i>
+                  <div style={{background:'#f8fafc',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'center',gap:12,minHeight:70}}>
+                    <i className="fas fa-eye" style={{color:'#73ad67',fontSize:24}}></i>
                     <div>
-                      <div
-                        style={{
-                          fontSize: 13,
-                          color: '#888',
-                          fontWeight: 500,
-                          marginBottom: 2,
-                        }}
-                      >
-                        THỊ LỰC TRÁI:
-                      </div>
+                      <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>THỊ LỰC TRÁI:</div>
                       <input
                         type="number"
                         name="visionleft"
@@ -1295,39 +1094,17 @@ const HealthCheck = () => {
                           fontWeight: '700',
                           color: '#2f5148',
                           width: '100%',
-                          outline: 'none',
+                          outline: 'none'
                         }}
                       />
                     </div>
                   </div>
 
                   {/* Row 4: Vision Right - Blood Pressure */}
-                  <div
-                    style={{
-                      background: '#f8fafc',
-                      borderRadius: 12,
-                      padding: '18px 16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      minHeight: 70,
-                    }}
-                  >
-                    <i
-                      className="fas fa-eye"
-                      style={{ color: '#73ad67', fontSize: 24 }}
-                    ></i>
+                  <div style={{background:'#f8fafc',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'center',gap:12,minHeight:70}}>
+                    <i className="fas fa-eye" style={{color:'#73ad67',fontSize:24}}></i>
                     <div>
-                      <div
-                        style={{
-                          fontSize: 13,
-                          color: '#888',
-                          fontWeight: 500,
-                          marginBottom: 2,
-                        }}
-                      >
-                        THỊ LỰC PHẢI:
-                      </div>
+                      <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>THỊ LỰC PHẢI:</div>
                       <input
                         type="number"
                         name="visionright"
@@ -1345,38 +1122,16 @@ const HealthCheck = () => {
                           fontWeight: '700',
                           color: '#2f5148',
                           width: '100%',
-                          outline: 'none',
+                          outline: 'none'
                         }}
                       />
                     </div>
                   </div>
 
-                  <div
-                    style={{
-                      background: '#f8fafc',
-                      borderRadius: 12,
-                      padding: '18px 16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      minHeight: 70,
-                    }}
-                  >
-                    <i
-                      className="fas fa-heartbeat"
-                      style={{ color: '#73ad67', fontSize: 24 }}
-                    ></i>
+                  <div style={{background:'#f8fafc',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'center',gap:12,minHeight:70}}>
+                    <i className="fas fa-heartbeat" style={{color:'#73ad67',fontSize:24}}></i>
                     <div>
-                      <div
-                        style={{
-                          fontSize: 13,
-                          color: '#888',
-                          fontWeight: 500,
-                          marginBottom: 2,
-                        }}
-                      >
-                        HUYẾT ÁP:
-                      </div>
+                      <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>HUYẾT ÁP:</div>
                       <input
                         type="text"
                         name="bloodpressure"
@@ -1390,7 +1145,7 @@ const HealthCheck = () => {
                           fontWeight: '700',
                           color: '#2f5148',
                           width: '100%',
-                          outline: 'none',
+                          outline: 'none'
                         }}
                       />
                     </div>
@@ -1398,32 +1153,10 @@ const HealthCheck = () => {
                 </div>
 
                 {/* Notes Section (Full Width) */}
-                <div
-                  style={{
-                    gridColumn: '1/3',
-                    background: '#f8fafc',
-                    borderRadius: 12,
-                    padding: '18px 16px',
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 12,
-                  }}
-                >
-                  <i
-                    className="fas fa-sticky-note"
-                    style={{ color: '#73ad67', fontSize: 24, marginTop: 2 }}
-                  ></i>
-                  <div style={{ width: '100%' }}>
-                    <div
-                      style={{
-                        fontSize: 13,
-                        color: '#888',
-                        fontWeight: 500,
-                        marginBottom: 2,
-                      }}
-                    >
-                      GHI CHÚ:
-                    </div>
+                <div style={{gridColumn:'1/3',background:'#f8fafc',borderRadius:12,padding:'18px 16px',display:'flex',alignItems:'flex-start',gap:12}}>
+                  <i className="fas fa-sticky-note" style={{color:'#73ad67',fontSize:24,marginTop:2}}></i>
+                  <div style={{width: '100%'}}>
+                    <div style={{fontSize:13,color:'#888',fontWeight:500,marginBottom:2}}>GHI CHÚ:</div>
                     <textarea
                       name="notes"
                       value={formData.notes}
@@ -1439,31 +1172,28 @@ const HealthCheck = () => {
                         width: '100%',
                         outline: 'none',
                         resize: 'vertical',
-                        minHeight: '60px',
+                        minHeight: '60px'
                       }}
                     />
                   </div>
                 </div>
               </div>
 
-              <div
-                className="action-buttons"
-                style={{
-                  display: 'flex',
-                  gap: '12px',
-                  justifyContent: 'flex-end',
-                  padding: '20px',
-                  borderTop: '1px solid #e0e0e0',
-                }}
-              >
-                <button
-                  type="button"
-                  className="btn-cancel"
-                  onClick={() => {
-                    setShowModal(false);
-                    resetForm();
-                  }}
-                  style={{
+              <div className="action-buttons" style={{
+                display: 'flex',
+                gap: '12px',
+                justifyContent: 'flex-end',
+                padding: '20px',
+                borderTop: '1px solid #e0e0e0'
+              }}>
+                                 <button
+                   type="button"
+                   className="btn-cancel"
+                   onClick={() => {
+                     setShowModal(false);
+                     resetForm();
+                   }}
+                   style={{
                     background: '#f8f9fa',
                     color: '#6c757d',
                     border: '1px solid #dee2e6',
@@ -1472,7 +1202,7 @@ const HealthCheck = () => {
                     cursor: 'pointer',
                     fontSize: '14px',
                     fontWeight: '500',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.2s ease'
                   }}
                 >
                   Hủy
@@ -1481,8 +1211,7 @@ const HealthCheck = () => {
                   type="submit"
                   className="btn-save"
                   style={{
-                    background:
-                      'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                    background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
                     color: 'white',
                     border: 'none',
                     padding: '10px 20px',
@@ -1490,7 +1219,7 @@ const HealthCheck = () => {
                     cursor: 'pointer',
                     fontSize: '14px',
                     fontWeight: '500',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.2s ease'
                   }}
                 >
                   {editingHealthCheck ? 'Cập nhật' : 'Lưu'}
@@ -1739,4 +1468,4 @@ const HealthCheck = () => {
   );
 };
 
-export default HealthCheck;
+export default HealthCheck; 

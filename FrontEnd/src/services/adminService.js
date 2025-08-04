@@ -482,8 +482,8 @@ export const adminStudentService = {
   // Add new student
   addStudent: async studentData => {
     try {
-      // Remove studentCode and age from data since backend will generate studentCode and calculate age from dob
-      const { studentCode: _, age: __, ...dataToSend } = studentData;
+      // Remove studentCode from data since backend will generate it
+      const { studentCode: _, ...dataToSend } = studentData;
       const response = await apiClient.post(
         'https://api-schoolhealth.purintech.id.vn/api/Student/AddStudent',
         dataToSend
