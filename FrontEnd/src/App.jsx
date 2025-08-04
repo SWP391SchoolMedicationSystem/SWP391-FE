@@ -26,6 +26,8 @@ import VaccinationEventParents from './pages/Manager/VaccinationEventParents';
 import ManagerNotifications from './pages/Manager/Notifications';
 import StudentList from './pages/Manager/StudentList';
 import ManagerStudentHealthRecordDetail from './pages/Manager/StudentHealthRecordDetail';
+import HealthCheckEvents from './pages/Manager/HealthCheckEvents';
+import HealthCheckEventStudents from './pages/Manager/HealthCheckEventStudents';
 
 // Admin pages
 import AdminDashboard from './pages/Admin/Dashboard';
@@ -47,6 +49,8 @@ import NurseNotifications from './pages/Nurse/Notifications';
 import NursePersonalMedicine from './pages/Nurse/PersonalMedicine';
 import ReviewRequests from './pages/Nurse/ReviewRequests';
 import HealthCheck from './pages/Nurse/HealthCheck';
+import NurseHealthCheckEvents from './pages/Nurse/HealthCheckEvents';
+import NurseHealthCheckEventStudents from './pages/Nurse/HealthCheckEventStudents';
 
 // Parent pages
 import ParentDashboard from './pages/Parent/Dashboard';
@@ -119,6 +123,8 @@ function App() {
             element={<ManagerStudentHealthRecordDetail />}
           />
           <Route path="notifications" element={<ManagerNotifications />} />
+          <Route path="health-check-events" element={<HealthCheckEvents />} />
+          <Route path="health-check-events/:eventId/students" element={<HealthCheckEventStudents />} />
         </Route>
 
         {/* Nurse routes */}
@@ -144,6 +150,8 @@ function App() {
           <Route path="medicine-management" element={<MedicineManagement />} />
           <Route path="personal-medicine" element={<NursePersonalMedicine />} />
           <Route path="health-check" element={<HealthCheck />} />
+          <Route path="health-check-events" element={<NurseHealthCheckEvents />} />
+          <Route path="health-check-events/:eventId/students" element={<NurseHealthCheckEventStudents />} />
           <Route path="student-list" element={<NurseStudentList />} />
           <Route path="blog" element={<NurseBlog />} />
           <Route path="chat" element={<ChatWithParents />} />
