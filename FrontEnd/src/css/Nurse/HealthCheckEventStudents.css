@@ -1,0 +1,145 @@
+/* HealthCheckEventStudents.css for Nurse */
+.health-check-event-students-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .health-check-event-students-container {
+    padding: 10px;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .header > div {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .header button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Card hover effects */
+.student-card {
+  transition: all 0.3s ease;
+}
+
+.student-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Statistics card styling */
+.stats-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(193, 203, 194, 0.4);
+}
+
+/* Button styling */
+.action-button {
+  transition: all 0.3s ease;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(47, 81, 72, 0.3);
+}
+
+/* Student avatar styling */
+.student-avatar {
+  background: linear-gradient(135deg, #2f5148 0%, #73ad67 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 600;
+}
+
+/* Empty state styling */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #97a19b;
+}
+
+/* Loading and error states */
+.loading-container,
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+/* Grid responsive adjustments */
+@media (max-width: 1024px) {
+  .students-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .students-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .event-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Animation for student cards */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.student-card {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Custom scrollbar for modal content */
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #c1cbc2;
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #97a19b;
+} 

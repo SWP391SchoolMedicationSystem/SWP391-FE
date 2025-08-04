@@ -222,4 +222,9 @@ export const buildApiUrl = (endpoint, id = null) => {
   return id ? `${endpoint}/${id}` : endpoint;
 };
 
+// Export config object for other services
+export const config = {
+  apiUrl: API_BASE_URL
+};
+
 export default apiClient;

@@ -25,6 +25,7 @@ import {
   Search,
   DarkMode,
   LightMode,
+  Event,
 } from '@mui/icons-material';
 import userService from '../../services/userService';
 import { managerNotificationService } from '../../services/managerService';
@@ -56,6 +57,12 @@ const navItems = [
     label: 'Sự Kiện Tiêm Chủng',
     icon: <Vaccines />,
     key: 'vaccination',
+  },
+  {
+    to: '/manager/health-check-events',
+    label: 'Sự Kiện Khám Sức Khỏe',
+    icon: <Event />,
+    key: 'health-check-events',
   },
   {
     to: '/manager/StudentList',
