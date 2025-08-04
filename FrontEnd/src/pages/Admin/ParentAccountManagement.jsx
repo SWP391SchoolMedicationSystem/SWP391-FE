@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAdminParents, useAdminActions } from '../../utils/hooks/useAdmin';
 import { adminStudentService } from '../../services/adminService';
 import Modal from '../../components/common/Modal';
+import { getCurrentDateStringGMT7 } from '../../utils/dateUtils';
 import '../../css/Admin/ParentAccountManagement.css';
 
 const ParentAccountManagement = () => {
@@ -28,12 +29,11 @@ const ParentAccountManagement = () => {
       {
         studentCode: 'String',
         fullname: '',
-        age: 0,
         bloodType: 'A+',
         gender: true,
         classid: 1, // Lớp Mầm A
         parentid: 123,
-        dob: new Date().toISOString().split('T')[0],
+        dob: getCurrentDateStringGMT7(),
       },
     ],
   });
@@ -42,12 +42,11 @@ const ParentAccountManagement = () => {
   // Student form data for adding new student
   const [studentFormData, setStudentFormData] = useState({
     fullname: '',
-    age: 0,
     bloodType: 'A+',
     gender: true,
     classid: 1,
     parentid: 0,
-    dob: new Date().toISOString().split('T')[0],
+    dob: getCurrentDateStringGMT7(),
   });
 
   // Load data on mount
@@ -94,12 +93,11 @@ const ParentAccountManagement = () => {
         {
           studentCode: 'String',
           fullname: '',
-          age: 0,
           bloodType: 'A+',
           gender: true,
           classid: 1, // Lớp Mầm A
           parentid: 123,
-          dob: new Date().toISOString().split('T')[0],
+          dob: getCurrentDateStringGMT7(),
         },
       ],
     }));
@@ -145,10 +143,6 @@ const ParentAccountManagement = () => {
       formData.students.forEach((student, index) => {
         if (!student.fullname.trim()) {
           errors.push(`Họ và tên học sinh ${index + 1} không được để trống`);
-        }
-
-        if (!student.age || student.age < 0 || student.age > 18) {
-          errors.push(`Tuổi học sinh ${index + 1} phải từ 0-18 tuổi`);
         }
 
         if (!student.dob) {
@@ -198,12 +192,11 @@ const ParentAccountManagement = () => {
           {
             studentCode: 'String',
             fullname: '',
-            age: 0,
             bloodType: 'A+',
             gender: true,
             classid: 1, // Lớp Mầm A
             parentid: 123,
-            dob: new Date().toISOString().split('T')[0],
+            dob: getCurrentDateStringGMT7(),
           },
         ],
       });
@@ -287,12 +280,11 @@ const ParentAccountManagement = () => {
     setStudentFormData({
       studentCode: '',
       fullname: '',
-      age: 0,
       bloodType: 'A+',
       gender: true,
       classid: 1,
       parentid: parent.parentid,
-      dob: new Date().toISOString().split('T')[0],
+      dob: getCurrentDateStringGMT7(),
     });
     setShowAddStudentModal(true);
   };
@@ -303,7 +295,7 @@ const ParentAccountManagement = () => {
     setStudentFormData(prev => ({
       ...prev,
       [name]:
-        name === 'age' || name === 'classid'
+        name === 'classid'
           ? parseInt(value)
           : name === 'gender'
           ? value === 'true'
@@ -319,13 +311,6 @@ const ParentAccountManagement = () => {
     const errors = [];
     if (!studentFormData.fullname.trim()) {
       errors.push('Họ và tên học sinh không được để trống');
-    }
-    if (
-      !studentFormData.age ||
-      studentFormData.age < 0 ||
-      studentFormData.age > 18
-    ) {
-      errors.push('Tuổi học sinh phải từ 0-18 tuổi');
     }
     if (!studentFormData.dob) {
       errors.push('Ngày sinh không được để trống');
@@ -351,12 +336,11 @@ const ParentAccountManagement = () => {
       setSelectedParent(null);
       setStudentFormData({
         fullname: '',
-        age: 0,
         bloodType: 'A+',
         gender: true,
         classid: 1,
         parentid: 0,
-        dob: new Date().toISOString().split('T')[0],
+        dob: getCurrentDateStringGMT7(),
       });
     } catch (error) {
       console.error('Add student failed:', error);
@@ -602,7 +586,7 @@ const ParentAccountManagement = () => {
               {formData.students.map((student, index) => (
                 <div key={index} className="student-form">
                   <div className="student-header">
-                  <h4 style={{ color: 'white' }}>Học Sinh {index + 1}</h4>
+                    <h4 style={{ color: 'white' }}>Học Sinh {index + 1}</h4>
                     {formData.students.length > 1 && (
                       <button
                         type="button"
@@ -627,25 +611,6 @@ const ParentAccountManagement = () => {
                         required
                       />
                       <small>Nhập họ và tên đầy đủ</small>
-                    </div>
-
-                    <div className="form-group">
-                      <label>Tuổi *</label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="18"
-                        value={student.age}
-                        onChange={e => {
-                          const value = parseInt(e.target.value) || 0;
-                          if (value >= 0 && value <= 18) {
-                            handleStudentChange(index, 'age', value);
-                          }
-                        }}
-                        placeholder="0-18"
-                        required
-                      />
-                      <small>Tuổi từ 0-18</small>
                     </div>
                   </div>
 
@@ -725,7 +690,7 @@ const ParentAccountManagement = () => {
                         onChange={e =>
                           handleStudentChange(index, 'dob', e.target.value)
                         }
-                        max={new Date().toISOString().split('T')[0]}
+                        max={getCurrentDateStringGMT7()}
                         required
                       />
                       <small>Không được chọn ngày trong tương lai</small>
@@ -750,7 +715,6 @@ const ParentAccountManagement = () => {
                       {
                         studentCode: 'String',
                         fullname: '',
-                        age: 0,
                         bloodType: 'A+',
                         gender: true,
                         classid: 1, // Lớp Mầm A
@@ -887,12 +851,11 @@ const ParentAccountManagement = () => {
             setStudentFormData({
               studentCode: '',
               fullname: '',
-              age: 0,
               bloodType: 'A+',
               gender: true,
               classid: 1,
               parentid: 0,
-              dob: new Date().toISOString().split('T')[0],
+              dob: getCurrentDateStringGMT7(),
             });
           }}
           title={`Thêm Học Sinh cho ${selectedParent.fullname}`}
@@ -911,40 +874,23 @@ const ParentAccountManagement = () => {
               />
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="studentAge">Tuổi *</label>
-                <input
-                  type="number"
-                  id="studentAge"
-                  name="age"
-                  min="0"
-                  max="18"
-                  value={studentFormData.age}
-                  onChange={handleStudentFormChange}
-                  placeholder="0-18"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="studentBloodType">Nhóm Máu</label>
-                <select
-                  id="studentBloodType"
-                  name="bloodType"
-                  value={studentFormData.bloodType}
-                  onChange={handleStudentFormChange}
-                >
-                  <option value="A+">A+</option>
-                  <option value="A-">A-</option>
-                  <option value="B+">B+</option>
-                  <option value="B-">B-</option>
-                  <option value="AB+">AB+</option>
-                  <option value="AB-">AB-</option>
-                  <option value="O+">O+</option>
-                  <option value="O-">O-</option>
-                </select>
-              </div>
+            <div className="form-group">
+              <label htmlFor="studentBloodType">Nhóm Máu</label>
+              <select
+                id="studentBloodType"
+                name="bloodType"
+                value={studentFormData.bloodType}
+                onChange={handleStudentFormChange}
+              >
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
             </div>
 
             <div className="form-row">
@@ -991,7 +937,7 @@ const ParentAccountManagement = () => {
                 name="dob"
                 value={studentFormData.dob}
                 onChange={handleStudentFormChange}
-                max={new Date().toISOString().split('T')[0]}
+                max={getCurrentDateStringGMT7()}
                 required
               />
             </div>
@@ -1004,12 +950,11 @@ const ParentAccountManagement = () => {
                   setSelectedParent(null);
                   setStudentFormData({
                     fullname: '',
-                    age: 0,
                     bloodType: 'A+',
                     gender: true,
                     classid: 1,
                     parentid: 0,
-                    dob: new Date().toISOString().split('T')[0],
+                    dob: getCurrentDateStringGMT7(),
                   });
                 }}
                 className="cancel-btn"

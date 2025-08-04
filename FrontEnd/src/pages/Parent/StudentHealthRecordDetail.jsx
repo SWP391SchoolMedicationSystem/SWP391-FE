@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import { parentService } from '../../services/parentService';
+import { getCurrentDateGMT7 } from '../../utils/dateUtils';
 import '../../css/Manager/StudentHealthRecordDetail.css';
 
 const StudentHealthRecordDetail = () => {
@@ -16,13 +17,13 @@ const StudentHealthRecordDetail = () => {
   const [formData, setFormData] = useState({
     studentID: parseInt(studentId),
     healthCategoryID: 1,
-    healthRecordDate: new Date().toISOString(),
+    healthRecordDate: getCurrentDateGMT7(),
     healthrecordtitle: '',
     healthrecorddescription: '',
     staffid: 3,
     isConfirm: true,
     createdBy: '3',
-    createdDate: new Date().toISOString(),
+    createdDate: getCurrentDateGMT7(),
   });
   const [submitLoading, setSubmitLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -120,13 +121,13 @@ const StudentHealthRecordDetail = () => {
       setFormData({
         studentID: parseInt(studentId),
         healthCategoryID: 1,
-        healthRecordDate: new Date().toISOString(),
+        healthRecordDate: getCurrentDateGMT7(),
         healthrecordtitle: '',
         healthrecorddescription: '',
         staffid: 3,
         isConfirm: true,
         createdBy: '3',
-        createdDate: new Date().toISOString(),
+        createdDate: getCurrentDateGMT7(),
       });
       fetchHealthRecord(); // Refresh data
     } catch (error) {
