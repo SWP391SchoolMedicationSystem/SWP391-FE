@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { healthCheckService } from '../../services/healthCheckService';
 import { nurseStudentService } from '../../services/nurseService';
+import { healthCheckEventService } from '../../services/healthCheckEventService';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Modal from '../../components/common/Modal';
 import {
@@ -15,6 +16,8 @@ const HealthCheck = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingHealthCheck, setEditingHealthCheck] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedHealthCheck, setSelectedHealthCheck] = useState(null);
   const [formData, setFormData] = useState({
     eventid: 1, // Default event ID
     studentid: '',
@@ -28,12 +31,16 @@ const HealthCheck = () => {
   });
   const [showStudentDropdown, setShowStudentDropdown] = useState(false);
   const [studentSearchTerm, setStudentSearchTerm] = useState('');
+  const [events, setEvents] = useState([]);
+  const [selectedEventName, setSelectedEventName] = useState('');
+  const [showEventDropdown, setShowEventDropdown] = useState(false);
+  const [eventSearchTerm, setEventSearchTerm] = useState('');
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  // Handle click outside to close dropdown
+  // Handle click outside to close dropdowns
   useEffect(() => {
     const handleClickOutside = event => {
       if (
@@ -42,13 +49,16 @@ const HealthCheck = () => {
       ) {
         setShowStudentDropdown(false);
       }
+      if (showEventDropdown && !event.target.closest('.event-dropdown-container')) {
+        setShowEventDropdown(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showStudentDropdown]);
+  }, [showStudentDropdown, showEventDropdown]);
 
   const fetchData = async () => {
     try {
@@ -82,6 +92,12 @@ const HealthCheck = () => {
       ...prev,
       [name]: value,
     }));
+    
+    // If eventid is changed, update the event name
+    if (name === 'eventid') {
+      const event = events.find(e => e.healthcheckeventID === parseInt(value));
+      setSelectedEventName(event ? event.healthcheckeventname : '');
+    }
   };
 
   const handleSubmit = async e => {
@@ -212,6 +228,9 @@ const HealthCheck = () => {
     });
     setStudentSearchTerm('');
     setShowStudentDropdown(false);
+    setSelectedEventName('');
+    setEventSearchTerm('');
+    setShowEventDropdown(false);
   };
 
   const openAddModal = () => {
@@ -220,6 +239,13 @@ const HealthCheck = () => {
     setStudentSearchTerm('');
     setShowStudentDropdown(false);
     setShowModal(true);
+    
+    // Set default event name and search term
+    const defaultEvent = events.find(e => e.healthcheckeventID === 1);
+    if (defaultEvent) {
+      setSelectedEventName(defaultEvent.healthcheckeventname);
+      setEventSearchTerm(defaultEvent.healthcheckeventname);
+    }
   };
 
   const getStudentName = studentId => {
@@ -231,6 +257,10 @@ const HealthCheck = () => {
     student.fullName.toLowerCase().includes(studentSearchTerm.toLowerCase())
   );
 
+  const filteredEvents = events.filter(event =>
+    event.healthcheckeventname.toLowerCase().includes(eventSearchTerm.toLowerCase())
+  );
+
   const handleStudentSelect = student => {
     setFormData(prev => ({
       ...prev,
@@ -238,6 +268,21 @@ const HealthCheck = () => {
     }));
     setStudentSearchTerm(student.fullName);
     setShowStudentDropdown(false);
+  };
+
+  const handleEventSelect = (event) => {
+    setFormData(prev => ({
+      ...prev,
+      eventid: event.healthcheckeventID
+    }));
+    setEventSearchTerm(event.healthcheckeventname);
+    setSelectedEventName(event.healthcheckeventname);
+    setShowEventDropdown(false);
+  };
+
+  const handleViewDetail = (healthCheck) => {
+    setSelectedHealthCheck(healthCheck);
+    setShowDetailModal(true);
   };
 
   if (loading) {
@@ -688,6 +733,37 @@ const HealthCheck = () => {
                       }}
                     >
                       <button
+                        onClick={() => handleViewDetail(check)}
+                        title="Xem chi tiết"
+                        style={{
+                          background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                          color: 'white',
+                          border: 'none',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontSize: '0.9rem',
+                          fontWeight: 500,
+                          transition: 'all 0.2s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          minWidth: '36px',
+                          height: '36px',
+                          justifyContent: 'center'
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(47, 81, 72, 0.3)';
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        <i className="fas fa-eye" style={{ fontSize: '14px' }}></i>
+                      </button>
+                      <button
                         onClick={() => handleEdit(check)}
                         title="Chỉnh sửa"
                         style={{
@@ -844,13 +920,18 @@ const HealthCheck = () => {
                         ID SỰ KIỆN:
                       </div>
                       <input
-                        type="number"
-                        name="eventid"
-                        value={formData.eventid}
-                        onChange={handleInputChange}
-                        min="1"
-                        required
-                        placeholder="Nhập ID sự kiện"
+                        type="text"
+                        placeholder="Gõ tên sự kiện để tìm..."
+                        value={eventSearchTerm}
+                        onChange={(e) => {
+                          setEventSearchTerm(e.target.value);
+                          setShowEventDropdown(true);
+                          if (!e.target.value) {
+                            setFormData(prev => ({ ...prev, eventid: 1 }));
+                            setSelectedEventName('');
+                          }
+                        }}
+                        onFocus={() => setShowEventDropdown(true)}
                         style={{
                           border: 'none',
                           background: 'transparent',
@@ -861,6 +942,58 @@ const HealthCheck = () => {
                           outline: 'none',
                         }}
                       />
+                      {showEventDropdown && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: 0,
+                          right: 0,
+                          background: 'white',
+                          border: '1px solid #e0e0e0',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                          maxHeight: '200px',
+                          overflowY: 'auto',
+                          zIndex: 1000,
+                          marginTop: '4px'
+                        }}>
+                          {filteredEvents.length > 0 ? (
+                            filteredEvents.map((event) => (
+                              <div
+                                key={event.healthcheckeventID}
+                                onClick={() => handleEventSelect(event)}
+                                style={{
+                                  padding: '12px 16px',
+                                  cursor: 'pointer',
+                                  borderBottom: '1px solid #f0f0f0',
+                                  fontSize: '14px',
+                                  color: '#2f5148',
+                                  transition: 'background-color 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.target.style.backgroundColor = '#f8f9fa';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.target.style.backgroundColor = 'transparent';
+                                }}
+                              >
+                                <div style={{ fontWeight: '600' }}>{event.healthcheckeventname}</div>
+                                <div style={{ fontSize: '12px', color: '#6c757d', marginTop: '2px' }}>
+                                  ID: {event.healthcheckeventID} | {event.location}
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div style={{
+                              padding: '12px 16px',
+                              fontSize: '14px',
+                              color: '#6c757d'
+                            }}>
+                              Không tìm thấy sự kiện
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -1364,6 +1497,241 @@ const HealthCheck = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Health Check Detail Modal */}
+      {showDetailModal && selectedHealthCheck && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px',
+            backdropFilter: 'blur(4px)',
+          }}
+          onClick={() => setShowDetailModal(false)}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '20px',
+              width: '100%',
+              maxWidth: '700px',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              border: '1px solid #c1cbc2',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(20px)',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '25px',
+                borderBottom: '1px solid #e9ecef',
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  color: '#2f5148',
+                  fontFamily: 'Satoshi, sans-serif',
+                  fontSize: '1.5rem',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+              >
+                <i className="fas fa-stethoscope" style={{ color: '#73ad67', fontSize: '1.5rem' }}></i>
+                Chi Tiết Kiểm Tra Sức Khỏe
+              </h3>
+              <button
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#97a19b',
+                  cursor: 'pointer',
+                  fontSize: '1.5rem',
+                  padding: '5px',
+                  borderRadius: '50%',
+                  transition: 'all 0.3s ease',
+                }}
+                onClick={() => setShowDetailModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div style={{ padding: '25px' }}>
+              {/* Student Information */}
+              <div style={{
+                background: '#f8f9fa',
+                borderRadius: '12px',
+                padding: '20px',
+                marginBottom: '20px',
+                border: '1px solid #e9ecef'
+              }}>
+                <h4 style={{
+                  margin: '0 0 15px 0',
+                  color: '#2f5148',
+                  fontSize: '1.2rem',
+                  fontWeight: '600'
+                }}>
+                  Thông tin học sinh
+                </h4>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '15px'
+                }}>
+                  <div>
+                    <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Tên học sinh:</span>
+                    <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                      {getStudentName(selectedHealthCheck.studentid)}
+                    </div>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>ID học sinh:</span>
+                    <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                      {selectedHealthCheck.studentid}
+                    </div>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>ID sự kiện:</span>
+                    <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                      {selectedHealthCheck.eventid}
+                    </div>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>ID bản ghi:</span>
+                    <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                      {selectedHealthCheck.checkid}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Health Check Results */}
+              <div style={{
+                background: '#f8f9fa',
+                borderRadius: '12px',
+                padding: '20px',
+                border: '1px solid #e9ecef'
+              }}>
+                <h4 style={{
+                  margin: '0 0 15px 0',
+                  color: '#2f5148',
+                  fontSize: '1.2rem',
+                  fontWeight: '600'
+                }}>
+                  Kết quả kiểm tra sức khỏe
+                </h4>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '15px'
+                }}>
+                  <div>
+                    <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Ngày kiểm tra:</span>
+                    <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                      {selectedHealthCheck.checkdate ? new Date(selectedHealthCheck.checkdate).toLocaleDateString('vi-VN') : 'Chưa có'}
+                    </div>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Chiều cao:</span>
+                    <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                      {selectedHealthCheck.height > 0 ? `${selectedHealthCheck.height}m` : 'Chưa có'}
+                    </div>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Cân nặng:</span>
+                    <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                      {selectedHealthCheck.weight > 0 ? `${selectedHealthCheck.weight}kg` : 'Chưa có'}
+                    </div>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Thị lực trái:</span>
+                    <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                      {selectedHealthCheck.visionleft > 0 ? selectedHealthCheck.visionleft : 'Chưa có'}
+                    </div>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Thị lực phải:</span>
+                    <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                      {selectedHealthCheck.visionright > 0 ? selectedHealthCheck.visionright : 'Chưa có'}
+                    </div>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Huyết áp:</span>
+                    <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                      {selectedHealthCheck.bloodpressure && selectedHealthCheck.bloodpressure !== 'string' 
+                        ? selectedHealthCheck.bloodpressure 
+                        : 'Chưa có'
+                      }
+                    </div>
+                  </div>
+                </div>
+                {selectedHealthCheck.notes && (
+                  <div style={{ marginTop: '15px' }}>
+                    <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Ghi chú:</span>
+                    <div style={{ 
+                      fontSize: '1rem', 
+                      color: '#2f5148',
+                      marginTop: '5px',
+                      padding: '10px',
+                      background: 'white',
+                      borderRadius: '8px',
+                      border: '1px solid #e9ecef'
+                    }}>
+                      {selectedHealthCheck.notes}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div
+              style={{
+                padding: '20px 25px',
+                borderTop: '1px solid #e9ecef',
+                display: 'flex',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <button
+                onClick={() => setShowDetailModal(false)}
+                style={{
+                  background: '#bfefa1',
+                  color: '#1a3a2e',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  fontFamily: 'Satoshi, sans-serif',
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                Đóng
+              </button>
+            </div>
           </div>
         </div>
       )}
