@@ -48,7 +48,15 @@ const HealthCheckEvents = () => {
       console.log('All events from API:', eventsData);
       
       // Filter out deleted events and sort by date (newest first)
-      const filteredEvents = (eventsData || []).filter(event => !event.isdeleted);
+      console.log('🔍 Raw events from API:', eventsData);
+      console.log('🔍 Events with isdeleted=true:', (eventsData || []).filter(event => event.isdeleted));
+      
+      const filteredEvents = (eventsData || []).filter(event => {
+        const isDeleted = event.isdeleted === true || event.isdeleted === 'true';
+        console.log(`🔍 Event ${event.healthcheckeventID}: isdeleted=${event.isdeleted} (${typeof event.isdeleted}), filtered=${!isDeleted}`);
+        return !isDeleted;
+      });
+      
       const sortedEvents = filteredEvents.sort((a, b) => {
         return new Date(b.eventdate) - new Date(a.eventdate);
       });
@@ -284,7 +292,11 @@ const HealthCheckEvents = () => {
   }
 
   return (
-    <div className="review-requests-container">
+    <div className="review-requests-container" style={{ 
+      maxWidth: '100%', 
+      padding: '0 20px',
+      margin: '0 auto'
+    }}>
       {/* Header */}
       <div className="review-requests-header" style={{
         background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
@@ -302,6 +314,28 @@ const HealthCheckEvents = () => {
           <p style={{ color: 'white', opacity: 0.95, margin: '8px 0 0 0', fontSize: '1.1rem' }}>
             Tạo và quản lý các sự kiện khám sức khỏe cho học sinh
           </p>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <button 
+            onClick={fetchData}
+            disabled={loading}
+            style={{ 
+              color: 'white', 
+              background: 'rgba(255,255,255,0.15)', 
+              border: 'none', 
+              borderRadius: 10, 
+              padding: '10px 18px', 
+              fontWeight: 600, 
+              fontSize: 16, 
+              cursor: 'pointer', 
+              boxShadow: '0 2px 8px rgba(47,81,72,0.08)',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={e => e.target.style.background = 'rgba(255,255,255,0.25)'}
+            onMouseLeave={e => e.target.style.background = 'rgba(255,255,255,0.15)'}
+          >
+            {loading ? '🔄 Đang tải...' : '🔄 Làm mới'}
+          </button>
         </div>
       </div>
 
@@ -379,8 +413,9 @@ const HealthCheckEvents = () => {
         {/* Event Cards Grid */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-          gap: '24px'
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '20px',
+          maxWidth: '100%'
         }}>
           {events.map((event) => (
             <div

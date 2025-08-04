@@ -33,8 +33,17 @@ const HealthCheckEvents = () => {
       
       console.log('All events from API:', eventsData);
       
-      // Sort by date (newest first)
-      const sortedEvents = (eventsData || []).sort((a, b) => {
+      // Filter out deleted events and sort by date (newest first)
+      console.log('🔍 Raw events from API:', eventsData);
+      console.log('🔍 Events with isdeleted=true:', (eventsData || []).filter(event => event.isdeleted));
+      
+      const filteredEvents = (eventsData || []).filter(event => {
+        const isDeleted = event.isdeleted === true || event.isdeleted === 'true';
+        console.log(`🔍 Event ${event.healthcheckeventID}: isdeleted=${event.isdeleted} (${typeof event.isdeleted}), filtered=${!isDeleted}`);
+        return !isDeleted;
+      });
+      
+      const sortedEvents = filteredEvents.sort((a, b) => {
         return new Date(b.eventdate) - new Date(a.eventdate);
       });
       
@@ -103,6 +112,28 @@ const HealthCheckEvents = () => {
           <p style={{ color: 'white', opacity: 0.95, margin: '8px 0 0 0', fontSize: '1.1rem' }}>
             Xem danh sách các sự kiện khám sức khỏe cho học sinh
           </p>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <button 
+            onClick={fetchData}
+            disabled={loading}
+            style={{ 
+              color: 'white', 
+              background: 'rgba(255,255,255,0.15)', 
+              border: 'none', 
+              borderRadius: 10, 
+              padding: '10px 18px', 
+              fontWeight: 600, 
+              fontSize: 16, 
+              cursor: 'pointer', 
+              boxShadow: '0 2px 8px rgba(47,81,72,0.08)',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={e => e.target.style.background = 'rgba(255,255,255,0.25)'}
+            onMouseLeave={e => e.target.style.background = 'rgba(255,255,255,0.15)'}
+          >
+            {loading ? '🔄 Đang tải...' : '🔄 Làm mới'}
+          </button>
         </div>
       </div>
 
