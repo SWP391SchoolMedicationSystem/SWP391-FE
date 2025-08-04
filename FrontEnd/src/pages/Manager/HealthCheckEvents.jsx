@@ -23,6 +23,7 @@ const HealthCheckEvents = () => {
   const [editingEvent, setEditingEvent] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [eventStudentCounts, setEventStudentCounts] = useState({});
   const [formData, setFormData] = useState({
     healthcheckeventname: '',
     healthcheckeventdescription: '',
@@ -54,6 +55,23 @@ const HealthCheckEvents = () => {
       
       console.log('Filtered and sorted events to display:', sortedEvents);
       setEvents(sortedEvents);
+      
+      // Fetch student counts for each event
+      const studentCounts = {};
+      for (const event of sortedEvents) {
+        try {
+          const studentsData = await healthCheckEventService.getStudentsByEventId(event.healthcheckeventID);
+          studentCounts[event.healthcheckeventID] = studentsData ? studentsData.length : 0;
+        } catch (error) {
+          console.error(`Error fetching students for event ${event.healthcheckeventID}:`, error);
+          studentCounts[event.healthcheckeventID] = 0;
+        }
+      }
+      setEventStudentCounts(studentCounts);
+      
+      console.log('Updated events state:', sortedEvents);
+      console.log('Updated student counts:', studentCounts);
+      
     } catch (error) {
       console.error('Error fetching data:', error);
       // Set empty array if API fails
@@ -143,6 +161,24 @@ const HealthCheckEvents = () => {
           isdeleted: false
         };
         await healthCheckEventService.updateHealthCheckEvent(editingEvent.healthcheckeventID, updateData);
+        
+        // Verify the update by fetching the specific event
+        try {
+          const updatedEvent = await healthCheckEventService.getHealthCheckEventById(editingEvent.healthcheckeventID);
+          console.log('Verified updated event:', updatedEvent);
+          
+          // Update the specific event in the current state
+          setEvents(prevEvents => 
+            prevEvents.map(event => 
+              event.healthcheckeventID === editingEvent.healthcheckeventID 
+                ? { ...event, ...updatedEvent }
+                : event
+            )
+          );
+        } catch (error) {
+          console.error('Error verifying update:', error);
+        }
+        
         alert('Cập nhật sự kiện thành công!');
       } else {
         await healthCheckEventService.createHealthCheckEvent(formDataToSend);
@@ -150,8 +186,13 @@ const HealthCheckEvents = () => {
       }
       
       setShowModal(false);
+      setEditingEvent(null);
       resetForm();
-      fetchData();
+      
+      // Thêm một chút delay để đảm bảo modal đóng hoàn toàn trước khi fetch data
+      setTimeout(async () => {
+        await fetchData(); // Đảm bảo fetchData hoàn thành trước khi tiếp tục
+      }, 100);
     } catch (error) {
       console.error('Error saving event:', error);
       alert('Có lỗi xảy ra khi lưu sự kiện. Vui lòng thử lại.');
@@ -408,7 +449,8 @@ const HealthCheckEvents = () => {
                     </span>
                   </div>
                   
-                  <div style={{
+                  {/* Organization Section - Hidden */}
+                  {/* <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
@@ -418,7 +460,7 @@ const HealthCheckEvents = () => {
                     <span style={{ fontSize: '0.95rem', color: '#6c757d' }}>
                       Tổ chức: {event.createdby}
                     </span>
-                  </div>
+                  </div> */}
 
                   {/* Document Section - Hidden */}
                   {/* {event.documentfilename && (
@@ -479,7 +521,9 @@ const HealthCheckEvents = () => {
                   display: 'flex',
                   gap: '8px',
                   marginBottom: '20px',
-                  flexWrap: 'wrap'
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                  alignItems: 'center'
                 }}>
                   <button
                     onClick={() => handleViewDetails(event)}
@@ -574,36 +618,38 @@ const HealthCheckEvents = () => {
                     Chỉnh sửa
                   </button>
                   
-                  <button
-                    onClick={() => handleDelete(event.healthcheckeventID)}
-                    style={{
-                      background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
-                      color: 'white',
-                      border: 'none',
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      fontSize: '0.85rem',
-                      fontWeight: '500',
-                      transition: 'all 0.2s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      flex: 1,
-                      minWidth: '100px'
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  >
-                    <DeleteIcon sx={{ fontSize: '14px' }} />
-                    Xóa
-                  </button>
+                  {eventStudentCounts[event.healthcheckeventID] === 0 && (
+                    <button
+                      onClick={() => handleDelete(event.healthcheckeventID)}
+                      style={{
+                        background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                        color: 'white',
+                        border: 'none',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontSize: '0.85rem',
+                        fontWeight: '500',
+                        transition: 'all 0.2s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        flex: 1,
+                        minWidth: '100px'
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
+                    >
+                      <DeleteIcon sx={{ fontSize: '14px' }} />
+                      Xóa
+                    </button>
+                  )}
                 </div>
 
                 {/* Manager Notice */}
@@ -703,7 +749,11 @@ const HealthCheckEvents = () => {
                   borderRadius: '50%',
                   transition: 'all 0.3s ease',
                 }}
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+                  setEditingEvent(null);
+                  resetForm();
+                }}
               >
                 <CloseIcon sx={{ fontSize: '1.5rem' }} />
               </button>
@@ -801,7 +851,8 @@ const HealthCheckEvents = () => {
                 />
               </div>
 
-              <div style={{ marginBottom: '20px' }}>
+              {/* Examination Date Section - Hidden */}
+              {/* <div style={{ marginBottom: '20px' }}>
                 <label style={{
                   display: 'block',
                   marginBottom: '8px',
@@ -829,7 +880,7 @@ const HealthCheckEvents = () => {
                   onFocus={e => e.target.style.borderColor = '#73ad67'}
                   onBlur={e => e.target.style.borderColor = '#e9ecef'}
                 />
-              </div>
+              </div> */}
 
               {/* File Upload Section - Hidden */}
               {/* <div style={{ marginBottom: '20px' }}>
@@ -872,7 +923,11 @@ const HealthCheckEvents = () => {
               }}>
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditingEvent(null);
+                    resetForm();
+                  }}
                   style={{
                     background: '#6c757d',
                     color: 'white',
