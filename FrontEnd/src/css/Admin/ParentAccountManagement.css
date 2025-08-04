@@ -1,0 +1,614 @@
+/* Parent Account Management Styles */
+.parent-account-management {
+  padding: 5px;
+  max-width: 100%;
+  margin: 0;
+}
+
+/* Override MUI Box styles */
+
+/* Page header */
+.page-header {
+  margin-bottom: 16px;
+  padding: 8px 0;
+}
+
+.page-header h1 {
+  font-size: 24px;
+  margin: 0 0 4px 0;
+}
+
+.page-header p {
+  font-size: 14px;
+  margin: 0;
+  color: #6c757d;
+}
+
+/* Section header */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 8px 0;
+}
+
+.section-header h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+/* Tab content */
+.tab-content {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Sections */
+.form-section {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.form-section h3 {
+  margin: 0 0 20px 0;
+  color: #495057;
+  font-size: 18px;
+  font-weight: 600;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+}
+
+/* Form Rows */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+/* Student Form */
+.student-form {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.student-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.student-header h4 {
+  margin: 0;
+  color: #495057;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.remove-student-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s;
+}
+
+.remove-student-btn:hover {
+  background: #c82333;
+}
+
+/* Add Student Button */
+.add-student-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.add-student-btn:hover {
+  background: #218838;
+}
+
+/* Header Actions */
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.create-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.create-btn:hover {
+  background: #0056b3;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #495057;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.form-group small {
+  display: block;
+  margin-top: 5px;
+  color: #6c757d;
+  font-size: 12px;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e9ecef;
+}
+
+.cancel-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.cancel-btn:hover {
+  background: #5a6268;
+}
+
+.save-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.save-btn:hover {
+  background: #218838;
+}
+
+.save-btn:disabled,
+.cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .student-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+/* Loading and Error States */
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.retry-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+/* Table Styles */
+.accounts-table {
+  overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #dee2e6;
+  max-width: 100%;
+  min-width: 800px;
+}
+
+.accounts-table table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.accounts-table th,
+.accounts-table td {
+  padding: 7px 8px;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: middle;
+  border-right: 1px solid #dee2e6;
+}
+
+.accounts-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+  text-align: left;
+  border: 1px solid #dee2e6;
+}
+
+.accounts-table th:last-child {
+  width: 80px;
+  border-right: none;
+  background-color: #e9ecef;
+}
+
+.accounts-table td:last-child {
+  width: 80px;
+  text-align: center;
+  border-right: none;
+  background-color: #f8f9fa;
+  position: relative;
+}
+
+.accounts-table tr:hover {
+  background: #f8f9fa;
+}
+
+.accounts-table tr {
+  border: 1px solid #e9ecef;
+}
+
+.accounts-table th:nth-child(1),
+.accounts-table td:nth-child(1) {
+  width: 50px !important;
+  min-width: 40px;
+  max-width: 60px;
+  text-align: center;
+}
+.accounts-table th:nth-child(3),
+.accounts-table td:nth-child(3) {
+  width: 220px !important;
+  min-width: 180px;
+  max-width: 320px;
+  word-break: break-all;
+}
+
+/* Status Badges */
+.status-toggle {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.status-toggle.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-toggle.inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-toggle:hover {
+  opacity: 0.8;
+}
+
+/* Action Buttons */
+.actions {
+  display: flex !important;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+  min-width: 50px;
+}
+
+.edit-btn {
+  background: #ffc107 !important;
+  color: #212529 !important;
+  border: none !important;
+  padding: 6px 10px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-size: 12px !important;
+  transition: background-color 0.3s !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+.edit-btn:hover {
+  background: #e0a800 !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.edit-btn:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  background: #6c757d !important;
+}
+
+.edit-btn:focus {
+  outline: 2px solid #007bff !important;
+  outline-offset: 2px !important;
+}
+
+.edit-btn:active {
+  transform: scale(0.95) !important;
+}
+
+.edit-btn::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: #ffc107;
+  border-radius: 6px;
+  z-index: -1;
+  opacity: 0.3;
+}
+
+.edit-btn::after {
+  content: '✏️';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  z-index: 1;
+}
+
+.edit-btn span {
+  display: none !important;
+}
+
+.edit-btn:empty::after {
+  content: '✏️';
+  font-size: 14px;
+}
+
+.edit-btn:not(:empty)::after {
+  display: none !important;
+}
+
+/* Add Student Button - giống với edit-btn */
+.add-student-btn {
+  background: #155724 !important;
+  color: #212529 !important;
+  border: none !important;
+  padding: 6px 10px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-size: 12px !important;
+  transition: background-color 0.3s !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  z-index: 10 !important;
+  margin-left: 4px !important;
+}
+
+.add-student-btn:hover {
+  background: #e0a800 !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.add-student-btn:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  background: #6c757d !important;
+}
+
+.add-student-btn:focus {
+  outline: 2px solid #007bff !important;
+  outline-offset: 2px !important;
+}
+
+.add-student-btn:active {
+  transform: scale(0.95) !important;
+}
+
+.add-student-btn::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: #ffc107;
+  border-radius: 6px;
+  z-index: -1;
+  opacity: 0.3;
+}
+
+.add-student-btn::after {
+  content: '👶';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  z-index: 1;
+}
+
+.add-student-btn span {
+  display: none !important;
+}
+
+.add-student-btn:empty::after {
+  content: '👶';
+  font-size: 14px;
+}
+
+.add-student-btn:not(:empty)::after {
+  display: none !important;
+}
+
+/* Add Student Form */
+.add-student-form {
+  padding: 20px;
+}
+
+.add-student-form .form-group {
+  margin-bottom: 15px;
+}
+
+.add-student-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.add-student-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.add-student-form input,
+.add-student-form select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.add-student-form input:focus,
+.add-student-form select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}
+
+.empty-state p {
+  font-size: 16px;
+  margin: 0;
+}

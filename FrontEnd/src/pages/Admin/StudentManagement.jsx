@@ -106,27 +106,35 @@ const StudentManagement = () => {
   const handleFileChange = event => {
     const file = event.target.files[0];
     if (file) {
-      console.log('📁 Selected file:', file.name, 'Type:', file.type, 'Size:', file.size);
-      
+      console.log(
+        '📁 Selected file:',
+        file.name,
+        'Type:',
+        file.type,
+        'Size:',
+        file.size
+      );
+
       // Clear previous messages
       setImportError('');
       setImportSuccess('');
-      
-      // Validate file type
+
+      // Validate file type - only .xlsx
       const allowedTypes = [
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-        'application/vnd.ms-excel' // .xls
       ];
-      
-      const isValidType = allowedTypes.includes(file.type) || 
-                         file.name.endsWith('.xlsx');
-      
+
+      const isValidType =
+        allowedTypes.includes(file.type) || file.name.endsWith('.xlsx');
+
       if (!isValidType) {
-        setImportError('❌ File không đúng định dạng. Chỉ chấp nhận file Excel (.xlsx, .xls)');
+        setImportError(
+          '❌ File không đúng định dạng. Chỉ chấp nhận file Excel (.xlsx)'
+        );
         setImportFile(null);
         return;
       }
-      
+
       // Validate file size (max 5MB)
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
@@ -134,14 +142,14 @@ const StudentManagement = () => {
         setImportFile(null);
         return;
       }
-      
+
       // Validate file is not empty
       if (file.size === 0) {
         setImportError('❌ File rỗng. Vui lòng chọn file có dữ liệu');
         setImportFile(null);
         return;
       }
-      
+
       // All validations passed
       setImportFile(file);
       setImportSuccess('✅ File hợp lệ! Bạn có thể tiến hành import.');
@@ -154,14 +162,15 @@ const StudentManagement = () => {
       return;
     }
 
-    // Validate file type
+    // Validate file type - only .xlsx
     const allowedTypes = [
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-      'application/vnd.ms-excel' // .xls
     ];
-    
+
     if (!allowedTypes.includes(importFile.type)) {
-      setImportError('❌ File không đúng định dạng. Chỉ chấp nhận file Excel (.xlsx, .xls)');
+      setImportError(
+        '❌ File không đúng định dạng. Chỉ chấp nhận file Excel (.xlsx)'
+      );
       return;
     }
 
@@ -180,7 +189,12 @@ const StudentManagement = () => {
       const formData = new FormData();
       formData.append('file', importFile);
 
-      console.log('📤 Importing file:', importFile.name, 'Size:', importFile.size);
+      console.log(
+        '📤 Importing file:',
+        importFile.name,
+        'Size:',
+        importFile.size
+      );
 
       const response = await fetch(
         'https://api-schoolhealth.purintech.id.vn/api/Student/student',
@@ -188,9 +202,9 @@ const StudentManagement = () => {
           method: 'POST',
           body: formData,
           headers: {
-            'accept': '*/*',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+            accept: '*/*',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
         }
       );
 
@@ -199,11 +213,12 @@ const StudentManagement = () => {
       if (response.ok) {
         const result = await response.json();
         console.log('📊 Import result:', result);
-        
-        const successMessage = result.length > 0 
-          ? `Import thành công! Đã thêm ${result.length} học sinh mới.`
-          : 'Import thành công! Không có học sinh mới nào được thêm.';
-        
+
+        const successMessage =
+          result.length > 0
+            ? `Import thất bại.`
+            : 'Import thành công! Đã thêm học sinh mới.';
+
         setSuccessMessage(successMessage);
         setShowSuccessModal(true);
         setImportFile(null);
@@ -212,11 +227,11 @@ const StudentManagement = () => {
         fetchStudents();
       } else {
         let errorMessage = '❌ Có lỗi xảy ra khi import file';
-        
+
         try {
           const errorData = await response.json();
           console.log('📊 Import error data:', errorData);
-          
+
           if (errorData.message) {
             errorMessage = `❌ ${errorData.message}`;
           } else if (errorData.error) {
@@ -228,39 +243,40 @@ const StudentManagement = () => {
           console.error('Error parsing error response:', parseError);
           errorMessage = `❌ Lỗi server (${response.status}): ${response.statusText}`;
         }
-        
+
         setImportError(errorMessage);
       }
     } catch (error) {
       console.error('❌ Import error:', error);
-      
+
       let errorMessage = '❌ Có lỗi xảy ra khi import file. Vui lòng thử lại.';
-      
+
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        errorMessage = '❌ Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
+        errorMessage =
+          '❌ Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
       } else if (error.message) {
         errorMessage = `❌ ${error.message}`;
       }
-      
+
       setImportError(errorMessage);
     } finally {
       setImportLoading(false);
     }
   };
 
-  const handleEditStudent = (student) => {
+  const handleEditStudent = student => {
     setEditingStudent(student);
     setShowEditModal(true);
     setEditError('');
     setEditSuccess('');
   };
 
-  const handleViewStudent = (student) => {
+  const handleViewStudent = student => {
     setSelectedStudent(student);
     setShowDetailModal(true);
   };
 
-  const handleUpdateStudent = async (updatedData) => {
+  const handleUpdateStudent = async updatedData => {
     setEditLoading(true);
     setEditError('');
     setEditSuccess('');
@@ -276,7 +292,7 @@ const StudentManagement = () => {
         classid: parseInt(updatedData.classid),
         parentid: editingStudent.parent?.parentid || 0,
         dob: updatedData.dob,
-        updatedAt: new Date().toISOString().split('T')[0]
+        updatedAt: new Date().toISOString().split('T')[0],
       };
 
       console.log('📤 Update student request:', requestData);
@@ -287,9 +303,9 @@ const StudentManagement = () => {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'accept': '*/*'
+            accept: '*/*',
           },
-          body: JSON.stringify(requestData)
+          body: JSON.stringify(requestData),
         }
       );
 
@@ -303,7 +319,9 @@ const StudentManagement = () => {
       } else {
         const errorData = await response.json();
         console.error('❌ Update student error:', errorData);
-        setEditError(errorData.message || 'Có lỗi xảy ra khi cập nhật học sinh');
+        setEditError(
+          errorData.message || 'Có lỗi xảy ra khi cập nhật học sinh'
+        );
       }
     } catch (error) {
       console.error('❌ Update student error:', error);
@@ -315,9 +333,7 @@ const StudentManagement = () => {
 
   const handleDeleteStudent = async student => {
     if (
-      window.confirm(
-        `Bạn có chắc chắn muốn xóa học sinh ${student.fullname}?`
-      )
+      window.confirm(`Bạn có chắc chắn muốn xóa học sinh ${student.fullname}?`)
     ) {
       try {
         const response = await fetch(
@@ -339,66 +355,29 @@ const StudentManagement = () => {
     }
   };
 
-  const handleDownloadTemplate = () => {
-    // Create template data
-    const templateData = [
-      {
-        'Mã HS': 'HS001',
-        'Họ và tên': 'Nguyễn Trần Minh Anh',
-        'Lớp': 'Lớp Chồi A',
-        'Phụ huynh': 'Nguyễn Văn An',
-        'Email': 'phuhuynh.van.a@gmail.com',
-        'Số điện thoại': '0123456789',
-        'Ngày sinh': '2018-05-20',
-        'Địa chỉ': '123 Đường ABC, Phường Cầu Ông Lãnh, Quận 1, TP.HCM'
-      },
-      {
-        'Mã HS': 'HS002',
-        'Họ và tên': 'Trần Thị Bình',
-        'Lớp': 'Lớp Chồi B',
-        'Phụ huynh': 'Trần Văn Bình',
-        'Email': 'phuhuynh.van.b@gmail.com',
-        'Số điện thoại': '0987654321',
-        'Ngày sinh': '2018-03-15',
-        'Địa chỉ': '456 Đường DEF, Phường Bến Nghé, Quận 1, TP.HCM'
-      }
-    ];
-
-    // Convert to CSV format
-    const headers = Object.keys(templateData[0]);
-    const csvContent = [
-      headers.join(','),
-      ...templateData.map(row => headers.map(header => `"${row[header]}"`).join(','))
-    ].join('\n');
-
-    // Create and download file
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'template_import_hoc_sinh.csv');
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   // Filter students based on search term and class filter
   const filteredStudents = students.filter(student => {
     const matchesSearch =
       student.fullname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.studentCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.parent?.fullname?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const studentClass = student.classname || student.className || 'Không xác định';
+      student.parent?.fullname
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase());
+
+    const studentClass =
+      student.classname || student.className || 'Không xác định';
     const matchesClass = !filterClass || studentClass === filterClass;
-    
+
     return matchesSearch && matchesClass;
   });
 
   // Get unique classes for filter
   const uniqueClasses = [
-    ...new Set(students.map(student => student.classname || student.className || 'Không xác định')),
+    ...new Set(
+      students.map(
+        student => student.classname || student.className || 'Không xác định'
+      )
+    ),
   ].filter(Boolean);
 
   return (
@@ -418,14 +397,7 @@ const StudentManagement = () => {
           >
             Import Excel
           </Button>
-          <Button
-            variant="outlined"
-            startIcon={<Download />}
-            onClick={handleDownloadTemplate}
-            className="template-btn"
-          >
-            Tải Template
-          </Button>
+
           <Button
             variant="outlined"
             startIcon={<Refresh />}
@@ -474,18 +446,18 @@ const StudentManagement = () => {
           select
           label="Lọc theo lớp"
           value={filterClass}
-          onChange={(e) => {
+          onChange={e => {
             setFilterClass(e.target.value);
           }}
           className="filter-select"
           fullWidth
-          style={{ 
+          style={{
             minWidth: '200px',
             marginRight: '10px',
-            zIndex: 1000
+            zIndex: 1000,
           }}
           SelectProps={{
-            style: { zIndex: 1000 }
+            style: { zIndex: 1000 },
           }}
         >
           <MenuItem value="">
@@ -493,7 +465,12 @@ const StudentManagement = () => {
           </MenuItem>
           {uniqueClasses.map(className => (
             <MenuItem key={className} value={className}>
-              {className} ({students.filter(s => (s.classname || s.className) === className).length} học sinh)
+              {className} (
+              {
+                students.filter(s => (s.classname || s.className) === className)
+                  .length
+              }{' '}
+              học sinh)
             </MenuItem>
           ))}
         </TextField>
@@ -538,7 +515,11 @@ const StudentManagement = () => {
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={student.classname || student.className || 'Không xác định'}
+                        label={
+                          student.classname ||
+                          student.className ||
+                          'Không xác định'
+                        }
                         color="primary"
                         variant="outlined"
                         size="small"
@@ -564,13 +545,9 @@ const StudentManagement = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Chip
-                        label="Hoạt động"
-                        color="success"
-                        size="small"
-                      />
+                      <Chip label="Hoạt động" color="success" size="small" />
                     </TableCell>
-                                        <TableCell>
+                    <TableCell>
                       <div className="action-buttons">
                         <IconButton
                           onClick={() => handleViewStudent(student)}
@@ -624,7 +601,7 @@ const StudentManagement = () => {
           </DialogTitle>
           <DialogContent>
             {editingStudent && (
-              <EditStudentForm 
+              <EditStudentForm
                 student={editingStudent}
                 onUpdate={handleUpdateStudent}
                 onCancel={() => setShowEditModal(false)}
@@ -904,7 +881,9 @@ const StudentManagement = () => {
                           gap: '8px',
                         }}
                       >
-                        <Bloodtype sx={{ color: '#97a19b', fontSize: '1.1rem' }} />
+                        <Bloodtype
+                          sx={{ color: '#97a19b', fontSize: '1.1rem' }}
+                        />
                         <span
                           style={{
                             color: '#97a19b',
@@ -1000,7 +979,9 @@ const StudentManagement = () => {
                           fontWeight: 600,
                         }}
                       >
-                        {selectedStudent.classname || selectedStudent.className || 'N/A'}
+                        {selectedStudent.classname ||
+                          selectedStudent.className ||
+                          'N/A'}
                       </span>
                     </div>
 
@@ -1022,7 +1003,9 @@ const StudentManagement = () => {
                           gap: '8px',
                         }}
                       >
-                        <FamilyRestroom sx={{ color: '#97a19b', fontSize: '1.1rem' }} />
+                        <FamilyRestroom
+                          sx={{ color: '#97a19b', fontSize: '1.1rem' }}
+                        />
                         <span
                           style={{
                             color: '#97a19b',
@@ -1111,7 +1094,9 @@ const StudentManagement = () => {
                       gap: '8px',
                     }}
                   >
-                    <HealthAndSafety sx={{ color: '#97a19b', fontSize: '1.2rem' }} />
+                    <HealthAndSafety
+                      sx={{ color: '#97a19b', fontSize: '1.2rem' }}
+                    />
                     Thông tin sức khỏe
                   </h5>
 
@@ -1140,7 +1125,9 @@ const StudentManagement = () => {
                           gap: '8px',
                         }}
                       >
-                        <HealthAndSafety sx={{ color: '#97a19b', fontSize: '1.1rem' }} />
+                        <HealthAndSafety
+                          sx={{ color: '#97a19b', fontSize: '1.1rem' }}
+                        />
                         <span
                           style={{
                             color: '#97a19b',
@@ -1362,7 +1349,7 @@ const StudentManagement = () => {
 
               <div className="file-upload-section">
                 <input
-                  accept=".xlsx,.xls"
+                  accept=".xlsx"
                   type="file"
                   onChange={handleFileChange}
                   id="file-upload"
@@ -1371,7 +1358,7 @@ const StudentManagement = () => {
                 <label htmlFor="file-upload" className="file-upload-label">
                   <FileUpload className="upload-icon" />
                   <span>Chọn file Excel</span>
-                  <small>Hỗ trợ: .xlsx, .xls</small>
+                  <small>Chỉ hỗ trợ: .xlsx</small>
                 </label>
                 {importFile && (
                   <div className="file-info">
@@ -1385,13 +1372,16 @@ const StudentManagement = () => {
                 <h4>📋 Hướng dẫn:</h4>
                 <ul>
                   <li>
-                    File Excel phải có các cột: Mã HS, Họ và tên, Lớp, Phụ huynh,
-                    Email, Số điện thoại, Ngày sinh, Địa chỉ
+                    File Excel phải có các cột: fullName, bloodType, className,
+                    parentName, parentphone, birthDate, gender, healthStatus
                   </li>
                   <li>Dòng đầu tiên phải là header (tên cột)</li>
                   <li>Dữ liệu bắt đầu từ dòng thứ 2</li>
-                  <li>Không để trống các cột bắt buộc: Mã HS, Họ và tên, Lớp</li>
-                  <li>Tải template mẫu để xem định dạng chuẩn</li>
+                  <li>
+                    Không để trống các cột bắt buộc: fullName, className,
+                    parentName, parentphone, birthDate
+                  </li>
+                  <li>Chỉ hỗ trợ file định dạng .xlsx</li>
                 </ul>
               </div>
             </div>
@@ -1431,9 +1421,7 @@ const StudentManagement = () => {
         <div className="success-modal-overlay">
           <div className="success-modal-content">
             <div className="success-modal-header">
-              <div className="success-icon">
-                ✅
-              </div>
+              <div className="success-icon">✅</div>
               <h3>Thành công!</h3>
             </div>
             <div className="success-modal-body">
@@ -1458,7 +1446,14 @@ const StudentManagement = () => {
 export default StudentManagement;
 
 // Edit Student Form Component
-const EditStudentForm = ({ student, onUpdate, onCancel, loading, error, success }) => {
+const EditStudentForm = ({
+  student,
+  onUpdate,
+  onCancel,
+  loading,
+  error,
+  success,
+}) => {
   const [formData, setFormData] = useState({
     studentCode: student?.studentCode || '',
     fullname: student?.fullname || '',
@@ -1466,7 +1461,7 @@ const EditStudentForm = ({ student, onUpdate, onCancel, loading, error, success 
     bloodType: student?.bloodType || '',
     gender: student?.gender || false,
     classid: student?.classid || 0,
-    dob: student?.dob || ''
+    dob: student?.dob || '',
   });
 
   // Mock class data - in real app, this should come from API
@@ -1476,17 +1471,17 @@ const EditStudentForm = ({ student, onUpdate, onCancel, loading, error, success 
     { id: 3, name: 'Lớp Chồi A' },
     { id: 4, name: 'Lớp Chồi B' },
     { id: 5, name: 'Lớp Lá A' },
-    { id: 6, name: 'Lớp Lá B' }
+    { id: 6, name: 'Lớp Lá B' },
   ];
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
     onUpdate(formData);
   };
@@ -1498,19 +1493,21 @@ const EditStudentForm = ({ student, onUpdate, onCancel, loading, error, success 
           {error}
         </Alert>
       )}
-      
+
       {success && (
         <Alert severity="success" style={{ marginBottom: '20px' }}>
           {success}
         </Alert>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+      <div
+        style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}
+      >
         {/* Student Code */}
         <TextField
           label="Mã học sinh"
           value={formData.studentCode}
-          onChange={(e) => handleInputChange('studentCode', e.target.value)}
+          onChange={e => handleInputChange('studentCode', e.target.value)}
           fullWidth
           required
           disabled={loading}
@@ -1520,7 +1517,7 @@ const EditStudentForm = ({ student, onUpdate, onCancel, loading, error, success 
         <TextField
           label="Họ và tên"
           value={formData.fullname}
-          onChange={(e) => handleInputChange('fullname', e.target.value)}
+          onChange={e => handleInputChange('fullname', e.target.value)}
           fullWidth
           required
           disabled={loading}
@@ -1531,7 +1528,7 @@ const EditStudentForm = ({ student, onUpdate, onCancel, loading, error, success 
           label="Tuổi"
           type="number"
           value={formData.age}
-          onChange={(e) => handleInputChange('age', e.target.value)}
+          onChange={e => handleInputChange('age', e.target.value)}
           fullWidth
           required
           disabled={loading}
@@ -1543,7 +1540,7 @@ const EditStudentForm = ({ student, onUpdate, onCancel, loading, error, success 
           <InputLabel>Nhóm máu</InputLabel>
           <Select
             value={formData.bloodType}
-            onChange={(e) => handleInputChange('bloodType', e.target.value)}
+            onChange={e => handleInputChange('bloodType', e.target.value)}
             label="Nhóm máu"
           >
             <MenuItem value="A+">A+</MenuItem>
@@ -1565,18 +1562,12 @@ const EditStudentForm = ({ student, onUpdate, onCancel, loading, error, success 
           <RadioGroup
             row
             value={formData.gender ? 'male' : 'female'}
-            onChange={(e) => handleInputChange('gender', e.target.value === 'male')}
+            onChange={e =>
+              handleInputChange('gender', e.target.value === 'male')
+            }
           >
-            <FormControlLabel
-              value="male"
-              control={<Radio />}
-              label="Nam"
-            />
-            <FormControlLabel
-              value="female"
-              control={<Radio />}
-              label="Nữ"
-            />
+            <FormControlLabel value="male" control={<Radio />} label="Nam" />
+            <FormControlLabel value="female" control={<Radio />} label="Nữ" />
           </RadioGroup>
         </FormControl>
 
@@ -1585,10 +1576,10 @@ const EditStudentForm = ({ student, onUpdate, onCancel, loading, error, success 
           <InputLabel>Lớp</InputLabel>
           <Select
             value={formData.classid}
-            onChange={(e) => handleInputChange('classid', e.target.value)}
+            onChange={e => handleInputChange('classid', e.target.value)}
             label="Lớp"
           >
-            {classOptions.map((cls) => (
+            {classOptions.map(cls => (
               <MenuItem key={cls.id} value={cls.id}>
                 {cls.name}
               </MenuItem>
@@ -1601,7 +1592,7 @@ const EditStudentForm = ({ student, onUpdate, onCancel, loading, error, success 
           label="Ngày sinh"
           type="date"
           value={formData.dob}
-          onChange={(e) => handleInputChange('dob', e.target.value)}
+          onChange={e => handleInputChange('dob', e.target.value)}
           fullWidth
           required
           disabled={loading}
@@ -1610,11 +1601,24 @@ const EditStudentForm = ({ student, onUpdate, onCancel, loading, error, success 
       </div>
 
       {/* Parent Information (Read-only) */}
-      <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+      <div
+        style={{
+          marginTop: '20px',
+          padding: '15px',
+          backgroundColor: '#f5f5f5',
+          borderRadius: '8px',
+        }}
+      >
         <Typography variant="h6" style={{ marginBottom: '10px' }}>
           Thông tin phụ huynh (Chỉ đọc)
         </Typography>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '15px',
+          }}
+        >
           <TextField
             label="Tên phụ huynh"
             value={student?.parent?.fullname || 'N/A'}
@@ -1643,12 +1647,15 @@ const EditStudentForm = ({ student, onUpdate, onCancel, loading, error, success 
       </div>
 
       {/* Action Buttons */}
-      <div style={{ marginTop: '30px', display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-        <Button
-          onClick={onCancel}
-          disabled={loading}
-          variant="outlined"
-        >
+      <div
+        style={{
+          marginTop: '30px',
+          display: 'flex',
+          gap: '10px',
+          justifyContent: 'flex-end',
+        }}
+      >
+        <Button onClick={onCancel} disabled={loading} variant="outlined">
           Hủy
         </Button>
         <Button

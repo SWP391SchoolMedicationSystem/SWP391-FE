@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Button } from '@mui/material';
 import { adminStaffService } from '../../services/adminService';
 import '../../css/Admin/AccountManagement.css';
 
@@ -7,6 +8,8 @@ const AccountManagement = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingStaff, setEditingStaff] = useState(null);
   const [submitLoading, setSubmitLoading] = useState(false);
 
   // Form data
@@ -14,7 +17,7 @@ const AccountManagement = () => {
     fullname: '',
     email: '',
     phone: '',
-    password: 'Password123',
+    password: 'Password123@',
     roleID: 1,
   });
 
@@ -67,14 +70,14 @@ const AccountManagement = () => {
       fullname: '',
       email: '',
       phone: '',
-      password: 'Password123',
+      password: 'Password123@',
       roleID: 1,
     });
     setShowCreateModal(true);
   };
 
-  // Handle form submit
-  const handleSubmit = async e => {
+  // Handle form submit for create
+  const handleSubmitCreate = async e => {
     e.preventDefault();
     setSubmitLoading(true);
 
@@ -103,7 +106,7 @@ const AccountManagement = () => {
         fullname: '',
         email: '',
         phone: '',
-        password: 'Password123',
+        password: 'Password123@',
         roleID: 1,
       });
       fetchStaff();
@@ -115,6 +118,85 @@ const AccountManagement = () => {
     }
   };
 
+  // Handle edit staff
+  const handleEditStaff = staffMember => {
+    setEditingStaff(staffMember);
+    setFormData({
+      fullname: staffMember.fullname || '',
+      email: staffMember.email || '',
+      phone: staffMember.phone || '',
+      roleID: staffMember.roleid || 1,
+    });
+    setShowEditModal(true);
+  };
+
+  // Handle update staff
+  const handleUpdateStaff = async e => {
+    e.preventDefault();
+    setSubmitLoading(true);
+
+    try {
+      // Validate form
+      if (!formData.fullname.trim()) {
+        alert('Vui lòng nhập họ và tên');
+        return;
+      }
+      if (!formData.email.trim()) {
+        alert('Vui lòng nhập email');
+        return;
+      }
+      if (!formData.phone.trim()) {
+        alert('Vui lòng nhập số điện thoại');
+        return;
+      }
+
+      // Update staff via API
+      await adminStaffService.updateStaff({
+        staffid: editingStaff.staffid,
+        fullname: formData.fullname,
+        email: formData.email,
+        phone: formData.phone,
+        roleid: formData.roleID,
+      });
+
+      // Success - refresh data and close modal
+      alert('Cập nhật thông tin nhân viên thành công!');
+      setShowEditModal(false);
+      setEditingStaff(null);
+      setFormData({
+        fullname: '',
+        email: '',
+        phone: '',
+        password: 'Password123@',
+        roleID: 1,
+      });
+      fetchStaff();
+    } catch (error) {
+      console.error('Error updating staff:', error);
+      alert('Có lỗi xảy ra khi cập nhật tài khoản. Vui lòng thử lại!');
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
+  // Handle delete staff
+  const handleDeleteStaff = async staffMember => {
+    if (
+      window.confirm(
+        `Bạn có chắc chắn muốn xóa nhân viên "${staffMember.fullname}"?`
+      )
+    ) {
+      try {
+        await adminStaffService.deleteStaff(staffMember.staffid);
+        fetchStaff();
+        alert('Xóa tài khoản nhân viên thành công!');
+      } catch (error) {
+        console.error('Error deleting staff:', error);
+        alert('Không thể xóa tài khoản nhân viên. Vui lòng thử lại.');
+      }
+    }
+  };
+
   // Format date for display
   const formatDate = dateString => {
     if (!dateString) return 'N/A';
@@ -122,123 +204,97 @@ const AccountManagement = () => {
   };
 
   return (
-    <div className="account-management-container">
-      {/* Header */}
+    <div className="parent-account-management">
       <div className="page-header">
-        <div className="header-content">
-          <h1>👥 Quản Lý Tài Khoản</h1>
-          <p>Tạo và quản lý tài khoản nhân viên trong hệ thống</p>
-        </div>
-        <div className="header-actions">
-        
-          <button onClick={handleCreateStaff} className="create-btn">
-            ➕ Tạo tài khoản
-          </button>
-        </div>
+        <h1>👥 Quản Lý Tài Khoản</h1>
+        <p>Tạo và quản lý tài khoản nhân viên trong hệ thống</p>
       </div>
 
-      {/* Statistics */}
-      <div className="stats-row">
-        <div className="stat-card">
-          <div className="stat-icon">👥</div>
-          <div className="stat-content">
-            <h3>{staff.length}</h3>
-            <p>Tổng nhân viên</p>
+      <div className="tab-content">
+        <div className="section-header">
+          <div>
+            <h2>Tài Khoản Nhân Viên</h2>
+           
+          </div>
+          <div className="header-actions">
+            <button onClick={fetchStaff} className="refresh-btn">
+              🔄 Làm mới
+            </button>
+            <button onClick={handleCreateStaff} className="create-btn">
+              ➕ Tạo Tài Khoản Mới
+            </button>
           </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-icon">👨‍💼</div>
-          <div className="stat-content">
-            <h3>{staff.filter(s => s.roleid === 1).length}</h3>
-            <p>Admin</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">🏢</div>
-          <div className="stat-content">
-            <h3>{staff.filter(s => s.roleid === 2).length}</h3>
-            <p>Manager</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">👩‍⚕️</div>
-          <div className="stat-content">
-            <h3>{staff.filter(s => s.roleid === 3).length}</h3>
-            <p>Nurse</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Staff Table */}
-      <div className="staff-section">
-        <h2>📋 Danh sách nhân viên</h2>
 
         {loading ? (
-          <div className="loading-state">
+          <div className="loading-container">
+            <div className="spinner"></div>
             <p>⏳ Đang tải danh sách nhân viên...</p>
           </div>
         ) : error ? (
-          <div className="error-state">
+          <div className="error-container">
             <p>❌ {error}</p>
             <button onClick={fetchStaff} className="retry-btn">
               🔄 Thử lại
             </button>
           </div>
-        ) : staff.length > 0 ? (
-          <div className="staff-table-container">
-            <table className="staff-table">
+        ) : staff.filter(s => !s.isDeleted).length > 0 ? (
+          <div className="accounts-table">
+            <table>
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Họ và tên</th>
+                  <th>Họ và Tên</th>
                   <th>Email</th>
-                  <th>Số điện thoại</th>
-                  <th>Vai trò</th>
-                  <th>Ngày tạo</th>
-                  <th>Cập nhật</th>
-                  <th>Thao tác</th>
+                  <th>Số Điện Thoại</th>
+                  <th>Vai Trò</th>
+                  <th>Ngày Tạo</th>
+                  <th>Cập Nhật</th>
+                  <th>Thao Tác</th>
                 </tr>
               </thead>
               <tbody>
-                {staff.map(staffMember => (
-                  <tr key={staffMember.staffid}>
-                    <td>{staffMember.staffid}</td>
-                    <td>
-                      <div className="staff-name">
-                        <strong>{staffMember.fullname}</strong>
-                      </div>
-                    </td>
-                    <td>{staffMember.email}</td>
-                    <td>{staffMember.phone}</td>
-                    <td>
-                      <span className={`role-badge role-${staffMember.roleid}`}>
-                        {roleMapping[staffMember.roleid] || 'Unknown'}
-                      </span>
-                    </td>
-                    <td>{formatDate(staffMember.createdAt)}</td>
-                    <td>{formatDate(staffMember.updatedAt)}</td>
-                    <td>
-                      <div className="action-buttons">
-                        <button className="edit-btn" title="Chỉnh sửa">
+                {staff
+                  .filter(staffMember => !staffMember.isDeleted)
+                  .map(staffMember => (
+                    <tr key={staffMember.staffid}>
+                      <td>{staffMember.staffid}</td>
+                      <td>{staffMember.fullname}</td>
+                      <td>{staffMember.email}</td>
+                      <td>{staffMember.phone}</td>
+                      <td>
+                        <span
+                          className={`role-badge role-${staffMember.roleid}`}
+                        >
+                          {roleMapping[staffMember.roleid] || 'Unknown'}
+                        </span>
+                      </td>
+                      <td>{formatDate(staffMember.createdAt)}</td>
+                      <td>{formatDate(staffMember.updatedAt)}</td>
+                      <td className="actions">
+                        <button
+                          onClick={() => handleEditStaff(staffMember)}
+                          className="edit-btn"
+                          title="Chỉnh sửa Nhân Viên"
+                        >
                           ✏️
                         </button>
-                        <button className="delete-btn" title="Xóa">
+                        <button
+                          onClick={() => handleDeleteStaff(staffMember)}
+                          className="delete-btn"
+                          title="Xóa Nhân Viên"
+                        >
                           🗑️
                         </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
         ) : (
-          <div className="no-staff">
-            <div className="no-staff-icon">👥</div>
-            <p>Chưa có nhân viên nào trong hệ thống</p>
-            <button onClick={handleCreateStaff} className="create-first-btn">
-              ➕ Tạo nhân viên đầu tiên
-            </button>
+          <div className="empty-state">
+            <p>📭 Không tìm thấy nhân viên nào</p>
           </div>
         )}
       </div>
@@ -260,7 +316,7 @@ const AccountManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="modal-body">
+            <form onSubmit={handleSubmitCreate} className="modal-body">
               <div className="form-group">
                 <label>Họ và tên *</label>
                 <input
@@ -329,20 +385,154 @@ const AccountManagement = () => {
               </div>
 
               <div className="modal-footer">
-                <button
-                  type="button"
+                <Button
+                  variant="outlined"
                   onClick={() => setShowCreateModal(false)}
-                  className="cancel-btn"
+                  className="mui-cancel-btn"
+                  sx={{
+                    flex: 1,
+                    marginRight: '10px',
+                    padding: '12px 20px',
+                    borderColor: '#6c757d',
+                    color: '#6c757d',
+                    '&:hover': {
+                      borderColor: '#5a6268',
+                      backgroundColor: '#f8f9fa',
+                    },
+                  }}
                 >
                   Hủy
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="contained"
                   type="submit"
-                  className="submit-btn"
                   disabled={submitLoading}
+                  className="mui-submit-btn"
+                  sx={{
+                    flex: 1,
+                    padding: '12px 20px',
+                    backgroundColor: '#28a745',
+                    '&:hover': {
+                      backgroundColor: '#218838',
+                    },
+                    '&:disabled': {
+                      backgroundColor: '#6c757d',
+                    },
+                  }}
                 >
                   {submitLoading ? '⏳ Đang tạo...' : '➕ Tạo tài khoản'}
-                </button>
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Staff Modal */}
+      {showEditModal && (
+        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>✏️ Chỉnh Sửa Tài Khoản Nhân Viên</h3>
+              <button
+                className="modal-close"
+                onClick={() => setShowEditModal(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateStaff} className="modal-body">
+              <div className="form-group">
+                <label>Họ và tên *</label>
+                <input
+                  type="text"
+                  name="fullname"
+                  value={formData.fullname}
+                  onChange={handleInputChange}
+                  placeholder="Nhập họ và tên"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Email *</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="Nhập địa chỉ email"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Số điện thoại *</label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="Nhập số điện thoại"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Vai trò *</label>
+                <select
+                  name="roleID"
+                  value={formData.roleID}
+                  onChange={handleInputChange}
+                  required
+                >
+                  {roleOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="modal-footer">
+                <Button
+                  variant="outlined"
+                  onClick={() => setShowEditModal(false)}
+                  className="mui-cancel-btn"
+                  sx={{
+                    flex: 1,
+                    marginRight: '10px',
+                    padding: '12px 20px',
+                    borderColor: '#6c757d',
+                    color: '#6c757d',
+                    '&:hover': {
+                      borderColor: '#5a6268',
+                      backgroundColor: '#f8f9fa',
+                    },
+                  }}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  variant="contained"
+                  type="submit"
+                  disabled={submitLoading}
+                  className="mui-submit-btn"
+                  sx={{
+                    flex: 1,
+                    padding: '12px 20px',
+                    backgroundColor: '#28a745',
+                    '&:hover': {
+                      backgroundColor: '#218838',
+                    },
+                    '&:disabled': {
+                      backgroundColor: '#6c757d',
+                    },
+                  }}
+                >
+                  {submitLoading ? '⏳ Đang lưu...' : '💾 Lưu thay đổi'}
+                </Button>
               </div>
             </form>
           </div>

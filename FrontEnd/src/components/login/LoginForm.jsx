@@ -17,6 +17,8 @@ import {
 import {
   MailOutline,
   LockOutlined,
+  Visibility,
+  VisibilityOff,
 } from '@mui/icons-material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -37,6 +39,7 @@ export default function LoginForm() {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Check if user is already logged in
   useEffect(() => {
@@ -199,29 +202,29 @@ export default function LoginForm() {
       // Handle specific error cases
       if (err.response?.status === 401) {
         // Wrong password/credentials
-        
+
         setError('Mật khẩu không đúng.');
       } else if (
         errorMessage.includes('Token') ||
         errorMessage.includes('token')
       ) {
         // JWT/Token validation errors
-        
+
         setError('Lỗi xác thực.');
       } else if (
         errorMessage.includes('server') ||
         errorMessage.includes('Server')
       ) {
         // Server errors
-        
+
         setError('Lỗi kết nối server.');
       } else if (errorMessage.includes('Email không tồn tại')) {
         // Email not found
-        
+
         setError('Email không tồn tại.');
       } else {
         // Other errors - use the message from userService
-        
+
         setError(errorMessage);
       }
 
@@ -327,7 +330,7 @@ export default function LoginForm() {
                 id="password-field"
                 name="password"
                 label="Mật khẩu"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 fullWidth
                 value={formData.password}
                 onChange={handleChange}
@@ -337,6 +340,20 @@ export default function LoginForm() {
                   startAdornment: (
                     <InputAdornment position="start">
                       <LockOutlined sx={{ color: '#2f5148' }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={() => setShowPassword(!showPassword)}
+                        onMouseDown={e => e.preventDefault()}
+                        edge="end"
+                        disabled={isLoading}
+                        sx={{ color: '#2f5148' }}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
                     </InputAdornment>
                   ),
                 }}
@@ -479,11 +496,11 @@ export default function LoginForm() {
             </Button>
           </form>
 
-          <Divider sx={{ my: 1, color: '#97a19b' }}>Hoặc đăng nhập bằng</Divider>
+          <Divider sx={{ my: 1, color: '#97a19b' }}>
+            Hoặc đăng nhập bằng
+          </Divider>
 
-          <Box
-            sx={{ position: 'relative' }}
-          >
+          <Box sx={{ position: 'relative' }}>
             <GoogleOAuthProvider clientId={clientId}>
               <GoogleLogin
                 onSuccess={handleGoogleLoginSuccess}

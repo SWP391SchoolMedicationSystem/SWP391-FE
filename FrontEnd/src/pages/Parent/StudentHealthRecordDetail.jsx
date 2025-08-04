@@ -42,7 +42,7 @@ const StudentHealthRecordDetail = () => {
       setHealthRecord(data);
     } catch (err) {
       console.error('❌ Error fetching health record:', err);
-      setError('Không thể tải thông tin hồ sơ sức khỏe chi tiết');
+      setError('chưa có thông tin hồ sơ sức khỏe chi tiết');
     } finally {
       setLoading(false);
     }

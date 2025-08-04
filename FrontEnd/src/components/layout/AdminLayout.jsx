@@ -9,6 +9,7 @@ import {
   DarkMode,
   LightMode,
   School,
+  People,
 } from '@mui/icons-material';
 import userService from '../../services/userService';
 import MedlearnLogo from '../../assets/images/Medlearn-logo.png';
@@ -35,10 +36,10 @@ const navItems = [
     key: 'account-management',
   },
   {
-    to: '/admin/email-templates',
-    label: 'Mẫu Email',
-    icon: <AdminPanelSettings />,
-    key: 'calendar',
+    to: '/admin/parent-account-management',
+    label: 'Quản Lý Tài Khoản Phụ Huynh',
+    icon: <People />,
+    key: 'parent-account-management',
   },
 ];
 
@@ -343,8 +344,6 @@ export default function AdminLayout() {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-
-
             {/* Dark Mode Toggle */}
             <IconButton
               onClick={toggleDarkMode}
@@ -432,7 +431,7 @@ export default function AdminLayout() {
           sx={{
             flexGrow: 1,
             overflow: 'auto',
-            p: 3,
+            p: 1,
           }}
         >
           <Outlet

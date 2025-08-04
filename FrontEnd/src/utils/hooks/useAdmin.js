@@ -1,11 +1,12 @@
-import { useApi, useApiCall } from "./useApi";
+import { useApi, useApiCall } from './useApi';
 import {
   adminStaffService,
   adminEmailService,
   adminBlogService,
   adminSystemService,
   adminCategoryService,
-} from "../../services/adminService";
+  adminParentService,
+} from '../../services/adminService';
 
 // Hook for admin staff management
 export const useAdminStaff = () => {
@@ -37,35 +38,40 @@ export const useHealthCategories = () => {
   return useApi(adminCategoryService.getHealthCategories);
 };
 
+// Hook for admin parent management
+export const useAdminParents = () => {
+  return useApi(adminParentService.getAllParents);
+};
+
 // Hook for admin actions
 export const useAdminActions = () => {
   const { execute, loading, error } = useApiCall();
 
-  const createStaff = async (staffData) => {
+  const createStaff = async staffData => {
     return execute(() => adminStaffService.registerStaff(staffData));
   };
 
-  const updateStaff = async (staffData) => {
+  const updateStaff = async staffData => {
     return execute(() => adminStaffService.updateStaff(staffData));
   };
 
-  const deleteStaff = async (staffId) => {
+  const deleteStaff = async staffId => {
     return execute(() => adminStaffService.deleteStaff(staffId));
   };
 
-  const createEmailTemplate = async (templateData) => {
+  const createEmailTemplate = async templateData => {
     return execute(() => adminEmailService.createEmailTemplate(templateData));
   };
 
-  const updateEmailTemplate = async (templateData) => {
+  const updateEmailTemplate = async templateData => {
     return execute(() => adminEmailService.updateEmailTemplate(templateData));
   };
 
-  const sendEmail = async (emailData) => {
+  const sendEmail = async emailData => {
     return execute(() => adminEmailService.sendEmail(emailData));
   };
 
-  const approveBlog = async (blogId) => {
+  const approveBlog = async blogId => {
     return execute(() => adminBlogService.approveBlog(blogId));
   };
 
@@ -73,7 +79,7 @@ export const useAdminActions = () => {
     return execute(() => adminBlogService.rejectBlog(blogId, reason));
   };
 
-  const createHealthCategory = async (categoryData) => {
+  const createHealthCategory = async categoryData => {
     return execute(() =>
       adminCategoryService.createHealthCategory(categoryData)
     );
@@ -85,8 +91,24 @@ export const useAdminActions = () => {
     );
   };
 
-  const deleteHealthCategory = async (categoryId) => {
+  const deleteHealthCategory = async categoryId => {
     return execute(() => adminCategoryService.deleteHealthCategory(categoryId));
+  };
+
+  const createParent = async parentData => {
+    return execute(() => adminParentService.createParent(parentData));
+  };
+
+  const updateParent = async parentData => {
+    return execute(() => adminParentService.updateParent(parentData));
+  };
+
+  const deleteParent = async parentId => {
+    return execute(() => adminParentService.deleteParent(parentId));
+  };
+
+  const toggleParentStatus = async parentId => {
+    return execute(() => adminParentService.toggleParentStatus(parentId));
   };
 
   return {
@@ -101,6 +123,10 @@ export const useAdminActions = () => {
     createHealthCategory,
     updateHealthCategory,
     deleteHealthCategory,
+    createParent,
+    updateParent,
+    deleteParent,
+    toggleParentStatus,
     loading,
     error,
   };

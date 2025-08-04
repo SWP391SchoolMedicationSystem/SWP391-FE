@@ -30,6 +30,7 @@ import ManagerStudentHealthRecordDetail from './pages/Manager/StudentHealthRecor
 // Admin pages
 import AdminDashboard from './pages/Admin/Dashboard';
 import AdminAccountManagement from './pages/Admin/AccountManagement';
+import ParentAccountManagement from './pages/Admin/ParentAccountManagement';
 import EmailTemplates from './pages/Admin/EmailTemplates';
 import StudentManagement from './pages/Admin/StudentManagement';
 
@@ -85,6 +86,10 @@ function App() {
           <Route
             path="account-management"
             element={<AdminAccountManagement />}
+          />
+          <Route
+            path="parent-account-management"
+            element={<ParentAccountManagement />}
           />
           <Route path="email-templates" element={<EmailTemplates />} />
         </Route>
