@@ -363,7 +363,11 @@ function ReviewRequests() {
   }
 
   return (
-    <div className="review-requests-container">
+    <div className="review-requests-container" style={{ 
+      maxWidth: '100%', 
+      padding: '0 20px',
+      margin: '0 auto'
+    }}>
       {/* Header */}
       <div className="review-requests-header" style={{
         background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
@@ -388,8 +392,15 @@ function ReviewRequests() {
         </div>
       </div>
 
-      {/* Statistics Cards */}
-      <div className="stats-cards">
+             {/* Statistics Cards */}
+       <div className="stats-cards" style={{
+         width: '100%',
+         maxWidth: '100%',
+         display: 'grid',
+         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+         gap: '20px',
+         marginBottom: '30px'
+       }}>
         <div className="stat-card total">
           <div className="stat-icon">📋</div>
           <div className="stat-info">
@@ -420,8 +431,15 @@ function ReviewRequests() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="filters-container">
+             {/* Filters */}
+       <div className="filters-container" style={{
+         width: '100%',
+         maxWidth: '100%',
+         display: 'flex',
+         gap: '15px',
+         flexWrap: 'wrap',
+         alignItems: 'center'
+       }}>
         <div className="filter-group">
           <input
             type="text"
@@ -456,28 +474,22 @@ function ReviewRequests() {
             <option value="4">Đơn khác</option>
           </select>
         </div>
-        <div className="filter-group">
-          <input
-            type="number"
-            placeholder="🔍 Lọc theo ID phụ huynh..."
-            value={filterParent}
-            onChange={e => setFilterParent(e.target.value)}
-            className="search-input"
-          />
-        </div>
+        
       </div>
 
-      {/* Enhanced Modern Table */}
-      <div
-        style={{
-          background: '#ffffff',
-          borderRadius: '20px',
-          boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
-          border: '1px solid #c1cbc2',
-          overflow: 'hidden',
-          marginBottom: '30px',
-        }}
-      >
+             {/* Enhanced Modern Table */}
+       <div
+         style={{
+           background: '#ffffff',
+           borderRadius: '20px',
+           boxShadow: '0 2px 10px rgba(193, 203, 194, 0.3)',
+           border: '1px solid #c1cbc2',
+           overflow: 'hidden',
+           marginBottom: '30px',
+           width: '100%',
+           maxWidth: '100%'
+         }}
+       >
         {/* Table Header */}
         <div
           style={{

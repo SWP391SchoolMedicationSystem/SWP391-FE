@@ -81,7 +81,11 @@ const HealthCheckEvents = () => {
   }
 
   return (
-    <div className="review-requests-container">
+    <div className="review-requests-container" style={{ 
+      maxWidth: '100%', 
+      padding: '0 20px',
+      margin: '0 auto'
+    }}>
       {/* Header */}
       <div className="review-requests-header" style={{
         background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
@@ -139,8 +143,9 @@ const HealthCheckEvents = () => {
         {/* Event Cards Grid */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-          gap: '24px'
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '20px',
+          maxWidth: '100%'
         }}>
           {events.map((event) => (
             <div
