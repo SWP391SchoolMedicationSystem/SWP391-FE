@@ -6,6 +6,7 @@ import {
   useParentVaccinationEvents,
   useParentStudents,
 } from '../../utils/hooks/useParent';
+import { getCurrentDateGMT7 } from '../../utils/dateUtils';
 import '../../css/Parent/Dashboard.css';
 import * as signalR from '@microsoft/signalr';
 
@@ -89,7 +90,7 @@ function ParentDashboard() {
               message: notification.Message || notification.message || '',
               type: notification.Type || 'general',
               targetType: 'parent',
-              createdAt: new Date().toISOString(),
+              createdAt: getCurrentDateGMT7(),
               createdBy: 'Hệ thống',
               isNew: true,
             };
@@ -110,7 +111,7 @@ function ParentDashboard() {
               message: notification.Message || notification.message || '',
               type: notification.Type || 'general',
               targetType: 'parent',
-              createdAt: new Date().toISOString(),
+              createdAt: getCurrentDateGMT7(),
               createdBy: 'Hệ thống',
               isNew: true,
             };

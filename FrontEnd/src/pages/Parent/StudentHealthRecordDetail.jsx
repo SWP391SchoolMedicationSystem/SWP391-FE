@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { IconButton } from '@mui/material';
-import { ArrowBack } from '@mui/icons-material';
 import { parentService } from '../../services/parentService';
+import { getCurrentDateGMT7 } from '../../utils/dateUtils';
 import '../../css/Manager/StudentHealthRecordDetail.css';
 
 const StudentHealthRecordDetail = () => {
@@ -16,13 +15,13 @@ const StudentHealthRecordDetail = () => {
   const [formData, setFormData] = useState({
     studentID: parseInt(studentId),
     healthCategoryID: 1,
-    healthRecordDate: new Date().toISOString(),
+    healthRecordDate: getCurrentDateGMT7(),
     healthrecordtitle: '',
     healthrecorddescription: '',
     staffid: 3,
     isConfirm: true,
     createdBy: '3',
-    createdDate: new Date().toISOString(),
+    createdDate: getCurrentDateGMT7(),
   });
   const [submitLoading, setSubmitLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -52,13 +51,7 @@ const StudentHealthRecordDetail = () => {
       });
 
       if (!response.ok) {
-        if (response.status === 500) {
-          // Show create option when API returns 500
-          setError('Chưa có hồ sơ sức khỏe. Vui lòng tạo mới.');
-        } else {
-          throw new Error(`API Error: ${response.status}`);
-        }
-        return;
+        throw new Error(`API Error: ${response.status}`);
       }
 
       const data = await response.json();
@@ -120,13 +113,13 @@ const StudentHealthRecordDetail = () => {
       setFormData({
         studentID: parseInt(studentId),
         healthCategoryID: 1,
-        healthRecordDate: new Date().toISOString(),
+        healthRecordDate: getCurrentDateGMT7(),
         healthrecordtitle: '',
         healthrecorddescription: '',
         staffid: 3,
         isConfirm: true,
         createdBy: '3',
-        createdDate: new Date().toISOString(),
+        createdDate: getCurrentDateGMT7(),
       });
       fetchHealthRecord(); // Refresh data
     } catch (error) {
@@ -188,117 +181,13 @@ const StudentHealthRecordDetail = () => {
   if (error) {
     return (
       <div className="error-state">
-        <IconButton
-          onClick={() => navigate('/parent/health-records')}
-          className="back-icon-btn"
-          sx={{
-            position: 'absolute',
-            top: '20px',
-            left: '20px',
-            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 1)',
-              transform: 'scale(1.1)',
-            },
-          }}
-        >
-          <ArrowBack />
-        </IconButton>
         <div>{error}</div>
-        <div className="error-actions">
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="create-btn"
-          >
-            ➕ Tạo hồ sơ sức khỏe
-          </button>
-        </div>
-
-        {/* Create Health Record Modal */}
-        {showCreateModal && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h3>Tạo Hồ Sơ Sức Khỏe Mới</h3>
-                <button
-                  onClick={() => setShowCreateModal(false)}
-                  className="close-btn"
-                >
-                  ✕
-                </button>
-              </div>
-              <form onSubmit={handleCreateHealthRecord}>
-                <div className="form-group">
-                  <label htmlFor="healthCategoryID">Bệnh đặc biệt *</label>
-                  <select
-                    id="healthCategoryID"
-                    name="healthCategoryID"
-                    value={formData.healthCategoryID}
-                    onChange={handleFormChange}
-                    required
-                  >
-                    <option value={1}>Dị ứng</option>
-                    <option value={2}>Bệnh mãn tính</option>
-                    <option value={3}>Thị lực</option>
-                    <option value={4}>Tiền sử bệnh án</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="healthrecordtitle">Tiêu đề hồ sơ *</label>
-                  <input
-                    type="text"
-                    id="healthrecordtitle"
-                    name="healthrecordtitle"
-                    value={formData.healthrecordtitle}
-                    onChange={handleFormChange}
-                    placeholder="Nhập tiêu đề hồ sơ"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="healthRecordDate">Ngày ghi nhận *</label>
-                  <input
-                    type="datetime-local"
-                    id="healthRecordDate"
-                    name="healthRecordDate"
-                    value={formData.healthRecordDate.slice(0, 16)}
-                    onChange={handleFormChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="healthrecorddescription">
-                    Mô tả chi tiết
-                  </label>
-                  <textarea
-                    id="healthrecorddescription"
-                    name="healthrecorddescription"
-                    value={formData.healthrecorddescription}
-                    onChange={handleFormChange}
-                    placeholder="Nhập mô tả chi tiết"
-                    rows="4"
-                  />
-                </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    onClick={() => setShowCreateModal(false)}
-                    className="cancel-btn"
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="submit"
-                    className="submit-btn"
-                    disabled={submitLoading}
-                  >
-                    {submitLoading ? '⏳ Đang tạo...' : '➕ Tạo hồ sơ'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+        <button
+          onClick={() => navigate('/parent/health-records')}
+          className="back-button"
+        >
+          Quay lại
+        </button>
       </div>
     );
   }
@@ -340,27 +229,6 @@ const StudentHealthRecordDetail = () => {
             <span className="material-icons">person</span>
             Thông tin chi tiết
           </h2>
-          <button
-            onClick={() => setShowDeleteModal(true)}
-            className="delete-btn"
-            style={{
-              background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
-              color: 'white',
-              border: 'none',
-              padding: '8px 16px',
-              borderRadius: '20px',
-              fontSize: '0.9rem',
-              fontWeight: '600',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 3px 12px rgba(220, 53, 69, 0.3)',
-            }}
-          >
-            🗑️ Xóa hồ sơ
-          </button>
         </div>
         <div className="detail-grid">
           <div className="detail-item">
@@ -592,82 +460,14 @@ const StudentHealthRecordDetail = () => {
 
       {/* Back Button */}
       <div className="back-button-container">
-        <IconButton
+        <button
           onClick={() => navigate('/parent/health-records')}
-          className="back-icon-btn"
-          sx={{
-            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            boxShadow: '0 4px 15px rgba(47, 81, 72, 0.2)',
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 1)',
-              transform: 'scale(1.1)',
-              boxShadow: '0 6px 20px rgba(47, 81, 72, 0.3)',
-            },
-          }}
+          className="back-button"
         >
-          <ArrowBack />
-        </IconButton>
+          <span className="material-icons">arrow_back</span>
+          Quay lại danh sách
+        </button>
       </div>
-
-      {/* Delete Health Record Modal */}
-      {showDeleteModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>Xác nhận xóa hồ sơ</h3>
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="close-btn"
-              >
-                ✕
-              </button>
-            </div>
-            <div style={{ padding: '24px' }}>
-              <p
-                style={{
-                  margin: '0 0 20px 0',
-                  fontSize: '1.1rem',
-                  color: '#2f5148',
-                  textAlign: 'center',
-                }}
-              >
-                Bạn có chắc chắn muốn xóa hồ sơ sức khỏe này không?
-              </p>
-              <p
-                style={{
-                  margin: '0 0 20px 0',
-                  fontSize: '0.9rem',
-                  color: '#97a19b',
-                  textAlign: 'center',
-                }}
-              >
-                Hành động này không thể hoàn tác.
-              </p>
-            </div>
-            <div className="modal-footer">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="cancel-btn"
-                disabled={deleteLoading}
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleDeleteHealthRecord}
-                className="submit-btn"
-                disabled={deleteLoading}
-                style={{
-                  background: '#dc3545',
-                  '&:hover': { background: '#c82333' },
-                  '&:disabled': { background: '#6c757d' },
-                }}
-              >
-                {deleteLoading ? '⏳ Đang xóa...' : '🗑️ Xóa hồ sơ'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
