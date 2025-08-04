@@ -628,13 +628,7 @@ const HealthCheckEventStudents = () => {
                      fontSize: '0.9rem',
                      borderBottom: '1px solid #e9ecef'
                    }}>Ngày sinh</th>
-                   <th style={{
-                     padding: '16px 12px',
-                     textAlign: 'left',
-                     fontWeight: '600',
-                     fontSize: '0.9rem',
-                     borderBottom: '1px solid #e9ecef'
-                   }}>Ngày khám</th>
+
                    <th style={{
                      padding: '16px 12px',
                      textAlign: 'left',
@@ -711,16 +705,7 @@ const HealthCheckEventStudents = () => {
                          : 'Chưa có'
                        }
                      </td>
-                     <td style={{
-                       padding: '16px 12px',
-                       color: '#495057',
-                       fontSize: '0.9rem'
-                     }}>
-                       {student.checkDate 
-                         ? new Date(student.checkDate).toLocaleDateString('vi-VN')
-                         : 'Chưa có'
-                       }
-                     </td>
+
                      <td style={{
                        padding: '16px 12px',
                        color: '#495057',
@@ -797,192 +782,327 @@ const HealthCheckEventStudents = () => {
          )}
        </div>
 
-      {/* Detail Modal */}
-      {showDetailModal && selectedStudent && (
-        <Modal
-          isOpen={showDetailModal}
-          onClose={handleCloseModal}
-          title="Chi tiết thông tin học sinh"
-          size="large"
-        >
-          <div className="student-detail-content">
-            <div className="detail-section">
-              <h3>Thông tin học sinh</h3>
-              <div className="detail-grid">
-                <div className="detail-item">
-                  <span className="label">Họ và tên:</span>
-                  <span className="value">
-                    {selectedStudent.fullname || 'Không có'}
-                  </span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">Mã học sinh:</span>
-                  <span className="value">
-                    {selectedStudent.studentCode || 'Không có'}
-                  </span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">Lớp:</span>
-                  <span className="value">
-                    {selectedStudent.classname || 'Không có'}
-                  </span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">Ngày sinh:</span>
-                  <span className="value">
-                    {selectedStudent.dob 
-                      ? new Date(selectedStudent.dob).toLocaleDateString('vi-VN')
-                      : 'Không có'
-                    }
-                  </span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">Tuổi:</span>
-                  <span className="value">
-                    {selectedStudent.age || 'Không có'}
-                  </span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">Giới tính:</span>
-                  <span className="value">
-                    {selectedStudent.gender ? 'Nam' : 'Nữ'}
-                  </span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">Nhóm máu:</span>
-                  <span className="value">
-                    {selectedStudent.bloodType || 'Không có'}
-                  </span>
-                </div>
-              </div>
-            </div>
+             {/* Detail Modal */}
+       {showDetailModal && selectedStudent && (
+         <div style={{
+           position: 'fixed',
+           top: 0,
+           left: 0,
+           right: 0,
+           bottom: 0,
+           backgroundColor: 'rgba(0, 0, 0, 0.5)',
+           display: 'flex',
+           justifyContent: 'center',
+           alignItems: 'center',
+           zIndex: 1000,
+           padding: '20px'
+         }}
+         onClick={handleCloseModal}
+         >
+           <div style={{
+             background: 'white',
+             borderRadius: '16px',
+             maxWidth: '800px',
+             width: '100%',
+             maxHeight: '90vh',
+             overflow: 'hidden',
+             display: 'flex',
+             flexDirection: 'column',
+             boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+           }}
+           onClick={(e) => e.stopPropagation()}
+           >
+             {/* Modal Header */}
+             <div style={{
+               padding: '25px 30px',
+               borderBottom: '1px solid #e9ecef',
+               display: 'flex',
+               justifyContent: 'space-between',
+               alignItems: 'center',
+               background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+               color: 'white',
+               borderRadius: '16px 16px 0 0'
+             }}>
+               <h3 style={{
+                 margin: 0,
+                 fontSize: '1.5rem',
+                 fontWeight: '600',
+                 display: 'flex',
+                 alignItems: 'center',
+                 gap: '10px'
+               }}>
+                 <span style={{ fontSize: '1.2rem' }}>👤</span>
+                 Chi tiết thông tin học sinh
+               </h3>
+               <button
+                 onClick={handleCloseModal}
+                 style={{
+                   background: 'rgba(255, 255, 255, 0.2)',
+                   border: 'none',
+                   borderRadius: '50%',
+                   width: '32px',
+                   height: '32px',
+                   display: 'flex',
+                   alignItems: 'center',
+                   justifyContent: 'center',
+                   cursor: 'pointer',
+                   color: 'white',
+                   fontSize: '1.2rem',
+                   transition: 'all 0.2s ease'
+                 }}
+                 onMouseEnter={(e) => {
+                   e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                 }}
+                 onMouseLeave={(e) => {
+                   e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                 }}
+               >
+                 ×
+               </button>
+             </div>
 
-            {selectedStudent.parent && (
-              <div className="detail-section">
-                <h3>Thông tin phụ huynh</h3>
-                <div className="detail-grid">
-                  <div className="detail-item">
-                    <span className="label">Họ và tên phụ huynh:</span>
-                    <span className="value">
-                      {selectedStudent.parent.fullname || 'Không có'}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="label">Email:</span>
-                    <span className="value">
-                      {selectedStudent.parent.email || 'Không có'}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="label">Số điện thoại:</span>
-                    <span className="value">
-                      {selectedStudent.parent.phone || 'Không có'}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="label">Địa chỉ:</span>
-                    <span className="value">
-                      {selectedStudent.parent.address || 'Không có'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-                         <div className="detail-section">
-               <h3>Thông tin khám sức khỏe</h3>
-               <div className="detail-grid">
-                 <div className="detail-item">
-                   <span className="label">Ngày khám:</span>
-                   <span className="value">
-                     {selectedStudent.checkDate 
-                       ? new Date(selectedStudent.checkDate).toLocaleDateString('vi-VN')
-                       : 'Chưa có'
-                     }
-                   </span>
-                 </div>
-                 <div className="detail-item">
-                   <span className="label">Chiều cao:</span>
-                   <span className="value">
-                     {selectedStudent.height ? `${selectedStudent.height} cm` : 'Chưa có'}
-                   </span>
-                 </div>
-                 <div className="detail-item">
-                   <span className="label">Cân nặng:</span>
-                   <span className="value">
-                     {selectedStudent.weight ? `${selectedStudent.weight} kg` : 'Chưa có'}
-                   </span>
-                 </div>
-                 <div className="detail-item">
-                   <span className="label">Thị lực trái:</span>
-                   <span className="value">
-                     {selectedStudent.visionLeft || 'Chưa có'}
-                   </span>
-                 </div>
-                 <div className="detail-item">
-                   <span className="label">Thị lực phải:</span>
-                   <span className="value">
-                     {selectedStudent.visionRight || 'Chưa có'}
-                   </span>
-                 </div>
-                 <div className="detail-item">
-                   <span className="label">Huyết áp:</span>
-                   <span className="value">
-                     {selectedStudent.bloodPressure || 'Chưa có'}
-                   </span>
+             {/* Modal Body */}
+             <div style={{
+               padding: '30px',
+               overflowY: 'auto',
+               flex: 1
+             }}>
+               {/* Student Information */}
+               <div style={{
+                 background: '#f8f9fa',
+                 borderRadius: '12px',
+                 padding: '20px',
+                 border: '1px solid #e9ecef',
+                 marginBottom: '20px'
+               }}>
+                 <h4 style={{
+                   margin: '0 0 15px 0',
+                   color: '#2f5148',
+                   fontSize: '1.2rem',
+                   fontWeight: '600'
+                 }}>
+                   Thông tin học sinh
+                 </h4>
+                 <div style={{
+                   display: 'grid',
+                   gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                   gap: '15px'
+                 }}>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Họ và tên:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {selectedStudent.fullname || 'Chưa có'}
+                     </div>
+                   </div>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Mã học sinh:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {selectedStudent.studentCode || 'Chưa có'}
+                     </div>
+                   </div>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Lớp:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {selectedStudent.classname || 'Chưa có'}
+                     </div>
+                   </div>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Ngày sinh:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {selectedStudent.dob ? new Date(selectedStudent.dob).toLocaleDateString('vi-VN') : 'Chưa có'}
+                     </div>
+                   </div>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Tuổi:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {selectedStudent.age || 'Chưa có'}
+                     </div>
+                   </div>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Giới tính:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {selectedStudent.gender ? 'Nam' : 'Nữ'}
+                     </div>
+                   </div>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Nhóm máu:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {selectedStudent.bloodType || 'Chưa có'}
+                     </div>
+                   </div>
+                   
                  </div>
                </div>
-               
-               <div className="detail-item full-width">
-                 <span className="label">Ghi chú:</span>
-                 <div className="value description">
-                   {selectedStudent.notes || 'Không có ghi chú'}
+
+               {/* Health Check Results */}
+               <div style={{
+                 background: '#f8f9fa',
+                 borderRadius: '12px',
+                 padding: '20px',
+                 border: '1px solid #e9ecef',
+                 marginBottom: '20px'
+               }}>
+                 <h4 style={{
+                   margin: '0 0 15px 0',
+                   color: '#2f5148',
+                   fontSize: '1.2rem',
+                   fontWeight: '600'
+                 }}>
+                   Kết quả khám sức khỏe
+                 </h4>
+                 <div style={{
+                   display: 'grid',
+                   gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                   gap: '15px'
+                 }}>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Chiều cao:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {selectedStudent.height ? `${selectedStudent.height}cm` : 'Chưa có'}
+                     </div>
+                   </div>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Cân nặng:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {selectedStudent.weight ? `${selectedStudent.weight}kg` : 'Chưa có'}
+                     </div>
+                   </div>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Thị lực trái:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {selectedStudent.visionLeft || 'Chưa có'}
+                     </div>
+                   </div>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Thị lực phải:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {selectedStudent.visionRight || 'Chưa có'}
+                     </div>
+                   </div>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Huyết áp:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {selectedStudent.bloodPressure || 'Chưa có'}
+                     </div>
+                   </div>
                  </div>
+                 {selectedStudent.notes && (
+                   <div style={{ marginTop: '15px' }}>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Ghi chú:</span>
+                     <div style={{ 
+                       fontSize: '1rem', 
+                       color: '#2f5148',
+                       marginTop: '5px',
+                       padding: '10px',
+                       background: 'white',
+                       borderRadius: '8px',
+                       border: '1px solid #e9ecef'
+                     }}>
+                       {selectedStudent.notes}
+                     </div>
+                   </div>
+                 )}
+               </div>
+
+               {/* Event Information */}
+               <div style={{
+                 background: '#f8f9fa',
+                 borderRadius: '12px',
+                 padding: '20px',
+                 border: '1px solid #e9ecef'
+               }}>
+                 <h4 style={{
+                   margin: '0 0 15px 0',
+                   color: '#2f5148',
+                   fontSize: '1.2rem',
+                   fontWeight: '600'
+                 }}>
+                   Thông tin sự kiện
+                 </h4>
+                 <div style={{
+                   display: 'grid',
+                   gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                   gap: '15px'
+                 }}>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Tên sự kiện:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {eventData.healthcheckeventname || 'Chưa có'}
+                     </div>
+                   </div>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Ngày sự kiện:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {eventData.eventdate ? new Date(eventData.eventdate).toLocaleDateString('vi-VN') : 'Chưa có'}
+                     </div>
+                   </div>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Địa điểm:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {eventData.location || 'Chưa có'}
+                     </div>
+                   </div>
+                   <div>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Tổ chức:</span>
+                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
+                       {eventData.createdby || 'Chưa có'}
+                     </div>
+                   </div>
+                 </div>
+                 {eventData.healthcheckeventdescription && (
+                   <div style={{ marginTop: '15px' }}>
+                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Mô tả sự kiện:</span>
+                     <div style={{ 
+                       fontSize: '1rem', 
+                       color: '#2f5148',
+                       marginTop: '5px',
+                       padding: '10px',
+                       background: 'white',
+                       borderRadius: '8px',
+                       border: '1px solid #e9ecef'
+                     }}>
+                       {eventData.healthcheckeventdescription}
+                     </div>
+                   </div>
+                 )}
                </div>
              </div>
 
-             <div className="detail-section">
-               <h3>Thông tin sự kiện</h3>
-               <div className="detail-grid">
-                 <div className="detail-item">
-                   <span className="label">Tên sự kiện:</span>
-                   <span className="value">
-                     {eventData.healthcheckeventname || 'Không có'}
-                   </span>
-                 </div>
-                 <div className="detail-item">
-                   <span className="label">Ngày sự kiện:</span>
-                   <span className="value">
-                     {eventData.eventdate 
-                       ? new Date(eventData.eventdate).toLocaleDateString('vi-VN')
-                       : 'Không có'
-                     }
-                   </span>
-                 </div>
-                 <div className="detail-item">
-                   <span className="label">Địa điểm:</span>
-                   <span className="value">
-                     {eventData.location || 'Không có'}
-                   </span>
-                 </div>
-                 <div className="detail-item">
-                   <span className="label">Tổ chức:</span>
-                   <span className="value">
-                     {eventData.createdby || 'Không có'}
-                   </span>
-                 </div>
-               </div>
-               
-               <div className="detail-item full-width">
-                 <span className="label">Mô tả sự kiện:</span>
-                 <div className="value description">
-                   {eventData.healthcheckeventdescription || 'Không có mô tả'}
-                 </div>
-               </div>
+             {/* Modal Footer */}
+             <div style={{
+               padding: '20px 25px',
+               borderTop: '1px solid #e9ecef',
+               display: 'flex',
+               justifyContent: 'flex-end',
+             }}>
+               <button
+                 onClick={handleCloseModal}
+                 style={{
+                   background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                   color: 'white',
+                   border: 'none',
+                   padding: '12px 24px',
+                   borderRadius: '8px',
+                   cursor: 'pointer',
+                   fontSize: '1rem',
+                   fontWeight: '500',
+                   transition: 'all 0.2s ease'
+                 }}
+                 onMouseEnter={(e) => {
+                   e.currentTarget.style.transform = 'translateY(-1px)';
+                   e.currentTarget.style.boxShadow = '0 4px 8px rgba(47, 81, 72, 0.3)';
+                 }}
+                 onMouseLeave={(e) => {
+                   e.currentTarget.style.transform = 'translateY(0)';
+                   e.currentTarget.style.boxShadow = 'none';
+                 }}
+               >
+                 Đóng
+               </button>
              </div>
-          </div>
-        </Modal>
-      )}
+           </div>
+         </div>
+       )}
     </div>
   );
 };
