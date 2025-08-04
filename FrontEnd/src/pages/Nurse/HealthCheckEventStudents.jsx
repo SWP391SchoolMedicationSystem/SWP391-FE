@@ -791,13 +791,14 @@ const HealthCheckEventStudents = () => {
                     fontSize: '0.9rem',
                     borderBottom: '1px solid #e9ecef'
                   }}>Ngày sinh</th>
-                  <th style={{
+                  {/* Ngày khám column - Hidden */}
+                  {/* <th style={{
                     padding: '16px 12px',
                     textAlign: 'left',
                     fontWeight: '600',
                     fontSize: '0.9rem',
                     borderBottom: '1px solid #e9ecef'
-                  }}>Ngày khám</th>
+                  }}>Ngày khám</th> */}
                   <th style={{
                     padding: '16px 12px',
                     textAlign: 'left',
@@ -871,13 +872,14 @@ const HealthCheckEventStudents = () => {
                     }}>
                       {student.dateOfBirth ? new Date(student.dateOfBirth).toLocaleDateString('vi-VN') : 'Chưa có'}
                     </td>
-                    <td style={{
+                    {/* Ngày khám data - Hidden */}
+                    {/* <td style={{
                       padding: '16px 12px',
                       fontSize: '0.9rem',
                       color: '#6c757d'
                     }}>
                       {student.checkDate ? new Date(student.checkDate).toLocaleDateString('vi-VN') : 'Chưa có'}
-                    </td>
+                    </td> */}
                     <td style={{
                       padding: '16px 12px',
                       fontSize: '0.9rem',
@@ -1099,12 +1101,7 @@ const HealthCheckEventStudents = () => {
                        {selectedStudent.dateOfBirth ? new Date(selectedStudent.dateOfBirth).toLocaleDateString('vi-VN') : 'Chưa có'}
                      </div>
                    </div>
-                   <div>
-                     <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>ID bản ghi khám:</span>
-                     <div style={{ fontSize: '1rem', fontWeight: '600', color: '#2f5148' }}>
-                       {selectedStudent.recordID || 'N/A'}
-                     </div>
-                   </div>
+
                  </div>
                </div>
 
