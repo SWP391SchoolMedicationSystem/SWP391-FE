@@ -67,17 +67,11 @@ const navItems = [
     icon: <Medication />,
     key: 'personal-medicine',
   },
-  // {
-  //   to: '/nurse/health-check',
-  //   label: 'Kiểm tra sức khỏe',
-  //   icon: <HealthAndSafety />,
-  //   key: 'health-check',
-  // },
   {
-    to: '/nurse/health-check-events',
-    label: 'Sự Kiện Khám Sức Khỏe',
+    to: '/nurse/health-check',
+    label: 'Kiểm tra sức khỏe',
     icon: <HealthAndSafety />,
-    key: 'health-check-events',
+    key: 'health-check',
   },
   {
     to: '/nurse/review-requests',
