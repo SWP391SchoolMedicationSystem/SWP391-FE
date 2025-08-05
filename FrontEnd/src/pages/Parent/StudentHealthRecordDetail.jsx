@@ -214,28 +214,45 @@ const StudentHealthRecordDetail = () => {
           </button>
         </div>
 
-        {/* Create Health Record Modal */}
+        {/* Create Health Record Modal - New Design */}
         {showCreateModal && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h3>Tạo Hồ Sơ Sức Khỏe Mới</h3>
+          <div
+            className="health-modal-backdrop"
+            onClick={() => setShowCreateModal(false)}
+          >
+            <div
+              className="health-modal-container"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="health-modal-header">
+                <h3 className="health-modal-title">
+                  📝 Tạo Hồ Sơ Sức Khỏe Mới
+                </h3>
                 <button
                   onClick={() => setShowCreateModal(false)}
-                  className="close-btn"
+                  className="health-modal-close"
                 >
                   ✕
                 </button>
               </div>
-              <form onSubmit={handleCreateHealthRecord}>
-                <div className="form-group">
-                  <label htmlFor="healthCategoryID">Bệnh đặc biệt *</label>
+              <form
+                onSubmit={handleCreateHealthRecord}
+                className="health-modal-form"
+              >
+                <div className="health-form-group">
+                  <label
+                    htmlFor="healthCategoryID"
+                    className="health-form-label"
+                  >
+                    Bệnh đặc biệt *
+                  </label>
                   <select
                     id="healthCategoryID"
                     name="healthCategoryID"
                     value={formData.healthCategoryID}
                     onChange={handleFormChange}
                     required
+                    className="health-form-select"
                   >
                     <option value={1}>Dị ứng</option>
                     <option value={2}>Bệnh mãn tính</option>
@@ -243,8 +260,13 @@ const StudentHealthRecordDetail = () => {
                     <option value={4}>Tiền sử bệnh án</option>
                   </select>
                 </div>
-                <div className="form-group">
-                  <label htmlFor="healthrecordtitle">Tiêu đề hồ sơ *</label>
+                <div className="health-form-group">
+                  <label
+                    htmlFor="healthrecordtitle"
+                    className="health-form-label"
+                  >
+                    Tiêu đề hồ sơ *
+                  </label>
                   <input
                     type="text"
                     id="healthrecordtitle"
@@ -253,10 +275,17 @@ const StudentHealthRecordDetail = () => {
                     onChange={handleFormChange}
                     placeholder="Nhập tiêu đề hồ sơ"
                     required
+                    maxLength={100}
+                    className="health-form-input"
                   />
                 </div>
-                <div className="form-group">
-                  <label htmlFor="healthRecordDate">Ngày ghi nhận *</label>
+                <div className="health-form-group">
+                  <label
+                    htmlFor="healthRecordDate"
+                    className="health-form-label"
+                  >
+                    Ngày ghi nhận *
+                  </label>
                   <input
                     type="datetime-local"
                     id="healthRecordDate"
@@ -264,10 +293,14 @@ const StudentHealthRecordDetail = () => {
                     value={formData.healthRecordDate.slice(0, 16)}
                     onChange={handleFormChange}
                     required
+                    className="health-form-input"
                   />
                 </div>
-                <div className="form-group">
-                  <label htmlFor="healthrecorddescription">
+                <div className="health-form-group">
+                  <label
+                    htmlFor="healthrecorddescription"
+                    className="health-form-label"
+                  >
                     Mô tả chi tiết
                   </label>
                   <textarea
@@ -277,22 +310,32 @@ const StudentHealthRecordDetail = () => {
                     onChange={handleFormChange}
                     placeholder="Nhập mô tả chi tiết"
                     rows="4"
+                    maxLength={500}
+                    className="health-form-textarea"
                   />
+                  <small className="health-char-count">
+                    {formData.healthrecorddescription.length}/500 ký tự
+                  </small>
                 </div>
-                <div className="modal-footer">
+                <div className="health-modal-actions">
                   <button
                     type="button"
                     onClick={() => setShowCreateModal(false)}
-                    className="cancel-btn"
+                    className="health-cancel-btn"
+                    disabled={submitLoading}
                   >
                     Hủy
                   </button>
                   <button
                     type="submit"
-                    className="submit-btn"
-                    disabled={submitLoading}
+                    className="health-submit-btn"
+                    disabled={
+                      submitLoading ||
+                      !formData.healthrecordtitle ||
+                      !formData.healthrecorddescription
+                    }
                   >
-                    {submitLoading ? '⏳ Đang tạo...' : '➕ Tạo hồ sơ'}
+                    {submitLoading ? '⏳ Đang tạo...' : '📤 Tạo Hồ Sơ'}
                   </button>
                 </div>
               </form>

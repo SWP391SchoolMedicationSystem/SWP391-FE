@@ -602,7 +602,7 @@ const ParentAccountManagement = () => {
               {formData.students.map((student, index) => (
                 <div key={index} className="student-form">
                   <div className="student-header">
-                  <h4 style={{ color: 'white' }}>Học Sinh {index + 1}</h4>
+                    <h4 style={{ color: 'white' }}>Học Sinh {index + 1}</h4>
                     {formData.students.length > 1 && (
                       <button
                         type="button"
