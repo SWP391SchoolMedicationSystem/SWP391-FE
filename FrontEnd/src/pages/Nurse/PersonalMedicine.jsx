@@ -3,6 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import '../../css/Nurse/PersonalMedicine.css';
 import apiClient, { API_ENDPOINTS } from '../../services/config';
 import { CircularProgress, Typography, Box } from '@mui/material';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';   
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const PersonalMedicine = () => {
   const navigate = useNavigate();
@@ -39,7 +45,7 @@ const PersonalMedicine = () => {
     parentId: '',
     studentId: '',
     quantity: '',
-    receivedDate: new Date().toISOString().split('T')[0],
+    receivedDate: dayjs().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DDTHH:mm'),
     expiryDate: '',
     note: ''
   });
