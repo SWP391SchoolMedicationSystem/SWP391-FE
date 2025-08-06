@@ -1108,12 +1108,7 @@ function BlogManagement() {
                     </span>
                   </div>
 
-                  {currentPost?.approvedBy && (
-                    <div className="meta-row">
-                      <span className="meta-label">Đã phê duyệt bởi:</span>
-                      <span>{currentPost.approvedByName}</span>
-                    </div>
-                  )}
+                 
                   {currentPost?.approvedOn && (
                     <div className="meta-row">
                       <span className="meta-label">Ngày phê duyệt:</span>
