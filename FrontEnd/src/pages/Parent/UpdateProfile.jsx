@@ -934,6 +934,17 @@ export default function UpdateProfile() {
                       fontStyle: 'italic',
                     }}
                   >
+                    Mật khẩu phải bao gồm ít nhất 8 chữ, có 1 chữ hoa và 1 kí tự
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: '#97a19b',
+                      mb: 3,
+                      fontFamily: 'Satoshi, sans-serif',
+                      fontStyle: 'italic',
+                    }}
+                  >
                     Để đảm bảo an toàn, hãy xác minh mật khẩu hiện tại trước khi
                     đổi mật khẩu mới
                   </Typography>

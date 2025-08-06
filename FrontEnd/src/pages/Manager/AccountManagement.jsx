@@ -474,7 +474,7 @@ const AccountManagement = () => {
                       </td>
                     </tr>
                   ))}
-                </tbody>
+                </tbody>  
               </table>
             </div>
           )}

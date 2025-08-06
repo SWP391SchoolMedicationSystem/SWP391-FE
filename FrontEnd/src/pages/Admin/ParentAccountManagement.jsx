@@ -638,14 +638,14 @@ const ParentAccountManagement = () => {
                         value={student.age}
                         onChange={e => {
                           const value = parseInt(e.target.value) || 0;
-                          if (value >= 0 && value <= 18) {
+                          if (value >= 0 && value <= 6) {
                             handleStudentChange(index, 'age', value);
                           }
                         }}
-                        placeholder="0-18"
+                        placeholder="0-6"
                         required
                       />
-                      <small>Tuổi từ 0-18</small>
+                      <small>Tuổi từ 3-6</small>
                     </div>
                   </div>
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
-import { parentService } from '../../services/parentService';
+
 import '../../css/Manager/StudentHealthRecordDetail.css';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -32,13 +32,7 @@ const StudentHealthRecordDetail = () => {
   });
   const [submitLoading, setSubmitLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  var item = {
-    studentId: 1,
-    studentName: 'Nguyễn Văn A',
-    healthRecordTitle: 'Hồ sơ sức khỏe',
-    healthRecordDate: '2021-01-01',
-    healthCategory: 'Sức khỏe',
-  };
+  const [validationErrors, setValidationErrors] = useState({});
 
   useEffect(() => {
     fetchHealthRecord();
@@ -102,6 +96,35 @@ const StudentHealthRecordDetail = () => {
   // CRUD Functions for Health Record
   const handleCreateHealthRecord = async e => {
     e.preventDefault();
+
+    // Validation - Always show all errors when submit
+    const errors = {};
+
+    if (
+      !formData.healthrecordtitle ||
+      formData.healthrecordtitle.trim() === ''
+    ) {
+      errors.healthrecordtitle = 'Tiêu đề hồ sơ không được để trống';
+    }
+
+    if (
+      !formData.healthrecorddescription ||
+      formData.healthrecorddescription.trim() === ''
+    ) {
+      errors.healthrecorddescription = 'Mô tả chi tiết không được để trống';
+    }
+
+    if (!formData.healthRecordDate) {
+      errors.healthRecordDate = 'Ngày ghi nhận không được để trống';
+    }
+
+    // Always set validation errors to show all missing fields
+    setValidationErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
+
     setSubmitLoading(true);
 
     try {
@@ -122,18 +145,7 @@ const StudentHealthRecordDetail = () => {
       }
 
       alert('Tạo hồ sơ sức khỏe thành công!');
-      setShowCreateModal(false);
-      setFormData({
-        studentID: parseInt(studentId),
-        healthCategoryID: 1,
-        healthRecordDate: new Date().toISOString(),
-        healthrecordtitle: '',
-        healthrecorddescription: '',
-        staffid: 3,
-        isConfirm: true,
-        createdBy: '3',
-        createdDate: new Date().toISOString(),
-      });
+      handleCloseModal();
       fetchHealthRecord(); // Refresh data
     } catch (error) {
       console.error('Error creating health record:', error);
@@ -149,6 +161,35 @@ const StudentHealthRecordDetail = () => {
       ...prev,
       [name]: name === 'healthCategoryID' ? parseInt(value) : value,
     }));
+
+    // Clear validation error when user starts typing and field is no longer empty
+    if (validationErrors[name]) {
+      const trimmedValue = typeof value === 'string' ? value.trim() : value;
+      if (trimmedValue !== '') {
+        setValidationErrors(prev => ({
+          ...prev,
+          [name]: null,
+        }));
+      }
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowCreateModal(false);
+    setValidationErrors({});
+    setFormData({
+      studentID: parseInt(studentId),
+      healthCategoryID: 1,
+      healthRecordDate: dayjs()
+        .tz('Asia/Ho_Chi_Minh')
+        .format('YYYY-MM-DDTHH:mm'),
+      healthrecordtitle: '',
+      healthrecorddescription: '',
+      staffid: 3,
+      isConfirm: true,
+      createdBy: '3',
+      createdDate: new Date().toISOString(),
+    });
   };
 
   // Delete Health Record Function
@@ -238,7 +279,7 @@ const StudentHealthRecordDetail = () => {
               backdropFilter: 'blur(4px)',
               animation: 'fadeIn 0.3s ease',
             }}
-            onClick={() => setShowCreateModal(false)}
+            onClick={handleCloseModal}
           >
             <div
               style={{
@@ -295,7 +336,7 @@ const StudentHealthRecordDetail = () => {
                   📝 Tạo Hồ Sơ Sức Khỏe Mới
                 </h3>
                 <button
-                  onClick={() => setShowCreateModal(false)}
+                  onClick={handleCloseModal}
                   style={{
                     background: 'none',
                     border: 'none',
@@ -422,22 +463,46 @@ const StudentHealthRecordDetail = () => {
                       style={{
                         width: '100%',
                         padding: '14px 16px',
-                        border: '2px solid #e0e0e0',
+                        border: validationErrors.healthrecordtitle
+                          ? '2px solid #dc3545'
+                          : '2px solid #e0e0e0',
                         borderRadius: '12px',
                         fontSize: '14px',
                         transition: 'all 0.3s ease',
                         fontFamily: 'inherit',
                       }}
                       onFocus={e => {
-                        e.target.style.borderColor = '#73ad67';
+                        e.target.style.borderColor =
+                          validationErrors.healthrecordtitle
+                            ? '#dc3545'
+                            : '#73ad67';
                         e.target.style.boxShadow =
-                          '0 0 0 3px rgba(115, 173, 103, 0.1)';
+                          validationErrors.healthrecordtitle
+                            ? '0 0 0 3px rgba(220, 53, 69, 0.1)'
+                            : '0 0 0 3px rgba(115, 173, 103, 0.1)';
                       }}
                       onBlur={e => {
-                        e.target.style.borderColor = '#e0e0e0';
+                        e.target.style.borderColor =
+                          validationErrors.healthrecordtitle
+                            ? '#dc3545'
+                            : '#e0e0e0';
                         e.target.style.boxShadow = 'none';
                       }}
                     />
+                    {validationErrors.healthrecordtitle && (
+                      <div
+                        style={{
+                          color: '#dc3545',
+                          fontSize: '12px',
+                          marginTop: '4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        ⚠️ {validationErrors.healthrecordtitle}
+                      </div>
+                    )}
                   </div>
 
                   {/* Health Record Date */}
@@ -471,22 +536,46 @@ const StudentHealthRecordDetail = () => {
                       style={{
                         width: '100%',
                         padding: '14px 16px',
-                        border: '2px solid #e0e0e0',
+                        border: validationErrors.healthRecordDate
+                          ? '2px solid #dc3545'
+                          : '2px solid #e0e0e0',
                         borderRadius: '12px',
                         fontSize: '14px',
                         transition: 'all 0.3s ease',
                         fontFamily: 'inherit',
                       }}
                       onFocus={e => {
-                        e.target.style.borderColor = '#73ad67';
+                        e.target.style.borderColor =
+                          validationErrors.healthRecordDate
+                            ? '#dc3545'
+                            : '#73ad67';
                         e.target.style.boxShadow =
-                          '0 0 0 3px rgba(115, 173, 103, 0.1)';
+                          validationErrors.healthRecordDate
+                            ? '0 0 0 3px rgba(220, 53, 69, 0.1)'
+                            : '0 0 0 3px rgba(115, 173, 103, 0.1)';
                       }}
                       onBlur={e => {
-                        e.target.style.borderColor = '#e0e0e0';
+                        e.target.style.borderColor =
+                          validationErrors.healthRecordDate
+                            ? '#dc3545'
+                            : '#e0e0e0';
                         e.target.style.boxShadow = 'none';
                       }}
                     />
+                    {validationErrors.healthRecordDate && (
+                      <div
+                        style={{
+                          color: '#dc3545',
+                          fontSize: '12px',
+                          marginTop: '4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        ⚠️ {validationErrors.healthRecordDate}
+                      </div>
+                    )}
                   </div>
 
                   {/* Health Record Description */}
@@ -521,7 +610,9 @@ const StudentHealthRecordDetail = () => {
                       style={{
                         width: '100%',
                         padding: '14px 16px',
-                        border: '2px solid #e0e0e0',
+                        border: validationErrors.healthrecorddescription
+                          ? '2px solid #dc3545'
+                          : '2px solid #e0e0e0',
                         borderRadius: '12px',
                         fontSize: '14px',
                         transition: 'all 0.3s ease',
@@ -530,15 +621,37 @@ const StudentHealthRecordDetail = () => {
                         resize: 'vertical',
                       }}
                       onFocus={e => {
-                        e.target.style.borderColor = '#73ad67';
+                        e.target.style.borderColor =
+                          validationErrors.healthrecorddescription
+                            ? '#dc3545'
+                            : '#73ad67';
                         e.target.style.boxShadow =
-                          '0 0 0 3px rgba(115, 173, 103, 0.1)';
+                          validationErrors.healthrecorddescription
+                            ? '0 0 0 3px rgba(220, 53, 69, 0.1)'
+                            : '0 0 0 3px rgba(115, 173, 103, 0.1)';
                       }}
                       onBlur={e => {
-                        e.target.style.borderColor = '#e0e0e0';
+                        e.target.style.borderColor =
+                          validationErrors.healthrecorddescription
+                            ? '#dc3545'
+                            : '#e0e0e0';
                         e.target.style.boxShadow = 'none';
                       }}
                     />
+                    {validationErrors.healthrecorddescription && (
+                      <div
+                        style={{
+                          color: '#dc3545',
+                          fontSize: '12px',
+                          marginTop: '4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        ⚠️ {validationErrors.healthrecorddescription}
+                      </div>
+                    )}
                     <small
                       style={{
                         textAlign: 'right',
@@ -564,7 +677,7 @@ const StudentHealthRecordDetail = () => {
                   >
                     <button
                       type="button"
-                      onClick={() => setShowCreateModal(false)}
+                      onClick={handleCloseModal}
                       disabled={submitLoading}
                       style={{
                         padding: '12px 24px',
@@ -600,7 +713,8 @@ const StudentHealthRecordDetail = () => {
                       disabled={
                         submitLoading ||
                         !formData.healthrecordtitle ||
-                        !formData.healthrecorddescription
+                        !formData.healthrecorddescription ||
+                        Object.keys(validationErrors).length > 0
                       }
                       style={{
                         padding: '12px 24px',

@@ -335,7 +335,7 @@ export const nurseNotificationService = {
   getNotifications: async () => {
     try {
       console.log('🌐 Calling API:', API_ENDPOINTS.NOTIFICATION.GET_FOR_STAFF);
-      
+
       const response = await apiClient.get(
         API_ENDPOINTS.NOTIFICATION.GET_FOR_STAFF
       );
@@ -364,8 +364,11 @@ export const nurseNotificationService = {
 
       // Xử lý dữ liệu từ API để phù hợp với UI
       if (Array.isArray(dataToProcess)) {
-        console.log('📋 Processing array of notifications:', dataToProcess.length);
-        
+        console.log(
+          '📋 Processing array of notifications:',
+          dataToProcess.length
+        );
+
         const processedData = dataToProcess.map(notification => {
           // Lấy thông tin chi tiết cho staff hiện tại (giả sử staffid = 3 cho Nurse)
           const currentStaffDetail =
@@ -620,20 +623,20 @@ export const nurseFormService = {
       const response = await apiClient.get(API_ENDPOINTS.FORM.GET_ALL);
       console.log('📥 Raw API response:', response);
       console.log('🔍 Raw form data (first item):', response[0]);
-      
+
       if (!Array.isArray(response)) {
         console.warn('⚠️ API response is not an array:', response);
         return [];
       }
-      
+
       // Filter out soft deleted forms
       const activeForms = response.filter(form => !form.isDeleted);
       console.log('✅ Active forms (not deleted):', activeForms.length);
-      
+
       // Map the data
       const mappedForms = activeForms.map(nurseFormService.mapFormData);
       console.log('🎯 Mapped forms:', mappedForms);
-      
+
       return mappedForms;
     } catch (error) {
       console.error('❌ Error getting all forms:', error);
@@ -642,7 +645,7 @@ export const nurseFormService = {
   },
 
   // Get form by ID
-  getFormById: async (formId) => {
+  getFormById: async formId => {
     try {
       const url = buildApiUrl(API_ENDPOINTS.FORM.GET_BY_ID, formId);
       const response = await apiClient.get(url);
@@ -654,7 +657,7 @@ export const nurseFormService = {
   },
 
   // Get forms by status
-  getFormsByStatus: async (status) => {
+  getFormsByStatus: async status => {
     try {
       const url = buildApiUrl(API_ENDPOINTS.FORM.GET_BY_STATUS, status);
       const response = await apiClient.get(url);
@@ -667,12 +670,12 @@ export const nurseFormService = {
   },
 
   // Get forms by parent ID (excluding soft deleted)
-  getFormsByParent: async (parentId) => {
+  getFormsByParent: async parentId => {
     try {
       const url = buildApiUrl(API_ENDPOINTS.FORM.GET_BY_PARENT, parentId);
       const response = await apiClient.get(url);
       if (!Array.isArray(response)) return [];
-      
+
       // Filter out soft deleted forms
       const activeForms = response.filter(form => !form.isDeleted);
       return activeForms.map(nurseFormService.mapFormData);
@@ -683,12 +686,12 @@ export const nurseFormService = {
   },
 
   // Get forms by category ID (excluding soft deleted)
-  getFormsByCategory: async (categoryId) => {
+  getFormsByCategory: async categoryId => {
     try {
       const url = buildApiUrl(API_ENDPOINTS.FORM.GET_BY_CATEGORY, categoryId);
       const response = await apiClient.get(url);
       if (!Array.isArray(response)) return [];
-      
+
       // Filter out soft deleted forms
       const activeForms = response.filter(form => !form.isDeleted);
       return activeForms.map(nurseFormService.mapFormData);
@@ -699,7 +702,7 @@ export const nurseFormService = {
   },
 
   // Soft delete form by ID
-  deleteForm: async (formId) => {
+  deleteForm: async formId => {
     try {
       const url = `https://api-schoolhealth.purintech.id.vn/api/Form?id=${formId}`;
       const response = await apiClient.delete(url);
@@ -718,7 +721,7 @@ export const nurseFormService = {
         formId: formId,
         staffid: staffId || userInfo.userId || 0,
         reasonfordecline: null,
-        modifiedby: userInfo.fullName || 'System'
+        modifiedby: userInfo.fullName || 'System',
       };
       const response = await apiClient.post('/Form/accept', payload);
       return response;
@@ -736,7 +739,7 @@ export const nurseFormService = {
         formId: formId,
         staffid: staffId || userInfo.userId || 0,
         reasonfordecline: reason || 'Không được phê duyệt',
-        modifiedby: userInfo.fullName || 'System'
+        modifiedby: userInfo.fullName || 'System',
       };
       const response = await apiClient.post('/Form/decline', payload);
       return response;
@@ -747,20 +750,21 @@ export const nurseFormService = {
   },
 
   // Map form data for display
-  mapFormData: (apiForm) => {
-    const getFormCategoryName = (categoryId) => {
+  mapFormData: apiForm => {
+    const getFormCategoryName = categoryId => {
       const categories = {
         1: 'Đơn xin nghỉ phép',
-        2: 'Đơn xin thuốc', 
+        2: 'Đơn xin thuốc',
         3: 'Đơn xin tư vấn',
-        4: 'Đơn khác'
+        4: 'Đơn khác',
       };
       return categories[categoryId] || `Danh mục ${categoryId}`;
     };
 
     const getStatusInfo = (isPending, isAccepted) => {
       if (isPending === true) return { text: 'Chờ xử lý', class: 'pending' };
-      if (isAccepted === true) return { text: 'Đã phê duyệt', class: 'approved' };
+      if (isAccepted === true)
+        return { text: 'Đã phê duyệt', class: 'approved' };
       return { text: 'Đã từ chối', class: 'declined' };
     };
 
@@ -775,20 +779,27 @@ export const nurseFormService = {
       filePath: apiForm.filePath,
       fileUrl: apiForm.fileUrl,
       createdDate: apiForm.createdDate,
-      createdDateType: typeof apiForm.createdDate
+      createdDateType: typeof apiForm.createdDate,
     });
-    
+
     return {
       formId: apiForm.formId || apiForm.id,
       parentId: apiForm.parentId,
-      parentName: apiForm.parentName || `Phụ huynh #${apiForm.parentId || 'N/A'}`,
+      parentName:
+        apiForm.parentName || `Phụ huynh #${apiForm.parentId || 'N/A'}`,
       studentId: apiForm.studentid,
-      studentName: apiForm.studentName || `Học sinh #${apiForm.studentid || 'N/A'}`,
+      studentName:
+        apiForm.studentName || `Học sinh #${apiForm.studentid || 'N/A'}`,
       formCategoryId: apiForm.formCategoryId,
-      formCategoryName: apiForm.formCategoryName || getFormCategoryName(apiForm.formCategoryId),
+      formCategoryName:
+        apiForm.formCategoryName || getFormCategoryName(apiForm.formCategoryId),
       title: apiForm.title || 'Chưa có tiêu đề',
-      reason: (apiForm.reason && apiForm.reason !== 'string') ? apiForm.reason : 'Chưa có lý do chi tiết',
-      originalFilename: apiForm.originalfilename || apiForm.fileName || apiForm.attachmentFile,
+      reason:
+        apiForm.reason && apiForm.reason !== 'string'
+          ? apiForm.reason
+          : 'Chưa có lý do chi tiết',
+      originalFilename:
+        apiForm.originalfilename || apiForm.fileName || apiForm.attachmentFile,
       storedPath: apiForm.storedpath || apiForm.filePath || apiForm.fileUrl,
       staffId: apiForm.staffid,
       staffName: apiForm.staffName || '',
@@ -800,18 +811,21 @@ export const nurseFormService = {
       statusClass: statusInfo.class,
       createdDate: (() => {
         if (!apiForm.createdDate) return 'Chưa có ngày';
-        const formattedDate = new Date(apiForm.createdDate).toLocaleDateString('vi-VN', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          timeZone: 'Asia/Ho_Chi_Minh'
-        });
+        const formattedDate = new Date(apiForm.createdDate).toLocaleDateString(
+          'vi-VN',
+          {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'Asia/Ho_Chi_Minh',
+          }
+        );
         console.log('🔍 Date formatting:', {
           original: apiForm.createdDate,
           formatted: formattedDate,
-          dateObject: new Date(apiForm.createdDate)
+          dateObject: new Date(apiForm.createdDate),
         });
         return formattedDate;
       })(),
@@ -822,13 +836,13 @@ export const nurseFormService = {
             day: '2-digit',
             hour: '2-digit',
             minute: '2-digit',
-            timeZone: 'Asia/Ho_Chi_Minh'
+            timeZone: 'Asia/Ho_Chi_Minh',
           })
         : null,
       createdBy: apiForm.createdBy || 'Hệ thống',
-      modifiedBy: apiForm.modifiedBy || 'Hệ thống'
+      modifiedBy: apiForm.modifiedBy || 'Hệ thống',
     };
-  }
+  },
 };
 
 export default {

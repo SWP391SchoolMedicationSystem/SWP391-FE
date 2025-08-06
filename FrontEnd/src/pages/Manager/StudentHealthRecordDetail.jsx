@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card,
   CardContent,
@@ -17,7 +17,7 @@ import {
   Alert,
   CircularProgress,
   Grid,
-} from "@mui/material";
+} from '@mui/material';
 import {
   ArrowBack,
   Person,
@@ -26,9 +26,9 @@ import {
   Assessment,
   CheckCircle,
   Schedule,
-} from "@mui/icons-material";
-import { managerHealthService } from "../../services/managerService";
-import "../../css/Manager/StudentHealthRecordDetail.css";
+} from '@mui/icons-material';
+import { managerHealthService } from '../../services/managerService';
+import '../../css/Manager/StudentHealthRecordDetail.css';
 
 const StudentHealthRecordDetail = () => {
   const { studentId } = useParams();
@@ -48,50 +48,50 @@ const StudentHealthRecordDetail = () => {
       const data = await managerHealthService.getFullHealthRecord(studentId);
       setHealthRecord(data);
     } catch (err) {
-      console.error("Error fetching health record:", err);
-      setError("Không thể tải thông tin hồ sơ sức khỏe");
+      console.error('Error fetching health record:', err);
+      setError('Không thể tải thông tin hồ sơ sức khỏe');
     } finally {
       setLoading(false);
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "Chưa có thông tin";
+  const formatDate = dateString => {
+    if (!dateString) return 'Chưa có thông tin';
     try {
-      return new Date(dateString).toLocaleDateString("vi-VN");
+      return new Date(dateString).toLocaleDateString('vi-VN');
     } catch {
       return dateString;
     }
   };
 
-  const formatDateTime = (dateString) => {
-    if (!dateString) return "Chưa có thông tin";
+  const formatDateTime = dateString => {
+    if (!dateString) return 'Chưa có thông tin';
     try {
-      return new Date(dateString).toLocaleString("vi-VN");
+      return new Date(dateString).toLocaleString('vi-VN');
     } catch {
       return dateString;
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     switch (status) {
       case true:
-        return "success";
+        return 'success';
       case false:
-        return "warning";
+        return 'warning';
       default:
-        return "default";
+        return 'default';
     }
   };
 
-  const getStatusText = (status) => {
+  const getStatusText = status => {
     switch (status) {
       case true:
-        return "Đã xác nhận";
+        return 'Đã xác nhận';
       case false:
-        return "Chưa xác nhận";
+        return 'Chưa xác nhận';
       default:
-        return "Không xác định";
+        return 'Không xác định';
     }
   };
 
@@ -132,45 +132,134 @@ const StudentHealthRecordDetail = () => {
       </div>
 
       {/* Row 2: Detailed Information */}
-      <div className="section-card">
+      <div
+        className="section-card"
+        style={{
+          fontFamily:
+            "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        }}
+      >
         <div className="section-header">
-          <h2>
+          <h2
+            style={{
+              fontFamily:
+                "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+            }}
+          >
             <span className="material-icons">person</span>
             Thông tin chi tiết
           </h2>
         </div>
         <div className="detail-grid">
           <div className="detail-item">
-            <div className="detail-label">Danh mục sức khỏe</div>
-            <div className="detail-value">{healthRecord.healthCategory}</div>
+            <div
+              className="detail-label"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
+              Danh mục sức khỏe
+            </div>
+            <div
+              className="detail-value"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
+              {healthRecord.healthCategory}
+            </div>
           </div>
           <div className="detail-item">
-            <div className="detail-label">Ngày ghi nhận</div>
-            <div className="detail-value">
+            <div
+              className="detail-label"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
+              Ngày ghi nhận
+            </div>
+            <div
+              className="detail-value"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
               {new Date(healthRecord.healthRecordDate).toLocaleDateString(
-                "vi-VN"
+                'vi-VN'
               )}
             </div>
           </div>
           <div className="detail-item">
-            <div className="detail-label">Nhân viên phụ trách</div>
-            <div className="detail-value">{healthRecord.staffName}</div>
+            <div
+              className="detail-label"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
+              Nhân viên phụ trách
+            </div>
+            <div
+              className="detail-value"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
+              {healthRecord.staffName}
+            </div>
           </div>
           <div className="detail-item">
-            <div className="detail-label">Trạng thái xác nhận</div>
-            <div className="detail-value">
+            <div
+              className="detail-label"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
+              Trạng thái xác nhận
+            </div>
+            <div
+              className="detail-value"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
               <span
                 className={`status-badge ${
-                  healthRecord.isConfirm ? "confirmed" : "pending"
+                  healthRecord.isConfirm ? 'confirmed' : 'pending'
                 }`}
+                style={{
+                  fontFamily:
+                    "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                }}
               >
-                {healthRecord.isConfirm ? "Đã xác nhận" : "Chờ xác nhận"}
+                {healthRecord.isConfirm ? 'Đã xác nhận' : 'Chờ xác nhận'}
               </span>
             </div>
           </div>
           <div className="detail-item description">
-            <div className="detail-label">Mô tả chi tiết</div>
-            <div className="detail-value">
+            <div
+              className="detail-label"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
+              Mô tả chi tiết
+            </div>
+            <div
+              className="detail-value"
+              style={{
+                fontFamily:
+                  "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+              }}
+            >
               {healthRecord.healthrecorddescription}
             </div>
           </div>
@@ -199,7 +288,7 @@ const StudentHealthRecordDetail = () => {
                     <div className="record-info-label">Ngày tiêm</div>
                     <div className="record-info-value">
                       {new Date(vaccination.vaccinationdate).toLocaleDateString(
-                        "vi-VN"
+                        'vi-VN'
                       )}
                     </div>
                   </div>
@@ -251,7 +340,7 @@ const StudentHealthRecordDetail = () => {
                     Khám sức khỏe #{check.checkid}
                   </h3>
                   <span className="record-info-value">
-                    {new Date(check.checkdate).toLocaleDateString("vi-VN")}
+                    {new Date(check.checkdate).toLocaleDateString('vi-VN')}
                   </span>
                 </div>
 
