@@ -11,6 +11,7 @@ const AccountManagement = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingStaff, setEditingStaff] = useState(null);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({});
 
   // Form data
   const [formData, setFormData] = useState({
@@ -55,6 +56,17 @@ const AccountManagement = () => {
     }
   };
 
+  // Validation functions
+  const validateEmail = email => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = phone => {
+    const phoneRegex = /^\d{10,11}$/;
+    return phoneRegex.test(phone);
+  };
+
   // Handle form input changes
   const handleInputChange = e => {
     const { name, value } = e.target;
@@ -62,6 +74,14 @@ const AccountManagement = () => {
       ...prev,
       [name]: name === 'roleID' ? parseInt(value) : value,
     }));
+
+    // Clear validation error when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [name]: null,
+      }));
+    }
   };
 
   // Handle create staff
@@ -73,29 +93,43 @@ const AccountManagement = () => {
       password: 'Password123@',
       roleID: 1,
     });
+    setValidationErrors({});
     setShowCreateModal(true);
   };
 
   // Handle form submit for create
   const handleSubmitCreate = async e => {
     e.preventDefault();
+
+    // Validation
+    const errors = {};
+
+    if (!formData.fullname.trim()) {
+      errors.fullname = 'Vui lòng nhập họ và tên';
+    }
+
+    if (!formData.email.trim()) {
+      errors.email = 'Vui lòng nhập email';
+    } else if (!validateEmail(formData.email)) {
+      errors.email =
+        'Email phải có định dạng hợp lệ (ví dụ: example@domain.com)';
+    }
+
+    if (!formData.phone.trim()) {
+      errors.phone = 'Vui lòng nhập số điện thoại';
+    } else if (!validatePhone(formData.phone)) {
+      errors.phone = 'Số điện thoại phải có 10-11 chữ số';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
+    setValidationErrors({});
     setSubmitLoading(true);
 
     try {
-      // Validate form
-      if (!formData.fullname.trim()) {
-        alert('Vui lòng nhập họ và tên');
-        return;
-      }
-      if (!formData.email.trim()) {
-        alert('Vui lòng nhập email');
-        return;
-      }
-      if (!formData.phone.trim()) {
-        alert('Vui lòng nhập số điện thoại');
-        return;
-      }
-
       // Create staff via API
       await adminStaffService.registerStaff(formData);
 
@@ -127,29 +161,43 @@ const AccountManagement = () => {
       phone: staffMember.phone || '',
       roleID: staffMember.roleid || 1,
     });
+    setValidationErrors({});
     setShowEditModal(true);
   };
 
   // Handle update staff
   const handleUpdateStaff = async e => {
     e.preventDefault();
+
+    // Validation
+    const errors = {};
+
+    if (!formData.fullname.trim()) {
+      errors.fullname = 'Vui lòng nhập họ và tên';
+    }
+
+    if (!formData.email.trim()) {
+      errors.email = 'Vui lòng nhập email';
+    } else if (!validateEmail(formData.email)) {
+      errors.email =
+        'Email phải có định dạng hợp lệ (ví dụ: example@domain.com)';
+    }
+
+    if (!formData.phone.trim()) {
+      errors.phone = 'Vui lòng nhập số điện thoại';
+    } else if (!validatePhone(formData.phone)) {
+      errors.phone = 'Số điện thoại phải có 10-11 chữ số';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
+    setValidationErrors({});
     setSubmitLoading(true);
 
     try {
-      // Validate form
-      if (!formData.fullname.trim()) {
-        alert('Vui lòng nhập họ và tên');
-        return;
-      }
-      if (!formData.email.trim()) {
-        alert('Vui lòng nhập email');
-        return;
-      }
-      if (!formData.phone.trim()) {
-        alert('Vui lòng nhập số điện thoại');
-        return;
-      }
-
       // Update staff via API
       await adminStaffService.updateStaff({
         staffid: editingStaff.staffid,
@@ -214,7 +262,6 @@ const AccountManagement = () => {
         <div className="section-header">
           <div>
             <h2>Tài Khoản Nhân Viên</h2>
-           
           </div>
           <div className="header-actions">
             <button onClick={fetchStaff} className="refresh-btn">
@@ -303,14 +350,20 @@ const AccountManagement = () => {
       {showCreateModal && (
         <div
           className="modal-overlay"
-          onClick={() => setShowCreateModal(false)}
+          onClick={() => {
+            setShowCreateModal(false);
+            setValidationErrors({});
+          }}
         >
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>➕ Tạo Tài Khoản Nhân Viên</h3>
               <button
                 className="modal-close"
-                onClick={() => setShowCreateModal(false)}
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setValidationErrors({});
+                }}
               >
                 ×
               </button>
@@ -326,7 +379,26 @@ const AccountManagement = () => {
                   onChange={handleInputChange}
                   placeholder="Nhập họ và tên"
                   required
+                  style={{
+                    border: validationErrors.fullname
+                      ? '2px solid #dc3545'
+                      : '1px solid #ced4da',
+                  }}
                 />
+                {validationErrors.fullname && (
+                  <div
+                    style={{
+                      color: '#dc3545',
+                      fontSize: '12px',
+                      marginTop: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    ⚠️ {validationErrors.fullname}
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
@@ -338,7 +410,26 @@ const AccountManagement = () => {
                   onChange={handleInputChange}
                   placeholder="Nhập địa chỉ email"
                   required
+                  style={{
+                    border: validationErrors.email
+                      ? '2px solid #dc3545'
+                      : '1px solid #ced4da',
+                  }}
                 />
+                {validationErrors.email && (
+                  <div
+                    style={{
+                      color: '#dc3545',
+                      fontSize: '12px',
+                      marginTop: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    ⚠️ {validationErrors.email}
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
@@ -350,7 +441,26 @@ const AccountManagement = () => {
                   onChange={handleInputChange}
                   placeholder="Nhập số điện thoại"
                   required
+                  style={{
+                    border: validationErrors.phone
+                      ? '2px solid #dc3545'
+                      : '1px solid #ced4da',
+                  }}
                 />
+                {validationErrors.phone && (
+                  <div
+                    style={{
+                      color: '#dc3545',
+                      fontSize: '12px',
+                      marginTop: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    ⚠️ {validationErrors.phone}
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
@@ -387,7 +497,10 @@ const AccountManagement = () => {
               <div className="modal-footer">
                 <Button
                   variant="outlined"
-                  onClick={() => setShowCreateModal(false)}
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setValidationErrors({});
+                  }}
                   className="mui-cancel-btn"
                   sx={{
                     flex: 1,
@@ -430,13 +543,22 @@ const AccountManagement = () => {
 
       {/* Edit Staff Modal */}
       {showEditModal && (
-        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
+        <div
+          className="modal-overlay"
+          onClick={() => {
+            setShowEditModal(false);
+            setValidationErrors({});
+          }}
+        >
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>✏️ Chỉnh Sửa Tài Khoản Nhân Viên</h3>
               <button
                 className="modal-close"
-                onClick={() => setShowEditModal(false)}
+                onClick={() => {
+                  setShowEditModal(false);
+                  setValidationErrors({});
+                }}
               >
                 ×
               </button>
@@ -452,7 +574,26 @@ const AccountManagement = () => {
                   onChange={handleInputChange}
                   placeholder="Nhập họ và tên"
                   required
+                  style={{
+                    border: validationErrors.fullname
+                      ? '2px solid #dc3545'
+                      : '1px solid #ced4da',
+                  }}
                 />
+                {validationErrors.fullname && (
+                  <div
+                    style={{
+                      color: '#dc3545',
+                      fontSize: '12px',
+                      marginTop: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    ⚠️ {validationErrors.fullname}
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
@@ -464,7 +605,26 @@ const AccountManagement = () => {
                   onChange={handleInputChange}
                   placeholder="Nhập địa chỉ email"
                   required
+                  style={{
+                    border: validationErrors.email
+                      ? '2px solid #dc3545'
+                      : '1px solid #ced4da',
+                  }}
                 />
+                {validationErrors.email && (
+                  <div
+                    style={{
+                      color: '#dc3545',
+                      fontSize: '12px',
+                      marginTop: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    ⚠️ {validationErrors.email}
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
@@ -476,7 +636,26 @@ const AccountManagement = () => {
                   onChange={handleInputChange}
                   placeholder="Nhập số điện thoại"
                   required
+                  style={{
+                    border: validationErrors.phone
+                      ? '2px solid #dc3545'
+                      : '1px solid #ced4da',
+                  }}
                 />
+                {validationErrors.phone && (
+                  <div
+                    style={{
+                      color: '#dc3545',
+                      fontSize: '12px',
+                      marginTop: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    ⚠️ {validationErrors.phone}
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
@@ -498,7 +677,10 @@ const AccountManagement = () => {
               <div className="modal-footer">
                 <Button
                   variant="outlined"
-                  onClick={() => setShowEditModal(false)}
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setValidationErrors({});
+                  }}
                   className="mui-cancel-btn"
                   sx={{
                     flex: 1,
