@@ -81,7 +81,9 @@ export const healthCheckEventService = {
         const dateValue = eventData.get('eventdate');
         if (dateValue) {
           try {
-            eventDate = new Date(dateValue + 'T00:00:00').toISOString();
+            eventDate = new Date(dateValue).toISOString();
+            console.log(new Date(dateValue + 'T00:00:00').toISOString());
+            console.log(dateValue);
           } catch (error) {
             console.error('Invalid date format:', dateValue);
             eventDate = new Date().toISOString();

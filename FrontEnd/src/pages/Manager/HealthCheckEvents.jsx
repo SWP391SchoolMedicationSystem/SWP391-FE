@@ -24,6 +24,9 @@ const HealthCheckEvents = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [eventStudentCounts, setEventStudentCounts] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedClass, setSelectedClass] = useState('all');
+  const [filteredEvents, setFilteredEvents] = useState([]);
   const [formData, setFormData] = useState({
     healthcheckeventname: '',
     healthcheckeventdescription: '',
@@ -39,6 +42,33 @@ const HealthCheckEvents = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Filter events based on search term and class
+  useEffect(() => {
+    if (!events || events.length === 0) {
+      setFilteredEvents([]);
+      return;
+    }
+
+    let filtered = events;
+
+    // Filter by search term (event name, description, location)
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(event => 
+        event.healthcheckeventname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.healthcheckeventdescription?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.location?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by class (if implemented)
+    if (selectedClass !== 'all') {
+      // This can be extended when class filtering is needed
+      // filtered = filtered.filter(event => event.class === selectedClass);
+    }
+
+    setFilteredEvents(filtered);
+  }, [events, searchTerm, selectedClass]);
 
   const fetchData = async () => {
     try {
@@ -159,6 +189,9 @@ const HealthCheckEvents = () => {
       });
 
       if (editingEvent) {
+        console.log(new Date(formData.eventdate + 'T00:00:00').toISOString());
+        console.log(formData.eventdate);
+
         // Send as JSON object instead of FormData for update
         const updateData = {
           healthcheckeventID: editingEvent.healthcheckeventID,
@@ -210,6 +243,7 @@ const HealthCheckEvents = () => {
   };
 
   const handleEdit = (event) => {
+    console.log(event.eventdate);
     setEditingEvent(event);
     setFormData({
       healthcheckeventname: event.healthcheckeventname || '',
@@ -339,6 +373,134 @@ const HealthCheckEvents = () => {
         </div>
       </div>
 
+      {/* Search and Filter Section */}
+      <div style={{
+        background: '#f8f9fa',
+        borderRadius: '16px',
+        padding: '24px',
+        marginBottom: '30px',
+        border: '1px solid #e9ecef'
+      }}>
+        <h3 style={{
+          fontSize: '1.2rem',
+          fontWeight: '600',
+          color: '#2f5148',
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <i className="fas fa-filter" style={{ color: '#73ad67' }}></i>
+          Bộ lọc tìm kiếm
+        </h3>
+        
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '20px',
+          alignItems: 'end'
+        }}>
+          {/* Search by Event Name */}
+          <div>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              color: '#2f5148',
+              fontWeight: '600',
+              fontSize: '0.95rem'
+            }}>
+              Tìm kiếm sự kiện:
+            </label>
+            <input
+              type="text"
+              placeholder="Nhập tên sự kiện, mô tả hoặc địa điểm..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '2px solid #e9ecef',
+                borderRadius: '10px',
+                fontSize: '0.95rem',
+                transition: 'border-color 0.3s ease',
+                boxSizing: 'border-box'
+              }}
+              onFocus={e => e.target.style.borderColor = '#73ad67'}
+              onBlur={e => e.target.style.borderColor = '#e9ecef'}
+            />
+          </div>
+
+          {/* Class Filter */}
+          <div>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              color: '#2f5148',
+              fontWeight: '600',
+              fontSize: '0.95rem'
+            }}>
+              Lớp học:
+            </label>
+            <select
+              value={selectedClass}
+              onChange={(e) => setSelectedClass(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '2px solid #e9ecef',
+                borderRadius: '10px',
+                fontSize: '0.95rem',
+                transition: 'border-color 0.3s ease',
+                boxSizing: 'border-box',
+                backgroundColor: 'white',
+                cursor: 'pointer'
+              }}
+              onFocus={e => e.target.style.borderColor = '#73ad67'}
+              onBlur={e => e.target.style.borderColor = '#e9ecef'}
+            >
+              <option value="all">Tất cả lớp</option>
+              <option value="1">Lớp 1</option>
+              <option value="2">Lớp 2</option>
+              <option value="3">Lớp 3</option>
+              <option value="4">Lớp 4</option>
+              <option value="5">Lớp 5</option>
+            </select>
+          </div>
+
+          {/* Clear Filters Button */}
+          <div style={{ display: 'flex', alignItems: 'end' }}>
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedClass('all');
+              }}
+              style={{
+                background: '#6c757d',
+                color: 'white',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                fontSize: '0.95rem',
+                fontWeight: '600',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#5a6268';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#6c757d';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              <i className="fas fa-times" style={{ marginRight: '8px' }}></i>
+              Xóa bộ lọc
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Create New Event Button */}
       <div style={{ 
         marginBottom: '30px',
@@ -388,11 +550,16 @@ const HealthCheckEvents = () => {
         boxShadow: '0 2px 10px rgba(115, 173, 103, 0.1)'
       }}>
         <div style={{ fontSize: '24px' }}>📋</div>
-        <div>
-          <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '600', color: '#2f5148' }}>
-            {events.length} Tổng sự kiện
-          </h3>
-        </div>
+                 <div>
+           <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '600', color: '#2f5148' }}>
+             {filteredEvents.length} Sự kiện {searchTerm || selectedClass !== 'all' ? 'đã lọc' : 'tổng cộng'}
+           </h3>
+           {searchTerm || selectedClass !== 'all' ? (
+             <p style={{ margin: '4px 0 0 0', fontSize: '0.9rem', color: '#6c757d' }}>
+               Từ {events.length} sự kiện tổng cộng
+             </p>
+           ) : null}
+         </div>
       </div>
 
       {/* Event List Section */}
@@ -417,7 +584,7 @@ const HealthCheckEvents = () => {
           gap: '20px',
           maxWidth: '100%'
         }}>
-          {events.map((event) => (
+          {filteredEvents.map((event) => (
             <div
               key={event.healthcheckeventID}
               style={{
@@ -705,17 +872,50 @@ const HealthCheckEvents = () => {
           ))}
         </div>
 
-        {events.length === 0 && (
-          <div style={{
-            textAlign: 'center',
-            padding: '60px 20px',
-            color: '#6c757d',
-            fontSize: '1.1rem'
-          }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>📋</div>
-            <p>Không có sự kiện khám sức khỏe nào</p>
-          </div>
-        )}
+                 {filteredEvents.length === 0 && (
+           <div style={{
+             textAlign: 'center',
+             padding: '60px 20px',
+             color: '#6c757d',
+             fontSize: '1.1rem'
+           }}>
+             <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
+             <p>
+               {searchTerm || selectedClass !== 'all' 
+                 ? 'Không tìm thấy sự kiện nào phù hợp với bộ lọc' 
+                 : 'Không có sự kiện khám sức khỏe nào'
+               }
+             </p>
+             {searchTerm || selectedClass !== 'all' ? (
+               <button
+                 onClick={() => {
+                   setSearchTerm('');
+                   setSelectedClass('all');
+                 }}
+                 style={{
+                   background: 'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                   color: 'white',
+                   border: 'none',
+                   padding: '8px 16px',
+                   borderRadius: '8px',
+                   cursor: 'pointer',
+                   fontSize: '0.9rem',
+                   fontWeight: '500',
+                   marginTop: '12px',
+                   transition: 'all 0.2s ease'
+                 }}
+                 onMouseEnter={e => {
+                   e.currentTarget.style.transform = 'translateY(-2px)';
+                 }}
+                 onMouseLeave={e => {
+                   e.currentTarget.style.transform = 'translateY(0)';
+                 }}
+               >
+                 Xóa bộ lọc
+               </button>
+             ) : null}
+           </div>
+         )}
       </div>
 
       {/* Create/Edit Modal */}
@@ -887,7 +1087,7 @@ const HealthCheckEvents = () => {
               </div>
 
               {/* Examination Date Section - Hidden */}
-              {/* <div style={{ marginBottom: '20px' }}>
+              { <div style={{ marginBottom: '20px' }}>
                 <label style={{
                   display: 'block',
                   marginBottom: '8px',
@@ -915,7 +1115,7 @@ const HealthCheckEvents = () => {
                   onFocus={e => e.target.style.borderColor = '#73ad67'}
                   onBlur={e => e.target.style.borderColor = '#e9ecef'}
                 />
-              </div> */}
+              </div> }
 
               {/* File Upload Section - Hidden */}
               {/* <div style={{ marginBottom: '20px' }}>
