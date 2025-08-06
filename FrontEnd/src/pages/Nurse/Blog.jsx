@@ -42,7 +42,7 @@ function Blog() {
     'An toàn',
     'Phát triển',
   ];
-  const statuses = ['Draft', 'Published', 'Pending', 'Rejected'];
+  const statuses = ['Draft', 'Published', 'Rejected'];
 
   // Filter blogs
   const filteredBlogs = (blogs || []).filter(blog => {
@@ -231,7 +231,7 @@ function Blog() {
       case 'Rejected':
         return 'Bị từ chối';
       case 'Pending':
-        return 'Chờ duyệt';
+        return 'Chờ xử lý';
       default:
         return status;
     }
@@ -629,7 +629,7 @@ function Blog() {
               <option value="">Tất cả trạng thái</option>
               {statuses.map(status => (
                 <option key={status} value={status}>
-                  {status}
+                  {getStatusText(status)}
                 </option>
               ))}
             </select>
@@ -1045,7 +1045,7 @@ function Blog() {
                       >
                         <span style={{ fontSize: '2rem' }}>📷</span>
                         <p>Click để chọn ảnh</p>
-                        <small>Hỗ trợ: JPG, PNG, GIF (tối đa 5MB)</small>
+                        <small>Hỗ trợ: JPG, PNG, JPEG (tối đa 2MB)</small>
                       </div>
                     ) : (
                       <div className="image-preview-container">
