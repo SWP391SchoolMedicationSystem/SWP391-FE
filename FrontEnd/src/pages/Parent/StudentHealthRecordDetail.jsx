@@ -214,131 +214,444 @@ const StudentHealthRecordDetail = () => {
           </button>
         </div>
 
-        {/* Create Health Record Modal - New Design */}
+        {/* Create Health Record Modal - Improved Design */}
         {showCreateModal && (
           <div
-            className="health-modal-backdrop"
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.6)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 1000,
+              padding: '20px',
+              backdropFilter: 'blur(4px)',
+              animation: 'fadeIn 0.3s ease',
+            }}
             onClick={() => setShowCreateModal(false)}
           >
             <div
-              className="health-modal-container"
+              style={{
+                background: 'white',
+                borderRadius: '20px',
+                maxWidth: '600px',
+                width: '100%',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+                animation: 'slideIn 0.3s ease',
+                position: 'relative',
+              }}
               onClick={e => e.stopPropagation()}
             >
-              <div className="health-modal-header">
-                <h3 className="health-modal-title">
+              {/* Modal Header */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '24px 30px',
+                  borderBottom: '1px solid #e0e0e0',
+                  background:
+                    'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                  color: 'white',
+                  borderRadius: '20px 20px 0 0',
+                  position: 'relative',
+                }}
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '4px',
+                    background:
+                      'linear-gradient(135deg, #73ad67 0%, #2f5148 100%)',
+                    borderRadius: '20px 20px 0 0',
+                  }}
+                />
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: '1.4rem',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    zIndex: 1,
+                  }}
+                >
                   📝 Tạo Hồ Sơ Sức Khỏe Mới
                 </h3>
                 <button
                   onClick={() => setShowCreateModal(false)}
-                  className="health-modal-close"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'white',
+                    fontSize: '24px',
+                    cursor: 'pointer',
+                    padding: '8px',
+                    borderRadius: '50%',
+                    width: '36px',
+                    height: '36px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.3s ease',
+                    zIndex: 1,
+                  }}
+                  onMouseEnter={e => {
+                    e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+                    e.target.style.transform = 'scale(1.1)';
+                  }}
+                  onMouseLeave={e => {
+                    e.target.style.background = 'none';
+                    e.target.style.transform = 'scale(1)';
+                  }}
                 >
                   ✕
                 </button>
               </div>
-              <form
-                onSubmit={handleCreateHealthRecord}
-                className="health-modal-form"
-              >
-                <div className="health-form-group">
-                  <label
-                    htmlFor="healthCategoryID"
-                    className="health-form-label"
+
+              {/* Modal Body */}
+              <div style={{ padding: '30px' }}>
+                <form
+                  onSubmit={handleCreateHealthRecord}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '24px',
+                  }}
+                >
+                  {/* Health Category */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                    }}
                   >
-                    Bệnh đặc biệt *
-                  </label>
-                  <select
-                    id="healthCategoryID"
-                    name="healthCategoryID"
-                    value={formData.healthCategoryID}
-                    onChange={handleFormChange}
-                    required
-                    className="health-form-select"
+                    <label
+                      htmlFor="healthCategoryID"
+                      style={{
+                        fontWeight: '600',
+                        color: '#2f5148',
+                        fontSize: '14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                      }}
+                    >
+                      🏥 Bệnh đặc biệt *
+                    </label>
+                    <select
+                      id="healthCategoryID"
+                      name="healthCategoryID"
+                      value={formData.healthCategoryID}
+                      onChange={handleFormChange}
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '14px 16px',
+                        border: '2px solid #e0e0e0',
+                        borderRadius: '12px',
+                        fontSize: '14px',
+                        transition: 'all 0.3s ease',
+                        fontFamily: 'inherit',
+                        background: 'white',
+                      }}
+                      onFocus={e => {
+                        e.target.style.borderColor = '#73ad67';
+                        e.target.style.boxShadow =
+                          '0 0 0 3px rgba(115, 173, 103, 0.1)';
+                      }}
+                      onBlur={e => {
+                        e.target.style.borderColor = '#e0e0e0';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    >
+                      <option value={1}>Dị ứng</option>
+                      <option value={2}>Bệnh mãn tính</option>
+                      <option value={3}>Thị lực</option>
+                      <option value={4}>Tiền sử bệnh án</option>
+                    </select>
+                  </div>
+
+                  {/* Health Record Title */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                    }}
                   >
-                    <option value={1}>Dị ứng</option>
-                    <option value={2}>Bệnh mãn tính</option>
-                    <option value={3}>Thị lực</option>
-                    <option value={4}>Tiền sử bệnh án</option>
-                  </select>
-                </div>
-                <div className="health-form-group">
-                  <label
-                    htmlFor="healthrecordtitle"
-                    className="health-form-label"
+                    <label
+                      htmlFor="healthrecordtitle"
+                      style={{
+                        fontWeight: '600',
+                        color: '#2f5148',
+                        fontSize: '14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                      }}
+                    >
+                      📋 Tiêu đề hồ sơ *
+                    </label>
+                    <input
+                      type="text"
+                      id="healthrecordtitle"
+                      name="healthrecordtitle"
+                      value={formData.healthrecordtitle}
+                      onChange={handleFormChange}
+                      placeholder="Nhập tiêu đề hồ sơ"
+                      required
+                      maxLength={100}
+                      style={{
+                        width: '100%',
+                        padding: '14px 16px',
+                        border: '2px solid #e0e0e0',
+                        borderRadius: '12px',
+                        fontSize: '14px',
+                        transition: 'all 0.3s ease',
+                        fontFamily: 'inherit',
+                      }}
+                      onFocus={e => {
+                        e.target.style.borderColor = '#73ad67';
+                        e.target.style.boxShadow =
+                          '0 0 0 3px rgba(115, 173, 103, 0.1)';
+                      }}
+                      onBlur={e => {
+                        e.target.style.borderColor = '#e0e0e0';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    />
+                  </div>
+
+                  {/* Health Record Date */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                    }}
                   >
-                    Tiêu đề hồ sơ *
-                  </label>
-                  <input
-                    type="text"
-                    id="healthrecordtitle"
-                    name="healthrecordtitle"
-                    value={formData.healthrecordtitle}
-                    onChange={handleFormChange}
-                    placeholder="Nhập tiêu đề hồ sơ"
-                    required
-                    maxLength={100}
-                    className="health-form-input"
-                  />
-                </div>
-                <div className="health-form-group">
-                  <label
-                    htmlFor="healthRecordDate"
-                    className="health-form-label"
+                    <label
+                      htmlFor="healthRecordDate"
+                      style={{
+                        fontWeight: '600',
+                        color: '#2f5148',
+                        fontSize: '14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                      }}
+                    >
+                      📅 Ngày ghi nhận *
+                    </label>
+                    <input
+                      type="datetime-local"
+                      id="healthRecordDate"
+                      name="healthRecordDate"
+                      value={formData.healthRecordDate.slice(0, 16)}
+                      onChange={handleFormChange}
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '14px 16px',
+                        border: '2px solid #e0e0e0',
+                        borderRadius: '12px',
+                        fontSize: '14px',
+                        transition: 'all 0.3s ease',
+                        fontFamily: 'inherit',
+                      }}
+                      onFocus={e => {
+                        e.target.style.borderColor = '#73ad67';
+                        e.target.style.boxShadow =
+                          '0 0 0 3px rgba(115, 173, 103, 0.1)';
+                      }}
+                      onBlur={e => {
+                        e.target.style.borderColor = '#e0e0e0';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    />
+                  </div>
+
+                  {/* Health Record Description */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                    }}
                   >
-                    Ngày ghi nhận *
-                  </label>
-                  <input
-                    type="datetime-local"
-                    id="healthRecordDate"
-                    name="healthRecordDate"
-                    value={formData.healthRecordDate.slice(0, 16)}
-                    onChange={handleFormChange}
-                    required
-                    className="health-form-input"
-                  />
-                </div>
-                <div className="health-form-group">
-                  <label
-                    htmlFor="healthrecorddescription"
-                    className="health-form-label"
+                    <label
+                      htmlFor="healthrecorddescription"
+                      style={{
+                        fontWeight: '600',
+                        color: '#2f5148',
+                        fontSize: '14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                      }}
+                    >
+                      📝 Mô tả chi tiết
+                    </label>
+                    <textarea
+                      id="healthrecorddescription"
+                      name="healthrecorddescription"
+                      value={formData.healthrecorddescription}
+                      onChange={handleFormChange}
+                      placeholder="Nhập mô tả chi tiết về tình trạng sức khỏe..."
+                      rows="4"
+                      maxLength={500}
+                      style={{
+                        width: '100%',
+                        padding: '14px 16px',
+                        border: '2px solid #e0e0e0',
+                        borderRadius: '12px',
+                        fontSize: '14px',
+                        transition: 'all 0.3s ease',
+                        fontFamily: 'inherit',
+                        minHeight: '120px',
+                        resize: 'vertical',
+                      }}
+                      onFocus={e => {
+                        e.target.style.borderColor = '#73ad67';
+                        e.target.style.boxShadow =
+                          '0 0 0 3px rgba(115, 173, 103, 0.1)';
+                      }}
+                      onBlur={e => {
+                        e.target.style.borderColor = '#e0e0e0';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    />
+                    <small
+                      style={{
+                        textAlign: 'right',
+                        fontSize: '12px',
+                        color: '#97a19b',
+                        marginTop: '4px',
+                      }}
+                    >
+                      {formData.healthrecorddescription.length}/500 ký tự
+                    </small>
+                  </div>
+
+                  {/* Modal Actions */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '16px',
+                      justifyContent: 'flex-end',
+                      marginTop: '20px',
+                      paddingTop: '24px',
+                      borderTop: '1px solid #e0e0e0',
+                    }}
                   >
-                    Mô tả chi tiết
-                  </label>
-                  <textarea
-                    id="healthrecorddescription"
-                    name="healthrecorddescription"
-                    value={formData.healthrecorddescription}
-                    onChange={handleFormChange}
-                    placeholder="Nhập mô tả chi tiết"
-                    rows="4"
-                    maxLength={500}
-                    className="health-form-textarea"
-                  />
-                  <small className="health-char-count">
-                    {formData.healthrecorddescription.length}/500 ký tự
-                  </small>
-                </div>
-                <div className="health-modal-actions">
-                  <button
-                    type="button"
-                    onClick={() => setShowCreateModal(false)}
-                    className="health-cancel-btn"
-                    disabled={submitLoading}
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="submit"
-                    className="health-submit-btn"
-                    disabled={
-                      submitLoading ||
-                      !formData.healthrecordtitle ||
-                      !formData.healthrecorddescription
-                    }
-                  >
-                    {submitLoading ? '⏳ Đang tạo...' : '📤 Tạo Hồ Sơ'}
-                  </button>
-                </div>
-              </form>
+                    <button
+                      type="button"
+                      onClick={() => setShowCreateModal(false)}
+                      disabled={submitLoading}
+                      style={{
+                        padding: '12px 24px',
+                        border: '2px solid #e0e0e0',
+                        borderRadius: '12px',
+                        background: 'white',
+                        color: '#2f5148',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        minWidth: '100px',
+                      }}
+                      onMouseEnter={e => {
+                        if (!submitLoading) {
+                          e.target.style.borderColor = '#73ad67';
+                          e.target.style.color = '#73ad67';
+                          e.target.style.transform = 'translateY(-1px)';
+                        }
+                      }}
+                      onMouseLeave={e => {
+                        if (!submitLoading) {
+                          e.target.style.borderColor = '#e0e0e0';
+                          e.target.style.color = '#2f5148';
+                          e.target.style.transform = 'translateY(0)';
+                        }
+                      }}
+                    >
+                      Hủy
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={
+                        submitLoading ||
+                        !formData.healthrecordtitle ||
+                        !formData.healthrecorddescription
+                      }
+                      style={{
+                        padding: '12px 24px',
+                        border: 'none',
+                        borderRadius: '12px',
+                        background:
+                          'linear-gradient(135deg, #2f5148 0%, #73ad67 100%)',
+                        color: 'white',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        minWidth: '120px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                      }}
+                      onMouseEnter={e => {
+                        if (
+                          !submitLoading &&
+                          formData.healthrecordtitle &&
+                          formData.healthrecorddescription
+                        ) {
+                          e.target.style.transform = 'translateY(-2px)';
+                          e.target.style.boxShadow =
+                            '0 6px 20px rgba(115, 173, 103, 0.4)';
+                        }
+                      }}
+                      onMouseLeave={e => {
+                        if (!submitLoading) {
+                          e.target.style.transform = 'translateY(0)';
+                          e.target.style.boxShadow = 'none';
+                        }
+                      }}
+                    >
+                      {submitLoading ? (
+                        <>
+                          <div
+                            style={{
+                              width: '16px',
+                              height: '16px',
+                              border: '2px solid rgba(255, 255, 255, 0.3)',
+                              borderTop: '2px solid white',
+                              borderRadius: '50%',
+                              animation: 'spin 1s linear infinite',
+                            }}
+                          />
+                          Đang tạo...
+                        </>
+                      ) : (
+                        <>📤 Tạo Hồ Sơ</>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         )}
