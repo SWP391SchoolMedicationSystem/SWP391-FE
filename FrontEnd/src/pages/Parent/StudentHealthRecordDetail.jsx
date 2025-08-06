@@ -4,6 +4,12 @@ import { IconButton } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import { parentService } from '../../services/parentService';
 import '../../css/Manager/StudentHealthRecordDetail.css';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const StudentHealthRecordDetail = () => {
   const { studentId } = useParams();
@@ -16,7 +22,7 @@ const StudentHealthRecordDetail = () => {
   const [formData, setFormData] = useState({
     studentID: parseInt(studentId),
     healthCategoryID: 1,
-    healthRecordDate: new Date().toISOString(),
+    healthRecordDate: dayjs().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DDTHH:mm'),
     healthrecordtitle: '',
     healthrecorddescription: '',
     staffid: 3,
