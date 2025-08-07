@@ -70,11 +70,6 @@ const PersonalMedicine = () => {
   // Re-group medicines when all data is available
   useEffect(() => {
     if (students.length > 0 && parents.length > 0 && medicines.length > 0 && personalMedicines.length > 0) {
-      console.log('🔄 Re-grouping medicines with all data available');
-      console.log('📊 Available medicines:', medicines.length);
-      console.log('📊 Available students:', students.length);
-      console.log('📊 Available parents:', parents.length);
-      console.log('📊 Personal medicines to group:', personalMedicines.length);
       groupMedicinesByParent(personalMedicines);
     }
   }, [students, parents, medicines, personalMedicines]);
@@ -111,7 +106,6 @@ const PersonalMedicine = () => {
         index === self.findIndex((s) => String(s.id) === String(student.id))
       );
       
-      console.log('✅ Students loaded:', uniqueStudents);
       setStudents(uniqueStudents);
       
     } catch (error) {
@@ -132,12 +126,6 @@ const PersonalMedicine = () => {
         index === self.findIndex((m) => String(m.medicineid) === String(medicine.medicineid))
       );
       
-      console.log('✅ Medicines loaded:', uniqueMedicines.length, 'medicines');
-      console.log('🔍 Sample medicines:', uniqueMedicines.slice(0, 3).map(m => ({
-        id: m.medicineid,
-        name: m.medicinename,
-        type: m.type
-      })));
       setMedicines(uniqueMedicines);
     } catch (error) {
       console.error('Error loading medicines:', error);
@@ -147,11 +135,7 @@ const PersonalMedicine = () => {
 
     const loadParents = async () => {
     try {
-      console.log('🔍 Loading parents from students data...');
-      console.log('📚 Available students:', students.length);
-      
       if (students.length === 0) {
-        console.warn('No students data available to extract parents');
         setParents([]);
         return;
       }
@@ -162,8 +146,6 @@ const PersonalMedicine = () => {
       students.forEach(student => {
         const parentId = student.parentId || student._raw_student?.parentId;
         const parentName = student.parentName || student._raw_student?.parentName;
-        
-        console.log(`Student: ${student.name}, ParentID: ${parentId}, ParentName: ${parentName}`);
         
         if (parentId && parentName && parentName !== 'Chưa có thông tin') {
           const key = String(parentId);
@@ -185,12 +167,6 @@ const PersonalMedicine = () => {
       });
       
       const parentsArray = Array.from(parentMap.values());
-      console.log('✅ Extracted parents:', parentsArray.length, 'parents');
-      console.log('📋 Parents data for mapping:', parentsArray.map(p => ({
-        id: p.id,
-        name: p.name,
-        studentCount: p.studentCount
-      })));
       
       setParents(parentsArray);
       
@@ -207,8 +183,6 @@ const PersonalMedicine = () => {
 
   const loadPersonalMedicines = async () => {
     try {
-      console.log('🔍 Loading personal medicines...');
-      
       const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicines', {
         method: 'GET',
         headers: {
@@ -222,39 +196,16 @@ const PersonalMedicine = () => {
       }
 
       const data = await response.json();
-      console.log('📥 Personal medicines response:', data);
       
       const medicinesArray = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
-      console.log('🔍 Total personal medicines from API:', medicinesArray.length);
       
       // Filter out soft-deleted records
       const activeMedicines = medicinesArray.filter(medicine => {
         const isDeleted = medicine.isDeleted === true || medicine.isdeleted === true || medicine.status === false;
-        if (isDeleted) {
-          console.log('🗑️ Filtering out soft-deleted medicine:', medicine.id || medicine.personalmedicineid, medicine.medicinename);
-        }
         return !isDeleted;
       });
       
-      console.log('✅ Active personal medicines after filtering:', activeMedicines.length);
-      console.log('🔍 Personal medicines structure:', activeMedicines.slice(0, 2).map(m => ({
-        id: m.personalmedicineid,
-        medicineId: m.medicineid,
-        parentId: m.parentid,
-        studentId: m.studentid,
-        isDeleted: m.isDeleted,
-        status: m.status
-      })));
-      
-      // Also log the raw structure to see all fields
-      if (activeMedicines.length > 0) {
-        console.log('🔍 Raw active personal medicine sample:', activeMedicines[0]);
-      }
-      
       setPersonalMedicines(activeMedicines);
-      
-      // Don't group here - let useEffect handle it when all data is ready
-      console.log('✅ Active personal medicines loaded, will group when parents/students are ready');
       
     } catch (error) {
       console.error('Error loading personal medicines:', error);
@@ -285,8 +236,6 @@ const PersonalMedicine = () => {
         }
       }
       
-      console.log(`🔍 Medicine parentId: ${parentId}, found parentName: ${parentName}`);
-      
       if (!parentGroups[parentId]) {
         parentGroups[parentId] = {
           parentId: parentId,
@@ -307,11 +256,6 @@ const PersonalMedicine = () => {
         String(s.id) === String(studentId)
       );
       
-      console.log(`🔍 Looking for medicine ID: ${medicineId}`);
-      console.log(`🔍 Available medicine IDs:`, medicines.slice(0, 5).map(m => m.medicineid || m.id));
-      console.log(`🔍 Found medicine detail:`, medicineDetail);
-      console.log(`🔍 Looking for student ID: ${studentId}, found:`, studentDetail);
-      
       // Let's try different approaches to get the medicine name
       let medicineName = 'Thuốc không xác định';
       
@@ -321,8 +265,6 @@ const PersonalMedicine = () => {
         // If not found in medicines list, check if medicine info is directly in personal medicine record
         medicineName = medicine.medicineName || `Thuốc ID: ${medicineId}`;
       }
-      
-            console.log(`✅ Final medicine name: ${medicineName}`);
       
       // Safe date formatting for display
       const formatDisplayDate = (dateValue) => {
@@ -350,7 +292,6 @@ const PersonalMedicine = () => {
     });
     
     const groupsArray = Object.values(parentGroups);
-    console.log('📊 Grouped medicines by parent:', groupsArray);
     setParentMedicineGroups(groupsArray);
   };
 
@@ -409,15 +350,8 @@ const PersonalMedicine = () => {
   const handleEditMedicine = (medicine, parentId) => {
     // Prevent opening edit form if already editing or submitting
     if (showEditForm || submitting) {
-      console.log('🔒 Edit form already open or operation in progress');
       return;
     }
-
-    console.log('🔧 Editing medicine:', medicine);
-    console.log('🔧 Raw date values from API:', {
-      receiveddate: medicine.receiveddate,
-      expiryDate: medicine.expiryDate
-    });
     
     const parentInfo = parents.find(p => String(p.id) === String(parentId));
     const studentInfo = students.find(s => String(s.id) === String(medicine.studentid));
@@ -458,7 +392,6 @@ const PersonalMedicine = () => {
       originalExpiryDate: medicine.expiryDate
     };
     
-    console.log('🔧 Edit data prepared:', editData);
     setEditingMedicine(editData);
     setShowEditForm(true);
   };
@@ -466,7 +399,6 @@ const PersonalMedicine = () => {
   const handleUpdateMedicine = async (updatedData) => {
     // Prevent multiple simultaneous updates
     if (submitting) {
-      console.log('🔒 Update already in progress, ignoring duplicate request');
       return;
     }
 
@@ -476,16 +408,11 @@ const PersonalMedicine = () => {
       // Get the correct ID for the personal medicine record
       const personalMedicineId = editingMedicine.personalmedicineid;
       
-      console.log('🔧 Updating medicine with ID:', personalMedicineId);
-      console.log('🔧 Update data:', updatedData);
-      
       if (!personalMedicineId) {
         throw new Error('Không tìm thấy ID của thuốc để cập nhật');
       }
 
       // Use PUT method to update the medicine
-      console.log('🔧 Using PUT method to update medicine...');
-      
       const updateData = {
         personalMedicineId: personalMedicineId,
         medicineid: parseInt(editingMedicine.medicineid),
@@ -500,8 +427,6 @@ const PersonalMedicine = () => {
         isDeleted: false
       };
 
-      console.log('🔧 PUT request data:', updateData);
-
       const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine', {
         method: 'PUT',
         headers: {
@@ -512,21 +437,9 @@ const PersonalMedicine = () => {
         body: JSON.stringify(updateData)
       });
 
-      console.log('🔧 PUT response status:', response.status);
-
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ PUT request failed:', errorText);
         throw new Error(`Không thể cập nhật thuốc: ${response.status} - ${errorText}`);
-      }
-
-      // Try to get response data
-      let responseData = null;
-      try {
-        responseData = await response.json();
-        console.log('✅ PUT successful, response:', responseData);
-      } catch (e) {
-        console.log('✅ PUT successful, no JSON response');
       }
 
       // Close modal and reset state before reloading
@@ -535,7 +448,6 @@ const PersonalMedicine = () => {
       setMessage({ type: 'success', text: '✅ Đã cập nhật thuốc thành công!' });
       
       // Reload data to reflect changes
-      console.log('🔄 Reloading personal medicines...');
       await loadPersonalMedicines();
 
     } catch (error) {
@@ -562,9 +474,6 @@ const PersonalMedicine = () => {
     try {
       const personalMedicineId = medicineToDelete.personalmedicineid;
       
-      console.log('🗑️ Deleting medicine with ID:', personalMedicineId);
-      console.log('🗑️ Medicine to delete:', medicineToDelete);
-      
       if (!personalMedicineId) {
         throw new Error('Không tìm thấy ID của thuốc để xóa');
       }
@@ -576,24 +485,12 @@ const PersonalMedicine = () => {
           'Authorization': `Bearer ${localStorage.getItem('authToken') || localStorage.getItem('token') || ''}`
         }
       });
-
-      console.log('🗑️ Delete response status:', response.status);
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('🗑️ Delete failed:', errorText);
         throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
 
-      // Try to get response data to see what API returns
-      try {
-        const responseData = await response.text();
-        console.log('🗑️ Delete response data:', responseData);
-      } catch (e) {
-        console.log('🗑️ Delete response had no readable content');
-      }
-
-      console.log('✅ Delete successful, reloading medicines...');
       setMessage({ type: 'success', text: '✅ Đã xóa thuốc thành công!' });
       setShowDeleteConfirm(false);
       setMedicineToDelete(null);
@@ -653,28 +550,18 @@ const PersonalMedicine = () => {
       const parentStudents = students.filter(student => 
         String(student.parentId) === String(value)
       );
-      console.log(`🎯 Parent ${value} selected. Found students:`, parentStudents);
-      console.log('🎯 All students for reference:', students.map(s => ({
-        id: s.id, 
-        name: s.name, 
-        parentId: s.parentId,
-        _raw_parentId: s._raw_parentId
-      })));
       
       if (parentStudents.length === 1) {
-        console.log(`🎯 Auto-selecting single student: ${parentStudents[0].name}`);
         setAddFormData(prev => ({
           ...prev,
           studentId: String(parentStudents[0].id)
         }));
       } else if (parentStudents.length === 0) {
-        console.log(`🎯 No students found for parent ${value}`);
         setAddFormData(prev => ({
           ...prev,
           studentId: ''
         }));
       } else {
-        console.log(`🎯 Multiple students found (${parentStudents.length}), clearing selection`);
         setAddFormData(prev => ({
           ...prev,
           studentId: ''
@@ -686,7 +573,6 @@ const PersonalMedicine = () => {
   // Get students for selected parent
   const getStudentsForParent = (parentId) => {
     if (!parentId) {
-      console.log('📚 No parent selected, showing all students:', students.length);
       return students;
     }
     
@@ -695,14 +581,9 @@ const PersonalMedicine = () => {
       const targetParentId = String(parentId);
       const match = studentParentId === targetParentId;
       
-      if (match) {
-        console.log(`✅ Student ${student.name} matches parent ${parentId}`);
-      }
-      
       return match;
     });
     
-    console.log(`📚 Parent ${parentId} has ${filteredStudents.length} students:`, filteredStudents);
     return filteredStudents;
   };
 
@@ -722,8 +603,6 @@ const PersonalMedicine = () => {
         status: true, // Medicine has been received
         note: addFormData.note || ''
       };
-
-      console.log('📤 Sending new PersonalMedicine data:', requestData);
 
       const response = await fetch('https://api-schoolhealth.purintech.id.vn/api/PersonalMedicine/Personalmedicine', {
         method: 'POST',
