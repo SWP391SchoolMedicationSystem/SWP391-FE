@@ -337,7 +337,7 @@ const StudentManagement = () => {
     ) {
       try {
         const response = await fetch(
-          `https://api-schoolhealth.purintech.id.vn/api/Student/delete/${student.studentId}`,
+          `https://api-schoolhealth.purintech.id.vn/api/Student/DeleteStudent/${student.studentId}`,
           {
             method: 'DELETE',
           }
