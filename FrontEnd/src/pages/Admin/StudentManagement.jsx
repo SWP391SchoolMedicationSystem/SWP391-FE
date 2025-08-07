@@ -90,7 +90,18 @@ const StudentManagement = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        setStudents(data);
+        
+        // Handle different possible API response structures
+        let studentsData = data;
+        if (data.data && Array.isArray(data.data)) {
+          studentsData = data.data;
+        } else if (data.result && Array.isArray(data.result)) {
+          studentsData = data.result;
+        } else if (data.items && Array.isArray(data.items)) {
+          studentsData = data.items;
+        }
+        
+        setStudents(studentsData);
       } else {
         console.error('Failed to fetch students');
         setStudents([]);
@@ -208,11 +219,8 @@ const StudentManagement = () => {
         }
       );
 
-      console.log('📊 Import response status:', response.status);
-
       if (response.ok) {
         const result = await response.json();
-        console.log('📊 Import result:', result);
 
         const successMessage =
           result.length > 0
@@ -230,7 +238,6 @@ const StudentManagement = () => {
 
         try {
           const errorData = await response.json();
-          console.log('📊 Import error data:', errorData);
 
           if (errorData.message) {
             errorMessage = `❌ ${errorData.message}`;
@@ -309,7 +316,7 @@ const StudentManagement = () => {
         updatedAt: new Date().toISOString().split('T')[0],
       };
 
-      console.log('📤 Update student request:', requestData);
+
       
       // Validate required fields
       if (!requestData.fullname || !requestData.age || !requestData.bloodType || !requestData.classid) {
@@ -331,7 +338,6 @@ const StudentManagement = () => {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('📊 Update student response:', result);
         setEditSuccess('Cập nhật học sinh thành công!');
         setShowEditModal(false);
         // Refresh student list
@@ -387,8 +393,20 @@ const StudentManagement = () => {
     }
   };
 
-  // Filter students based on search term and class filter
+
+
+  // Filter students based on search term and class filter, excluding deleted students
   const filteredStudents = students.filter(student => {
+    // Exclude students with any delete flag = true (check multiple possible formats and property names)
+    const isDeleted = 
+      student.isdelete === true || student.isdelete === "true" || student.isdelete === 1 ||
+      student.isDeleted === true || student.isDeleted === "true" || student.isDeleted === 1 ||
+      student.isdeleted === true || student.isdeleted === "true" || student.isdeleted === 1;
+    
+    if (isDeleted) {
+      return false;
+    }
+
     const matchesSearch =
       student.fullname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.studentCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -403,10 +421,10 @@ const StudentManagement = () => {
     return matchesSearch && matchesClass;
   });
 
-  // Get unique classes for filter
+  // Get unique classes for filter (only from non-deleted students)
   const uniqueClasses = [
     ...new Set(
-      students.map(
+      filteredStudents.map(
         student => student.classname || student.className || 'Không xác định'
       )
     ),
@@ -446,7 +464,7 @@ const StudentManagement = () => {
         <div className="stat-card">
           <div className="stat-icon">👨‍🎓</div>
           <div className="stat-content">
-            <h3>{students.length}</h3>
+            <h3>{filteredStudents.length}</h3>
             <p>Tổng học sinh</p>
           </div>
         </div>
@@ -460,11 +478,13 @@ const StudentManagement = () => {
         <div className="stat-card">
           <div className="stat-icon">👨‍👩‍👧‍👦</div>
           <div className="stat-content">
-            <h3>{new Set(students.map(s => s.parent?.parentid)).size}</h3>
+            <h3>{new Set(filteredStudents.map(s => s.parent?.parentid)).size}</h3>
             <p>Phụ huynh</p>
           </div>
         </div>
       </div>
+
+
 
       {/* Filters */}
       <div className="filters-section">
@@ -1533,9 +1553,7 @@ const EditStudentForm = ({
 
   // Function to find class ID by class name
   const findClassIdByName = (className) => {
-    console.log('Finding class ID for:', className);
     const foundClass = classOptions.find(cls => cls.name === className);
-    console.log('Found class:', foundClass);
     return foundClass ? foundClass.id : '';
   };
 
@@ -1557,14 +1575,9 @@ const EditStudentForm = ({
     dob: student?.dob || '',
   });
 
-  // Debug: Log initial form data
-  useEffect(() => {
-    console.log('Initial form data:', formData);
-    console.log('Student data:', student);
-  }, [student]);
+
 
   const handleInputChange = (field, value) => {
-    console.log('Form field changed:', field, 'Value:', value);
     setFormData(prev => ({
       ...prev,
       [field]: value,
@@ -1580,7 +1593,6 @@ const EditStudentForm = ({
       return;
     }
     
-    console.log('Submitting form data:', formData);
     onUpdate(formData);
   };
 
