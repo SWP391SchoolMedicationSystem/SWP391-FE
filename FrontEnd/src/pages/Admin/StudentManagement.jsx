@@ -282,20 +282,40 @@ const StudentManagement = () => {
     setEditSuccess('');
 
     try {
+      // Format date properly (convert from MM/DD/YYYY to YYYY-MM-DD)
+      const formatDate = (dateString) => {
+        if (!dateString) return '';
+        // If already in YYYY-MM-DD format, return as is
+        if (dateString.includes('-') && dateString.length === 10) {
+          return dateString;
+        }
+        // Convert from MM/DD/YYYY to YYYY-MM-DD
+        const parts = dateString.split('/');
+        if (parts.length === 3) {
+          return `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+        }
+        return dateString;
+      };
+
       const requestData = {
         id: editingStudent.studentId,
-        studentCode: updatedData.studentCode,
         fullname: updatedData.fullname,
         age: parseInt(updatedData.age),
         bloodType: updatedData.bloodType,
         gender: updatedData.gender === 'true' || updatedData.gender === true,
         classid: parseInt(updatedData.classid),
-        parentid: editingStudent.parent?.parentid || 0,
-        dob: updatedData.dob,
+        parentid: editingStudent.parent?.parentid || editingStudent.parent?.parentId || 1,
+        dob: formatDate(updatedData.dob),
         updatedAt: new Date().toISOString().split('T')[0],
       };
 
       console.log('📤 Update student request:', requestData);
+      
+      // Validate required fields
+      if (!requestData.fullname || !requestData.age || !requestData.bloodType || !requestData.classid) {
+        setEditError('Vui lòng điền đầy đủ thông tin bắt buộc');
+        return;
+      }
 
       const response = await fetch(
         'https://api-schoolhealth.purintech.id.vn/api/Student/UpdateStudent',
@@ -319,9 +339,21 @@ const StudentManagement = () => {
       } else {
         const errorData = await response.json();
         console.error('❌ Update student error:', errorData);
-        setEditError(
-          errorData.message || 'Có lỗi xảy ra khi cập nhật học sinh'
-        );
+        
+        // Show detailed validation errors if available
+        let errorMessage = 'Có lỗi xảy ra khi cập nhật học sinh';
+        if (errorData.errors) {
+          const validationErrors = Object.entries(errorData.errors)
+            .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+            .join('\n');
+          errorMessage = `Lỗi validation:\n${validationErrors}`;
+        } else if (errorData.title) {
+          errorMessage = errorData.title;
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+        
+        setEditError(errorMessage);
       }
     } catch (error) {
       console.error('❌ Update student error:', error);
@@ -618,6 +650,11 @@ const StudentManagement = () => {
           maxWidth="md"
           fullWidth
           style={{ zIndex: 9999 }}
+          PaperProps={{
+            style: {
+              zIndex: 9999
+            }
+          }}
         >
           <DialogTitle>
             <div className="modal-header">
@@ -1482,16 +1519,6 @@ const EditStudentForm = ({
   error,
   success,
 }) => {
-  const [formData, setFormData] = useState({
-    studentCode: student?.studentCode || '',
-    fullname: student?.fullname || '',
-    age: student?.age || '',
-    bloodType: student?.bloodType || '',
-    gender: student?.gender || false,
-    classid: student?.classid || 0,
-    dob: student?.dob || '',
-  });
-
   // Mock class data - in real app, this should come from API
   const classOptions = [
     { id: 1, name: 'Lớp Mầm A' },
@@ -1500,9 +1527,44 @@ const EditStudentForm = ({
     { id: 4, name: 'Lớp Chồi B' },
     { id: 5, name: 'Lớp Lá A' },
     { id: 6, name: 'Lớp Lá B' },
+    { id: 7, name: 'Lớp Lá C' },
+    { id: 8, name: 'Lớp Lá D' },
   ];
 
+  // Function to find class ID by class name
+  const findClassIdByName = (className) => {
+    console.log('Finding class ID for:', className);
+    const foundClass = classOptions.find(cls => cls.name === className);
+    console.log('Found class:', foundClass);
+    return foundClass ? foundClass.id : '';
+  };
+
+  // Initialize form data with proper class mapping
+  const getInitialClassId = () => {
+    if (student?.classid) return student.classid;
+    if (student?.classId) return student.classId;
+    if (student?.classname) return findClassIdByName(student.classname);
+    return '';
+  };
+
+  const [formData, setFormData] = useState({
+    studentCode: student?.studentCode || '',
+    fullname: student?.fullname || '',
+    age: student?.age || '',
+    bloodType: student?.bloodType || '',
+    gender: student?.gender || false,
+    classid: getInitialClassId(),
+    dob: student?.dob || '',
+  });
+
+  // Debug: Log initial form data
+  useEffect(() => {
+    console.log('Initial form data:', formData);
+    console.log('Student data:', student);
+  }, [student]);
+
   const handleInputChange = (field, value) => {
+    console.log('Form field changed:', field, 'Value:', value);
     setFormData(prev => ({
       ...prev,
       [field]: value,
@@ -1511,6 +1573,14 @@ const EditStudentForm = ({
 
   const handleSubmit = e => {
     e.preventDefault();
+    
+    // Validate required fields
+    if (!formData.classid) {
+      alert('Vui lòng chọn lớp cho học sinh');
+      return;
+    }
+    
+    console.log('Submitting form data:', formData);
     onUpdate(formData);
   };
 
@@ -1565,12 +1635,24 @@ const EditStudentForm = ({
 
         {/* Blood Type */}
         <FormControl fullWidth disabled={loading}>
-          <InputLabel>Nhóm máu</InputLabel>
+          <InputLabel id="blood-type-label">Nhóm máu</InputLabel>
           <Select
+            labelId="blood-type-label"
             value={formData.bloodType}
             onChange={e => handleInputChange('bloodType', e.target.value)}
             label="Nhóm máu"
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 300,
+                  zIndex: 9999
+                }
+              }
+            }}
           >
+            <MenuItem value="" disabled>
+              Chọn nhóm máu
+            </MenuItem>
             <MenuItem value="A+">A+</MenuItem>
             <MenuItem value="A-">A-</MenuItem>
             <MenuItem value="B+">B+</MenuItem>
@@ -1601,12 +1683,24 @@ const EditStudentForm = ({
 
         {/* Class Name */}
         <FormControl fullWidth disabled={loading}>
-          <InputLabel>Lớp</InputLabel>
+          <InputLabel id="class-label">Lớp</InputLabel>
           <Select
+            labelId="class-label"
             value={formData.classid}
             onChange={e => handleInputChange('classid', e.target.value)}
             label="Lớp"
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 300,
+                  zIndex: 9999
+                }
+              }
+            }}
           >
+            <MenuItem value="" disabled>
+              Chọn lớp
+            </MenuItem>
             {classOptions.map(cls => (
               <MenuItem key={cls.id} value={cls.id}>
                 {cls.name}
