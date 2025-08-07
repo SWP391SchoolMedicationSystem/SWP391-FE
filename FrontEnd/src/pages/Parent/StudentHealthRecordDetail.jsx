@@ -793,8 +793,7 @@ const StudentHealthRecordDetail = () => {
     );
   }
 
-  const vaccinationCount = healthRecord.vaccinationRecords?.length || 0;
-  const healthCheckCount = healthRecord.healthChecks?.length || 0;
+
 
   return (
     <div className="student-health-record-detail">
@@ -948,123 +947,8 @@ const StudentHealthRecordDetail = () => {
         </div>
       </div>
 
-      {/* Row 3: Vaccination History */}
-      <div className="section-card">
-        <div className="section-header">
-          <h2>
-            <span className="material-icons">vaccines</span>
-            Lịch sử tiêm chủng
-          </h2>
-          <span className="count-badge">{vaccinationCount} lần tiêm</span>
-        </div>
-        {vaccinationCount > 0 ? (
-          <div className="record-grid">
-            {healthRecord.vaccinationRecords.map((vaccination, index) => (
-              <div key={index} className="record-card">
-                <div className="record-header">
-                  <h3 className="record-title">{vaccination.vaccinename}</h3>
-                  <span className="vaccination-status completed">Đã tiêm</span>
-                </div>
-                <div className="record-info">
-                  <div className="record-info-item">
-                    <div className="record-info-label">Ngày tiêm</div>
-                    <div className="record-info-value">
-                      {new Date(vaccination.vaccinationdate).toLocaleDateString(
-                        'vi-VN'
-                      )}
-                    </div>
-                  </div>
-                  <div className="record-info-item">
-                    <div className="record-info-label">Số liều</div>
-                    <div className="record-info-value">
-                      Liều {vaccination.dosenumber}
-                    </div>
-                  </div>
-                  <div className="record-info-item">
-                    <div className="record-info-label">Mã sự kiện</div>
-                    <div className="record-info-value">
-                      #{vaccination.vaccinationeventid}
-                    </div>
-                  </div>
-                </div>
-                {vaccination.notes && (
-                  <div className="notes-section">
-                    <div className="notes-label">Ghi chú</div>
-                    <div className="notes-text">{vaccination.notes}</div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="empty-state">
-            <span className="material-icons">vaccines</span>
-            <p>Chưa có lịch sử tiêm chủng</p>
-          </div>
-        )}
-      </div>
 
-      {/* Row 4: Health Checks */}
-      <div className="section-card">
-        <div className="section-header">
-          <h2>
-            <span className="material-icons">assessment</span>
-            Lịch sử khám sức khỏe
-          </h2>
-          <span className="count-badge">{healthCheckCount} lần khám</span>
-        </div>
-        {healthCheckCount > 0 ? (
-          <div className="record-grid">
-            {healthRecord.healthChecks.map((check, index) => (
-              <div key={index} className="record-card">
-                <div className="record-header">
-                  <h3 className="record-title">
-                    Khám sức khỏe #{check.checkid}
-                  </h3>
-                  <span className="record-info-value">
-                    {new Date(check.checkdate).toLocaleDateString('vi-VN')}
-                  </span>
-                </div>
-
-                <div className="health-metrics">
-                  <div className="metric-card height">
-                    <div className="metric-label">Chiều cao</div>
-                    <div className="metric-value">{check.height} m</div>
-                  </div>
-                  <div className="metric-card weight">
-                    <div className="metric-label">Cân nặng</div>
-                    <div className="metric-value">{check.weight} kg</div>
-                  </div>
-                  <div className="metric-card left-vision">
-                    <div className="metric-label">Thị lực trái</div>
-                    <div className="metric-value">{check.visionleft}/10</div>
-                  </div>
-                  <div className="metric-card right-vision">
-                    <div className="metric-label">Thị lực phải</div>
-                    <div className="metric-value">{check.visionright}/10</div>
-                  </div>
-                  <div className="metric-card blood-pressure">
-                    <div className="metric-label">Huyết áp</div>
-                    <div className="metric-value">{check.bloodpressure}</div>
-                  </div>
-                </div>
-
-                {check.notes && (
-                  <div className="notes-section">
-                    <div className="notes-label">Ghi chú</div>
-                    <div className="notes-text">{check.notes}</div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="empty-state">
-            <span className="material-icons">assessment</span>
-            <p>Chưa có lịch sử khám sức khỏe</p>
-          </div>
-        )}
-      </div>
+ 
 
       {/* Back Button */}
       <div className="back-button-container">
