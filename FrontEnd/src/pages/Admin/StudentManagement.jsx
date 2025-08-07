@@ -90,7 +90,24 @@ const StudentManagement = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        setStudents(data);
+        console.log('📊 API Response - Raw data:', data);
+        
+        // Handle different possible API response structures
+        let studentsData = data;
+        if (data.data && Array.isArray(data.data)) {
+          studentsData = data.data;
+          console.log('📊 API Response - Data wrapped in .data property');
+        } else if (data.result && Array.isArray(data.result)) {
+          studentsData = data.result;
+          console.log('📊 API Response - Data wrapped in .result property');
+        } else if (data.items && Array.isArray(data.items)) {
+          studentsData = data.items;
+          console.log('📊 API Response - Data wrapped in .items property');
+        }
+        
+        console.log('📊 API Response - Final students data:', studentsData);
+        console.log('📊 API Response - Sample student:', studentsData[0]);
+        setStudents(studentsData);
       } else {
         console.error('Failed to fetch students');
         setStudents([]);
@@ -387,8 +404,42 @@ const StudentManagement = () => {
     }
   };
 
-  // Filter students based on search term and class filter
+  // Debug: Log students with various delete flags to understand the data structure
+  console.log('🔍 All students:', students);
+  console.log('🔍 Students with isdelete:', students.filter(s => s.isdelete !== undefined));
+  console.log('🔍 Students with isDeleted:', students.filter(s => s.isDeleted !== undefined));
+  console.log('🔍 Students with isdeleted:', students.filter(s => s.isdeleted !== undefined));
+  console.log('🔍 Students with any delete flag = true:', students.filter(s => 
+    s.isdelete === true || s.isdelete === "true" || s.isdelete === 1 ||
+    s.isDeleted === true || s.isDeleted === "true" || s.isDeleted === 1 ||
+    s.isdeleted === true || s.isdeleted === "true" || s.isdeleted === 1
+  ));
+  
+  // Debug: Show filtering results
+  const deletedStudents = students.filter(s => 
+    s.isdelete === true || s.isdelete === "true" || s.isdelete === 1 ||
+    s.isDeleted === true || s.isDeleted === "true" || s.isDeleted === 1 ||
+    s.isdeleted === true || s.isdeleted === "true" || s.isdeleted === 1
+  );
+  console.log('🚫 Students that should be excluded:', deletedStudents.map(s => ({ name: s.fullname, deleteFlags: { isdelete: s.isdelete, isDeleted: s.isDeleted, isdeleted: s.isdeleted } })));
+
+  // Filter students based on search term and class filter, excluding deleted students
   const filteredStudents = students.filter(student => {
+    // Exclude students with any delete flag = true (check multiple possible formats and property names)
+    const isDeleted = 
+      student.isdelete === true || student.isdelete === "true" || student.isdelete === 1 ||
+      student.isDeleted === true || student.isDeleted === "true" || student.isDeleted === 1 ||
+      student.isdeleted === true || student.isdeleted === "true" || student.isdeleted === 1;
+    
+    if (isDeleted) {
+      console.log('🚫 Excluding student:', student.fullname, 'delete flags:', {
+        isdelete: student.isdelete,
+        isDeleted: student.isDeleted,
+        isdeleted: student.isdeleted
+      });
+      return false;
+    }
+
     const matchesSearch =
       student.fullname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.studentCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -403,10 +454,10 @@ const StudentManagement = () => {
     return matchesSearch && matchesClass;
   });
 
-  // Get unique classes for filter
+  // Get unique classes for filter (only from non-deleted students)
   const uniqueClasses = [
     ...new Set(
-      students.map(
+      filteredStudents.map(
         student => student.classname || student.className || 'Không xác định'
       )
     ),
@@ -446,7 +497,7 @@ const StudentManagement = () => {
         <div className="stat-card">
           <div className="stat-icon">👨‍🎓</div>
           <div className="stat-content">
-            <h3>{students.length}</h3>
+            <h3>{filteredStudents.length}</h3>
             <p>Tổng học sinh</p>
           </div>
         </div>
@@ -460,10 +511,33 @@ const StudentManagement = () => {
         <div className="stat-card">
           <div className="stat-icon">👨‍👩‍👧‍👦</div>
           <div className="stat-content">
-            <h3>{new Set(students.map(s => s.parent?.parentid)).size}</h3>
+            <h3>{new Set(filteredStudents.map(s => s.parent?.parentid)).size}</h3>
             <p>Phụ huynh</p>
           </div>
         </div>
+      </div>
+
+      {/* Debug Section - Temporary */}
+      <div style={{ 
+        backgroundColor: '#fff3cd', 
+        border: '1px solid #ffeaa7', 
+        borderRadius: '8px', 
+        padding: '12px', 
+        margin: '16px 0',
+        fontSize: '14px'
+      }}>
+        <strong>🔍 Debug Info:</strong><br/>
+        Total students from API: {students.length}<br/>
+        Students with delete flags: {students.filter(s => 
+          s.isdelete !== undefined || s.isDeleted !== undefined || s.isdeleted !== undefined
+        ).length}<br/>
+        Students marked as deleted: {students.filter(s => 
+          s.isdelete === true || s.isdelete === "true" || s.isdelete === 1 ||
+          s.isDeleted === true || s.isDeleted === "true" || s.isDeleted === 1 ||
+          s.isdeleted === true || s.isdeleted === "true" || s.isdeleted === 1
+        ).length}<br/>
+        Students after filtering: {filteredStudents.length}<br/>
+        <small>Check browser console for detailed logs</small>
       </div>
 
       {/* Filters */}
