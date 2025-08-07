@@ -212,7 +212,24 @@ const ParentAccountManagement = () => {
       alert('Tạo tài khoản phụ huynh thành công!');
     } catch (error) {
       console.error('Create failed:', error);
-      alert('Không thể tạo tài khoản phụ huynh. Vui lòng thử lại.');
+      let errorMessage = 'Không thể tạo tài khoản phụ huynh.';
+      if (error.response && error.response.data) {
+        if (error.response.data.innerMessage) {
+          errorMessage = error.response.data.innerMessage;
+        } else if (error.response.data.errors) {
+          const errorKeys = Object.keys(error.response.data.errors);
+          if (errorKeys.length > 0) {
+            errorMessage = error.response.data.errors[errorKeys[0]][0];
+          }
+        } else if (error.response.data.title) {
+          errorMessage = error.response.data.title;
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      alert('Tạo tài khoản phụ huynh thất bại: ' + errorMessage);
     }
   };
 
@@ -261,7 +278,24 @@ const ParentAccountManagement = () => {
       alert('Cập nhật thông tin phụ huynh thành công!');
     } catch (error) {
       console.error('Update failed:', error);
-      alert('Không thể cập nhật thông tin phụ huynh. Vui lòng thử lại.');
+      let errorMessage = 'Không thể cập nhật thông tin phụ huynh.';
+      if (error.response && error.response.data) {
+        if (error.response.data.innerMessage) {
+          errorMessage = error.response.data.innerMessage;
+        } else if (error.response.data.errors) {
+          const errorKeys = Object.keys(error.response.data.errors);
+          if (errorKeys.length > 0) {
+            errorMessage = error.response.data.errors[errorKeys[0]][0];
+          }
+        } else if (error.response.data.title) {
+          errorMessage = error.response.data.title;
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      alert('Cập nhật thông tin phụ huynh thất bại: ' + errorMessage);
     }
   };
 

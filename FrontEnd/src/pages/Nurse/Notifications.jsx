@@ -285,7 +285,7 @@ const Notifications = () => {
           });
 
           // Listen for staff-specific notifications
-          signalRConnection.on('ReceiveStaffNotification', notification => {
+          signalRConnection.on('ReceiveNotification', notification => {
             console.log('👩‍⚕️ Nurse notification:', notification);
 
             const newNotification = {

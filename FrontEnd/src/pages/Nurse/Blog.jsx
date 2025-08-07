@@ -215,7 +215,7 @@ function Blog() {
         alert('Đã xóa blog thành công!');
         refetch();
       } catch (error) {
-        console.error('Error deleting blog:', error);
+        console.error('Error deleting blog:', error.response.data.message);
         alert('Có lỗi xảy ra khi xóa blog.');
       }
     }
