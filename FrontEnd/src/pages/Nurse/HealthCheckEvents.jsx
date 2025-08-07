@@ -31,15 +31,9 @@ const HealthCheckEvents = () => {
       setLoading(true);
       const eventsData = await healthCheckEventService.getAllHealthCheckEvents();
       
-      console.log('All events from API:', eventsData);
-      
       // Filter out deleted events and sort by date (newest first)
-      console.log('🔍 Raw events from API:', eventsData);
-      console.log('🔍 Events with isdeleted=true:', (eventsData || []).filter(event => event.isdeleted));
-      
       const filteredEvents = (eventsData || []).filter(event => {
         const isDeleted = event.isdeleted === true || event.isdeleted === 'true';
-        console.log(`🔍 Event ${event.healthcheckeventID}: isdeleted=${event.isdeleted} (${typeof event.isdeleted}), filtered=${!isDeleted}`);
         return !isDeleted;
       });
       
@@ -47,7 +41,6 @@ const HealthCheckEvents = () => {
         return new Date(b.eventdate) - new Date(a.eventdate);
       });
       
-      console.log('Sorted events to display:', sortedEvents);
       setEvents(sortedEvents);
     } catch (error) {
       console.error('Error fetching data:', error);
