@@ -285,44 +285,44 @@ const Notifications = () => {
           });
 
           // Listen for staff-specific notifications
-          signalRConnection.on('ReceiveNotification', notification => {
-            console.log('👩‍⚕️ Nurse notification:', notification);
+          // signalRConnection.on('ReceiveNotification', notification => {
+          //   console.log('👩‍⚕️ Nurse notification:', notification);
 
-            const newNotification = {
-              id: Date.now(),
-              title:
-                notification.Title ||
-                notification.title ||
-                'Thông báo nhân viên',
-              message: notification.Message || notification.message || '',
-              type: notification.Type || 'general',
-              targetType: 'staff',
-              createdAt: new Date().toISOString(),
-              createdBy: 'Hệ thống',
-              isNew: true,
-            };
+          //   const newNotification = {
+          //     id: Date.now(),
+          //     title:
+          //       notification.Title ||
+          //       notification.title ||
+          //       'Thông báo nhân viên',
+          //     message: notification.Message || notification.message || '',
+          //     type: notification.Type || 'general',
+          //     targetType: 'staff',
+          //     createdAt: new Date().toISOString(),
+          //     createdBy: 'Hệ thống',
+          //     isNew: true,
+          //   };
 
-            setRealTimeNotifications(prev => [newNotification, ...prev]);
+          //   setRealTimeNotifications(prev => [newNotification, ...prev]);
 
-            // Update notification count in layout
-            if (window.updateNurseNotificationCount) {
-              window.updateNurseNotificationCount.increment();
-            }
+          //   // Update notification count in layout
+          //   if (window.updateNurseNotificationCount) {
+          //     window.updateNurseNotificationCount.increment();
+          //   }
 
-            // Show browser notification
-            if (Notification.permission === 'granted') {
-              new Notification(newNotification.title, {
-                body: newNotification.message,
-                icon: '/favicon.ico',
-                tag: 'nurse-notification',
-              });
-            }
+          //   // Show browser notification
+          //   if (Notification.permission === 'granted') {
+          //     new Notification(newNotification.title, {
+          //       body: newNotification.message,
+          //       icon: '/favicon.ico',
+          //       tag: 'nurse-notification',
+          //     });
+          //   }
 
-            // Refresh notifications
-            setTimeout(() => {
-              fetchNotifications();
-            }, 1000);
-          });
+          //   // Refresh notifications
+          //   setTimeout(() => {
+          //     fetchNotifications();
+          //   }, 1000);
+          // });
 
           // Listen for errors
           signalRConnection.on('ReceiveError', errorMsg => {
