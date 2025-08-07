@@ -484,23 +484,22 @@ const StudentManagement = () => {
             <p>Đang tải danh sách học sinh...</p>
           </div>
         ) : (
-          <TableContainer component={Paper} className="students-table">
-            <Table>
+          <TableContainer component={Paper} className="students-table" style={{ overflow: 'visible' }}>
+            <Table style={{ minWidth: 1000 }}>
               <TableHead>
                 <TableRow>
-                  <TableCell>Mã HS</TableCell>
-                  <TableCell>Họ và tên</TableCell>
-                  <TableCell>Lớp</TableCell>
-                  <TableCell>Phụ huynh</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Số điện thoại</TableCell>
-                  <TableCell>Trạng thái</TableCell>
-                  <TableCell>Thao tác</TableCell>
+                  <TableCell style={{ minWidth: '100px' }}>Mã HS</TableCell>
+                  <TableCell style={{ minWidth: '150px' }}>Họ và tên</TableCell>
+                  <TableCell style={{ minWidth: '120px' }}>Lớp</TableCell>
+                  <TableCell style={{ minWidth: '140px' }}>Phụ huynh</TableCell>
+                  <TableCell style={{ minWidth: '160px' }}>Email</TableCell>
+                  <TableCell style={{ minWidth: '100px' }}>Trạng thái</TableCell>
+                  <TableCell style={{ minWidth: '120px' }}>Thao tác</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {filteredStudents.map(student => (
-                  <TableRow key={student.studentId} className="student-row">
+                  <TableRow key={student.studentId} className="student-row" style={{ position: 'relative' }}>
                     <TableCell>
                       <div className="student-id">
                         <School className="student-icon" />
@@ -539,37 +538,62 @@ const StudentManagement = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="contact-info">
-                        <Phone className="contact-icon" />
-                        {student.parent?.phone || 'N/A'}
-                      </div>
-                    </TableCell>
-                    <TableCell>
                       <Chip label="Hoạt động" color="success" size="small" />
                     </TableCell>
                     <TableCell>
-                      <div className="action-buttons">
+                      <div style={{ 
+                        display: 'flex', 
+                        gap: '4px', 
+                        justifyContent: 'center', 
+                        alignItems: 'center'
+                      }}>
                         <IconButton
                           onClick={() => handleViewStudent(student)}
-                          className="btn-view"
                           title="Xem chi tiết"
-                          sx={{ color: '#2196f3' }}
+                          size="small"
+                          sx={{ 
+                            backgroundColor: '#2196f3',
+                            color: 'white',
+                            width: '32px',
+                            height: '32px',
+                            '&:hover': {
+                              backgroundColor: '#1976d2'
+                            }
+                          }}
                         >
-                          <Visibility />
+                          <Visibility fontSize="small" />
                         </IconButton>
                         <IconButton
                           onClick={() => handleEditStudent(student)}
-                          className="btn-edit"
                           title="Chỉnh sửa"
+                          size="small"
+                          sx={{ 
+                            backgroundColor: '#f59e0b',
+                            color: 'white',
+                            width: '32px',
+                            height: '32px',
+                            '&:hover': {
+                              backgroundColor: '#d97706'
+                            }
+                          }}
                         >
-                          <Edit />
+                          <Edit fontSize="small" />
                         </IconButton>
                         <IconButton
                           onClick={() => handleDeleteStudent(student)}
-                          className="btn-delete"
                           title="Xóa"
+                          size="small"
+                          sx={{ 
+                            backgroundColor: '#ef4444',
+                            color: 'white',
+                            width: '32px',
+                            height: '32px',
+                            '&:hover': {
+                              backgroundColor: '#dc2626'
+                            }
+                          }}
                         >
-                          <Delete />
+                          <Delete fontSize="small" />
                         </IconButton>
                       </div>
                     </TableCell>
@@ -586,12 +610,14 @@ const StudentManagement = () => {
         open={showEditModal}
         onClose={() => setShowEditModal(false)}
         className="edit-modal"
+        style={{ zIndex: 9999 }}
       >
         <Dialog
           open={showEditModal}
           onClose={() => setShowEditModal(false)}
           maxWidth="md"
           fullWidth
+          style={{ zIndex: 9999 }}
         >
           <DialogTitle>
             <div className="modal-header">
@@ -627,7 +653,7 @@ const StudentManagement = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 1000,
+            zIndex: 9999,
             padding: '20px',
           }}
           onClick={() => setShowDetailModal(false)}
@@ -1316,6 +1342,7 @@ const StudentManagement = () => {
           setImportFile(null);
         }}
         className="import-modal"
+        style={{ zIndex: 9999 }}
       >
         <Dialog
           open={showImportModal}
@@ -1327,6 +1354,7 @@ const StudentManagement = () => {
           }}
           maxWidth="sm"
           fullWidth
+          style={{ zIndex: 9999 }}
         >
           <DialogTitle>
             <div className="modal-header">
