@@ -90,23 +90,17 @@ const StudentManagement = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        console.log('📊 API Response - Raw data:', data);
         
         // Handle different possible API response structures
         let studentsData = data;
         if (data.data && Array.isArray(data.data)) {
           studentsData = data.data;
-          console.log('📊 API Response - Data wrapped in .data property');
         } else if (data.result && Array.isArray(data.result)) {
           studentsData = data.result;
-          console.log('📊 API Response - Data wrapped in .result property');
         } else if (data.items && Array.isArray(data.items)) {
           studentsData = data.items;
-          console.log('📊 API Response - Data wrapped in .items property');
         }
         
-        console.log('📊 API Response - Final students data:', studentsData);
-        console.log('📊 API Response - Sample student:', studentsData[0]);
         setStudents(studentsData);
       } else {
         console.error('Failed to fetch students');
@@ -225,11 +219,8 @@ const StudentManagement = () => {
         }
       );
 
-      console.log('📊 Import response status:', response.status);
-
       if (response.ok) {
         const result = await response.json();
-        console.log('📊 Import result:', result);
 
         const successMessage =
           result.length > 0
@@ -247,7 +238,6 @@ const StudentManagement = () => {
 
         try {
           const errorData = await response.json();
-          console.log('📊 Import error data:', errorData);
 
           if (errorData.message) {
             errorMessage = `❌ ${errorData.message}`;
@@ -326,7 +316,7 @@ const StudentManagement = () => {
         updatedAt: new Date().toISOString().split('T')[0],
       };
 
-      console.log('📤 Update student request:', requestData);
+
       
       // Validate required fields
       if (!requestData.fullname || !requestData.age || !requestData.bloodType || !requestData.classid) {
@@ -348,7 +338,6 @@ const StudentManagement = () => {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('📊 Update student response:', result);
         setEditSuccess('Cập nhật học sinh thành công!');
         setShowEditModal(false);
         // Refresh student list
@@ -404,24 +393,7 @@ const StudentManagement = () => {
     }
   };
 
-  // Debug: Log students with various delete flags to understand the data structure
-  console.log('🔍 All students:', students);
-  console.log('🔍 Students with isdelete:', students.filter(s => s.isdelete !== undefined));
-  console.log('🔍 Students with isDeleted:', students.filter(s => s.isDeleted !== undefined));
-  console.log('🔍 Students with isdeleted:', students.filter(s => s.isdeleted !== undefined));
-  console.log('🔍 Students with any delete flag = true:', students.filter(s => 
-    s.isdelete === true || s.isdelete === "true" || s.isdelete === 1 ||
-    s.isDeleted === true || s.isDeleted === "true" || s.isDeleted === 1 ||
-    s.isdeleted === true || s.isdeleted === "true" || s.isdeleted === 1
-  ));
-  
-  // Debug: Show filtering results
-  const deletedStudents = students.filter(s => 
-    s.isdelete === true || s.isdelete === "true" || s.isdelete === 1 ||
-    s.isDeleted === true || s.isDeleted === "true" || s.isDeleted === 1 ||
-    s.isdeleted === true || s.isdeleted === "true" || s.isdeleted === 1
-  );
-  console.log('🚫 Students that should be excluded:', deletedStudents.map(s => ({ name: s.fullname, deleteFlags: { isdelete: s.isdelete, isDeleted: s.isDeleted, isdeleted: s.isdeleted } })));
+
 
   // Filter students based on search term and class filter, excluding deleted students
   const filteredStudents = students.filter(student => {
@@ -432,11 +404,6 @@ const StudentManagement = () => {
       student.isdeleted === true || student.isdeleted === "true" || student.isdeleted === 1;
     
     if (isDeleted) {
-      console.log('🚫 Excluding student:', student.fullname, 'delete flags:', {
-        isdelete: student.isdelete,
-        isDeleted: student.isDeleted,
-        isdeleted: student.isdeleted
-      });
       return false;
     }
 
@@ -517,28 +484,7 @@ const StudentManagement = () => {
         </div>
       </div>
 
-      {/* Debug Section - Temporary */}
-      <div style={{ 
-        backgroundColor: '#fff3cd', 
-        border: '1px solid #ffeaa7', 
-        borderRadius: '8px', 
-        padding: '12px', 
-        margin: '16px 0',
-        fontSize: '14px'
-      }}>
-        <strong>🔍 Debug Info:</strong><br/>
-        Total students from API: {students.length}<br/>
-        Students with delete flags: {students.filter(s => 
-          s.isdelete !== undefined || s.isDeleted !== undefined || s.isdeleted !== undefined
-        ).length}<br/>
-        Students marked as deleted: {students.filter(s => 
-          s.isdelete === true || s.isdelete === "true" || s.isdelete === 1 ||
-          s.isDeleted === true || s.isDeleted === "true" || s.isDeleted === 1 ||
-          s.isdeleted === true || s.isdeleted === "true" || s.isdeleted === 1
-        ).length}<br/>
-        Students after filtering: {filteredStudents.length}<br/>
-        <small>Check browser console for detailed logs</small>
-      </div>
+
 
       {/* Filters */}
       <div className="filters-section">
@@ -1607,9 +1553,7 @@ const EditStudentForm = ({
 
   // Function to find class ID by class name
   const findClassIdByName = (className) => {
-    console.log('Finding class ID for:', className);
     const foundClass = classOptions.find(cls => cls.name === className);
-    console.log('Found class:', foundClass);
     return foundClass ? foundClass.id : '';
   };
 
@@ -1631,14 +1575,9 @@ const EditStudentForm = ({
     dob: student?.dob || '',
   });
 
-  // Debug: Log initial form data
-  useEffect(() => {
-    console.log('Initial form data:', formData);
-    console.log('Student data:', student);
-  }, [student]);
+
 
   const handleInputChange = (field, value) => {
-    console.log('Form field changed:', field, 'Value:', value);
     setFormData(prev => ({
       ...prev,
       [field]: value,
@@ -1654,7 +1593,6 @@ const EditStudentForm = ({
       return;
     }
     
-    console.log('Submitting form data:', formData);
     onUpdate(formData);
   };
 
